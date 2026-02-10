@@ -1,0 +1,265 @@
+diff --git a/src/unified_llm_w4a16_hetero/unified_llm_w4a16.cpp b/src/unified_llm_w4a16_hetero/unified_llm_w4a16.cpp
+index 65c5ffa..fcbaf4a 100644
+--- a/src/unified_llm_w4a16_hetero/unified_llm_w4a16.cpp
++++ b/src/unified_llm_w4a16_hetero/unified_llm_w4a16.cpp
+@@ -1156,23 +1156,39 @@ torch::Tensor UnifiedLLMW4A16Impl::forward(torch::Tensor x, int64_t start_pos) {
+ }
+ 
+ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start_pos) {
++    auto time_op = [](const std::string &name, std::function<void()> op) {
++        hipDeviceSynchronize();
++        auto t0 = std::chrono::high_resolution_clock::now();
++        op();
++        hipDeviceSynchronize();
++        auto t1 = std::chrono::high_resolution_clock::now();
++        double ms = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;
++        if (ms > 0.001)
++            std::cout << "Node: " << std::left << std::setw(20) << name << " | time = " << std::fixed << std::setprecision(3)
++                      << std::setw(8) << ms << " ms" << std::endl;
++    };
++
+     int64_t bsz = x.size(0);
+     int64_t seq_len = x.size(1);
+ 
+     // Embedding
+-    x = token_embedding(x);
++    time_op("token_embedding", [&]() { x = token_embedding(x); });
+ 
+     // Compute RoPE frequencies
+-    auto freqs_cis = compute_rope_freqs(seq_len, start_pos);
++    torch::Tensor freqs_cis;
++    time_op("compute_rope_freqs", [&]() { freqs_cis = compute_rope_freqs(seq_len, start_pos); });
+ 
+     // Create causal mask
+     torch::Tensor mask;
+     if (seq_len > 1) {
+-        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
+-                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+-        mask = torch::triu(mask, 1);
+-        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+-        mask = mask.to(x.dtype());
++        time_op("create_mask", [&]() {
++            mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
++                               torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
++            mask = torch::triu(mask, 1);
++            mask =
++                torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
++            mask = mask.to(x.dtype());
++        });
+     }
+ 
+     // Forward through layers
+@@ -1190,49 +1206,58 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
+     for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+         // Pre-attention norm (write to norm_buffer)
+         // Use sliced buffer to avoid allocation
+-        input_norms[i]->forward_out(normed, x);
++        time_op("input_norm", [&]() { input_norms[i]->forward_out(normed, x); });
+ 
+         // Attention
+         // Async calls for Q, K, V
+-        auto f_q = q_layers[i]->forward(q_buf, normed, "q");
+-        auto f_k = k_layers[i]->forward(k_buf, normed, "k");
+-        auto f_v = v_layers[i]->forward(v_buf, normed, "v");
+-
+-        if (f_q.valid())
+-            f_q.wait();
+-        if (f_k.valid())
+-            f_k.wait();
++        torch::Tensor q, k, v;
++        time_op("q_proj", [&]() {
++            auto f_q = q_layers[i]->forward(q_buf, normed, "q");
++            if (f_q.valid())
++                f_q.wait();
++        });
++        time_op("k_proj", [&]() {
++            auto f_k = k_layers[i]->forward(k_buf, normed, "k");
++            if (f_k.valid())
++                f_k.wait();
++        });
++        time_op("v_proj", [&]() {
++            auto f_v = v_layers[i]->forward(v_buf, normed, "v");
++            if (f_v.valid())
++                f_v.wait();
++        });
+ 
+         // Slice padded buffers to valid dimensions before usage
+-        auto q = q_buf.slice(-1, 0, num_attention_heads_ * head_dim_);
+-        auto k = k_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
++        q = q_buf.slice(-1, 0, num_attention_heads_ * head_dim_);
++        k = k_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
+ 
+         // Reshape
+         q = q.view({bsz, seq_len, num_attention_heads_, head_dim_});
+         k = k.view({bsz, seq_len, num_key_value_heads_, head_dim_});
+ 
+         // Apply RoPE
+-        auto rope_result = apply_rotary_emb(q, k, freqs_cis);
+-        q = rope_result.first;
+-        k = rope_result.second;
+-
+-        if (f_v.valid())
+-            f_v.wait();
++        time_op("rope", [&]() {
++            auto rope_result = apply_rotary_emb(q, k, freqs_cis);
++            q = rope_result.first;
++            k = rope_result.second;
++        });
+ 
+-        auto v = v_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
++        v = v_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
+         v = v.view({bsz, seq_len, num_key_value_heads_, head_dim_});
+ 
+         // Update KV cache
+-        // Reshape K/V to [B, H, S, D] for storage
+-        auto k_transposed = k.transpose(1, 2);
+-        auto v_transposed = v.transpose(1, 2);
++        time_op("kv_cache_update", [&]() {
++            // Reshape K/V to [B, H, S, D] for storage
++            auto k_transposed = k.transpose(1, 2);
++            auto v_transposed = v.transpose(1, 2);
+ 
+-        caches_k[i].narrow(0, 0, bsz).narrow(2, start_pos, seq_len).copy_(k_transposed);
+-        caches_v[i].narrow(0, 0, bsz).narrow(2, start_pos, seq_len).copy_(v_transposed);
++            caches_k[i].narrow(0, 0, bsz).narrow(2, start_pos, seq_len).copy_(k_transposed);
++            caches_v[i].narrow(0, 0, bsz).narrow(2, start_pos, seq_len).copy_(v_transposed);
+ 
+-        // Retrieve full cache in [B, H, S, D]
+-        k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+-        v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
++            // Retrieve full cache in [B, H, S, D]
++            k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
++            v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
++        });
+ 
+         // Expand KV heads for GQA (8 KV heads -> 32 Q heads)
+         // For SDPA: Skip repeat during decoding (start_pos > 0) to use native GQA.
+@@ -1252,14 +1277,14 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
+         // k, v are already [B, H, S, D]
+ 
+         // Scaled dot-product attention
+-        // Scaled dot-product attention
++        torch::Tensor attn_output;
++        time_op("attention", [&]() {
+ #if LLAMA_USE_SCALED_ATTENTION == 1
+-        // PyTorch SDPA path
+-        auto attn_output = [&]() {
++            // PyTorch SDPA path
+             if (start_pos == 0 && seq_len > 1) {
+                 // First prompt pass: use native causal optimization
+                 // attn_mask: c10::nullopt, dropout_p: 0.0, is_causal: true, scale: std::nullopt, enable_gqa: false
+-                return torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
++                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+             } else {
+                 // Decoding or subsequent chunks: use explicit mask if defined
+                 c10::optional<torch::Tensor> opt_mask;
+@@ -1268,19 +1293,20 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
+                     opt_mask = mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                 }
+                 // attn_mask: opt_mask, dropout_p: 0.0, is_causal: false, scale: std::nullopt, enable_gqa: true
+-                return torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
++                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
+             }
+-        }();
+ #else
+-        auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
++            auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
+ 
+-        if (mask.defined() && mask.numel() > 0) {
+-            att = att + mask.to(q.dtype());
+-        }
++            if (mask.defined() && mask.numel() > 0) {
++                att = att + mask.to(q.dtype());
++            }
+ 
+-        auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
+-        auto attn_output = torch::matmul(attn_weights, v);
++            auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
++            attn_output = torch::matmul(attn_weights, v);
+ #endif
++        });
++
+         // Reshape and output projection
+         attn_output = attn_output.transpose(1, 2).contiguous().view({bsz, seq_len, hidden_size_});
+ 
+@@ -1292,10 +1318,13 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
+         attn_out_buf.slice(-1, 0, hidden_size_).copy_(attn_output);
+ 
+         auto attn_out_buf_proj = attn_output_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+-        // Input to o_proj: Slice to Padded K
+-        auto f_o = o_layers[i]->forward(attn_proj_buf, attn_out_buf_proj.slice(-1, 0, pad_k(hidden_size_)), "o");
+-        if (f_o.valid())
+-            f_o.wait();
++
++        time_op("o_proj", [&]() {
++            // Input to o_proj: Slice to Padded K
++            auto f_o = o_layers[i]->forward(attn_proj_buf, attn_out_buf_proj.slice(-1, 0, pad_k(hidden_size_)), "o");
++            if (f_o.valid())
++                f_o.wait();
++        });
+ 
+         // Residual connection: x = x + attn_output
+         // x points to x_buf. We add attn_proj_buf to it in-place.
+@@ -1304,31 +1333,39 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
+         // MLP (GeGLU)
+         // Post-attention        // RMSNorm (write to norm_buffer)
+         // Slice x and normed to logical size to ensure correct Mean calculation
+-        post_attn_norms[i]->forward_out(normed.slice(-1, 0, hidden_size_), x.slice(-1, 0, hidden_size_));
++        time_op("post_attn_norm",
++                [&]() { post_attn_norms[i]->forward_out(normed.slice(-1, 0, hidden_size_), x.slice(-1, 0, hidden_size_)); });
+ 
+         // QKV Projections
+         // Input to q/k/v_proj: Slice normed to Padded K (1536 -> 2048) and use Padded Buffer
+         auto normed_sliced = normed.slice(-1, 0, pad_k(hidden_size_));
+ 
+         // MLP projections with buffers
+-        auto f_gate = gate_layers[i]->forward(gate_buf, normed_sliced, "gate");
+-        auto f_up = up_layers[i]->forward(up_buf, normed_sliced, "up");
+-
+-        if (f_gate.valid())
+-            f_gate.wait();
++        time_op("gate_proj", [&]() {
++            auto f_gate = gate_layers[i]->forward(gate_buf, normed_sliced, "gate");
++            if (f_gate.valid())
++                f_gate.wait();
++        });
+ 
+         // In-place GELU and multiplication
+-        torch::silu_(gate_buf); // Llama3 uses SiLU (Swish), not GELU
++        time_op("silu", [&]() {
++            torch::silu_(gate_buf); // Llama3 uses SiLU (Swish), not GELU
++        });
+ 
+-        if (f_up.valid())
+-            f_up.wait();
++        time_op("up_proj", [&]() {
++            auto f_up = up_layers[i]->forward(up_buf, normed_sliced, "up");
++            if (f_up.valid())
++                f_up.wait();
++        });
+ 
+         gate_buf.mul_(up_buf);
+ 
+         // Down projection with buffer: Slice to Padded K
+-        auto f_down = down_layers[i]->forward(out_buf, gate_buf.slice(-1, 0, pad_k(intermediate_size_)), "down");
+-        if (f_down.valid())
+-            f_down.wait();
++        time_op("down_proj", [&]() {
++            auto f_down = down_layers[i]->forward(out_buf, gate_buf.slice(-1, 0, pad_k(intermediate_size_)), "down");
++            if (f_down.valid())
++                f_down.wait();
++        });
+ 
+         // Residual connection: x = x + mlp_output
+         // x points to x_buf. We add out_buf to it in-place.
+@@ -1336,8 +1373,8 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
+     }
+ 
+     // Final norm and output
+-    x = final_norm->forward(x);
+-    x = lm_head->forward(x);
++    time_op("final_norm", [&]() { x = final_norm->forward(x); });
++    time_op("lm_head", [&]() { x = lm_head->forward(x); });
+ 
+     // Convert to float32 for numerical stability
+     return x;

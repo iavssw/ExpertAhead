@@ -1,0 +1,16 @@
+# build directory 
+/build
+
+# unified_llm
+/py/unified_llm/model_weights
+
+# model_weights directories (general pattern)
+**/model_weights/
+*/model_weights/
+
+#plots
+**/plots/
+*/plots/
+
+# environment
+/util/rocmPytorch
