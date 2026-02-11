@@ -3,6 +3,8 @@
 #include <hip/hip_fp16.h>
 #include <hip/hip_runtime.h>
 #include <iostream>
+#include <mutex>
+#include <unordered_map>
 #include <vector>
 
 #define HIP_CHECK(call)                                                                                                                    \
@@ -64,9 +66,11 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
     }
 }
 
-DevicePtrCache &gemv_ptr_cache() {
-    static DevicePtrCache cache;
-    return cache;
+DevicePtrCache &gemv_ptr_cache_for_device(int device) {
+    static std::unordered_map<int, DevicePtrCache> caches;
+    static std::mutex cache_mutex;
+    std::lock_guard<std::mutex> lock(cache_mutex);
+    return caches[device];
 }
 } // namespace
 
@@ -677,7 +681,15 @@ void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
 void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &input, const std::vector<int64_t> &qweights_ptrs,
                                   const std::vector<int64_t> &scales_ptrs, const std::vector<int64_t> &zeros_ptrs, int64_t in_features,
                                   int64_t out_features, int64_t group_size, int64_t num_experts) {
-    auto &cache = gemv_ptr_cache();
+    TORCH_CHECK(input.is_cuda(), "input must be on CUDA");
+    const int target_device = input.get_device();
+    int current_device = 0;
+    HIP_CHECK(hipGetDevice(&current_device));
+    if (current_device != target_device) {
+        HIP_CHECK(hipSetDevice(target_device));
+    }
+
+    auto &cache = gemv_ptr_cache_for_device(target_device);
     ensure_device_ptrs(cache, qweights_ptrs, scales_ptrs, zeros_ptrs);
 
     const int K = static_cast<int>(in_features);

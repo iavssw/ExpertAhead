@@ -936,8 +936,22 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                       << std::endl;
 
             if (multi_gpu_enabled_) {
-                std::cout << "[GPU MAP] Layer split: layer 0 -> gpu" << static_cast<int>(layer_devices_.front().index()) << ", layer "
-                          << (num_hidden_layers_ - 1) << " -> gpu" << static_cast<int>(layer_devices_.back().index()) << std::endl;
+                std::ostringstream layer_map_ss;
+                layer_map_ss << "[GPU MAP] Layer ranges: ";
+                bool first = true;
+                for (int slot = 0; slot < gpu_count_; ++slot) {
+                    const int64_t layer_start = (slot * num_hidden_layers_) / gpu_count_;
+                    const int64_t layer_end = (((slot + 1) * num_hidden_layers_) / gpu_count_) - 1;
+                    if (layer_start > layer_end) {
+                        continue;
+                    }
+                    if (!first) {
+                        layer_map_ss << "; ";
+                    }
+                    first = false;
+                    layer_map_ss << "gpu" << selection.selected[slot] << ": layers " << layer_start << "-" << layer_end;
+                }
+                std::cout << layer_map_ss.str() << std::endl;
             } else {
                 std::cout << "[GPU MAP] Single-GPU placement on gpu" << static_cast<int>(embedding_device_.index()) << std::endl;
             }
