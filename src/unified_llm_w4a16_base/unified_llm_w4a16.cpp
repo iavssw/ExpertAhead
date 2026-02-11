@@ -469,9 +469,8 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 }
 
 // MixtureOfExpertsImpl Implementation
-MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts,
-                                           int64_t num_experts_per_tok, int64_t max_seq_len, bool use_softmax_before_topk,
-                                           bool normalize_topk_prob)
+MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), use_softmax_before_topk_(use_softmax_before_topk),
       normalize_topk_prob_(normalize_topk_prob) {
@@ -488,8 +487,8 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     }
 }
 
-torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
-                                                const torch::Tensor &topk_idx, torch::Tensor &output) {
+torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
+                                                torch::Tensor &output) {
     for (int64_t t = 0; t < x_flat.size(0); ++t) {
         auto token_input = x_flat.narrow(0, t, 1);
         for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
@@ -510,24 +509,86 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
     return output;
 }
 
+// Old Simple Version: Do not delete for reference
+// torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
+//                                                        const torch::Tensor &topk_idx, torch::Tensor &output) {
+//     std::vector<torch::Tensor> down_buffers;
+//     std::vector<torch::Tensor> expert_weights;
+//     down_buffers.reserve(num_experts_per_tok_);
+//     expert_weights.reserve(num_experts_per_tok_);
+
+//     // Dispatch independent expert paths first.
+//     for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
+//         int64_t e = topk_idx[0][k].item<int64_t>();
+//         expert_weights.push_back(topk_vals[0][k].to(output.dtype()));
+//         auto gate_up = gate_up_experts[e]->forward(x_flat, "moe_gate_up");
+//         auto gate_buf = gate_up.narrow(1, 0, intermediate_size_);
+//         auto up_buf = gate_up.narrow(1, intermediate_size_, intermediate_size_);
+//         torch::silu_(gate_buf);
+//         gate_buf.mul_(up_buf);
+//         down_buffers.push_back(down_experts[e]->forward(gate_buf, "moe_down"));
+//     }
+
+//     // Separate reduction pass to aggregate expert outputs.
+//     for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
+//         down_buffers[k].mul_(expert_weights[k]);
+//         output.add_(down_buffers[k]);
+//     }
+//     return output;
+// }
+
 torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
                                                        const torch::Tensor &topk_idx, torch::Tensor &output) {
-    for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
+    auto opts = x_flat.options();
+    const int64_t active_experts = num_experts_per_tok_;
+
+    // Build expert pointer arrays once, then run both MoE projections batched in parallel.
+    std::vector<int64_t> gate_up_qw_ptrs(active_experts), gate_up_s_ptrs(active_experts), gate_up_z_ptrs(active_experts);
+    std::vector<int64_t> down_qw_ptrs(active_experts), down_s_ptrs(active_experts), down_z_ptrs(active_experts);
+    std::vector<int64_t> expert_ids(active_experts);
+
+    for (int64_t k = 0; k < active_experts; ++k) {
         int64_t e = topk_idx[0][k].item<int64_t>();
-        auto weight = topk_vals[0][k].to(output.dtype());
-
-        auto gate_up = gate_up_experts[e]->forward(x_flat, "moe_gate_up");
-
-        auto gate_buf = gate_up.narrow(1, 0, intermediate_size_);
-        auto up_buf = gate_up.narrow(1, intermediate_size_, intermediate_size_);
-        torch::silu_(gate_buf);
-        gate_buf.mul_(up_buf);
-
-        auto down_buf = down_experts[e]->forward(gate_buf, "moe_down");
-
-        down_buf.mul_(weight);
-        output.add_(down_buf);
+        expert_ids[k] = e;
+        gate_up_qw_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_quantized_weights().data_ptr<uint8_t>());
+        gate_up_s_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_scales().data_ptr<at::BFloat16>());
+        gate_up_z_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_zeros().data_ptr<int8_t>());
+        down_qw_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_quantized_weights().data_ptr<uint8_t>());
+        down_s_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_scales().data_ptr<at::BFloat16>());
+        down_z_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_zeros().data_ptr<int8_t>());
     }
+
+    int64_t group_size = hidden_size_;
+    if (gate_up_experts[expert_ids[0]]->get_scales().dim() == 2) {
+        int64_t n_groups = gate_up_experts[expert_ids[0]]->get_scales().size(1);
+        if (n_groups > 0)
+            group_size = hidden_size_ / n_groups;
+    }
+    int64_t down_group_size = intermediate_size_;
+    if (down_experts[expert_ids[0]]->get_scales().dim() == 2) {
+        int64_t n_groups = down_experts[expert_ids[0]]->get_scales().size(1);
+        if (n_groups > 0)
+            down_group_size = intermediate_size_ / n_groups;
+    }
+
+    auto input_batched = x_flat.expand({active_experts, hidden_size_}).contiguous();
+    auto gate_up_batched = torch::empty({active_experts, 2 * intermediate_size_}, opts);
+    auto down_batched = torch::empty({active_experts, hidden_size_}, opts);
+
+    hipkernels::w4a16_gemv_unpacked_fused_3d(gate_up_batched, input_batched, gate_up_qw_ptrs, gate_up_s_ptrs, gate_up_z_ptrs, hidden_size_,
+                                             2 * intermediate_size_, group_size, active_experts);
+
+    auto gate_buf = gate_up_batched.narrow(1, 0, intermediate_size_);
+    auto up_buf = gate_up_batched.narrow(1, intermediate_size_, intermediate_size_);
+    torch::silu_(gate_buf);
+    gate_buf.mul_(up_buf);
+
+    hipkernels::w4a16_gemv_unpacked_fused_3d(down_batched, gate_buf.contiguous(), down_qw_ptrs, down_s_ptrs, down_z_ptrs,
+                                             intermediate_size_, hidden_size_, down_group_size, active_experts);
+
+    auto weights = topk_vals[0].to(output.dtype()).view({active_experts, 1});
+    down_batched.mul_(weights);
+    output.add_(down_batched.sum(0, true));
     return output;
 }
 
@@ -773,10 +834,9 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
 
         bool use_qwen_router = (arch_type_ == ArchitectureType::QWEN);
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-            moe_layers.push_back(
-                register_module("moe_" + std::to_string(i), MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_,
-                                                                              num_experts_per_tok_, max_seq_len_, use_qwen_router,
-                                                                              use_qwen_router)));
+            moe_layers.push_back(register_module("moe_" + std::to_string(i),
+                                                 MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
