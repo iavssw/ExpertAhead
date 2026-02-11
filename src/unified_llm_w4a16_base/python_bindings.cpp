@@ -11,7 +11,10 @@ namespace py = pybind11;
 PYBIND11_MODULE(unified_llm_w4a16_base_libtorch, m) {
     m.doc() = "Pybind11 bindings for Unified LLM W4A16 Quantized LibTorch backend";
 
-    py::enum_<ArchitectureType>(m, "ArchitectureType").value("MIXTRAL", ArchitectureType::MIXTRAL).export_values();
+    py::enum_<ArchitectureType>(m, "ArchitectureType")
+        .value("MIXTRAL", ArchitectureType::MIXTRAL)
+        .value("QWEN", ArchitectureType::QWEN)
+        .export_values();
 
     py::class_<UnifiedLLMW4A16Impl, std::shared_ptr<UnifiedLLMW4A16Impl>>(m, "UnifiedLLMW4A16")
         .def(

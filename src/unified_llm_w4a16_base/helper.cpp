@@ -602,6 +602,16 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors(const std::str
                     skipped++;
                 }
             }
+        } else if (arch_type_ == ArchitectureType::QWEN) {
+            for (int64_t e = 0; e < num_experts_; ++e) {
+                std::string expert_prefix = layer_prefix + ".mlp.experts." + std::to_string(e);
+                QuantizedLinear tmp_gate(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_gate");
+                QuantizedLinear tmp_up(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_up");
+                load_linear_layer(tmp_gate, expert_prefix + ".gate_proj");
+                load_linear_layer(tmp_up, expert_prefix + ".up_proj");
+                set_gate_up_from_separate(moe_layers[i]->gate_up_experts[e], tmp_gate, tmp_up);
+                load_linear_layer(moe_layers[i]->down_experts[e], expert_prefix + ".down_proj");
+            }
         }
 
         // RMSNorm layers (not quantized)
@@ -631,6 +641,45 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors(const std::str
                               << "  Dtype: " << it_post_norm->second.dtype << " (" << loaded_tensor.dtype() << ")" << std::endl;
                     std::cout << "Model param: post_attn_norms[" << i << "].weight" << std::endl;
                     std::cout << "  -> Loaded" << std::endl;
+                }
+            }
+        }
+
+        if (arch_type_ == ArchitectureType::QWEN) {
+            auto it_q_norm = tensor_map.find(layer_prefix + ".self_attn.q_norm.weight");
+            if (it_q_norm != tensor_map.end() && it_q_norm->second.valid) {
+                torch::Tensor loaded_tensor = load_tensor(it_q_norm->second);
+                if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                    q_norms[i]->set_weight(loaded_tensor);
+                    loaded++;
+                }
+            }
+
+            auto it_k_norm = tensor_map.find(layer_prefix + ".self_attn.k_norm.weight");
+            if (it_k_norm != tensor_map.end() && it_k_norm->second.valid) {
+                torch::Tensor loaded_tensor = load_tensor(it_k_norm->second);
+                if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                    k_norms[i]->set_weight(loaded_tensor);
+                    loaded++;
+                }
+            }
+        }
+
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            auto it_router = tensor_map.find(layer_prefix + ".block_sparse_moe.gate.weight");
+            if (it_router == tensor_map.end() || !it_router->second.valid) {
+                it_router = tensor_map.find(layer_prefix + ".block_sparse_moe.router.weight");
+            }
+            if ((it_router == tensor_map.end() || !it_router->second.valid) && arch_type_ == ArchitectureType::QWEN) {
+                it_router = tensor_map.find(layer_prefix + ".mlp.gate.weight");
+            }
+            if (it_router != tensor_map.end() && it_router->second.valid) {
+                torch::Tensor loaded_tensor = load_tensor(it_router->second);
+                if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                    moe_layers[i]->router->weight.set_requires_grad(false);
+                    moe_layers[i]->router->weight.copy_(
+                        loaded_tensor.to(moe_layers[i]->router->weight.dtype()).to(moe_layers[i]->router->weight.device()));
+                    loaded++;
                 }
             }
         }
@@ -779,12 +828,15 @@ void UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors(const std:
         }
     }
 
-    if (arch_type_ == ArchitectureType::MIXTRAL) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         for (int64_t i = 0; i < num_hidden_layers_; ++i) {
             std::string layer_prefix = "model.layers." + std::to_string(i);
             auto it_router = tensor_map.find(layer_prefix + ".block_sparse_moe.gate.weight");
             if (it_router == tensor_map.end() || !it_router->second.valid) {
                 it_router = tensor_map.find(layer_prefix + ".block_sparse_moe.router.weight");
+            }
+            if ((it_router == tensor_map.end() || !it_router->second.valid) && arch_type_ == ArchitectureType::QWEN) {
+                it_router = tensor_map.find(layer_prefix + ".mlp.gate.weight");
             }
             if (it_router != tensor_map.end() && it_router->second.valid) {
                 torch::Tensor loaded_tensor = load_tensor(it_router->second);
@@ -793,6 +845,26 @@ void UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors(const std:
                     moe_layers[i]->router->weight.copy_(
                         loaded_tensor.to(moe_layers[i]->router->weight.dtype()).to(moe_layers[i]->router->weight.device()));
                     loaded++;
+                }
+            }
+
+            if (arch_type_ == ArchitectureType::QWEN) {
+                auto it_q_norm = tensor_map.find(layer_prefix + ".self_attn.q_norm.weight");
+                if (it_q_norm != tensor_map.end() && it_q_norm->second.valid) {
+                    torch::Tensor loaded_tensor = load_tensor(it_q_norm->second);
+                    if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                        q_norms[i]->set_weight(loaded_tensor);
+                        loaded++;
+                    }
+                }
+
+                auto it_k_norm = tensor_map.find(layer_prefix + ".self_attn.k_norm.weight");
+                if (it_k_norm != tensor_map.end() && it_k_norm->second.valid) {
+                    torch::Tensor loaded_tensor = load_tensor(it_k_norm->second);
+                    if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                        k_norms[i]->set_weight(loaded_tensor);
+                        loaded++;
+                    }
                 }
             }
         }
@@ -960,7 +1032,7 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &we
         load_layer(k_layers[i], "layer_" + std::to_string(i) + "_k");
         load_layer(v_layers[i], "layer_" + std::to_string(i) + "_v");
         load_layer(o_layers[i], "layer_" + std::to_string(i) + "_o");
-        if (arch_type_ == ArchitectureType::MIXTRAL) {
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
             for (int64_t e = 0; e < num_experts_; ++e) {
                 std::string expert_prefix = "layer_" + std::to_string(i) + "_expert_" + std::to_string(e);
                 load_gate_up_from_bins(moe_layers[i]->gate_up_experts[e], expert_prefix + "_gate", expert_prefix + "_up");
@@ -989,6 +1061,10 @@ void UnifiedLLMW4A16Impl::initialize_dummy_weights(int seed) {
         auto layer_device = q_layers[i]->get_quantized_weights().device();
         input_norms[i]->set_weight(torch::ones({hidden_size_}).to(layer_device));
         post_attn_norms[i]->set_weight(torch::ones({hidden_size_}).to(layer_device));
+        if (arch_type_ == ArchitectureType::QWEN) {
+            q_norms[i]->set_weight(torch::ones({head_dim_}).to(layer_device));
+            k_norms[i]->set_weight(torch::ones({head_dim_}).to(layer_device));
+        }
 
         // Helper to init quantized linear
         auto init_layer = [&](QuantizedLinear &layer) {
@@ -1018,7 +1094,7 @@ void UnifiedLLMW4A16Impl::initialize_dummy_weights(int seed) {
         init_layer(v_layers[i]);
         init_layer(o_layers[i]);
 
-        if (arch_type_ == ArchitectureType::MIXTRAL) {
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
             moe_layers[i]->router->weight.uniform_(-0.1, 0.1);
             for (int64_t e = 0; e < num_experts_; ++e) {
                 init_layer(moe_layers[i]->gate_up_experts[e]);
