@@ -1252,6 +1252,94 @@ __global__ void flash_attn_decode_combine(const float *__restrict__ partials, co
     dst[head_idx * D_HEAD + tid] = convert_out<T>(out);
 }
 
+template <typename T> __device__ __forceinline__ float load_scalar(const T *ptr);
+
+template <> __device__ __forceinline__ float load_scalar<half>(const half *ptr) { return __half2float(*ptr); }
+
+template <> __device__ __forceinline__ float load_scalar<__hip_bfloat16>(const __hip_bfloat16 *ptr) { return __bfloat162float(*ptr); }
+
+// Correctness-first decode kernel for CDNA wave64:
+// - explicit FP32 dot products
+// - online softmax in deterministic token order
+// - one block per (batch, head), one thread per head dim
+template <typename T>
+__global__ void flash_attn_decode_reference(const char *__restrict__ Q_base, const char *__restrict__ K_base,
+                                            const char *__restrict__ V_base, T *__restrict__ dst, float scale, int ne11, int ne02, int ne12,
+                                            int nb01, int nb02, int nb03, int nb11, int nb12, int nb13, int nb21, int nb22, int nb23,
+                                            int batch_size) {
+    const int dim = threadIdx.x;
+    if (dim >= D_HEAD) {
+        return;
+    }
+
+    const int head_idx = blockIdx.x;
+    const int sequence = head_idx / ne02;
+    const int head = head_idx % ne02;
+    if (sequence >= batch_size) {
+        return;
+    }
+
+    const int gqa_ratio = ne02 / ne12;
+    const int head_kv = head / gqa_ratio;
+
+    const char *Q_ptr = Q_base + (int64_t)nb03 * sequence + (int64_t)nb02 * head;
+    const char *K_ptr = K_base + (int64_t)nb13 * sequence + (int64_t)nb12 * head_kv;
+    const char *V_ptr = V_base + (int64_t)nb23 * sequence + (int64_t)nb22 * head_kv;
+
+    const T *q_row = reinterpret_cast<const T *>(Q_ptr);
+    const float q_val = load_scalar(&q_row[dim]);
+
+    __shared__ float dot_smem[D_HEAD];
+    __shared__ float running_max;
+    __shared__ float running_sum;
+    __shared__ float prev_scale;
+    __shared__ float weight;
+
+    if (dim == 0) {
+        running_max = -FLT_MAX;
+        running_sum = 0.0f;
+        prev_scale = 0.0f;
+        weight = 0.0f;
+    }
+    __syncthreads();
+
+    float acc = 0.0f;
+
+    for (int tok = 0; tok < ne11; ++tok) {
+        const T *k_row = reinterpret_cast<const T *>(K_ptr + (int64_t)tok * nb11);
+        dot_smem[dim] = q_val * load_scalar(&k_row[dim]);
+        __syncthreads();
+
+        for (int stride = D_HEAD / 2; stride > 0; stride >>= 1) {
+            if (dim < stride) {
+                dot_smem[dim] += dot_smem[dim + stride];
+            }
+            __syncthreads();
+        }
+
+        if (dim == 0) {
+            const float score = dot_smem[0] * scale;
+            const float next_max = fmaxf(running_max, score);
+            const float scale_prev = (running_sum > 0.0f) ? __expf(running_max - next_max) : 0.0f;
+            const float score_weight = __expf(score - next_max);
+            running_sum = running_sum * scale_prev + score_weight;
+            running_max = next_max;
+            prev_scale = scale_prev;
+            weight = score_weight;
+        }
+        __syncthreads();
+
+        const T *v_row = reinterpret_cast<const T *>(V_ptr + (int64_t)tok * nb21);
+        const float v_val = load_scalar(&v_row[dim]);
+        acc = acc * prev_scale + weight * v_val;
+        __syncthreads();
+    }
+
+    const float denom = running_sum;
+    const float out = (denom > 0.0f) ? (acc / denom) : 0.0f;
+    dst[head_idx * D_HEAD + dim] = convert_out<T>(out);
+}
+
 // =============================================================================
 // Launcher
 // =============================================================================
@@ -1261,6 +1349,27 @@ extern "C" void launch_flash_attn_decode_hip(const void *Q, const void *K, const
                                              int stride_Q_head, int stride_Q_batch, int stride_K_seq, int stride_K_head, int stride_K_batch,
                                              int stride_V_seq, int stride_V_head, int stride_V_batch, int stride_mask_seq, bool is_bf16,
                                              hipStream_t stream) {
+#if FLASH_ATTN_CDNA_MODE
+    // CDNA correctness path: use deterministic FP32 decode kernel.
+    // This avoids wave-size-sensitive drift observed with the vectorized decode kernels.
+    if (head_dim == D_HEAD) {
+        dim3 grid(batch_size * n_heads_Q, 1, 1);
+        dim3 block_ref(D_HEAD, 1, 1);
+        if (is_bf16) {
+            flash_attn_decode_reference<__hip_bfloat16>
+                <<<grid, block_ref, 0, stream>>>((const char *)Q, (const char *)K, (const char *)V, (__hip_bfloat16 *)dst, scale, seq_len_kv,
+                                                 n_heads_Q, n_heads_KV, stride_Q_seq, stride_Q_head, stride_Q_batch, stride_K_seq,
+                                                 stride_K_head, stride_K_batch, stride_V_seq, stride_V_head, stride_V_batch, batch_size);
+        } else {
+            flash_attn_decode_reference<half><<<grid, block_ref, 0, stream>>>(
+                (const char *)Q, (const char *)K, (const char *)V, (half *)dst, scale, seq_len_kv, n_heads_Q, n_heads_KV, stride_Q_seq,
+                stride_Q_head, stride_Q_batch, stride_K_seq, stride_K_head, stride_K_batch, stride_V_seq, stride_V_head, stride_V_batch,
+                batch_size);
+        }
+        return;
+    }
+#endif
+
     dim3 block(WARP_SIZE, NWARPS); // 2D launch; always 128 threads total
     size_t smem_size = 0;          // kernel uses static shared memory only
 
