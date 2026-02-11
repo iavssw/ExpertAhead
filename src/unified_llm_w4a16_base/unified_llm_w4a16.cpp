@@ -464,9 +464,10 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 
 // MixtralMoEImpl Implementation
 MixtralMoEImpl::MixtralMoEImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
-                               int64_t max_seq_len)
+                               int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
-      num_experts_per_tok_(num_experts_per_tok) {
+      num_experts_per_tok_(num_experts_per_tok), use_softmax_before_topk_(use_softmax_before_topk),
+      normalize_topk_prob_(normalize_topk_prob) {
     router = register_module("router", LinearMatmul(hidden_size_, num_experts_, false));
 
     gate_up_experts.reserve(num_experts_);
@@ -567,6 +568,7 @@ torch::Tensor MixtralMoEImpl::forward_prefill(const torch::Tensor &x_flat, const
         return output;
 
     int64_t actual_num_experts = expert_ids.size();
+
     int64_t padded_M = ((max_rows + tile - 1) / tile) * tile;
 
     // Get group sizes once
@@ -645,10 +647,24 @@ torch::Tensor MixtralMoEImpl::forward(const torch::Tensor &x) {
 
     torch::Tensor router_out = router->forward(x_flat);
 
-    auto topk = router_out.topk(num_experts_per_tok_, -1);
+    torch::Tensor router_scores = router_out;
+    if (use_softmax_before_topk_) {
+        router_scores = torch::softmax(router_scores.to(torch::kFloat32), -1).to(router_out.dtype());
+    }
+
+    auto topk = router_scores.topk(num_experts_per_tok_, -1);
     torch::Tensor topk_vals = std::get<0>(topk);
     torch::Tensor topk_idx = std::get<1>(topk);
-    topk_vals = torch::softmax(topk_vals.to(torch::kFloat32), -1).to(router_out.dtype());
+    if (use_softmax_before_topk_) {
+        if (normalize_topk_prob_) {
+            auto denom = topk_vals.sum(-1, true).clamp_min(1e-9);
+            topk_vals = (topk_vals / denom).to(router_out.dtype());
+        } else {
+            topk_vals = topk_vals.to(router_out.dtype());
+        }
+    } else {
+        topk_vals = torch::softmax(topk_vals.to(torch::kFloat32), -1).to(router_out.dtype());
+    }
 
     auto output = torch::zeros({x_flat.size(0), hidden_size_}, opts);
 
@@ -692,8 +708,11 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
     if (arch_type_ == ArchitectureType::MIXTRAL) {
         num_experts_ = (num_experts > 0) ? num_experts : 8;
         num_experts_per_tok_ = (num_experts_per_tok > 0) ? num_experts_per_tok : 2;
+    } else if (arch_type_ == ArchitectureType::QWEN) {
+        num_experts_ = (num_experts > 0) ? num_experts : 128;
+        num_experts_per_tok_ = (num_experts_per_tok > 0) ? num_experts_per_tok : 8;
     } else {
-        throw std::runtime_error("Only MIXTRAL architecture is supported.");
+        throw std::runtime_error("Unsupported architecture.");
     }
 
     // Multi-GPU layer split configuration (GPU mode only).
@@ -745,9 +764,15 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
         o_layers.push_back(register_module("o_" + std::to_string(i),
                                            QuantizedLinear(num_attention_heads_ * head_dim_, hidden_size_, false, max_seq_len_, "o")));
 
-        if (arch_type_ == ArchitectureType::MIXTRAL) {
-            moe_layers.push_back(register_module("moe_" + std::to_string(i), MixtralMoE(hidden_size_, intermediate_size_, num_experts_,
-                                                                                        num_experts_per_tok_, max_seq_len_)));
+        bool use_qwen_router = (arch_type_ == ArchitectureType::QWEN);
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            moe_layers.push_back(register_module("moe_" + std::to_string(i),
+                                                 MixtralMoE(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
+                                                            max_seq_len_, use_qwen_router, use_qwen_router)));
+        }
+        if (arch_type_ == ArchitectureType::QWEN) {
+            q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
+            k_norms.push_back(register_module("k_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
         }
 
         // Normalization layers (not quantized)
@@ -780,9 +805,15 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
         k_layers[i]->to(layer_device);
         v_layers[i]->to(layer_device);
         o_layers[i]->to(layer_device);
-        if (arch_type_ == ArchitectureType::MIXTRAL) {
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
             moe_layers[i]->to(layer_device);
             moe_layers[i]->router->to(torch::kBFloat16);
+        }
+        if (arch_type_ == ArchitectureType::QWEN) {
+            q_norms[i]->to(layer_device);
+            q_norms[i]->to(torch::kBFloat16);
+            k_norms[i]->to(layer_device);
+            k_norms[i]->to(torch::kBFloat16);
         }
         input_norms[i]->to(layer_device);
         input_norms[i]->to(torch::kBFloat16);
@@ -878,9 +909,15 @@ UnifiedLLMW4A16Impl &UnifiedLLMW4A16Impl::to(torch::Device device) {
     attn_output_proj_buffer = attn_output_proj_buffer.to(device);
     norm_buffer = norm_buffer.to(device);
 
-    if (arch_type_ == ArchitectureType::MIXTRAL) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         for (int64_t i = 0; i < num_hidden_layers_; ++i) {
             moe_layers[i]->to(device);
+        }
+    }
+    if (arch_type_ == ArchitectureType::QWEN) {
+        for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+            q_norms[i]->to(device);
+            k_norms[i]->to(device);
         }
     }
 
@@ -951,7 +988,7 @@ torch::Tensor UnifiedLLMW4A16Impl::gelu(const torch::Tensor &x) { return torch::
 torch::Tensor UnifiedLLMW4A16Impl::swiglu(const torch::Tensor &gate, const torch::Tensor &up) { return silu(gate) * up; }
 
 void UnifiedLLMW4A16Impl::preload_moe_kernels() {
-    if (arch_type_ != ArchitectureType::MIXTRAL || !preload_moe_kernels_enabled) {
+    if ((arch_type_ != ArchitectureType::MIXTRAL && arch_type_ != ArchitectureType::QWEN) || !preload_moe_kernels_enabled) {
         return;
     }
     if (!x_buffer.is_cuda()) {
@@ -1005,7 +1042,13 @@ torch::Tensor UnifiedLLMW4A16Impl::forward(torch::Tensor x, int64_t start_pos) {
         }
         return forward_mixtral(x, start_pos);
     }
-    throw std::runtime_error("Only MIXTRAL architecture is supported.");
+    if (arch_type_ == ArchitectureType::QWEN) {
+        if (multi_gpu_enabled_) {
+            return forward_qwen_multi_gpu(x, start_pos);
+        }
+        return forward_qwen(x, start_pos);
+    }
+    throw std::runtime_error("Unsupported architecture.");
 }
 
 torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral_multi_gpu(torch::Tensor x, int64_t start_pos) {
@@ -1153,12 +1196,12 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral_multi_gpu(torch::Tensor x, in
 
         attn_output = attn_output.transpose(1, 2).contiguous().view({bsz, seq_len, hidden_size_});
         auto attn_proj_buf = o_layers[i]->forward(attn_output.view({-1, hidden_size_}), "o").view({bsz, seq_len, hidden_size_});
-        x.add_(attn_proj_buf);
+        x = x + attn_proj_buf;
 
         auto post_normed = torch::empty({bsz, seq_len, hidden_size_}, opts);
         post_attn_norms[i]->forward_out(post_normed, x);
         auto moe_out = moe_layers[i]->forward(post_normed);
-        x.add_(moe_out);
+        x = x + moe_out;
     }
 
     if (x.device() != output_device_) {
@@ -1325,7 +1368,7 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
         o_layers[i]->forward(attn_proj_buf, attn_out_buf_proj.slice(-1, 0, hidden_size_), "o");
 
         // Residual connection
-        x.add_(attn_proj_buf.slice(-1, 0, hidden_size_));
+        x = x + attn_proj_buf.slice(-1, 0, hidden_size_);
 
         // Post-attention norm
         post_attn_norms[i]->forward_out(normed.slice(-1, 0, hidden_size_), x.slice(-1, 0, hidden_size_));
@@ -1334,13 +1377,333 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
         auto moe_out = moe_layers[i]->forward(normed.slice(-1, 0, hidden_size_));
 
         // Residual connection
-        x.add_(moe_out);
+        x = x + moe_out;
     }
 
     // Final norm and output
     x = final_norm->forward(x);
     x = lm_head->forward(x);
 
+    return x;
+}
+
+torch::Tensor UnifiedLLMW4A16Impl::forward_qwen_multi_gpu(torch::Tensor x, int64_t start_pos) {
+    int64_t bsz = x.size(0);
+    int64_t seq_len = x.size(1);
+    const int64_t q_proj_size = num_attention_heads_ * head_dim_;
+
+    if (embedding_device_.is_cuda() && embedding_device_.index() >= 0) {
+        c10::hip::set_device(static_cast<c10::DeviceIndex>(embedding_device_.index()));
+    }
+    if (x.device() != embedding_device_) {
+        x = x.to(embedding_device_);
+    }
+    x = token_embedding->forward(x);
+
+    torch::Tensor mask;
+    if (seq_len > 1) {
+        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
+                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+        mask = torch::triu(mask, 1);
+        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+        mask = mask.to(x.dtype());
+    }
+
+    for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        auto layer_device = layer_devices_[i];
+        if (layer_device.is_cuda() && layer_device.index() >= 0) {
+            c10::hip::set_device(static_cast<c10::DeviceIndex>(layer_device.index()));
+        }
+        if (x.device() != layer_device) {
+            x = x.to(layer_device);
+        }
+
+        auto opts = torch::TensorOptions().device(layer_device).dtype(torch::kBFloat16);
+        auto normed = torch::empty({bsz, seq_len, hidden_size_}, opts);
+        input_norms[i]->forward_out(normed, x);
+
+        auto normed_2d = normed.view({-1, hidden_size_});
+        auto q = q_layers[i]->forward(normed_2d, "q").view({bsz, seq_len, num_attention_heads_, head_dim_});
+        auto k = k_layers[i]->forward(normed_2d, "k").view({bsz, seq_len, num_key_value_heads_, head_dim_});
+        auto v = v_layers[i]->forward(normed_2d, "v").view({bsz, seq_len, num_key_value_heads_, head_dim_});
+
+        q = q_norms[i]->forward(q);
+        k = k_norms[i]->forward(k);
+
+        if (!q.is_cuda() || (rope_scaling_enabled && rope_scaling_type == "llama3")) {
+            auto freqs_cis = compute_rope_freqs(seq_len, start_pos);
+            auto rope_result = apply_rotary_emb(q, k, freqs_cis);
+            q = rope_result.first;
+            k = rope_result.second;
+        } else {
+            launch_rope(q, k, start_pos, rope_theta_);
+        }
+
+        auto cache_k = caches_k[i];
+        auto cache_v = caches_v[i];
+        cache_k = cache_k.narrow(2, start_pos, seq_len).copy_(k.transpose(1, 2));
+        cache_v = cache_v.narrow(2, start_pos, seq_len).copy_(v.transpose(1, 2));
+
+        k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+        v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+
+        if (attention_mode_ >= 1) {
+            if (start_pos == 0) {
+                k = repeat_kv(k, GQA_head_ratio_);
+                v = repeat_kv(v, GQA_head_ratio_);
+            }
+        } else {
+            k = repeat_kv(k, GQA_head_ratio_);
+            v = repeat_kv(v, GQA_head_ratio_);
+        }
+
+        q = q.transpose(1, 2);
+
+        torch::Tensor attn_output;
+        torch::Tensor layer_mask;
+        if (mask.defined() && mask.numel() > 0) {
+            layer_mask = (mask.device() == layer_device) ? mask : mask.to(layer_device);
+        }
+
+        if (attention_mode_ == 1) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                c10::optional<torch::Tensor> opt_mask;
+                if (layer_mask.defined() && layer_mask.numel() > 0) {
+                    opt_mask = layer_mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                }
+                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
+            }
+        } else if (attention_mode_ == 2) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                int batch_size = q.size(0);
+                int n_heads_Q = q.size(1);
+                int n_heads_KV = k.size(1);
+                int head_dim = q.size(3);
+                int seq_len_kv = k.size(2);
+                float scale = 1.0f / std::sqrt(static_cast<float>(head_dim));
+                attn_output = torch::empty_like(q);
+                int element_size = q.element_size();
+
+                launch_flash_attn_decode_hip(q.data_ptr(), k.data_ptr(), v.data_ptr(),
+                                             (layer_mask.defined() && layer_mask.numel() > 0) ? layer_mask.data_ptr() : nullptr,
+                                             attn_output.data_ptr(), batch_size, n_heads_Q, n_heads_KV, head_dim, seq_len_kv, scale,
+                                             q.stride(2) * element_size, q.stride(1) * element_size, q.stride(0) * element_size,
+                                             k.stride(2) * element_size, k.stride(1) * element_size, k.stride(0) * element_size,
+                                             v.stride(2) * element_size, v.stride(1) * element_size, v.stride(0) * element_size, 0,
+                                             q.dtype() == torch::kBFloat16, c10::hip::getCurrentHIPStream().stream());
+            }
+        } else {
+            auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
+            if (layer_mask.defined() && layer_mask.numel() > 0) {
+                att = att + layer_mask.to(q.dtype());
+            }
+            auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
+            attn_output = torch::matmul(attn_weights, v);
+        }
+
+        attn_output = attn_output.transpose(1, 2).contiguous().view({bsz, seq_len, q_proj_size});
+        auto attn_out_2d = attn_output.view({-1, q_proj_size});
+        auto attn_proj_2d = torch::empty({attn_out_2d.size(0), hidden_size_},
+                                         torch::TensorOptions().device(layer_device).dtype(torch::kBFloat16));
+        if (seq_len > 1) {
+            for (int64_t t = 0; t < attn_out_2d.size(0); ++t) {
+                o_layers[i]->forward(attn_proj_2d.narrow(0, t, 1), attn_out_2d.narrow(0, t, 1), "o");
+            }
+        } else {
+            o_layers[i]->forward(attn_proj_2d, attn_out_2d, "o");
+        }
+        auto attn_proj_buf = attn_proj_2d.view({bsz, seq_len, hidden_size_});
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN-MP] Layer " << i << " after o-proj" << std::endl;
+        }
+        x = x + attn_proj_buf;
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN-MP] Layer " << i << " after residual add" << std::endl;
+        }
+
+        auto post_normed = torch::empty({bsz, seq_len, hidden_size_}, opts);
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN-MP] Layer " << i << " before post-attn norm" << std::endl;
+        }
+        post_attn_norms[i]->forward_out(post_normed, x);
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN-MP] Layer " << i << " after post-attn norm" << std::endl;
+        }
+        auto moe_out = moe_layers[i]->forward(post_normed);
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN-MP] Layer " << i << " after MoE" << std::endl;
+        }
+        x = x + moe_out;
+    }
+
+    if (x.device() != output_device_) {
+        x = x.to(output_device_);
+    }
+    x = final_norm->forward(x);
+    x = lm_head->forward(x);
+    return x;
+}
+
+torch::Tensor UnifiedLLMW4A16Impl::forward_qwen(torch::Tensor x, int64_t start_pos) {
+    int64_t bsz = x.size(0);
+    int64_t seq_len = x.size(1);
+    const int64_t q_proj_size = num_attention_heads_ * head_dim_;
+
+    x = token_embedding->forward(x);
+
+    torch::Tensor mask;
+    if (seq_len > 1) {
+        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
+                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+        mask = torch::triu(mask, 1);
+        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+        mask = mask.to(x.dtype());
+    }
+
+    auto q_buf = queries_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+    auto k_buf = keys_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+    auto v_buf = values_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+    auto attn_proj_buf = attn_output_proj_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+
+    auto normed = norm_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+
+    for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        input_norms[i]->forward_out(normed, x);
+
+        torch::Tensor q, k, v;
+
+        q_layers[i]->forward(q_buf, normed, "q");
+        k_layers[i]->forward(k_buf, normed, "k");
+        v_layers[i]->forward(v_buf, normed, "v");
+
+        q = q_buf.slice(-1, 0, num_attention_heads_ * head_dim_);
+        k = k_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
+
+        q = q.view({bsz, seq_len, num_attention_heads_, head_dim_});
+        k = k.view({bsz, seq_len, num_key_value_heads_, head_dim_});
+
+        q = q_norms[i]->forward(q);
+        k = k_norms[i]->forward(k);
+
+        if (!q.is_cuda() || (rope_scaling_enabled && rope_scaling_type == "llama3")) {
+            auto freqs_cis = compute_rope_freqs(seq_len, start_pos);
+            auto rope_result = apply_rotary_emb(q, k, freqs_cis);
+            q = rope_result.first;
+            k = rope_result.second;
+        } else {
+            launch_rope(q, k, start_pos, rope_theta_);
+        }
+
+        v = v_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
+        v = v.view({bsz, seq_len, num_key_value_heads_, head_dim_});
+
+        auto cache_k = caches_k[i];
+        auto cache_v = caches_v[i];
+        cache_k = cache_k.narrow(2, start_pos, seq_len).copy_(k.transpose(1, 2));
+        cache_v = cache_v.narrow(2, start_pos, seq_len).copy_(v.transpose(1, 2));
+
+        k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+        v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+
+        if (attention_mode_ >= 1) {
+            if (start_pos == 0) {
+                k = repeat_kv(k, GQA_head_ratio_);
+                v = repeat_kv(v, GQA_head_ratio_);
+            }
+        } else {
+            k = repeat_kv(k, GQA_head_ratio_);
+            v = repeat_kv(v, GQA_head_ratio_);
+        }
+
+        q = q.transpose(1, 2);
+
+        torch::Tensor attn_output;
+        if (attention_mode_ == 1) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                c10::optional<torch::Tensor> opt_mask;
+                if (mask.defined() && mask.numel() > 0) {
+                    opt_mask = mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                }
+                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
+            }
+        } else if (attention_mode_ == 2) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                int batch_size = q.size(0);
+                int n_heads_Q = q.size(1);
+                int n_heads_KV = k.size(1);
+                int head_dim = q.size(3);
+                int seq_len_kv = k.size(2);
+                float scale = 1.0f / std::sqrt(static_cast<float>(head_dim));
+
+                if (q.size(2) == 1) {
+                    attn_output = attn_output_heads_buffer.narrow(0, 0, batch_size);
+                } else {
+                    attn_output = torch::empty_like(q);
+                }
+
+                int element_size = q.element_size();
+                launch_flash_attn_decode_hip(q.data_ptr(), k.data_ptr(), v.data_ptr(),
+                                             (mask.defined() && mask.numel() > 0) ? mask.data_ptr() : nullptr, attn_output.data_ptr(),
+                                             batch_size, n_heads_Q, n_heads_KV, head_dim, seq_len_kv, scale,
+                                             q.stride(2) * element_size, q.stride(1) * element_size, q.stride(0) * element_size,
+                                             k.stride(2) * element_size, k.stride(1) * element_size, k.stride(0) * element_size,
+                                             v.stride(2) * element_size, v.stride(1) * element_size, v.stride(0) * element_size, 0,
+                                             q.dtype() == torch::kBFloat16, c10::hip::getCurrentHIPStream().stream());
+            }
+        } else {
+            auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
+            if (mask.defined() && mask.numel() > 0) {
+                att = att + mask.to(q.dtype());
+            }
+            auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
+            attn_output = torch::matmul(attn_weights, v);
+        }
+
+        attn_output = attn_output.transpose(1, 2).contiguous().view({bsz, seq_len, q_proj_size});
+        auto attn_out_2d = attn_output.view({-1, q_proj_size});
+        auto attn_proj_2d = attn_proj_buf.view({-1, hidden_size_});
+        if (seq_len > 1) {
+            for (int64_t t = 0; t < attn_out_2d.size(0); ++t) {
+                o_layers[i]->forward(attn_proj_2d.narrow(0, t, 1), attn_out_2d.narrow(0, t, 1), "o");
+            }
+        } else {
+            o_layers[i]->forward(attn_proj_buf, attn_out_2d, "o");
+        }
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN] Layer " << i << " after o-proj" << std::endl;
+        }
+        x.add_(attn_proj_buf.slice(-1, 0, hidden_size_));
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN] Layer " << i << " after residual add" << std::endl;
+        }
+
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN] Layer " << i << " before post-attn norm" << std::endl;
+        }
+        post_attn_norms[i]->forward_out(normed.slice(-1, 0, hidden_size_), x.slice(-1, 0, hidden_size_));
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN] Layer " << i << " after post-attn norm" << std::endl;
+        }
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN] Layer " << i << " before MoE" << std::endl;
+        }
+        auto moe_out = moe_layers[i]->forward(normed.slice(-1, 0, hidden_size_));
+        if (debug_verbosity >= 2) {
+            std::cout << "[QWEN] Layer " << i << " after MoE" << std::endl;
+        }
+        x.add_(moe_out);
+    }
+
+    x = final_norm->forward(x);
+    x = lm_head->forward(x);
     return x;
 }
 

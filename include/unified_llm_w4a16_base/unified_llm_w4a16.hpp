@@ -12,7 +12,7 @@
 #define MIXTRAL_USE_SCALED_ATTENTION 2
 
 // Architecture type enum
-enum class ArchitectureType { MIXTRAL };
+enum class ArchitectureType { MIXTRAL, QWEN };
 
 // Quantized Linear Layer for w4a16 (4-bit weights, 16-bit activations)
 // Weights are stored as 4-bit packed in uint8, with scales for dequantization
@@ -119,7 +119,7 @@ TORCH_MODULE(LinearMatmul);
 class MixtralMoEImpl : public torch::nn::Module {
   public:
     MixtralMoEImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
-                   int64_t max_seq_len = 8192);
+                   int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false);
 
     torch::Tensor forward(const torch::Tensor &x);
 
@@ -133,6 +133,8 @@ class MixtralMoEImpl : public torch::nn::Module {
     int64_t intermediate_size_;
     int64_t num_experts_;
     int64_t num_experts_per_tok_;
+    bool use_softmax_before_topk_;
+    bool normalize_topk_prob_;
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);
@@ -211,6 +213,8 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     std::vector<QuantizedLinear> k_layers;
     std::vector<QuantizedLinear> v_layers;
     std::vector<QuantizedLinear> o_layers;
+    std::vector<RMSNorm> q_norms;
+    std::vector<RMSNorm> k_norms;
 
     // MLP layers
 
@@ -258,6 +262,8 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
 
     torch::Tensor forward_mixtral_multi_gpu(torch::Tensor x, int64_t start_pos);
     torch::Tensor forward_mixtral(torch::Tensor x, int64_t start_pos);
+    torch::Tensor forward_qwen_multi_gpu(torch::Tensor x, int64_t start_pos);
+    torch::Tensor forward_qwen(torch::Tensor x, int64_t start_pos);
 
     // Activation functions
     torch::Tensor silu(const torch::Tensor &x);

@@ -1,0 +1,13 @@
+{
+    // choice between cpu and gpu: cpu very slow due to quantization
+    "heterogeneity": "gpu",
+    // only works when there is more than one gpu and heterogeneity is set to gpu
+    "gpu-count": 1,
+    "warmup": false,
+    "preload_moe_kernels": true,
+    "dummy_weights": false,
+    "debug_verbosity": 2,
+    "usePreSavedWeights": true,
+    "minimal_pdi": true,
+    "kernels_gemm": []
+}
