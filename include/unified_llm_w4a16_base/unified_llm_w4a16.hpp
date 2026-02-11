@@ -9,7 +9,7 @@
 
 // Attention mechanism default (can be overridden at runtime by heterogeneity config):
 // 0 = Manual matmul, 1 = PyTorch SDPA, 2 = Custom HIP kernel
-#define MIXTRAL_USE_SCALED_ATTENTION 2
+#define ATTENTION_BACKEND 2
 
 // Architecture type enum
 enum class ArchitectureType { MIXTRAL, QWEN };
@@ -116,10 +116,10 @@ class LinearMatmulImpl : public torch::nn::Module {
 TORCH_MODULE(LinearMatmul);
 
 // Mixtral MoE layer (router + experts)
-class MixtralMoEImpl : public torch::nn::Module {
+class MixtureOfExpertsImpl : public torch::nn::Module {
   public:
-    MixtralMoEImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
-                   int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false);
+    MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
+                         int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false);
 
     torch::Tensor forward(const torch::Tensor &x);
 
@@ -143,7 +143,7 @@ class MixtralMoEImpl : public torch::nn::Module {
     torch::Tensor forward_prefill(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                                   torch::Tensor &output);
 };
-TORCH_MODULE(MixtralMoE);
+TORCH_MODULE(MixtureOfExperts);
 
 #include "unified_llm_w4a16_base/npuSetup.hpp"
 
@@ -219,7 +219,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // MLP layers
 
     // Mixtral MoE layers
-    std::vector<MixtralMoE> moe_layers;
+    std::vector<MixtureOfExperts> moe_layers;
 
     // Note: gate_layers/up_layers/down_layers have been removed. Mixtral uses MoE layers instead.
     // weight loading.) Let's reuse the existing vectors to keep it simple, but we need to know which is which.

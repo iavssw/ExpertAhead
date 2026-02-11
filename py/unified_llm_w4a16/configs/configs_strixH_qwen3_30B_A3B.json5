@@ -6,7 +6,7 @@
     "warmup": false,
     "preload_moe_kernels": true,
     "dummy_weights": false,
-    "debug_verbosity": 2,
+    "debug_verbosity": 1,
     "usePreSavedWeights": true,
     "minimal_pdi": true,
     "kernels_gemm": []
