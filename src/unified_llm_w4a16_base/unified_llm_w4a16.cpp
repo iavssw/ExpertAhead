@@ -15,9 +15,102 @@
 #include <hip/hip_runtime.h>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <torch/torch.h>
 #include <unistd.h>
 #include <vector>
+#include <algorithm>
+
+namespace {
+
+struct GpuVramInfo {
+    int index = -1;
+    size_t free_bytes = 0;
+    size_t total_bytes = 0;
+};
+
+struct GpuSelectionInfo {
+    std::vector<GpuVramInfo> ranked;
+    std::vector<int> selected;
+    bool used_fallback = false;
+    std::string fallback_reason;
+};
+
+double bytes_to_gib(size_t bytes) { return static_cast<double>(bytes) / (1024.0 * 1024.0 * 1024.0); }
+
+std::string join_gpu_indices(const std::vector<int> &gpu_indices) {
+    std::ostringstream oss;
+    oss << "[";
+    for (size_t i = 0; i < gpu_indices.size(); ++i) {
+        if (i > 0) {
+            oss << ", ";
+        }
+        oss << gpu_indices[i];
+    }
+    oss << "]";
+    return oss.str();
+}
+
+GpuSelectionInfo select_gpus_by_free_vram(int requested_gpu_count, int available_gpus) {
+    GpuSelectionInfo selection;
+    if (requested_gpu_count <= 0 || available_gpus <= 0) {
+        return selection;
+    }
+
+    int original_device = 0;
+    bool has_original_device = (hipGetDevice(&original_device) == hipSuccess);
+
+    for (int gpu_idx = 0; gpu_idx < available_gpus; ++gpu_idx) {
+        hipError_t set_err = hipSetDevice(gpu_idx);
+        if (set_err != hipSuccess) {
+            selection.used_fallback = true;
+            selection.fallback_reason = "hipSetDevice(" + std::to_string(gpu_idx) + ") failed: " + hipGetErrorString(set_err);
+            break;
+        }
+
+        size_t free_bytes = 0;
+        size_t total_bytes = 0;
+        hipError_t mem_err = hipMemGetInfo(&free_bytes, &total_bytes);
+        if (mem_err != hipSuccess) {
+            selection.used_fallback = true;
+            selection.fallback_reason = "hipMemGetInfo failed on gpu " + std::to_string(gpu_idx) + ": " + hipGetErrorString(mem_err);
+            break;
+        }
+
+        selection.ranked.push_back({gpu_idx, free_bytes, total_bytes});
+    }
+
+    if (has_original_device) {
+        (void)hipSetDevice(original_device);
+    }
+
+    if (!selection.used_fallback && static_cast<int>(selection.ranked.size()) == available_gpus) {
+        std::sort(selection.ranked.begin(), selection.ranked.end(), [](const GpuVramInfo &a, const GpuVramInfo &b) {
+            if (a.free_bytes != b.free_bytes) {
+                return a.free_bytes > b.free_bytes;
+            }
+            return a.index < b.index;
+        });
+
+        for (const auto &info : selection.ranked) {
+            if (static_cast<int>(selection.selected.size()) >= requested_gpu_count) {
+                break;
+            }
+            selection.selected.push_back(info.index);
+        }
+        return selection;
+    }
+
+    selection.used_fallback = true;
+    selection.ranked.clear();
+    selection.selected.clear();
+    for (int gpu_idx = 0; gpu_idx < available_gpus && static_cast<int>(selection.selected.size()) < requested_gpu_count; ++gpu_idx) {
+        selection.selected.push_back(gpu_idx);
+    }
+    return selection;
+}
+
+} // namespace
 
 template <typename Func> void time_op(const std::string &name, Func func) {
     auto sync0 = hipDeviceSynchronize();
@@ -783,30 +876,72 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
         throw std::runtime_error("Unsupported architecture.");
     }
 
-    // Multi-GPU layer split configuration (GPU mode only).
+    // GPU placement configuration (GPU mode only): auto-select by free VRAM.
     gpu_count_ = std::max(1, npu_config_.gpu_count);
     embedding_device_ = device;
     output_device_ = device;
     layer_devices_.assign(num_hidden_layers_, device);
 
-    if (!is_cpu && device.is_cuda() && gpu_count_ > 1) {
+    if (!is_cpu && device.is_cuda()) {
         int available_gpus = 0;
         if (hipGetDeviceCount(&available_gpus) != hipSuccess) {
             available_gpus = 0;
+        }
+        if (available_gpus <= 0) {
+            throw std::runtime_error("Config requested GPU execution, but no GPU is available.");
         }
         if (available_gpus < gpu_count_) {
             throw std::runtime_error("Config requested gpu-count=" + std::to_string(gpu_count_) + " but only " +
                                      std::to_string(available_gpus) + " GPU(s) are available.");
         }
 
-        multi_gpu_enabled_ = true;
-        embedding_device_ = torch::Device(torch::kCUDA, 0);
+        auto selection = select_gpus_by_free_vram(gpu_count_, available_gpus);
+        if (static_cast<int>(selection.selected.size()) < gpu_count_) {
+            throw std::runtime_error("Failed to select enough GPUs for gpu-count=" + std::to_string(gpu_count_) + ".");
+        }
+
+        multi_gpu_enabled_ = (gpu_count_ > 1);
+        embedding_device_ = torch::Device(torch::kCUDA, selection.selected.front());
         for (int64_t i = 0; i < num_hidden_layers_; ++i) {
-            int gpu_idx = static_cast<int>((i * gpu_count_) / num_hidden_layers_);
+            int selected_slot = static_cast<int>((i * gpu_count_) / num_hidden_layers_);
+            int gpu_idx = selection.selected[selected_slot];
             layer_devices_[i] = torch::Device(torch::kCUDA, gpu_idx);
         }
         output_device_ = layer_devices_.back();
         device = embedding_device_;
+
+        if (debug_verbosity >= 1) {
+            if (selection.used_fallback) {
+                std::cout << "[GPU SELECT] VRAM query failed, using fallback gpu ordering 0..N-1";
+                if (!selection.fallback_reason.empty()) {
+                    std::cout << " (" << selection.fallback_reason << ")";
+                }
+                std::cout << std::endl;
+            } else {
+                std::cout << "[GPU SELECT] Free VRAM ranking: ";
+                for (size_t i = 0; i < selection.ranked.size(); ++i) {
+                    if (i > 0) {
+                        std::cout << ", ";
+                    }
+                    const auto &info = selection.ranked[i];
+                    std::ostringstream vram_ss;
+                    vram_ss << std::fixed << std::setprecision(2) << bytes_to_gib(info.free_bytes) << "/" << bytes_to_gib(info.total_bytes)
+                            << " GiB";
+                    std::cout << "gpu" << info.index << "=" << vram_ss.str();
+                }
+                std::cout << std::endl;
+            }
+
+            std::cout << "[GPU SELECT] Selected GPUs for gpu-count=" << gpu_count_ << ": " << join_gpu_indices(selection.selected)
+                      << std::endl;
+
+            if (multi_gpu_enabled_) {
+                std::cout << "[GPU MAP] Layer split: layer 0 -> gpu" << static_cast<int>(layer_devices_.front().index()) << ", layer "
+                          << (num_hidden_layers_ - 1) << " -> gpu" << static_cast<int>(layer_devices_.back().index()) << std::endl;
+            } else {
+                std::cout << "[GPU MAP] Single-GPU placement on gpu" << static_cast<int>(embedding_device_.index()) << std::endl;
+            }
+        }
     } else {
         gpu_count_ = 1;
     }
@@ -1270,6 +1405,13 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral_multi_gpu(torch::Tensor x, in
 }
 
 torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t start_pos) {
+    if (embedding_device_.is_cuda() && embedding_device_.index() >= 0) {
+        c10::hip::set_device(static_cast<c10::DeviceIndex>(embedding_device_.index()));
+    }
+    if (x.device() != embedding_device_) {
+        x = x.to(embedding_device_);
+    }
+
     int64_t bsz = x.size(0);
     int64_t seq_len = x.size(1);
 
@@ -1599,6 +1741,13 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_qwen_multi_gpu(torch::Tensor x, int64
 }
 
 torch::Tensor UnifiedLLMW4A16Impl::forward_qwen(torch::Tensor x, int64_t start_pos) {
+    if (embedding_device_.is_cuda() && embedding_device_.index() >= 0) {
+        c10::hip::set_device(static_cast<c10::DeviceIndex>(embedding_device_.index()));
+    }
+    if (x.device() != embedding_device_) {
+        x = x.to(embedding_device_);
+    }
+
     int64_t bsz = x.size(0);
     int64_t seq_len = x.size(1);
     const int64_t q_proj_size = num_attention_heads_ * head_dim_;

@@ -1,7 +1,8 @@
 {
     // choice between cpu and gpu: cpu very slow due to quantization
     "heterogeneity": "gpu",
-    // only works when there is more than one gpu and heterogeneity is set to gpu
+    // number of GPUs to use when heterogeneity is set to gpu
+    // if the system has more GPUs than this count, runtime auto-selects GPUs by highest free VRAM
     "gpu-count": 1,
     "warmup": false,
     "preload_moe_kernels": true,
