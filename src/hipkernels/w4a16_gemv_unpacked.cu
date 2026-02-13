@@ -82,7 +82,7 @@ constexpr int WAVE_SIZE = 32;
 
 // Kernel: One Wave per Output (N). Outputs per Block = 256 / WAVE_SIZE.
 // Optimization: v23 (Hybrid Scale Caching + NegZS + Branch).
-template <int MAX_GROUPS>
+template <int MAX_GROUPS, int CHUNKS_PER_TILE = 256>
 __global__ void __launch_bounds__(256)
     w4a16_gemv_unpacked_kernel(bfloat16_t *__restrict__ output, const bfloat16_t *__restrict__ input,
                                const uint8_t *__restrict__ qweights,  // [N, K/2]
@@ -90,6 +90,9 @@ __global__ void __launch_bounds__(256)
                                const uint8_t *__restrict__ zeros,     // [Groups, N_total] or [N_total, Groups]
                                const int M,                           // 1
                                const int K, const int N, const int group_shift, const int stride_groups, const int stride_n) {
+    static_assert((CHUNKS_PER_TILE == 128 || CHUNKS_PER_TILE == 256), "Unsupported CHUNKS_PER_TILE");
+    static_assert((CHUNKS_PER_TILE % WAVE_SIZE) == 0, "CHUNKS_PER_TILE must be a multiple of WAVE_SIZE");
+    static_assert((CHUNKS_PER_TILE & (CHUNKS_PER_TILE - 1)) == 0, "CHUNKS_PER_TILE must be power-of-two");
     const int bx = blockIdx.x;
     const int tid = threadIdx.x;
     const int lane_id = tid % WAVE_SIZE;
@@ -159,11 +162,13 @@ __global__ void __launch_bounds__(256)
     __half2 s2 = __float2half2_rn(1.0f);
     __half2 neg_zs = __float2half2_rn(0.0f);
 
-    const int TILE_SIZE = 8192;
+    constexpr int TILE_SIZE = CHUNKS_PER_TILE * 32;
+    constexpr int INPUT_LOAD_ITERS = TILE_SIZE / 2048;
+    constexpr int CHUNK_MASK = CHUNKS_PER_TILE - 1;
     const int num_tiles = (K + TILE_SIZE - 1) / TILE_SIZE;
 
     int stagger_idx = (global_n & 31);
-    int stagger_offset = (stagger_idx * 8);
+    int stagger_offset = (stagger_idx * 8) & CHUNK_MASK;
 
     for (int t = 0; t < num_tiles; ++t) {
         int k_tile_base = t * TILE_SIZE;
@@ -205,17 +210,15 @@ __global__ void __launch_bounds__(256)
             // Prefetch Weights (with bounds check for smaller K)
             int max_vecs = (K / 2) / 16; // Total uint4 vectors per row
 
-            // Number of chunks processed per iteration depends on WAVE_SIZE.
-            // Wave32: 8 iters * 32 lanes = 256 chunks.
-            // Wave64: 4 iters * 64 lanes = 256 chunks.
-            constexpr int ITERS_PER_LOOP = 256 / WAVE_SIZE;
+            // Number of chunks processed per iteration depends on WAVE_SIZE and tile size.
+            constexpr int ITERS_PER_LOOP = CHUNKS_PER_TILE / WAVE_SIZE;
 
 #pragma unroll
             for (int i = 0; i < ITERS_PER_LOOP; ++i) {
                 int chunk_id_raw = i * WAVE_SIZE + lane_id;
-                int chunk_id = (chunk_id_raw + stagger_offset) & 255;
+                int chunk_id = (chunk_id_raw + stagger_offset) & CHUNK_MASK;
                 chunk_ids[i] = chunk_id;
-                int vec_idx = t * 256 + chunk_id;
+                int vec_idx = t * CHUNKS_PER_TILE + chunk_id;
                 if (vec_idx < max_vecs) {
                     w_vals[i] = w_row_vec[vec_idx];
                 } else {
@@ -332,12 +335,15 @@ __global__ void __launch_bounds__(256)
     }
 }
 
-template <int MAX_GROUPS>
+template <int MAX_GROUPS, int CHUNKS_PER_TILE = 256>
 __global__ void __launch_bounds__(256)
     w4a16_gemv_unpacked_kernel_3d(bfloat16_t *__restrict__ output, const bfloat16_t *__restrict__ input,
                                   const uint64_t *__restrict__ qweights_ptrs, const uint64_t *__restrict__ scales_ptrs,
                                   const uint64_t *__restrict__ zeros_ptrs, const int M, const int K, const int N, const int group_shift,
                                   const int stride_groups, const int stride_n) {
+    static_assert((CHUNKS_PER_TILE == 128 || CHUNKS_PER_TILE == 256), "Unsupported CHUNKS_PER_TILE");
+    static_assert((CHUNKS_PER_TILE % WAVE_SIZE) == 0, "CHUNKS_PER_TILE must be a multiple of WAVE_SIZE");
+    static_assert((CHUNKS_PER_TILE & (CHUNKS_PER_TILE - 1)) == 0, "CHUNKS_PER_TILE must be power-of-two");
     const int expert = blockIdx.z;
     const bfloat16_t *input_e = input + static_cast<size_t>(expert) * static_cast<size_t>(K);
     bfloat16_t *output_e = output + static_cast<size_t>(expert) * static_cast<size_t>(N);
@@ -412,21 +418,23 @@ __global__ void __launch_bounds__(256)
     __half2 s2 = __float2half2_rn(1.0f);
     __half2 neg_zs = __float2half2_rn(0.0f);
 
-    const int TILE_SIZE = 8192;
+    constexpr int TILE_SIZE = CHUNKS_PER_TILE * 32;
+    constexpr int INPUT_LOAD_ITERS = TILE_SIZE / 2048;
+    constexpr int CHUNK_MASK = CHUNKS_PER_TILE - 1;
     const int num_tiles = (K + TILE_SIZE - 1) / TILE_SIZE;
 
     int stagger_idx = (global_n & 31);
-    int stagger_offset = (stagger_idx * 8);
+    int stagger_offset = (stagger_idx * 8) & CHUNK_MASK;
 
     // Pre-calculate chunks (Strength Reduction)
-    constexpr int ITERS_PER_LOOP = 256 / WAVE_SIZE;
+    constexpr int ITERS_PER_LOOP = CHUNKS_PER_TILE / WAVE_SIZE;
     int chunk_ids[ITERS_PER_LOOP];
     const uint4 *w_ptrs[ITERS_PER_LOOP];
     if (active) {
 #pragma unroll
         for (int i = 0; i < ITERS_PER_LOOP; ++i) {
             int chunk_id_raw = i * WAVE_SIZE + lane_id;
-            int chunk_id = (chunk_id_raw + stagger_offset) & 255;
+            int chunk_id = (chunk_id_raw + stagger_offset) & CHUNK_MASK;
             chunk_ids[i] = chunk_id;
             w_ptrs[i] = w_row_vec + chunk_id;
         }
@@ -440,9 +448,9 @@ __global__ void __launch_bounds__(256)
         int vec_base_k = k_tile_base / 8;
         int max_vec_k = K / 8;
 
-        // Load Input (Block 256: 4 iters required to load 1024 uint4s)
+        // Load Input to shared tile.
 #pragma unroll
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < INPUT_LOAD_ITERS; ++i) {
             int vec_offset = i * 256 + tid;
             int vec_idx = vec_base_k + vec_offset;
             if (vec_idx < max_vec_k) {
@@ -472,7 +480,7 @@ __global__ void __launch_bounds__(256)
             // Load Loads
 #pragma unroll
             for (int i = 0; i < ITERS_PER_LOOP; ++i) {
-                int vec_idx = t * 256 + chunk_ids[i];
+                int vec_idx = t * CHUNKS_PER_TILE + chunk_ids[i];
                 if (vec_idx < max_vecs) {
                     // Use non-temporal load to bypass L2 cache (streaming weights)
                     // Cast to __int128_t (16 bytes) which is a native type for the builtin
@@ -482,7 +490,7 @@ __global__ void __launch_bounds__(256)
                 } else {
                     w_vals[i] = {0, 0, 0, 0};
                 }
-                w_ptrs[i] += 256;
+                w_ptrs[i] += CHUNKS_PER_TILE;
             }
 
 #pragma unroll
@@ -660,13 +668,33 @@ void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
     }
 
     int num_groups = K >> group_shift;
-    if (num_groups <= 128) {
-        w4a16_gemv_unpacked_kernel_3d<128>
+    if (K == 4096) {
+        if (num_groups <= 32) {
+            w4a16_gemv_unpacked_kernel_3d<32, 128>
+                <<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
+                                        (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(),
+                                        (const uint64_t *)scales_ptrs.data_ptr<int64_t>(), (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(),
+                                        M, K, N, group_shift, stride_groups, stride_n);
+        } else if (num_groups <= 128) {
+            w4a16_gemv_unpacked_kernel_3d<128, 128>
+                <<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
+                                        (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(),
+                                        (const uint64_t *)scales_ptrs.data_ptr<int64_t>(), (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(),
+                                        M, K, N, group_shift, stride_groups, stride_n);
+        } else {
+            w4a16_gemv_unpacked_kernel_3d<256, 128>
+                <<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
+                                        (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(),
+                                        (const uint64_t *)scales_ptrs.data_ptr<int64_t>(), (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(),
+                                        M, K, N, group_shift, stride_groups, stride_n);
+        }
+    } else if (num_groups <= 128) {
+        w4a16_gemv_unpacked_kernel_3d<128, 256>
             <<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
                                     (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(), (const uint64_t *)scales_ptrs.data_ptr<int64_t>(),
                                     (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(), M, K, N, group_shift, stride_groups, stride_n);
     } else {
-        w4a16_gemv_unpacked_kernel_3d<256>
+        w4a16_gemv_unpacked_kernel_3d<256, 256>
             <<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
                                     (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(), (const uint64_t *)scales_ptrs.data_ptr<int64_t>(),
                                     (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(), M, K, N, group_shift, stride_groups, stride_n);
@@ -682,15 +710,16 @@ void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
                                   const std::vector<int64_t> &scales_ptrs, const std::vector<int64_t> &zeros_ptrs, int64_t in_features,
                                   int64_t out_features, int64_t group_size, int64_t num_experts) {
     TORCH_CHECK(input.is_cuda(), "input must be on CUDA");
+    TORCH_CHECK(static_cast<int64_t>(qweights_ptrs.size()) >= num_experts, "qweights_ptrs size is smaller than num_experts");
+    TORCH_CHECK(static_cast<int64_t>(scales_ptrs.size()) >= num_experts, "scales_ptrs size is smaller than num_experts");
+    TORCH_CHECK(static_cast<int64_t>(zeros_ptrs.size()) >= num_experts, "zeros_ptrs size is smaller than num_experts");
+
     const int target_device = input.get_device();
     int current_device = 0;
     HIP_CHECK(hipGetDevice(&current_device));
     if (current_device != target_device) {
         HIP_CHECK(hipSetDevice(target_device));
     }
-
-    auto &cache = gemv_ptr_cache_for_device(target_device);
-    ensure_device_ptrs(cache, qweights_ptrs, scales_ptrs, zeros_ptrs);
 
     const int K = static_cast<int>(in_features);
     const int N = static_cast<int>(out_features);
@@ -711,14 +740,37 @@ void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
     }
 
     int num_groups = K >> group_shift;
-    if (num_groups <= 128) {
-        w4a16_gemv_unpacked_kernel_3d<128><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
-                                                                  cache.d_qweights, cache.d_scales, cache.d_zeros, M, K, N, group_shift,
-                                                                  stride_groups, stride_n);
+
+    auto &cache = gemv_ptr_cache_for_device(target_device);
+    ensure_device_ptrs(cache, qweights_ptrs, scales_ptrs, zeros_ptrs);
+
+    if (K == 4096) {
+        if (num_groups <= 32) {
+            w4a16_gemv_unpacked_kernel_3d<32, 128><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(),
+                                                                           (const bfloat16_t *)input.data_ptr(), cache.d_qweights,
+                                                                           cache.d_scales, cache.d_zeros, M, K, N, group_shift,
+                                                                           stride_groups, stride_n);
+        } else if (num_groups <= 128) {
+            w4a16_gemv_unpacked_kernel_3d<128, 128><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(),
+                                                                            (const bfloat16_t *)input.data_ptr(), cache.d_qweights,
+                                                                            cache.d_scales, cache.d_zeros, M, K, N, group_shift,
+                                                                            stride_groups, stride_n);
+        } else {
+            w4a16_gemv_unpacked_kernel_3d<256, 128><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(),
+                                                                            (const bfloat16_t *)input.data_ptr(), cache.d_qweights,
+                                                                            cache.d_scales, cache.d_zeros, M, K, N, group_shift,
+                                                                            stride_groups, stride_n);
+        }
+    } else if (num_groups <= 128) {
+        w4a16_gemv_unpacked_kernel_3d<128, 256><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(),
+                                                                        (const bfloat16_t *)input.data_ptr(), cache.d_qweights,
+                                                                        cache.d_scales, cache.d_zeros, M, K, N, group_shift,
+                                                                        stride_groups, stride_n);
     } else {
-        w4a16_gemv_unpacked_kernel_3d<256><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
-                                                                  cache.d_qweights, cache.d_scales, cache.d_zeros, M, K, N, group_shift,
-                                                                  stride_groups, stride_n);
+        w4a16_gemv_unpacked_kernel_3d<256, 256><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(),
+                                                                        (const bfloat16_t *)input.data_ptr(), cache.d_qweights,
+                                                                        cache.d_scales, cache.d_zeros, M, K, N, group_shift,
+                                                                        stride_groups, stride_n);
     }
 
     hipError_t err = hipGetLastError();
