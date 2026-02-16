@@ -9,7 +9,7 @@
 
 // Attention mechanism default (can be overridden at runtime by heterogeneity config):
 // 0 = Manual matmul, 1 = PyTorch SDPA, 2 = Custom HIP kernel
-#define MIXTRAL_USE_SCALED_ATTENTION 2
+#define ATTENTION_BACKEND 2
 
 // Architecture type enum
 enum class ArchitectureType { MIXTRAL, QWEN };

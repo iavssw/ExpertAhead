@@ -1,6 +1,6 @@
-#include "unified_llm_w4a16_predict/helper.hpp"
-#include "unified_llm_w4a16_predict/npuSetup.hpp"
-#include "unified_llm_w4a16_predict/unified_llm_w4a16.hpp"
+#include "unified_llm_w4a16_cached/helper.hpp"
+#include "unified_llm_w4a16_cached/npuSetup.hpp"
+#include "unified_llm_w4a16_cached/unified_llm_w4a16.hpp"
 
 #include <algorithm>
 #include <chrono>

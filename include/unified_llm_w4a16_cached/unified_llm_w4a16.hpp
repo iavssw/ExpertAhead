@@ -6,9 +6,6 @@
 #include <torch/torch.h>
 #include <utility>
 #include <vector>
-#include <mutex>
-#include <future>
-#include <unified_llm_w4a16_predict/expert_predictor.h>
 
 // Attention mechanism default (can be overridden at runtime by heterogeneity config):
 // 0 = Manual matmul, 1 = PyTorch SDPA, 2 = Custom HIP kernel
@@ -124,7 +121,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                          int64_t max_cached_experts, int64_t layer_idx, 
                          int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false,
-                         double lambda = 0.0, const std::string& predictor_model_path = "");
+                         double lambda = 0.0);
 
     torch::Tensor forward(const torch::Tensor &x);
     void set_weights_dir(const std::string& dir) { weights_dir_ = dir; }
@@ -147,11 +144,6 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void print_cache_stats() const;
     std::pair<int64_t, int64_t> get_cache_stats() const { return {cache_hits_, cache_misses_}; }
     void reset_cache_stats();
-
-    // Prediction & Speculative Loading
-    void set_context_token_ids(const std::vector<int64_t>& token_ids);
-    void trigger_speculative_loading(std::vector<int64_t> recent_token_ids);
-    void load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids);
 
     // Exposed for weight loading
     LinearMatmul router{nullptr};
@@ -188,13 +180,6 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
     
-    // Prediction & Speculative Loading
-    std::unique_ptr<IExpertPredictor> predictor_;
-    std::vector<int64_t> recent_token_ids_;
-    std::future<void> speculative_load_future_;
-    bool in_generation_mode_ = false;
-    std::mutex expert_slots_mutex_;  // For thread safety during loading
-    
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
 
@@ -207,7 +192,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
 };
 TORCH_MODULE(MixtureOfExperts);
 
-#include "unified_llm_w4a16_predict/npuSetup.hpp"
+#include "unified_llm_w4a16_cached/npuSetup.hpp"
 
 class UnifiedLLMW4A16Impl : public torch::nn::Module {
   public:
@@ -215,8 +200,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                         int64_t num_hidden_layers, int64_t num_attention_heads, int64_t num_key_value_heads, int64_t head_dim,
                         float rms_norm_eps, float rope_theta, const NPUGlobalConfig &npu_config, int64_t max_seq_len = 8192,
                         int64_t max_batch_size = 1, int64_t groupsize = 128, int64_t num_experts = 0, int64_t num_experts_per_tok = 0,
-                        torch::Device device = torch::kCPU, int64_t max_cached_experts_per_layer = 0,
-                        const std::string& predictor_model_path = "");
+                        torch::Device device = torch::kCPU, int64_t max_cached_experts_per_layer = 0);
 
     // Forward pass: takes token IDs and returns logits
     torch::Tensor forward(torch::Tensor input_ids, int64_t start_pos = 0);

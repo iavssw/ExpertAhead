@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Optional, Union, List
 
 import torch
+import torch.nn.functional as F
 from transformers import AutoTokenizer
 
 _script_dir = Path(__file__).parent.resolve()
@@ -181,19 +182,28 @@ class Mixtral8x7BW4A16Model:
         num_experts_per_tok: int = 2,
         device: str = "cuda",
         backend: str = "base",
-        config_path: Optional[str] = None
+        config_path: Optional[str] = None,
+        max_cached_experts_per_layer: int = 8,
+        use_cached_moe: bool = False,
+        predictor_models_dir: str = "",
+        weights_dir: str = ""
     ):
         """
         Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
         """
 
-        if backend != "base":
-            raise ValueError("Mixtral is only supported in the base backend for now.")
+        if backend not in ["base", "predict", "cached"]:
+            raise ValueError(f"Invalid backend: {backend}. Choose from: base, predict, cached")
 
         try:
-            import unified_llm_w4a16_base_libtorch as backend_module
+            if backend == "base":
+                import unified_llm_w4a16_base_libtorch as backend_module
+            elif backend == "predict":
+                import unified_llm_w4a16_predict_libtorch as backend_module
+            elif backend == "cached":
+                import unified_llm_w4a16_cached_libtorch as backend_module
         except ImportError as e:
-            raise ImportError(f"Could not import base backend: {e}")
+            raise ImportError(f"Could not import {backend} backend: {e}")
 
         global ArchitectureType
         ArchitectureType = backend_module.ArchitectureType
@@ -227,8 +237,19 @@ class Mixtral8x7BW4A16Model:
             groupsize,
             num_experts,
             num_experts_per_tok,
-            device,
         ]
+
+        if backend == "cached":
+             # Cached backend specific args: max_cached, device, config
+             constructor_args.append(max_cached_experts_per_layer)
+             constructor_args.append(device)
+        else:
+             # Base/Predict backend args (assuming predict uses extra args)
+             constructor_args.append(device)
+             # predict backend usage would need to be checked, for now keeping compatibility with previous style if backend=predict?
+             if backend == "predict":
+                 constructor_args.append(max_cached_experts_per_layer) # Predict might use this too?
+                 constructor_args.append(predictor_models_dir)
 
         if config_path is None:
             config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5"))
@@ -259,6 +280,10 @@ class Mixtral8x7BW4A16Model:
             self.model.initialize_dummy_weights()
         elif model_path:
             self._load_quantized_weights(model_path, weights_folder="model_weights")
+
+        if backend == "cached":
+            print(f"Pre-warming expert cache with {max_cached_experts_per_layer} experts...")
+            self.model.prewarm_experts(max_cached_experts_per_layer)
 
         tokenizer_path = tokenizer_path or model_path
         if tokenizer_path:
@@ -479,6 +504,8 @@ class Mixtral8x7BW4A16Model:
         if self.tokenizer is not None and self.tokenizer.eos_token_id is not None:
             eos_token_id = self.tokenizer.eos_token_id
 
+        print(" ========================== Starting generation ==========================")
+
         return self.model.generate(
             input_ids,
             max_new_tokens,
@@ -493,6 +520,64 @@ class Mixtral8x7BW4A16Model:
         if isinstance(input_ids, str):
             input_ids = self.tokenize(input_ids)
         return self.model.forward(input_ids, start_pos)
+
+    def set_lambda(self, lambda_value: float, layer_idx: int = -1):
+        """
+        Set the router logit bias parameter (lambda).
+        
+        Args:
+            lambda_value: Bias strength in range [0, 1].
+                         0.0: no bias (standard routing)
+                         0.0 < λ ≤ 1.0: bias toward cached experts
+                         Higher values = stronger bias toward cache
+            layer_idx: Layer index to modify, or -1 for all layers
+        
+        Raises:
+            ValueError: If lambda_value is not in [0, 1]
+        """
+        if lambda_value < 0.0 or lambda_value > 1.0:
+            raise ValueError(f"Lambda must be in range [0, 1], got: {lambda_value}")
+        self.model.set_lambda(lambda_value, layer_idx)
+
+    def get_lambda(self, layer_idx: int = 0) -> float:
+        """Get lambda parameter for specified layer."""
+        return self.model.get_lambda(layer_idx)
+
+    def calculate_generation_perplexity(self, text: str) -> float:
+        """
+        Calculate generation-time perplexity using the optimized C++ backend loop.
+        This provides a fair evaluation of cache performance during generation.
+        """
+        if isinstance(text, str):
+            input_ids = self.tokenize(text)
+            # Ensure input_ids on correct device is handled by tokenize/backend
+        elif isinstance(text, torch.Tensor):
+            input_ids = text
+        else:
+            raise ValueError("Text must be string or tensor")
+            
+        # Call C++ backend method directly
+        if hasattr(self.model, "calculate_generation_perplexity"):
+             return self.model.calculate_generation_perplexity(input_ids)
+        else:
+             print("Error: Backend does not support calculate_generation_perplexity")
+             return 0.0
+
+    def print_cache_stats(self):
+        """Print cache hits and misses."""
+        if hasattr(self.model, "print_cache_stats"):
+            self.model.print_cache_stats()
+
+    def reset_cache_stats(self):
+        """Reset cache hits and misses."""
+        if hasattr(self.model, "reset_cache_stats"):
+            self.model.reset_cache_stats()
+    
+    def get_cache_stats(self):
+        """Get cache statistics as (total_hits, total_misses) tuple."""
+        if hasattr(self.model, "get_cache_stats"):
+            return self.model.get_cache_stats()
+        return (0, 0)
 
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
@@ -695,14 +780,26 @@ def main():
         "--backend",
         type=str,
         default="base",
-        choices=["base", "predict"],
-        help="Backend to use (default: base)"
+        choices=["base", "predict", "cached"],
+        help="Backend to use: base (all experts), predict (heterogeneous), cached (selective loading)"
+    )
+    parser.add_argument(
+        "--expert-cache",
+        type=int,
+        default=8,
+        help="Maximum number of cached experts per layer (for cached backend)"
     )
     parser.add_argument(
         "--config-path",
         type=str,
         default=os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5")),
         help="Path to NPU config JSON"
+    )
+    parser.add_argument(
+        "--predictor-model",
+        type=str,
+        default="",
+        help="Path to predictor model file (.pt) for 'predict' backend"
     )
     parser.add_argument(
         "--generate",
@@ -720,7 +817,7 @@ def main():
     parser.add_argument(
         "--max-new-tokens",
         type=int,
-        default=16,
+        default=40,
         help="Maximum number of tokens to generate (if --generate is used, default: 16)"
     )
     parser.add_argument(
@@ -746,6 +843,25 @@ def main():
         type=int,
         default=None,
         help="Run prompt test case with specified token count."
+    )
+    parser.add_argument(
+        "--lambda-val",
+        type=float,
+        default=0.0,
+        help="Lambda value for router logit biasing (range [0, 1])"
+    )
+    parser.add_argument(
+        "--perplexity",
+        action="store_true",
+        default=False,
+        help="Calculate perplexity instead of generating text"
+    )
+
+    parser.add_argument(
+        "--generation-perplexity",
+        action="store_true",
+        default=False,
+        help="Calculate generation-time perplexity (slower, token-by-token)"
     )
 
     args = parser.parse_args()
@@ -775,7 +891,9 @@ def main():
             tokenizer_path=args.tokenizer_path,
             device=args.device,
             backend=args.backend,
-            config_path=args.config_path
+            config_path=args.config_path,
+            max_cached_experts_per_layer=args.expert_cache,
+            predictor_models_dir=args.predictor_model
         )
 
         print("Model initialized successfully!")
@@ -791,8 +909,32 @@ def main():
 
     print(f"Processing text: '{args.text}'")
 
+    # Set lambda if specified
+    if args.lambda_val != 0.0:
+        print(f"Setting lambda to {args.lambda_val}")
+        model.set_lambda(args.lambda_val)
+
+    if args.generation_perplexity:
+        print("Calculating generation-time perplexity (using C++ backend loop)...")
+        # Reset stats before PPL so we capture only PPL phases
+        model.reset_cache_stats()
+        
+        gppl = model.calculate_generation_perplexity(args.text)
+             
+        print(f"Generation Perplexity: {gppl:.4f}")
+        
+        # Get and print cache stats
+        hits, misses = model.get_cache_stats()
+        total = hits + misses
+        hit_rate = (hits / total * 100.0) if total > 0 else 0.0
+        print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
+        
+        model.print_cache_stats()
+
     if args.generate:
         print(f"Generating {args.max_new_tokens} tokens...\n")
+        # Reset stats before generation so we only capture generation stats
+        model.reset_cache_stats()
         try:
             input_ids = model.tokenize(args.text)
 
@@ -820,6 +962,14 @@ def main():
                 print(f"{'='*60}")
                 print(decoded_generated)
                 print(f"{'='*60}")
+                
+                # Get and print cache stats
+                hits, misses = model.get_cache_stats()
+                total = hits + misses
+                hit_rate = (hits / total * 100.0) if total > 0 else 0.0
+                print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
+                
+                model.print_cache_stats()
             else:
                 print(f"\nGenerated token IDs: {generated}")
         except Exception as e:

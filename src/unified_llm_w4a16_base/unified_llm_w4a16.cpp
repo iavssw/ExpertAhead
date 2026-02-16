@@ -16,7 +16,6 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <sstream>
 #include <torch/torch.h>
 #include <unistd.h>
 #include <vector>
@@ -910,6 +909,53 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
         }
         output_device_ = layer_devices_.back();
         device = embedding_device_;
+
+        if (debug_verbosity >= 1) {
+            if (selection.used_fallback) {
+                std::cout << "[GPU SELECT] VRAM query failed, using fallback gpu ordering 0..N-1";
+                if (!selection.fallback_reason.empty()) {
+                    std::cout << " (" << selection.fallback_reason << ")";
+                }
+                std::cout << std::endl;
+            } else {
+                std::cout << "[GPU SELECT] Free VRAM ranking: ";
+                for (size_t i = 0; i < selection.ranked.size(); ++i) {
+                    if (i > 0) {
+                        std::cout << ", ";
+                    }
+                    const auto &info = selection.ranked[i];
+                    std::ostringstream vram_ss;
+                    vram_ss << std::fixed << std::setprecision(2) << bytes_to_gib(info.free_bytes) << "/" << bytes_to_gib(info.total_bytes)
+                            << " GiB";
+                    std::cout << "gpu" << info.index << "=" << vram_ss.str();
+                }
+                std::cout << std::endl;
+            }
+
+            std::cout << "[GPU SELECT] Selected GPUs for gpu-count=" << gpu_count_ << ": " << join_gpu_indices(selection.selected)
+                      << std::endl;
+
+            if (multi_gpu_enabled_) {
+                std::ostringstream layer_map_ss;
+                layer_map_ss << "[GPU MAP] Layer ranges: ";
+                bool first = true;
+                for (int slot = 0; slot < gpu_count_; ++slot) {
+                    const int64_t layer_start = (slot * num_hidden_layers_) / gpu_count_;
+                    const int64_t layer_end = (((slot + 1) * num_hidden_layers_) / gpu_count_) - 1;
+                    if (layer_start > layer_end) {
+                        continue;
+                    }
+                    if (!first) {
+                        layer_map_ss << "; ";
+                    }
+                    first = false;
+                    layer_map_ss << "gpu" << selection.selected[slot] << ": layers " << layer_start << "-" << layer_end;
+                }
+                std::cout << layer_map_ss.str() << std::endl;
+            } else {
+                std::cout << "[GPU MAP] Single-GPU placement on gpu" << static_cast<int>(embedding_device_.index()) << std::endl;
+            }
+        }
     } else {
         gpu_count_ = 1;
     }

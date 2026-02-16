@@ -187,13 +187,18 @@ class Qwen3_30BA3BW4A16Model:
         Initialize Qwen3 30B-A3B AWQ w4a16 quantized model.
         """
 
-        if backend != "base":
-            raise ValueError("Qwen3 is only supported in the base backend for now.")
+        if backend not in ["base", "predict", "cached"]:
+            raise ValueError(f"Invalid backend: {backend}. Choose from: base, predict, cached")
 
         try:
-            import unified_llm_w4a16_base_libtorch as backend_module
+            if backend == "base":
+                import unified_llm_w4a16_base_libtorch as backend_module
+            elif backend == "predict":
+                import unified_llm_w4a16_predict_libtorch as backend_module
+            elif backend == "cached":
+                import unified_llm_w4a16_cached_libtorch as backend_module
         except ImportError as e:
-            raise ImportError(f"Could not import base backend: {e}")
+            raise ImportError(f"Could not import {backend} backend: {e}")
 
         global ArchitectureType
         ArchitectureType = backend_module.ArchitectureType
@@ -701,8 +706,8 @@ def main():
         "--backend",
         type=str,
         default="base",
-        choices=["base", "predict"],
-        help="Backend to use (default: base)"
+        choices=["base", "predict", "cached"],
+        help="Backend to use: base (all experts), predict (heterogeneous), cached (selective loading)"
     )
     parser.add_argument(
         "--config-path",

@@ -1,4 +1,4 @@
-#include "unified_llm_w4a16_predict/npuSetup.hpp"
+#include "unified_llm_w4a16_cached/npuSetup.hpp"
 
 #include <iostream>
 #include <string>

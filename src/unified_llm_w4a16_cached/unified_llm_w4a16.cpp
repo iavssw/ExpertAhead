@@ -1,4 +1,4 @@
-#include "unified_llm_w4a16_predict/unified_llm_w4a16.hpp"
+#include "unified_llm_w4a16_cached/unified_llm_w4a16.hpp"
 #include "hipkernels/embedding.hpp"
 #include "hipkernels/flash_attn_decode.hpp"
 #include "hipkernels/lm_head.hpp"
@@ -6,8 +6,8 @@
 #include "hipkernels/rope.hpp"
 #include "hipkernels/w4a16_gemm_unpacked.hpp"
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
-#include "unified_llm_w4a16_predict/helper.hpp"
-#include "unified_llm_w4a16_predict/npuSetup.hpp"
+#include "unified_llm_w4a16_cached/helper.hpp"
+#include "unified_llm_w4a16_cached/npuSetup.hpp"
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
 #include <chrono>
@@ -565,20 +565,10 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 // MixtureOfExpertsImpl Implementation
 MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                                            int64_t max_cached_experts, int64_t layer_idx,
-                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path)
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), max_cached_experts_(max_cached_experts), layer_idx_(layer_idx),
       use_softmax_before_topk_(use_softmax_before_topk), normalize_topk_prob_(normalize_topk_prob), lambda_(lambda) {
-
-    // Initialize predictor if model path provided
-    if (!predictor_model_path.empty()) {
-        try {
-            predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_);
-        } catch (const std::exception& e) {
-            std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
-        }
-    }
-
     router = register_module("router", LinearMatmul(hidden_size_, num_experts_, false));
 
     // Initialize cache with empty slots
@@ -613,129 +603,11 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     }
 }
 
-void MixtureOfExpertsImpl::set_context_token_ids(const std::vector<int64_t>& token_ids) {
-    recent_token_ids_ = token_ids;
-    // Keep only the last 32 tokens (predictor usually expects fixed context)
-    if (recent_token_ids_.size() > 32) {
-        recent_token_ids_.erase(
-            recent_token_ids_.begin(), 
-            recent_token_ids_.begin() + (recent_token_ids_.size() - 32)
-        );
-    }
-}
-
-void MixtureOfExpertsImpl::trigger_speculative_loading(std::vector<int64_t> recent_token_ids) {
-    // Check if predictor is available
-    if (!predictor_) {
-        return;
-    }
-    
-    // Only do speculative loading during generation (single token at a time usually, but here based on mode)
-    if (!in_generation_mode_) {
-        return;
-    }
-    
-    // Launch async prediction and loading
-    // Capture necessary data by value to avoid lifetime issues
-    std::vector<int64_t> context_copy = recent_token_ids;
-    
-    speculative_load_future_ = std::async(std::launch::async, 
-        [this, context_copy]() {
-            // Predict
-            predictor_->predict_async(0, context_copy); // Token ID 0 as placeholder
-            
-            // Wait for prediction
-            int64_t predicted_expert_id = predictor_->get_prediction();
-            
-            if (predicted_expert_id != -1) {
-                if (debug_verbosity >= 1) {
-                    std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted expert: " << predicted_expert_id << std::endl;
-                }
-                std::vector<int64_t> predicted_experts = {predicted_expert_id};
-                load_predicted_experts(predicted_experts);
-            }
-        });
-}
-
-void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids) {
-    for (int64_t eid : predicted_expert_ids) {
-        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
-        
-        // Check if expert is already loaded
-        auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
-        
-        if (it != expert_slots_indices.end()) {
-            // Already loaded - just update LRU
-            size_t slot_idx = std::distance(expert_slots_indices.begin(), it);
-            // Move to back (MRU)
-             for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
-                if (*lit == slot_idx) {
-                    expert_lru_order_.erase(lit);
-                    expert_lru_order_.push_back(slot_idx);
-                    break;
-                }
-            }
-        } else {
-            // Not loaded - need to load it
-            size_t slot_to_use;
-            
-            // Find an empty slot or use LRU
-            auto empty_it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), -1);
-            if (empty_it != expert_slots_indices.end()) {
-                // Use empty slot
-                slot_to_use = std::distance(expert_slots_indices.begin(), empty_it);
-                
-                // Remove from LRU list wherever it is (it's initialized there)
-                for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
-                    if (*lit == slot_to_use) {
-                        expert_lru_order_.erase(lit);
-                        break;
-                    }
-                }
-            } else {
-                // All slots full - evict LRU (front of vector)
-                slot_to_use = expert_lru_order_.front();
-                expert_lru_order_.erase(expert_lru_order_.begin());
-                
-                if (debug_verbosity >= 1) {
-                     std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Evicting expert " 
-                               << expert_slots_indices[slot_to_use] << " from slot " << slot_to_use << std::endl;
-                }
-            }
-            
-            // Load the expert (temporarily release lock during I/O if we were being fancy, but keeping it simple/safe)
-            // Actually, load_expert_weights might be slow, but we are in async thread.
-            // Be careful about other threads accessing expert_slots_indices.
-            
-            load_expert_weights(slot_to_use, eid, weights_dir_);
-            // Since this is async/speculative, we want to ensure weights are ready? 
-            // hipDeviceSynchronize(); // Maybe too heavy?
-            
-            // Update tracking
-            expert_slots_indices[slot_to_use] = eid;
-            expert_lru_order_.push_back(slot_to_use);
-            
-             // Update cache bitmask
-            if (expert_cache_bitmask_.size() == num_experts_) {
-                std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
-                for (auto eid : expert_slots_indices) {
-                    if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
-                        expert_cache_bitmask_[eid] = 1;
-                    }
-                }
-            }
-        }
-    }
-}
-
 int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
     // Linear scan of slots to find if expert is already loaded
-    // Lock for thread safety with speculative loading
-    std::lock_guard<std::mutex> lock(expert_slots_mutex_);
-
     for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
         if (expert_slots_indices[s] == global_expert_idx) {
-            std::cout << "Layer " << layer_idx_ << " - Hit" << std::endl;
+            // std::cout << "Layer " << layer_idx_ << " - Hit" << std::endl;
             if (update_stats) {
                 cache_hits_++;
             }
@@ -753,7 +625,7 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
     }
     
     // Miss: Evict the Least Recently Used slot (front of the vector)
-    std::cout << "Layer " << layer_idx_ << " - Miss" << std::endl;
+    // std::cout << "Layer " << layer_idx_ << " - Miss" << std::endl;
     if (update_stats) {
         cache_misses_++;
     }
@@ -836,12 +708,6 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
 
 torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
                                                        const torch::Tensor &topk_idx, torch::Tensor &output) {
-    in_generation_mode_ = true;
-    
-    // First, wait for any speculative loading to complete
-    if (speculative_load_future_.valid()) {
-        speculative_load_future_.wait();
-    }
     auto opts = x_flat.options();
     const int64_t active_experts = num_experts_per_tok_;
 
@@ -894,16 +760,12 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     hipkernels::w4a16_gemv_unpacked_fused_3d(down_batched, gate_buf.contiguous(), down_qw_ptrs, down_s_ptrs, down_z_ptrs,
                                              intermediate_size_, hidden_size_, down_group_size, active_experts);
 
-    std::cout << "ran kernel" << std::endl;
+    // std::cout << "ran kernel" << std::endl;
 
     auto weights = topk_vals[0].to(output.dtype()).view({active_experts, 1});
-    std::cout << "weights: " << weights << std::endl;
+    // std::cout << "weights: " << weights << std::endl;
     down_batched.mul_(weights);
     output.add_(down_batched.sum(0, true));
-    
-    // Trigger speculative loading for the next token based on recent history
-    trigger_speculative_loading(recent_token_ids_);
-    
     return output;
 }
 
@@ -1101,8 +963,7 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                                          int64_t num_hidden_layers, int64_t num_attention_heads, int64_t num_key_value_heads,
                                          int64_t head_dim, float rms_norm_eps, float rope_theta, const NPUGlobalConfig &npu_config,
                                          int64_t max_seq_len, int64_t max_batch_size, int64_t groupsize, int64_t num_experts,
-                                         int64_t num_experts_per_tok, torch::Device device, int64_t max_cached_experts_per_layer,
-                                         const std::string& predictor_model_path)
+                                         int64_t num_experts_per_tok, torch::Device device, int64_t max_cached_experts_per_layer)
     : arch_type_(arch_type), vocab_size_(vocab_size), hidden_size_(hidden_size), intermediate_size_(intermediate_size),
       num_hidden_layers_(num_hidden_layers), num_attention_heads_(num_attention_heads), num_key_value_heads_(num_key_value_heads),
       head_dim_(head_dim), rms_norm_eps_(rms_norm_eps), rope_theta_(rope_theta), max_seq_len_(max_seq_len), max_batch_size_(max_batch_size),
@@ -1239,7 +1100,7 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
             moe_layers.push_back(register_module("moe_" + std::to_string(i),
                                                  MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
                                                                   max_cached_experts_per_layer, i,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, predictor_model_path)));
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
@@ -1504,21 +1365,6 @@ void UnifiedLLMW4A16Impl::preload_moe_kernels() {
 }
 
 torch::Tensor UnifiedLLMW4A16Impl::forward(torch::Tensor x, int64_t start_pos) {
-    // Extract token IDs and update context for all MoE layers
-    std::vector<int64_t> token_ids;
-    if (x.is_cuda()) {
-        auto x_cpu = x.cpu();
-        token_ids = std::vector<int64_t>(x_cpu.data_ptr<int64_t>(), x_cpu.data_ptr<int64_t>() + x_cpu.numel());
-    } else {
-        token_ids = std::vector<int64_t>(x.data_ptr<int64_t>(), x.data_ptr<int64_t>() + x.numel());
-    }
-
-    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-        for (auto& moe_layer : moe_layers) {
-            moe_layer->set_context_token_ids(token_ids);
-        }
-    }
-
     if (arch_type_ == ArchitectureType::MIXTRAL) {
         if (multi_gpu_enabled_) {
             return forward_mixtral_multi_gpu(x, start_pos);
