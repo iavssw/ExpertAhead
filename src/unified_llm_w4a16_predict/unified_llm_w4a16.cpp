@@ -1236,10 +1236,18 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
 
         bool use_qwen_router = (arch_type_ == ArchitectureType::QWEN);
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            std::string layer_predictor_path = "";
+            if (!predictor_model_path.empty()) {
+                layer_predictor_path = predictor_model_path;
+                if (!layer_predictor_path.empty() && layer_predictor_path.back() != '/') {
+                    layer_predictor_path += "/";
+                }
+                layer_predictor_path += "layer_" + std::to_string(i) + "/embedding_only_best.pt";
+            }
             moe_layers.push_back(register_module("moe_" + std::to_string(i),
                                                  MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
                                                                   max_cached_experts_per_layer, i,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, predictor_model_path)));
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));

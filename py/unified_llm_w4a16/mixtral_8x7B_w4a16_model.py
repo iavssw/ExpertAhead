@@ -799,7 +799,7 @@ def main():
         "--predictor-model",
         type=str,
         default="",
-        help="Path to predictor model file (.pt) for 'predict' backend"
+        help="Path to predictor model directory (containing layer_X subdirs) for 'predict' backend"
     )
     parser.add_argument(
         "--generate",
