@@ -1,0 +1,13 @@
+lambda,backend,gen_perplexity,hit_rate,cache_size
+0.0,Cached (LRU),,,2
+0.0,Predict (Spec),0.0,,2
+0.2,Cached (LRU),,,2
+0.2,Predict (Spec),,,2
+0.4,Cached (LRU),,,2
+0.4,Predict (Spec),,,2
+0.6,Cached (LRU),,,2
+0.6,Predict (Spec),,,2
+0.8,Cached (LRU),,,2
+0.8,Predict (Spec),,,2
+1.0,Cached (LRU),3.67,42.12853773584906,2
+1.0,Predict (Spec),,,2

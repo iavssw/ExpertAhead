@@ -166,6 +166,7 @@ private:
 // Single-Model TorchScript Predictor with Dedicated Thread
 // ============================================================================
 
+
 class ThreadedTorchScriptPredictor : public IExpertPredictor {
 public:
     struct PredictionJob {
@@ -174,19 +175,29 @@ public:
         int64_t job_id;
     };
     
-    ThreadedTorchScriptPredictor(const std::string& model_path, int layer_idx = -1) 
-        : layer_idx_(layer_idx), running_(true), model_loaded_(false) {
+    ThreadedTorchScriptPredictor(const std::string& model_path, int layer_idx = -1, torch::Device device = torch::kCPU) 
+        : layer_idx_(layer_idx), device_(device), running_(true), model_loaded_(false) {
         
-        // Load the model (map to CPU to avoid CUDA issues)
+        // Load the model
         try {
-            model_ = torch::jit::load(model_path, torch::kCPU);
+            // Attempt to load on the specified device
+            if (device_.type() != torch::kCPU) {
+                 std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+                          << "] Loading model on device: " << device_ << " (NPU/GPU)" << std::endl;
+            } else {
+                 std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+                          << "] Loading model on CPU" << std::endl;
+            }
+
+            model_ = torch::jit::load(model_path, device_);
             model_.eval();
             model_loaded_ = true;
             std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
                       << "] Loaded model: " << model_path << std::endl;
         } catch (const c10::Error& e) {
             std::cerr << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
-                      << "] Failed to load model: " << e.what() << std::endl;
+                      << "] Failed to load model on " << device_ << ": " << e.what() << std::endl;
+            // Fallback to CPU? Maybe not if user explicitly requested NPU.
             model_loaded_ = false;
         }
         
@@ -235,7 +246,8 @@ public:
         // Wait for prediction to be ready
         std::unique_lock<std::mutex> lock(result_mutex_);
         result_cv_.wait(lock, [this] { return prediction_ready_.load(); });
-        
+        std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+                  << "] Prediction ready" << std::endl;
         return predicted_expert_;
     }
     
@@ -305,7 +317,7 @@ private:
                  padded_tokens.assign(padded_tokens.end() - 32, padded_tokens.end());
             }
 
-            torch::Tensor input = torch::tensor(padded_tokens, torch::kInt64).unsqueeze(0);
+            torch::Tensor input = torch::tensor(padded_tokens, torch::kInt64).unsqueeze(0).to(device_);
             
             std::vector<torch::jit::IValue> inputs;
             inputs.push_back(input);
@@ -342,6 +354,7 @@ private:
     }
     
     int layer_idx_;
+    torch::Device device_;
     torch::jit::script::Module model_;
     bool model_loaded_;
     

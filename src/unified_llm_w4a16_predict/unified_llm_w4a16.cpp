@@ -563,9 +563,10 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 
 // MixtureOfExpertsImpl Implementation
 // MixtureOfExpertsImpl Implementation
+
 MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                                            int64_t max_cached_experts, int64_t layer_idx,
-                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path)
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), max_cached_experts_(max_cached_experts), layer_idx_(layer_idx),
       use_softmax_before_topk_(use_softmax_before_topk), normalize_topk_prob_(normalize_topk_prob), lambda_(lambda) {
@@ -573,7 +574,7 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     // Initialize predictor if model path provided
     if (!predictor_model_path.empty()) {
         try {
-            predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_);
+            predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
         } catch (const std::exception& e) {
             std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
         }
@@ -753,7 +754,7 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
     }
     
     // Miss: Evict the Least Recently Used slot (front of the vector)
-    std::cout << "Layer " << layer_idx_ << " - Miss" << std::endl;
+    // std::cout << "Layer " << layer_idx_ << " - Miss" << std::endl;
     if (update_stats) {
         cache_misses_++;
     }
@@ -1244,10 +1245,11 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                 }
                 layer_predictor_path += "layer_" + std::to_string(i) + "/embedding_only_best.pt";
             }
+
             moe_layers.push_back(register_module("moe_" + std::to_string(i),
                                                  MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
                                                                   max_cached_experts_per_layer, i,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path)));
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, layer_devices_[i])));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));

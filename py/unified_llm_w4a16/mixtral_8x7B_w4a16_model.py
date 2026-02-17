@@ -864,6 +864,14 @@ def main():
         help="Calculate generation-time perplexity (slower, token-by-token)"
     )
 
+
+    parser.add_argument(
+        "--benchmark-prompts",
+        type=str,
+        default=None,
+        help="Path to a file containing prompts for benchmarking. If set, runs benchmark mode."
+    )
+    
     args = parser.parse_args()
 
     if args.prompt_test is not None:
@@ -907,12 +915,116 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
-    print(f"Processing text: '{args.text}'")
-
     # Set lambda if specified
     if args.lambda_val != 0.0:
         print(f"Setting lambda to {args.lambda_val}")
         model.set_lambda(args.lambda_val)
+
+    # Benchmark Mode
+    if args.benchmark_prompts:
+        print(f"\nRunning benchmark using prompts from: {args.benchmark_prompts}")
+        if not os.path.exists(args.benchmark_prompts):
+            print(f"Error: Prompts file {args.benchmark_prompts} not found.")
+            return 1
+            
+        with open(args.benchmark_prompts, 'r') as f:
+            content = f.read()
+            
+        # Parse prompts (simple splitting by newline or custom separator if needed)
+        # Using the logic from previous script attempt:
+        lines = [l.strip() for l in content.split('\n') if l.strip()]
+        prompts = []
+        current_prompt = ""
+        for line in lines:
+            if line.startswith("<|begin_of_text|>"):
+                 if current_prompt: prompts.append(current_prompt)
+                 current_prompt = line.replace("<|begin_of_text|>", "")
+            else:
+                 current_prompt += " " + line
+                 
+            if len(current_prompt) > 200: 
+                 prompts.append(current_prompt)
+                 current_prompt = ""
+        if current_prompt: prompts.append(current_prompt)
+        
+        # Limit to 20 prompts for reasonable runtime
+        prompts = [p for p in prompts if len(p) > 20][:20]
+        print(f"Loaded {len(prompts)} prompts for benchmarking.")
+        
+        tps_values = []
+        
+        for i, prompt in enumerate(prompts):
+            print(f"\nProcessing Prompt {i+1}/{len(prompts)}...")
+            try:
+                # Reset stats
+                model.reset_cache_stats()
+                
+                # Tokenize
+                input_ids = model.tokenize(prompt)
+                
+                # Warmup / Forward pass measure
+                start_time = time.time()
+                
+                # Generate
+                generated = model.generate(
+                    input_ids,
+                    max_new_tokens=args.max_new_tokens,
+                    temperature=args.temperature,
+                    top_p=args.top_p,
+                    top_k=args.top_k
+                )
+                
+                end_time = time.time()
+                elapsed = end_time - start_time
+                
+                # Calculate TPS (generation only, usually)
+                # But here elapsed includes prefill. 
+                # Ideally we want generation TPS.
+                # The generate() function returns, we assume prefill dominates short prompts?
+                # Actually for long prompts prefill dominates.
+                # User asked for "tokens per second".
+                
+                # Let's count generated tokens
+                num_generated = generated.size(1) - input_ids.size(1)
+                
+                # We should subtract prefill time? exact prefill time is harder to get from wrappers 
+                # unless we instrument generate().
+                # But simple Total Time / Generated Tokens is "End-to-End TPS"
+                
+                # However, usually benchmarks exclude prefill.
+                # For now, let's use Total Time / Tokens and note it. 
+                # Or better: check if model has internal TPS tracking.
+                # The C++ backend prints "Average Time per Token" which is generation only.
+                # We can capture that from stdout if we were capturing it, but here we are IN python.
+                
+                # Let's rely on wall clock for now as a rough metric, or look for C++ output.
+                # But wait, we want to return the metric to the user.
+                
+                if num_generated > 0 and elapsed > 0:
+                    tps = num_generated / elapsed
+                    tps_values.append(tps)
+                    print(f"  Generated {num_generated} tokens in {elapsed:.4f}s")
+                    print(f"  End-to-End TPS: {tps:.2f}")
+                
+            except Exception as e:
+                print(f"  Error on prompt {i+1}: {e}")
+                
+        if tps_values:
+            avg_tps = sum(tps_values) / len(tps_values)
+            import statistics
+            std_tps = statistics.stdev(tps_values) if len(tps_values) > 1 else 0
+            print(f"\nBenchmark Complete.")
+            print(f"Average TPS: {avg_tps:.2f} +/- {std_tps:.2f}")
+            # Identify special output for parsing
+            print(f"BENCHMARK_RESULT_TPS: {avg_tps:.4f}")
+            print(f"BENCHMARK_RESULT_STD: {std_tps:.4f}")
+        else:
+            print("No valid benchmark results.")
+            
+        return 0
+
+    # Normal execution path (Single Text)
+    print(f"Processing text: '{args.text}'")
 
     if args.generation_perplexity:
         print("Calculating generation-time perplexity (using C++ backend loop)...")

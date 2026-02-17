@@ -121,10 +121,11 @@ TORCH_MODULE(LinearMatmul);
 // Mixtral MoE layer (router + experts)
 class MixtureOfExpertsImpl : public torch::nn::Module {
   public:
+
     MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                          int64_t max_cached_experts, int64_t layer_idx, 
                          int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false,
-                         double lambda = 0.0, const std::string& predictor_model_path = "");
+                         double lambda = 0.0, const std::string& predictor_model_path = "", torch::Device predictor_device = torch::kCPU);
 
     torch::Tensor forward(const torch::Tensor &x);
     void set_weights_dir(const std::string& dir) { weights_dir_ = dir; }
