@@ -1,0 +1,10 @@
+{
+  "vocab_size": 32000,
+  "embedding_dim": 4096,
+  "num_experts": 8,
+  "top_k": 2,
+  "context_window_k": 10,
+  "use_context_tokens": false,
+  "use_embedding": true,
+  "use_router_history": false
+}
