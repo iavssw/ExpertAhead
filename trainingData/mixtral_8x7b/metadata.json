@@ -1,0 +1,10 @@
+{
+  "model": "mixtral_8x7b",
+  "model_path": "TheBloke/mixtral-8x7b-v0.1-AWQ",
+  "num_fineweb": 100,
+  "num_orca": 100,
+  "min_tokens": 100,
+  "max_tokens": 512,
+  "file_format": "per_sample_pt",
+  "description": "Each .pt file is a dict with keys: sample_idx, dataset, token_count, model, layers. 'layers' is a list of dicts keyed by layer_idx, embeddings [seq_len, hidden_size], router_logits [seq_len, num_experts]. Embeddings are post-attention-norm (pre-router)."
+}

@@ -1866,6 +1866,13 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_qwen_multi_gpu(torch::Tensor x, int64
         // MoE block
         auto moe_out = moe_layers[i]->forward(post_normed);
 
+        // Collect training data if enabled
+        if (collect_training_data_) {
+            auto embeddings = post_normed.detach().clone();
+            auto router_logits = moe_layers[i]->get_last_router_logits();
+            training_data_.push_back(std::make_pair(embeddings, router_logits));
+        }
+
         // Residual connection
         x = x + moe_out;
     }
@@ -2021,6 +2028,13 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_qwen(torch::Tensor x, int64_t start_p
 
         // MoE block
         auto moe_out = moe_layers[i]->forward(normed.slice(-1, 0, hidden_size_));
+
+        // Collect training data if enabled
+        if (collect_training_data_) {
+            auto embeddings = normed.slice(-1, 0, hidden_size_).detach().clone();
+            auto router_logits = moe_layers[i]->get_last_router_logits();
+            training_data_.push_back(std::make_pair(embeddings, router_logits));
+        }
 
         // Residual connection
         x.add_(moe_out);

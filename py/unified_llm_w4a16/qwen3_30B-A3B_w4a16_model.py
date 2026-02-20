@@ -181,6 +181,7 @@ class Qwen3_30BA3BW4A16Model:
         num_experts_per_tok: int = 8,
         device: str = "cuda",
         backend: str = "base",
+        max_cached_experts_per_layer: int = 0,
         config_path: Optional[str] = None
     ):
         """
@@ -232,8 +233,12 @@ class Qwen3_30BA3BW4A16Model:
             groupsize,
             num_experts,
             num_experts_per_tok,
-            device,
         ]
+
+        if backend == "cached":
+            constructor_args.append(max_cached_experts_per_layer)
+
+        constructor_args.append(device)
 
         if config_path is None:
             config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_qwen3_30B_A3B.json5"))
