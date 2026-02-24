@@ -125,7 +125,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                          int64_t max_cached_experts, int64_t layer_idx, 
                          int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false,
-                         double lambda = 0.0, const std::string& predictor_model_path = "", torch::Device predictor_device = torch::kCPU);
+                         double lambda = 0.0, const std::string& predictor_model_path = "", torch::Device predictor_device = torch::kCPU,
+                         int64_t prefetch_experts_count = 1);
 
     torch::Tensor forward(const torch::Tensor &x);
     void set_weights_dir(const std::string& dir) { weights_dir_ = dir; }
@@ -151,7 +152,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
 
     // Prediction & Speculative Loading
     void set_context_token_ids(const std::vector<int64_t>& token_ids);
-    void trigger_speculative_loading(std::vector<int64_t> recent_token_ids);
+    void trigger_speculative_loading(const torch::Tensor& embedding);
     void load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids);
 
     // Exposed for weight loading
@@ -163,12 +164,21 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::vector<QuantizedLinear> down_experts;
 
   private:
+    // Pinned memory buffers for fast expert weight loading (one per slot)
+    std::vector<torch::Tensor> gate_up_q_pinned_;
+    std::vector<torch::Tensor> gate_up_s_pinned_;
+    std::vector<torch::Tensor> gate_up_z_pinned_;
+    std::vector<torch::Tensor> down_q_pinned_;
+    std::vector<torch::Tensor> down_s_pinned_;
+    std::vector<torch::Tensor> down_z_pinned_;
+
     int64_t hidden_size_;
     int64_t intermediate_size_;
     int64_t num_experts_;
     int64_t num_experts_per_tok_;
     int64_t max_cached_experts_;
     int64_t layer_idx_;
+    int64_t prefetch_experts_count_;
     bool use_softmax_before_topk_;
     bool normalize_topk_prob_;
 
@@ -185,6 +195,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     
     int64_t cache_hits_ = 0;
     int64_t cache_misses_ = 0;
+    double total_expert_load_time_ms_ = 0.0;
     
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
@@ -195,6 +206,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::future<void> speculative_load_future_;
     bool in_generation_mode_ = false;
     std::mutex expert_slots_mutex_;  // For thread safety during loading
+    std::vector<bool> expert_slot_ready_; // For condition variable, size max_cached_experts_
+    std::condition_variable expert_slots_cv_; // To wait for background loading
     
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
@@ -217,7 +230,8 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                         float rms_norm_eps, float rope_theta, const NPUGlobalConfig &npu_config, int64_t max_seq_len = 8192,
                         int64_t max_batch_size = 1, int64_t groupsize = 128, int64_t num_experts = 0, int64_t num_experts_per_tok = 0,
                         torch::Device device = torch::kCPU, int64_t max_cached_experts_per_layer = 0,
-                        const std::string& predictor_model_path = "");
+                        const std::string& predictor_model_path = "", int64_t prefetch_experts_count = 1,
+                        const std::vector<int>& predict_layers = {});
 
     // Forward pass: takes token IDs and returns logits
     torch::Tensor forward(torch::Tensor input_ids, int64_t start_pos = 0);

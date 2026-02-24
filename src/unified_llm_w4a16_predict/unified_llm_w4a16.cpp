@@ -11,6 +11,7 @@
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <hip/hip_runtime.h>
 #include <iomanip>
@@ -111,6 +112,47 @@ GpuSelectionInfo select_gpus_by_free_vram(int requested_gpu_count, int available
 }
 
 } // namespace
+
+// ---------------------------------------------------------------------------
+// find_predictor_model_path
+// Resolve the TorchScript predictor file for a given layer index.
+//
+// Strategy:
+//  1. <base>/layer_<i>/embedding_predictor_best.pt  (flat layout)
+//  2. <base>/layer_<i>/<any subdir>/embedding_predictor_best.pt
+//     e.g. <base>/layer_<i>/hidden_1024/embedding_predictor_best.pt
+//
+// Returns the first path that exists, or empty string if none found.
+// ---------------------------------------------------------------------------
+static std::string find_predictor_model_path(const std::string& base_dir, int64_t layer_idx) {
+    namespace fs = std::filesystem;
+
+    if (base_dir.empty()) return "";
+
+    fs::path layer_dir = fs::path(base_dir) / ("layer_" + std::to_string(layer_idx));
+    const std::string kModelFile = "embedding_predictor_best.pt";
+
+    // 1. Flat: base/layer_X/embedding_predictor_best.pt
+    fs::path direct = layer_dir / kModelFile;
+    if (fs::exists(direct)) {
+        return direct.string();
+    }
+
+    // 2. One level of subdirectories: base/layer_X/<subdir>/embedding_predictor_best.pt
+    std::error_code ec;
+    if (fs::is_directory(layer_dir, ec)) {
+        for (const auto& entry : fs::directory_iterator(layer_dir, ec)) {
+            if (entry.is_directory()) {
+                fs::path candidate = entry.path() / kModelFile;
+                if (fs::exists(candidate)) {
+                    return candidate.string();
+                }
+            }
+        }
+    }
+
+    return "";  // Not found
+}
 
 template <typename Func> void time_op(const std::string &name, Func func) {
     auto sync0 = hipDeviceSynchronize();
@@ -554,11 +596,19 @@ void QuantizedLinearImpl::set_quantized_weights(torch::Tensor qweight, torch::Te
 }
 
 void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torch::Tensor scale, torch::Tensor zero_point) {
-    auto device = quantized_weight_.device();
+    if (quantized_weight_.sizes() != qweight_packed.sizes()) {
+        quantized_weight_.resize_as_(qweight_packed);
+    }
+    if (scale_.sizes() != scale.sizes()) {
+        scale_.resize_as_(scale);
+    }
+    if (zero_point_.sizes() != zero_point.sizes()) {
+        zero_point_.resize_as_(zero_point);
+    }
 
-    quantized_weight_ = qweight_packed.to(torch::kUInt8).contiguous().to(device);
-    scale_ = scale.to(torch::kBFloat16).contiguous().to(device);
-    zero_point_ = zero_point.to(torch::kInt8).contiguous().to(device);
+    quantized_weight_.copy_(qweight_packed.to(torch::kUInt8).contiguous(), /*non_blocking=*/true);
+    scale_.copy_(scale.to(torch::kBFloat16).contiguous(), /*non_blocking=*/true);
+    zero_point_.copy_(zero_point.to(torch::kInt8).contiguous(), /*non_blocking=*/true);
 }
 
 // MixtureOfExpertsImpl Implementation
@@ -566,18 +616,22 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 
 MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                                            int64_t max_cached_experts, int64_t layer_idx,
-                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device)
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device, int64_t prefetch_experts_count)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), max_cached_experts_(max_cached_experts), layer_idx_(layer_idx),
+      prefetch_experts_count_(prefetch_experts_count),
       use_softmax_before_topk_(use_softmax_before_topk), normalize_topk_prob_(normalize_topk_prob), lambda_(lambda) {
 
-    // Initialize predictor if model path provided
     if (!predictor_model_path.empty()) {
         try {
             predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
         } catch (const std::exception& e) {
             std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
         }
+    }
+
+    if (prefetch_experts_count_ > max_cached_experts_) {
+        prefetch_experts_count_ = max_cached_experts_;
     }
 
     router = register_module("router", LinearMatmul(hidden_size_, num_experts_, false));
@@ -587,6 +641,9 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     
     // Initialize cache bitmask
     expert_cache_bitmask_.assign(num_experts_, 0);
+    
+    // Initialize slot ready state
+    expert_slot_ready_.assign(max_cached_experts_, true);
     
     // Initialize LRU order (initially 0, 1, 2, ..., max-1)
     for (size_t i = 0; i < max_cached_experts_; ++i) {
@@ -625,7 +682,7 @@ void MixtureOfExpertsImpl::set_context_token_ids(const std::vector<int64_t>& tok
     }
 }
 
-void MixtureOfExpertsImpl::trigger_speculative_loading(std::vector<int64_t> recent_token_ids) {
+void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embedding) {
     // Check if predictor is available
     if (!predictor_) {
         return;
@@ -636,33 +693,50 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(std::vector<int64_t> rece
         return;
     }
     
+    // std::future assignment blocks until the previous async task completes!
+    // If the disk/PCIe is still busy loading the previous guess, skip this token's guess
+    // rather than stalling the entire main inference thread waiting for it to finish.
+    if (speculative_load_future_.valid() && 
+        speculative_load_future_.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+        if (debug_verbosity >= 2) {
+            std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Skipping prefetch, previous still running." << std::endl;
+        }
+        return;
+    }
+    
     // Launch async prediction and loading
-    // Capture necessary data by value to avoid lifetime issues
-    std::vector<int64_t> context_copy = recent_token_ids;
+    // Capture necessary data by deep copy to avoid lifetime issues across async barrier
+    torch::Tensor embedding_copy = embedding.detach().clone();
     
     speculative_load_future_ = std::async(std::launch::async, 
-        [this, context_copy]() {
+        [this, embedding_copy]() {
             // Predict
-            predictor_->predict_async(0, context_copy); // Token ID 0 as placeholder
+            predictor_->predict_async(embedding_copy);
             
             // Wait for prediction
-            int64_t predicted_expert_id = predictor_->get_prediction();
+            std::vector<int64_t> predicted_experts_res = predictor_->get_prediction();
             
-            if (predicted_expert_id != -1) {
-                if (debug_verbosity >= 1) {
-                    std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted expert: " << predicted_expert_id << std::endl;
+            if (!predicted_experts_res.empty()) {
+                int limit = std::min((int)predicted_experts_res.size(), (int)prefetch_experts_count_);
+                std::vector<int64_t> top_experts(predicted_experts_res.begin(), predicted_experts_res.begin() + limit);
+                
+                if (debug_verbosity >= 2) {
+                    std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted experts: ";
+                    for (auto e : top_experts) std::cout << e << " ";
+                    std::cout << std::endl;
                 }
-                std::vector<int64_t> predicted_experts = {predicted_expert_id};
-                load_predicted_experts(predicted_experts);
+                load_predicted_experts(top_experts);
             }
         });
 }
 
 void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids) {
-    for (int64_t eid : predicted_expert_ids) {
-        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+    // Iterate in reverse so the most confident expert becomes the most recently used (pushed to back of LRU last)
+    for (auto pred_it = predicted_expert_ids.rbegin(); pred_it != predicted_expert_ids.rend(); ++pred_it) {
+        int64_t eid = *pred_it;
+        std::unique_lock<std::mutex> lock(expert_slots_mutex_);
         
-        // Check if expert is already loaded
+        // Check if expert is already loaded or being loaded
         auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
         
         if (it != expert_slots_indices.end()) {
@@ -695,53 +769,84 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
                 }
             } else {
                 // All slots full - evict LRU (front of vector)
-                slot_to_use = expert_lru_order_.front();
-                expert_lru_order_.erase(expert_lru_order_.begin());
+                // BUT we must find an LRU slot that is actually ready!
+                // Skip slots that are currently being loaded by another thread.
+                bool found = false;
+                for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+                    if (expert_slot_ready_[*lit]) {
+                        slot_to_use = *lit;
+                        expert_lru_order_.erase(lit);
+                        found = true;
+                        break;
+                    }
+                }
                 
-                if (debug_verbosity >= 1) {
+                if (!found) {
+                     // All slots are currently busy being loaded. Don't prefetch this expert.
+                     continue;
+                }
+                
+                if (debug_verbosity >= 2) {
                      std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Evicting expert " 
                                << expert_slots_indices[slot_to_use] << " from slot " << slot_to_use << std::endl;
                 }
             }
             
-            // Load the expert (temporarily release lock during I/O if we were being fancy, but keeping it simple/safe)
-            // Actually, load_expert_weights might be slow, but we are in async thread.
-            // Be careful about other threads accessing expert_slots_indices.
-            
-            load_expert_weights(slot_to_use, eid, weights_dir_);
-            // Since this is async/speculative, we want to ensure weights are ready? 
-            // hipDeviceSynchronize(); // Maybe too heavy?
-            
-            // Update tracking
+            // Mark slot as busy and update indices
+            expert_slot_ready_[slot_to_use] = false;
             expert_slots_indices[slot_to_use] = eid;
             expert_lru_order_.push_back(slot_to_use);
             
-             // Update cache bitmask
+            // Update cache bitmask early so main thread routing knows it's eventually coming
             if (expert_cache_bitmask_.size() == num_experts_) {
                 std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
-                for (auto eid : expert_slots_indices) {
-                    if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
-                        expert_cache_bitmask_[eid] = 1;
+                for (auto current_eid : expert_slots_indices) {
+                    if (current_eid >= 0 && current_eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
+                        expert_cache_bitmask_[current_eid] = 1;
                     }
                 }
             }
+            
+            // Release the lock BEFORE the slow disk I/O!
+            lock.unlock();
+            
+            if (debug_verbosity >= 2) {
+                std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Loading predicted expert " << eid << " into slot " << slot_to_use << std::endl;
+            }
+            
+            // Perform the slow disk read
+            try {
+                load_expert_weights(slot_to_use, eid, weights_dir_);
+            } catch (...) {
+                lock.lock();
+                expert_slot_ready_[slot_to_use] = true;
+                expert_slots_indices[slot_to_use] = -1; // Reset it so it can be used again
+                expert_slots_cv_.notify_all();
+                throw;
+            }
+            
+            // Re-acquire lock to mark as ready and notify waiting inference threads
+            lock.lock();
+            expert_slot_ready_[slot_to_use] = true;
+            expert_slots_cv_.notify_all();
         }
     }
 }
 
 int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
-    // Linear scan of slots to find if expert is already loaded
-    // Lock for thread safety with speculative loading
-    std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+    std::unique_lock<std::mutex> lock(expert_slots_mutex_);
 
     for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
         if (expert_slots_indices[s] == global_expert_idx) {
-            std::cout << "Layer " << layer_idx_ << " - Hit" << std::endl;
+            
+            // If it's already here but the predictive thread is currently loading it, sleep until it finishes
+            expert_slots_cv_.wait(lock, [this, s]() { return expert_slot_ready_[s]; });
+            
             if (update_stats) {
                 cache_hits_++;
             }
-            // Hit: Move slot 's' to the back of the LRU vector (Mark as MRU)
-            // We search for 's' in the LRU order list
+            
+            // Move slot 's' to the back of the LRU vector (Mark as MRU)
             for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
                 if (*it == s) {
                     expert_lru_order_.erase(it);
@@ -754,23 +859,43 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
     }
     
     // Miss: Evict the Least Recently Used slot (front of the vector)
-    // std::cout << "Layer " << layer_idx_ << " - Miss" << std::endl;
     if (update_stats) {
         cache_misses_++;
     }
-    size_t lru_slot = expert_lru_order_[0];
-    expert_lru_order_.erase(expert_lru_order_.begin());
     
-    // Load new expert into the evicted slot
-    load_expert_weights(lru_slot, global_expert_idx, weights_dir_);
-    // Ensure weights are fully on device before usage (critical for cache=2 and generation perplexity)
-    hipDeviceSynchronize();
+    // Find an LRU slot that isn't currently being overwritten by the predictor
+    size_t lru_slot = -1;
+    for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+        if (expert_slot_ready_[*lit]) {
+            lru_slot = *lit;
+            expert_lru_order_.erase(lit);
+            break;
+        }
+    }
     
-    // Update slot mapping and mark as MRU
+    // If somehow all slots are being loaded by predictor right now, wait for one to finish
+    if (lru_slot == size_t(-1)) {
+        expert_slots_cv_.wait(lock, [this]() {
+            for (auto r : expert_slot_ready_) if (r) return true;
+            return false;
+        });
+        
+        // Re-find the free slot now that we woke up
+        for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+            if (expert_slot_ready_[*lit]) {
+                lru_slot = *lit;
+                expert_lru_order_.erase(lit);
+                break;
+            }
+        }
+    }
+    
+    // Mark as busy
+    expert_slot_ready_[lru_slot] = false;
     expert_slots_indices[lru_slot] = global_expert_idx;
     expert_lru_order_.push_back(lru_slot);
     
-    // Update cache bitmask to reflect currently loaded experts
+    // Update cache bitmask tracking
     if (expert_cache_bitmask_.size() == num_experts_) {
         std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
         for (auto eid : expert_slots_indices) {
@@ -779,6 +904,28 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
             }
         }
     }
+    
+    // Unlock during slow disk I/O!
+    lock.unlock();
+    
+    // Load new expert into the evicted slot
+    try {
+        load_expert_weights(lru_slot, global_expert_idx, weights_dir_);
+    } catch (...) {
+        lock.lock();
+        expert_slot_ready_[lru_slot] = true;
+        expert_slots_indices[lru_slot] = -1; // Reset it so it can be used again
+        expert_slots_cv_.notify_all();
+        throw;
+    }
+    
+    // Ensure weights are fully on device before usage
+    (void)hipDeviceSynchronize();
+    
+    // Lock, mark exactly one ready, wake any waiting thread
+    lock.lock();
+    expert_slot_ready_[lru_slot] = true;
+    expert_slots_cv_.notify_all();
     
     return lru_slot;
 }
@@ -839,10 +986,8 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
                                                        const torch::Tensor &topk_idx, torch::Tensor &output) {
     in_generation_mode_ = true;
     
-    // First, wait for any speculative loading to complete
-    if (speculative_load_future_.valid()) {
-        speculative_load_future_.wait();
-    }
+    // Speculative loading runs entirely in the background. The main thread will only wait 
+    // dynamically inside `ensure_expert_cached` if it actually needs an expert that is currently streaming.
     auto opts = x_flat.options();
     const int64_t active_experts = num_experts_per_tok_;
 
@@ -895,15 +1040,15 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     hipkernels::w4a16_gemv_unpacked_fused_3d(down_batched, gate_buf.contiguous(), down_qw_ptrs, down_s_ptrs, down_z_ptrs,
                                              intermediate_size_, hidden_size_, down_group_size, active_experts);
 
-    std::cout << "ran kernel" << std::endl;
+    // std::cout << "ran kernel" << std::endl;
 
     auto weights = topk_vals[0].to(output.dtype()).view({active_experts, 1});
-    std::cout << "weights: " << weights << std::endl;
+    // std::cout << "weights: " << weights << std::endl;
     down_batched.mul_(weights);
     output.add_(down_batched.sum(0, true));
     
     // Trigger speculative loading for the next token based on recent history
-    trigger_speculative_loading(recent_token_ids_);
+    trigger_speculative_loading(x_flat);
     
     return output;
 }
@@ -1103,7 +1248,8 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                                          int64_t head_dim, float rms_norm_eps, float rope_theta, const NPUGlobalConfig &npu_config,
                                          int64_t max_seq_len, int64_t max_batch_size, int64_t groupsize, int64_t num_experts,
                                          int64_t num_experts_per_tok, torch::Device device, int64_t max_cached_experts_per_layer,
-                                         const std::string& predictor_model_path)
+                                         const std::string& predictor_model_path, int64_t prefetch_experts_count,
+                                         const std::vector<int>& predict_layers)
     : arch_type_(arch_type), vocab_size_(vocab_size), hidden_size_(hidden_size), intermediate_size_(intermediate_size),
       num_hidden_layers_(num_hidden_layers), num_attention_heads_(num_attention_heads), num_key_value_heads_(num_key_value_heads),
       head_dim_(head_dim), rms_norm_eps_(rms_norm_eps), rope_theta_(rope_theta), max_seq_len_(max_seq_len), max_batch_size_(max_batch_size),
@@ -1237,19 +1383,61 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
 
         bool use_qwen_router = (arch_type_ == ArchitectureType::QWEN);
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-            std::string layer_predictor_path = "";
-            if (!predictor_model_path.empty()) {
-                layer_predictor_path = predictor_model_path;
-                if (!layer_predictor_path.empty() && layer_predictor_path.back() != '/') {
-                    layer_predictor_path += "/";
+            // Resolve predictor path for this layer (supports flat and hidden_dim subdirectory layouts).
+            std::string layer_predictor_path = find_predictor_model_path(predictor_model_path, i);
+            
+            // Check if explicitly filtered out by predict_layers array
+            if (!predict_layers.empty() && std::find(predict_layers.begin(), predict_layers.end(), static_cast<int>(i)) == predict_layers.end()) {
+                layer_predictor_path = "";
+            }
+
+            if (!predictor_model_path.empty() && layer_predictor_path.empty() && (predict_layers.empty() || std::find(predict_layers.begin(), predict_layers.end(), static_cast<int>(i)) != predict_layers.end())) {
+                std::cerr << "[Predictor] Warning: no model found for layer " << i
+                          << " under " << predictor_model_path << "/layer_" << i
+                          << " (tried flat and one-level subdirs)" << std::endl;
+            } else if (!layer_predictor_path.empty() && debug_verbosity >= 1 && (i == 0 || (!predict_layers.empty() && i == predict_layers[0]))) {
+                // Log resolved path for the first activated layer as a representative sample.
+                std::cout << "[Predictor] Layer " << i << " model path resolved to: " << layer_predictor_path << std::endl;
+            }
+
+            // Determine which device the predictor TorchScript model runs on.
+            // "hetero" / "npu" -> CPU device (Ryzen AI NPU backend runs under CPU TorchScript)
+            // "gpu"            -> same GPU as the MoE layer (default)
+            // "cpu"            -> CPU
+            // An explicit predictor_device in the config overrides the inference.
+            torch::Device pred_device = layer_devices_[i]; // default: same GPU as MoE
+            {
+                std::string pd = npu_config_.predictor_device; // explicit override
+                if (pd == "auto" || pd.empty()) {
+                    // Infer from heterogeneity
+                    const std::string &h = npu_config_.heterogeneity;
+                    if (h == "hetero" || h == "npu") {
+                        pd = "cpu";
+                    } else if (h == "cpu") {
+                        pd = "cpu";
+                    } else {
+                        pd = "gpu"; // "gpu" or anything else
+                    }
                 }
-                layer_predictor_path += "layer_" + std::to_string(i) + "/embedding_only_best.pt";
+                if (pd == "cpu") {
+                    pred_device = torch::kCPU;
+                } else if (pd == "gpu") {
+                    pred_device = layer_devices_[i];
+                }
+                // Log only for layer 0 to avoid 32 identical lines
+                if (i == 0 && debug_verbosity >= 1 && !layer_predictor_path.empty()) {
+                    std::cout << "[Predictor] Running on device: "
+                              << (pred_device.is_cpu() ? "CPU (NPU path)" : "GPU")
+                              << " (heterogeneity=\"" << npu_config_.heterogeneity
+                              << "\", predictor_device=\"" << npu_config_.predictor_device << "\")"
+                              << std::endl;
+                }
             }
 
             moe_layers.push_back(register_module("moe_" + std::to_string(i),
                                                  MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
                                                                   max_cached_experts_per_layer, i,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, layer_devices_[i])));
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, pred_device, prefetch_experts_count)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
@@ -2276,6 +2464,9 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
 
     start_pos = token_len - 1;
 
+    // Reset cache stats before generation to ensure accurate measurements
+    reset_cache_stats();
+
     // Generate remaining tokens
     if (should_sync_device) {
         torch::cuda::synchronize();
@@ -2349,6 +2540,9 @@ double UnifiedLLMW4A16Impl::calculate_generation_perplexity(torch::Tensor input_
     //   ...
     
     auto start_time = std::chrono::high_resolution_clock::now();
+    
+    // Reset cache stats before calculating perplexity to ensure accurate measurements
+    reset_cache_stats();
     
     for (int64_t i = 0; i < seq_len - 1; ++i) {
         // Prepare input token [1, 1]
@@ -2439,9 +2633,11 @@ double UnifiedLLMW4A16Impl::get_lambda(int64_t layer_idx) const {
 void MixtureOfExpertsImpl::print_cache_stats() const {
     double hit_rate = (cache_hits_ + cache_misses_ > 0) ? 
         static_cast<double>(cache_hits_) / (cache_hits_ + cache_misses_) : 0.0;
+    double avg_load_time = (cache_misses_ > 0) ? total_expert_load_time_ms_ / cache_misses_ : 0.0;
     std::cout << "Layer " << layer_idx_ << ": Hits=" << cache_hits_ 
               << ", Misses=" << cache_misses_ 
-              << ", HitRate=" << std::fixed << std::setprecision(2) << hit_rate * 100.0 << "%" << std::endl;
+              << ", HitRate=" << std::fixed << std::setprecision(2) << hit_rate * 100.0 << "%" 
+              << ", AvgLoadTime=" << std::fixed << std::setprecision(3) << avg_load_time << "ms" << std::endl;
 }
 
 void UnifiedLLMW4A16Impl::print_cache_stats() const {
@@ -2457,6 +2653,7 @@ void UnifiedLLMW4A16Impl::print_cache_stats() const {
 void MixtureOfExpertsImpl::reset_cache_stats() {
     cache_hits_ = 0;
     cache_misses_ = 0;
+    total_expert_load_time_ms_ = 0.0;
 }
 
 void UnifiedLLMW4A16Impl::reset_cache_stats() {

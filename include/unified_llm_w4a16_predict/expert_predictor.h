@@ -55,11 +55,10 @@ class IExpertPredictor {
 public:
     virtual ~IExpertPredictor() = default;
     
-    virtual void predict_async(int64_t token_id, 
-                               const std::vector<int64_t>& context_tokens) = 0;
+    virtual void predict_async(torch::Tensor embedding) = 0;
     virtual bool is_ready() = 0;
-    virtual int64_t get_prediction() = 0;
-    virtual int64_t try_get_prediction() = 0;
+    virtual std::vector<int64_t> get_prediction() = 0;
+    virtual std::vector<int64_t> try_get_prediction() = 0;
     virtual double get_prediction_time_ms() = 0;
 };
 
@@ -109,14 +108,11 @@ public:
         shm_unlink(shm_name_.c_str());
     }
     
-    void predict_async(int64_t token_id, const std::vector<int64_t>& context_tokens) override {
+    void predict_async(torch::Tensor embedding) override {
         response_->reset();
         
-        request_->token_id = token_id;
-        request_->context_length = std::min((int64_t)context_tokens.size(), (int64_t)32);
-        for (size_t i = 0; i < request_->context_length; ++i) {
-            request_->context_token_ids[i] = context_tokens[i];
-        }
+        request_->token_id = 0; // Deprecated
+        request_->context_length = 0;
         
         request_->processed.store(false);
         request_->ready.store(true);
@@ -126,28 +122,28 @@ public:
         return response_->ready.load();
     }
     
-    int64_t get_prediction() override {
+    std::vector<int64_t> get_prediction() override {
         while (!response_->ready.load()) {
             std::this_thread::yield();
         }
         
         if (layer_idx_ < 0 || layer_idx_ >= 32) {
-            return -1;
+            return {};
         }
         
-        return response_->expert_ids[layer_idx_];
+        return {response_->expert_ids[layer_idx_]};
     }
     
-    int64_t try_get_prediction() override {
+    std::vector<int64_t> try_get_prediction() override {
         if (!response_->ready.load()) {
-            return -1;
+            return {};
         }
         
         if (layer_idx_ < 0 || layer_idx_ >= 32) {
-            return -1;
+            return {};
         }
         
-        return response_->expert_ids[layer_idx_];
+        return {response_->expert_ids[layer_idx_]};
     }
     
     double get_prediction_time_ms() override {
@@ -170,8 +166,7 @@ private:
 class ThreadedTorchScriptPredictor : public IExpertPredictor {
 public:
     struct PredictionJob {
-        int64_t token_id;
-        std::vector<int64_t> context_tokens;
+        torch::Tensor embedding;
         int64_t job_id;
     };
     
@@ -225,10 +220,9 @@ public:
                   << "] Shutdown complete" << std::endl;
     }
     
-    void predict_async(int64_t token_id, const std::vector<int64_t>& context_tokens) override {
+    void predict_async(torch::Tensor embedding) override {
         PredictionJob job;
-        job.token_id = token_id;
-        job.context_tokens = context_tokens;
+        job.embedding = embedding;
         job.job_id = next_job_id_++;
         
         {
@@ -242,22 +236,24 @@ public:
         return prediction_ready_.load();
     }
     
-    int64_t get_prediction() override {
+    std::vector<int64_t> get_prediction() override {
         // Wait for prediction to be ready
         std::unique_lock<std::mutex> lock(result_mutex_);
         result_cv_.wait(lock, [this] { return prediction_ready_.load(); });
-        std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
-                  << "] Prediction ready" << std::endl;
-        return predicted_expert_;
+        // if (!predicted_experts_.empty()) {
+        //     std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+        //               << "] Prediction ready, top value: " << predicted_experts_[0] << std::endl;
+        // }
+        return predicted_experts_;
     }
     
-    int64_t try_get_prediction() override {
+    std::vector<int64_t> try_get_prediction() override {
         if (!prediction_ready_.load()) {
-            return -1;
+            return {};
         }
         
         std::lock_guard<std::mutex> lock(result_mutex_);
-        return predicted_expert_;
+        return predicted_experts_;
     }
     
     double get_prediction_time_ms() override {
@@ -298,7 +294,7 @@ private:
         
         if (!model_loaded_) {
             std::lock_guard<std::mutex> lock(result_mutex_);
-            predicted_expert_ = -1;
+            predicted_experts_.clear();
             prediction_ready_.store(true);
             result_cv_.notify_all();
             return;
@@ -306,18 +302,12 @@ private:
         
         try {
             // Prepare input
-            // Ensure strictly 32 tokens (Left Padding with 0)
-            std::vector<int64_t> padded_tokens = job.context_tokens;
-            if (padded_tokens.size() < 32) {
-                 std::vector<int64_t> padding(32 - padded_tokens.size(), 0);
-                 padding.insert(padding.end(), padded_tokens.begin(), padded_tokens.end());
-                 padded_tokens = padding;
-            } else if (padded_tokens.size() > 32) {
-                 // Keep last 32
-                 padded_tokens.assign(padded_tokens.end() - 32, padded_tokens.end());
+            // The embedding needs to be passed to the TorchScript model.
+            // Predictor models accept [1, hidden_dim] tensors, likely in float32.
+            torch::Tensor input = job.embedding.to(torch::kFloat32).to(device_);
+            if (input.dim() == 1) {
+                input = input.unsqueeze(0); // Ensure [1, hidden_dim]
             }
-
-            torch::Tensor input = torch::tensor(padded_tokens, torch::kInt64).unsqueeze(0).to(device_);
             
             std::vector<torch::jit::IValue> inputs;
             inputs.push_back(input);
@@ -325,24 +315,34 @@ private:
             torch::NoGradGuard no_grad;
             auto output = model_.forward(inputs).toTensor();
             
-            // Extract prediction (assuming scalar or first element)
-            auto output_cpu = output.cpu();
-            int64_t predicted_expert;
+            // Extract prediction (get fully ranked list of experts)
+            // Perform argsort on the dedicated stream/device before safely copying to CPU
+            auto indices = output.argsort(-1, true).to(torch::kCPU, torch::kInt64);
             
-            // The model returns logits [B, 1, 8].
-            // Use argmax to get the predicted expert index.
-            predicted_expert = output_cpu.argmax().item<int64_t>();
+            std::vector<int64_t> predicted_experts;
+            if (indices.dim() == 2) {
+                // Batch dimension exists
+                auto acc = indices.accessor<int64_t, 2>();
+                for (int i = 0; i < indices.size(1); ++i) {
+                    predicted_experts.push_back(acc[0][i]);
+                }
+            } else if (indices.dim() == 1) {
+                auto acc = indices.accessor<int64_t, 1>();
+                for (int i = 0; i < indices.size(0); ++i) {
+                    predicted_experts.push_back(acc[i]);
+                }
+            }
             
             {
                 std::lock_guard<std::mutex> lock(result_mutex_);
-                predicted_expert_ = predicted_expert;
+                predicted_experts_ = predicted_experts;
             }
             
         } catch (const std::exception& e) {
             std::cerr << "[Worker Layer " << layer_idx_ << "] Prediction error: " 
                       << e.what() << std::endl;
             std::lock_guard<std::mutex> lock(result_mutex_);
-            predicted_expert_ = -1;
+            predicted_experts_.clear();
         }
         
         auto end = std::chrono::high_resolution_clock::now();
@@ -366,7 +366,7 @@ private:
     std::condition_variable queue_cv_;
     
     std::atomic<bool> prediction_ready_{false};
-    int64_t predicted_expert_ = -1;
+    std::vector<int64_t> predicted_experts_;
     double prediction_time_ms_ = 0.0;
     std::mutex result_mutex_;
     std::condition_variable result_cv_;

@@ -21,105 +21,6 @@ import json
 from pathlib import Path
 
 
-class ContextTokenMLP(nn.Module):
-    """MLP for processing context tokens (t-k to t-1) using frozen Mixtral embeddings"""
-    
-    def __init__(
-        self, 
-        pretrained_embeddings: torch.Tensor,
-        context_window_k: int = 10,
-        hidden_dim: int = 512,
-        output_dim: int = 256,
-        dropout: float = 0.1,
-        use_attention: bool = True
-    ):
-        """
-        Args:
-            pretrained_embeddings: Frozen Mixtral embeddings [vocab_size, embed_dim]
-            context_window_k: Number of context tokens
-            hidden_dim: Hidden dimension for MLP
-            output_dim: Output feature dimension
-            dropout: Dropout rate
-            use_attention: Whether to use attention pooling over context
-        """
-        super().__init__()
-        self.context_window_k = context_window_k
-        self.use_attention = use_attention
-        
-        # Frozen Mixtral embeddings (keep on CPU to avoid ROCm issues)
-        # We use a non-persistent buffer so it is NOT saved in the state_dict
-        self.register_buffer('embedding_weight', pretrained_embeddings, persistent=False)
-        
-        embed_dim = pretrained_embeddings.shape[1]
-        
-        if use_attention:
-            # Attention pooling over context tokens
-            self.attention = nn.Sequential(
-                nn.Linear(embed_dim, hidden_dim),
-                nn.Tanh(),
-                nn.Linear(hidden_dim, 1)
-            )
-            input_size = embed_dim
-        else:
-            # Simple flattening
-            input_size = context_window_k * embed_dim
-        
-        # MLP to process context
-        self.mlp = nn.Sequential(
-            nn.Linear(input_size, hidden_dim),
-            nn.LayerNorm(hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.LayerNorm(hidden_dim // 2),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim // 2, output_dim),
-        )
-    
-    def _apply(self, fn):
-        """Override to keep embedding on CPU even when model is moved to GPU"""
-        # Store embedding device
-        embedding_device = self.embedding_weight.device
-        
-        # Apply to all other parameters
-        super()._apply(fn)
-        
-        # Move embedding back to CPU if it was moved
-        if self.embedding_weight.device != embedding_device:
-            self.embedding_weight = self.embedding_weight.cpu()
-        
-        return self
-    
-    def forward(self, context_tokens: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            context_tokens: [batch_size, context_window_k] token IDs
-            
-        Returns:
-            [batch_size, output_dim] feature vector
-        """
-        # Store original device
-        original_device = context_tokens.device
-        
-        # Embed tokens on CPU (frozen embeddings stay on CPU to avoid ROCm issues)
-        # Ensure tokens are long dtype for indexing
-        context_tokens_cpu = context_tokens.cpu().long()
-        # Use F.embedding with the registered buffer
-        embedded = F.embedding(context_tokens_cpu, self.embedding_weight)  # [batch, k, embed_dim]
-        embedded = embedded.to(original_device)
-        
-        if self.use_attention:
-            # Attention pooling: [batch, k, embed_dim] -> [batch, embed_dim]
-            attn_scores = self.attention(embedded)  # [batch, k, 1]
-            attn_weights = F.softmax(attn_scores, dim=1)  # [batch, k, 1]
-            pooled = (embedded * attn_weights).sum(dim=1)  # [batch, embed_dim]
-            return self.mlp(pooled)
-        else:
-            # Flatten: [batch, k, embed_dim] -> [batch, k * embed_dim]
-            flattened = embedded.view(embedded.size(0), -1)
-            return self.mlp(flattened)
-
 
 class EmbeddingMLP(nn.Module):
     """MLP for processing post-attention, post-RMS norm embeddings"""
@@ -156,108 +57,6 @@ class EmbeddingMLP(nn.Module):
         return self.mlp(embedding)
 
 
-class RouterLogitsHistoryMLP(nn.Module):
-    """MLP for processing router logits history"""
-    
-    def __init__(
-        self,
-        num_experts: int = 8,
-        context_window_k: int = 10,
-        hidden_dim: int = 512,
-        output_dim: int = 256,
-        dropout: float = 0.1
-    ):
-        super().__init__()
-        self.num_experts = num_experts
-        self.context_window_k = context_window_k
-        
-        # Input is (k-1) previous router logits, each with num_experts values
-        input_size = (context_window_k - 1) * num_experts
-        
-        self.mlp = nn.Sequential(
-            nn.Linear(input_size, hidden_dim),
-            nn.LayerNorm(hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.LayerNorm(hidden_dim // 2),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim // 2, output_dim),
-        )
-    
-    def forward(self, router_logits_history: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            router_logits_history: [batch_size, k-1, num_experts] router logits
-            
-        Returns:
-            [batch_size, output_dim] feature vector
-        """
-        # Flatten: [batch, k-1, num_experts] -> [batch, (k-1) * num_experts]
-        batch_size = router_logits_history.size(0)
-        flattened = router_logits_history.view(batch_size, -1)
-        
-        return self.mlp(flattened)
-
-
-class FusionMLP(nn.Module):
-    """MLP for fusing features from different sources and predicting experts"""
-    
-    def __init__(
-        self,
-        feature_dims: Dict[str, int],
-        num_experts: int = 8,
-        top_k: int = 2,
-        hidden_dim: int = 512,
-        dropout: float = 0.1
-    ):
-        """
-        Args:
-            feature_dims: Dictionary mapping feature names to their dimensions
-                         e.g., {'context': 256, 'embedding': 256, 'router_history': 256}
-            num_experts: Number of experts to predict
-            top_k: Number of top experts to predict
-            hidden_dim: Hidden dimension for fusion MLP
-            dropout: Dropout rate
-        """
-        super().__init__()
-        self.num_experts = num_experts
-        self.top_k = top_k
-        self.feature_names = sorted(feature_dims.keys())
-        
-        # Calculate total input dimension
-        total_input_dim = sum(feature_dims.values())
-        
-        # Fusion MLP
-        self.fusion_mlp = nn.Sequential(
-            nn.Linear(total_input_dim, hidden_dim),
-            nn.LayerNorm(hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.LayerNorm(hidden_dim // 2),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim // 2, num_experts),
-        )
-    
-    def forward(self, features: Dict[str, torch.Tensor]) -> torch.Tensor:
-        """
-        Args:
-            features: Dictionary of feature tensors, each [batch_size, feature_dim]
-            
-        Returns:
-            [batch_size, num_experts] logits for expert selection
-        """
-        # Concatenate features in consistent order
-        feature_list = [features[name] for name in self.feature_names]
-        concatenated = torch.cat(feature_list, dim=1)
-        
-        # Predict expert logits
-        return self.fusion_mlp(concatenated)
-
-
 class ExpertPredictor(nn.Module):
     """
     Complete expert prediction model with ablation study support.
@@ -275,17 +74,12 @@ class ExpertPredictor(nn.Module):
         top_k: int = 2,
         context_window_k: int = 10,
         # Feature-specific MLP dimensions
-        context_output_dim: int = 256,
         embedding_output_dim: int = 256,
-        router_history_output_dim: int = 256,
         # Fusion MLP dimensions
         fusion_hidden_dim: int = 512,
         dropout: float = 0.1,
         # Ablation flags
-        use_context_tokens: bool = True,
         use_embedding: bool = True,
-        use_router_history: bool = True,
-        use_attention: bool = True,
     ):
         super().__init__()
         
@@ -296,22 +90,7 @@ class ExpertPredictor(nn.Module):
         self.context_window_k = context_window_k
         
         # Ablation flags
-        self.use_context_tokens = use_context_tokens
         self.use_embedding = use_embedding
-        self.use_router_history = use_router_history
-        
-        # Feature-specific MLPs
-        if use_context_tokens:
-            if pretrained_embeddings is None:
-                raise ValueError("pretrained_embeddings required when use_context_tokens=True")
-            self.context_mlp = ContextTokenMLP(
-                pretrained_embeddings=pretrained_embeddings,
-                context_window_k=context_window_k,
-                hidden_dim=512,
-                output_dim=context_output_dim,
-                dropout=dropout,
-                use_attention=use_attention
-            )
         
         if use_embedding:
             self.embedding_mlp = EmbeddingMLP(
@@ -321,36 +100,15 @@ class ExpertPredictor(nn.Module):
                 dropout=dropout
             )
         
-        if use_router_history:
-            self.router_history_mlp = RouterLogitsHistoryMLP(
-                num_experts=num_experts,
-                context_window_k=context_window_k,
-                hidden_dim=512,
-                output_dim=router_history_output_dim,
-                dropout=dropout
-            )
         
         # Build feature dimensions dict for fusion
         feature_dims = {}
-        if use_context_tokens:
-            feature_dims['context'] = context_output_dim
         if use_embedding:
             feature_dims['embedding'] = embedding_output_dim
-        if use_router_history:
-            feature_dims['router_history'] = router_history_output_dim
-        
-        # Fusion MLP
-        self.fusion_mlp = FusionMLP(
-            feature_dims=feature_dims,
-            num_experts=num_experts,
-            top_k=top_k,
-            hidden_dim=fusion_hidden_dim,
-            dropout=dropout
-        )
+   
     
     def forward(
         self,
-        context_tokens: Optional[torch.Tensor] = None,
         post_attn_embedding: Optional[torch.Tensor] = None,
         router_logits_history: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
@@ -366,23 +124,13 @@ class ExpertPredictor(nn.Module):
             [batch_size, num_experts] logits for expert selection
         """
         features = {}
-        
-        # Process each feature type if enabled
-        if self.use_context_tokens:
-            if context_tokens is None:
-                raise ValueError("context_tokens required when use_context_tokens=True")
-            features['context'] = self.context_mlp(context_tokens)
-        
+
         if self.use_embedding:
             if post_attn_embedding is None:
                 raise ValueError("post_attn_embedding required when use_embedding=True")
             features['embedding'] = self.embedding_mlp(post_attn_embedding)
         
-        if self.use_router_history:
-            if router_logits_history is None:
-                raise ValueError("router_logits_history required when use_router_history=True")
-            features['router_history'] = self.router_history_mlp(router_logits_history)
-        
+
         # Fuse features and predict
         return self.fusion_mlp(features)
     
@@ -422,16 +170,46 @@ class ExpertPredictor(nn.Module):
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         
+        # We save the state dict to .pth to avoid overwriting the TorchScript model
+        state_path = path.with_suffix('.pth') if path.suffix == '.pt' else path
+        
         # Save model state
         torch.save({
             'model_state_dict': self.state_dict(),
             'config': self.get_config(),
-        }, path)
+        }, state_path)
         
         # Also save config as JSON for easy inspection
         config_path = path.with_suffix('.json')
         with open(config_path, 'w') as f:
             json.dump(self.get_config(), f, indent=2)
+            
+        # Export as TorchScript
+        if self.use_embedding and not self.use_context_tokens and not self.use_router_history:
+            class PredictorWrapper(nn.Module):
+                def __init__(self, predictor):
+                    super().__init__()
+                    self.predictor = predictor
+                def forward(self, embedding: torch.Tensor) -> torch.Tensor:
+                    return self.predictor(None, embedding, None)
+                    
+            try:
+                params = list(self.parameters())
+                orig_device = params[0].device if params else torch.device('cpu')
+                self.to('cpu')
+                
+                wrapper = PredictorWrapper(self)
+                wrapper.eval()
+                example_input = torch.randn(1, self.embedding_dim)
+                with torch.no_grad():
+                    traced_model = torch.jit.trace(wrapper, example_input)
+                
+                ts_path = path.with_suffix('.pt')
+                traced_model.save(str(ts_path))
+                
+                self.to(orig_device)
+            except Exception as e:
+                print(f"Warning: Failed to export TorchScript model: {e}")
     
     @classmethod
     def load(cls, path: str, device: str = 'cpu', pretrained_embeddings: Optional[torch.Tensor] = None):
@@ -443,7 +221,15 @@ class ExpertPredictor(nn.Module):
              device: Device to load model on
              pretrained_embeddings: Pretrained embeddings tensor (required if model uses context tokens)
         """
-        checkpoint = torch.load(path, map_location=device)
+        path_obj = Path(path)
+        # If trying to load .pt but it might be a traced TorchScript model, fallback to .pth state dict
+        if path_obj.suffix == '.pt' and path_obj.with_suffix('.pth').exists():
+            try:
+                checkpoint = torch.load(path_obj.with_suffix('.pth'), map_location=device, weights_only=False)
+            except Exception:
+                checkpoint = torch.load(path, map_location=device, weights_only=False)
+        else:
+            checkpoint = torch.load(path, map_location=device, weights_only=False)
         
         # Check if we need embeddings and warn if missing
         config = checkpoint['config']

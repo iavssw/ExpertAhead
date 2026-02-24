@@ -944,29 +944,71 @@ void UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors(const std:
     munmap((void *)map, file_size);
 }
 
+// Fast binary tensor loader using mmap + MADV_SEQUENTIAL.
+// Avoids kernel-buffered ifstream overhead; the OS DMA-reads directly into
+// the mapped pages which we then memcpy into a pinned CPU tensor for fast H2D.
 static torch::Tensor read_bin_tensor(const std::string &path, torch::ScalarType dtype, const std::vector<int64_t> &shape) {
-    std::ifstream input_file(path, std::ios::binary);
-    if (!input_file) {
-        throw std::runtime_error("Could not open file: " + path);
+    int fd = open(path.c_str(), O_RDONLY);
+    if (fd == -1) {
+        throw std::runtime_error("Could not open file: " + path + " (" + strerror(errno) + ")");
     }
 
-    auto tensor = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU));
-    size_t expected_bytes = tensor.numel() * tensor.element_size();
+    struct stat sb;
+    if (fstat(fd, &sb) == -1) {
+        close(fd);
+        throw std::runtime_error("fstat failed for: " + path);
+    }
+    size_t file_size = static_cast<size_t>(sb.st_size);
 
-    input_file.seekg(0, std::ios::end);
-    size_t file_size = static_cast<size_t>(input_file.tellg());
-    input_file.seekg(0, std::ios::beg);
+    // Allocate pinned (page-locked) CPU tensor so H2D DMA is ~2x faster.
+    auto tensor = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU).pinned_memory(true));
+    size_t expected_bytes = static_cast<size_t>(tensor.numel()) * tensor.element_size();
 
     if (file_size != expected_bytes) {
-        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(expected_bytes) + ", got " +
-                                 std::to_string(file_size) + ")");
+        close(fd);
+        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(expected_bytes) +
+                                 ", got " + std::to_string(file_size) + ")");
     }
 
-    input_file.read(reinterpret_cast<char *>(tensor.data_ptr()), file_size);
-    if (!input_file) {
-        throw std::runtime_error("Failed to read file: " + path);
+    void *map = mmap(nullptr, file_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd);
+    if (map == MAP_FAILED) {
+        throw std::runtime_error("mmap failed for: " + path);
     }
+    // Hint to the kernel: read sequentially, prefetch aggressively.
+    madvise(map, file_size, MADV_SEQUENTIAL);
+
+    std::memcpy(tensor.data_ptr(), map, file_size);
+    munmap(map, file_size);
+
     return tensor;
+}
+
+static void read_bin_tensor_pread(const std::string &path, void* dest_ptr, size_t copy_size) {
+    int fd = open(path.c_str(), O_RDONLY);
+    if (fd == -1) {
+        throw std::runtime_error("Could not open file: " + path + " (" + strerror(errno) + ")");
+    }
+    struct stat sb;
+    if (fstat(fd, &sb) == -1) {
+        close(fd);
+        throw std::runtime_error("fstat failed for: " + path);
+    }
+    size_t file_size = static_cast<size_t>(sb.st_size);
+    if (file_size != copy_size) {
+        close(fd);
+        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(copy_size) +
+                                 ", got " + std::to_string(file_size) + ")");
+    }
+
+    size_t bytes_read = 0;
+    char* ptr = static_cast<char*>(dest_ptr);
+    while (bytes_read < copy_size) {
+        ssize_t ret = pread(fd, ptr + bytes_read, copy_size - bytes_read, bytes_read);
+        if (ret <= 0) break;
+        bytes_read += ret;
+    }
+    close(fd);
 }
 
 void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir) {
@@ -1178,70 +1220,109 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
     if (weights_dir.empty()) {
         throw std::runtime_error("Weights directory not set for MoE layer " + std::to_string(layer_idx_));
     }
-    
-    // Construct prefixes
-    std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
-    std::string gate_prefix = expert_prefix + "_gate";
-    std::string up_prefix = expert_prefix + "_up";
-    std::string down_prefix = expert_prefix + "_down";
-
-
 
     if (weights_dir == "DUMMY") {
-        // Initialize with random weights for testing
-        auto init_dummy = [&](QuantizedLinear &layer) {
-             // We can just randomize the existing tensors since they are already allocated in the slot
-             // But wait, the slot might be empty if we didn't reserve?
-             // No, constructor reserves and pushes back QuantizedLinear objects.
-             // initialize_dummy_weights ALREADY initialized all slots with random weights!
-             // So if we just want to "simulate" loading, we can just do nothing or maybe randomize again to prove it "loaded".
-             // For performance of test, doing nothing is fine, but to be sure, let's just print.
-             if (debug_verbosity >= 2) std::cout << "DUMMY load for expert " << expert_idx << " into slot " << slot_idx << std::endl;
-        };
-        // We don't need to do anything because initialize_dummy_weights filled all slots.
-        // But strictly speaking, the slot contains the *weights of the expert that is currently in it*.
-        // If we "load" a new expert, we should technically change the weights.
-        // But for random dummy weights, it doesn't matter if they change, as long as they are valid numbers.
-        return; 
+        if (debug_verbosity >= 2)
+            std::cout << "DUMMY load for expert " << expert_idx << " into slot " << slot_idx << std::endl;
+        return;
     }
 
-    auto load_layer_weights = [&](QuantizedLinear &layer, const std::string &prefix) {
-        int64_t out_features = layer->out_features();
-        int64_t in_features = layer->in_features();
-        int64_t packed_in = (in_features + 1) / 2;
+    std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
+    std::string gate_prefix   = expert_prefix + "_gate";
+    std::string up_prefix     = expert_prefix + "_up";
+    std::string down_prefix   = expert_prefix + "_down";
 
-        std::string q_path = weights_dir + "/" + prefix + ".qweight.bin";
-        std::string s_path = weights_dir + "/" + prefix + ".scales.bin";
-        std::string z_path = weights_dir + "/" + prefix + ".zeros.bin";
-
-        auto q = read_bin_tensor(q_path, torch::kUInt8, {out_features, packed_in});
-        
-        size_t s_bytes = std::filesystem::file_size(s_path);
-        int64_t s_numel = static_cast<int64_t>(s_bytes / 2);
-        int64_t s_groups = s_numel / out_features;
-        std::vector<int64_t> s_shape = (s_groups <= 1) ? std::vector<int64_t>{out_features} : std::vector<int64_t>{out_features, s_groups};
-        auto s = read_bin_tensor(s_path, torch::kBFloat16, s_shape);
-        
-        size_t z_bytes = std::filesystem::file_size(z_path);
-        int64_t z_numel = static_cast<int64_t>(z_bytes);
-        int64_t z_groups = z_numel / out_features;
-        std::vector<int64_t> z_shape = (z_groups <= 1) ? std::vector<int64_t>{out_features} : std::vector<int64_t>{out_features, z_groups};
-        auto z = read_bin_tensor(z_path, torch::kInt8, z_shape);
-
-        layer->set_unpacked_params(q, s, z);
+    auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot, const std::vector<int64_t>& shape, torch::ScalarType dtype) {
+        if (bufs.size() <= static_cast<size_t>(slot)) bufs.resize(max_cached_experts_);
+        if (!bufs[slot].defined()) {
+            bufs[slot] = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU).pinned_memory(true));
+        } else if (bufs[slot].sizes() != shape) {
+            bufs[slot].resize_(shape);
+        }
+        return bufs[slot];
     };
 
-    QuantizedLinear tmp_gate(hidden_size_, intermediate_size_, false, 4096, "tmp_moe_gate");
-    QuantizedLinear tmp_up(hidden_size_, intermediate_size_, false, 4096, "tmp_moe_up");
-    
-    load_layer_weights(tmp_gate, gate_prefix);
-    load_layer_weights(tmp_up, up_prefix);
-    
-    auto q = torch::cat({tmp_gate->get_quantized_weights(), tmp_up->get_quantized_weights()}, 0).contiguous();
-    auto s = torch::cat({tmp_gate->get_scales(), tmp_up->get_scales()}, 0).contiguous();
-    auto z = torch::cat({tmp_gate->get_zeros(), tmp_up->get_zeros()}, 0).contiguous();
-    
-    gate_up_experts[slot_idx]->set_unpacked_params(q, s, z);
-    
-    load_layer_weights(down_experts[slot_idx], down_prefix);
+    // ---- gate_up slot ----
+    {
+        int64_t out_feat   = intermediate_size_;
+        int64_t in_feat    = hidden_size_;
+        int64_t packed_in  = (in_feat + 1) / 2;
+
+        std::string gq = weights_dir + "/" + gate_prefix + ".qweight.bin";
+        std::string gs = weights_dir + "/" + gate_prefix + ".scales.bin";
+        std::string gz = weights_dir + "/" + gate_prefix + ".zeros.bin";
+        std::string uq = weights_dir + "/" + up_prefix   + ".qweight.bin";
+        std::string us = weights_dir + "/" + up_prefix   + ".scales.bin";
+        std::string uz = weights_dir + "/" + up_prefix   + ".zeros.bin";
+
+        // Determine scales/zeros shape from file sizes.
+        size_t gs_bytes  = std::filesystem::file_size(gs);
+        int64_t gs_numel = static_cast<int64_t>(gs_bytes / 2); // bf16
+        int64_t gs_grps  = gs_numel / out_feat;
+        std::vector<int64_t> s_shape = (gs_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                       : std::vector<int64_t>{out_feat, gs_grps};
+        size_t gz_bytes  = std::filesystem::file_size(gz);
+        int64_t gz_numel = static_cast<int64_t>(gz_bytes);
+        int64_t gz_grps  = gz_numel / out_feat;
+        std::vector<int64_t> z_shape = (gz_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                       : std::vector<int64_t>{out_feat, gz_grps};
+
+        auto dest_q = ensure_pinned_buffer(gate_up_q_pinned_, slot_idx, {out_feat * 2, packed_in}, torch::kUInt8);
+        auto dest_s = ensure_pinned_buffer(gate_up_s_pinned_, slot_idx, {s_shape[0] * 2, s_shape.size() > 1 ? s_shape[1] : 1}, torch::kBFloat16);
+        auto dest_z = ensure_pinned_buffer(gate_up_z_pinned_, slot_idx, {z_shape[0] * 2, z_shape.size() > 1 ? z_shape[1] : 1}, torch::kInt8);
+
+        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
+        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
+        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
+
+        char* ptr_q = static_cast<char*>(dest_q.data_ptr());
+        char* ptr_s = static_cast<char*>(dest_s.data_ptr());
+        char* ptr_z = static_cast<char*>(dest_z.data_ptr());
+
+        read_bin_tensor_pread(gq, ptr_q, expected_q);
+        read_bin_tensor_pread(uq, ptr_q + expected_q, expected_q);
+        read_bin_tensor_pread(gs, ptr_s, expected_s);
+        read_bin_tensor_pread(us, ptr_s + expected_s, expected_s);
+        read_bin_tensor_pread(gz, ptr_z, expected_z);
+        read_bin_tensor_pread(uz, ptr_z + expected_z, expected_z);
+
+        gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+    }
+
+    // ---- down slot ----
+    {
+        auto &down_layer = down_experts[slot_idx];
+        int64_t out_feat  = down_layer->out_features();
+        int64_t in_feat   = down_layer->in_features();
+        int64_t packed_in = (in_feat + 1) / 2;
+
+        std::string dq = weights_dir + "/" + down_prefix + ".qweight.bin";
+        std::string ds = weights_dir + "/" + down_prefix + ".scales.bin";
+        std::string dz = weights_dir + "/" + down_prefix + ".zeros.bin";
+
+        size_t ds_bytes  = std::filesystem::file_size(ds);
+        int64_t ds_numel = static_cast<int64_t>(ds_bytes / 2);
+        int64_t ds_grps  = ds_numel / out_feat;
+        std::vector<int64_t> s_shape = (ds_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                       : std::vector<int64_t>{out_feat, ds_grps};
+        size_t dz_bytes  = std::filesystem::file_size(dz);
+        int64_t dz_numel = static_cast<int64_t>(dz_bytes);
+        int64_t dz_grps  = dz_numel / out_feat;
+        std::vector<int64_t> z_shape = (dz_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                       : std::vector<int64_t>{out_feat, dz_grps};
+
+        auto dest_q = ensure_pinned_buffer(down_q_pinned_, slot_idx, {out_feat, packed_in}, torch::kUInt8);
+        auto dest_s = ensure_pinned_buffer(down_s_pinned_, slot_idx, s_shape, torch::kBFloat16);
+        auto dest_z = ensure_pinned_buffer(down_z_pinned_, slot_idx, z_shape, torch::kInt8);
+
+        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
+        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
+        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
+
+        read_bin_tensor_pread(dq, dest_q.data_ptr(), expected_q);
+        read_bin_tensor_pread(ds, dest_s.data_ptr(), expected_s);
+        read_bin_tensor_pread(dz, dest_z.data_ptr(), expected_z);
+
+        down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
+    }
 }

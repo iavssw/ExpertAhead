@@ -185,11 +185,20 @@ class Mixtral8x7BW4A16Model:
         config_path: Optional[str] = None,
         max_cached_experts_per_layer: int = 8,
         use_cached_moe: bool = False,
-        predictor_models_dir: str = "",
-        weights_dir: str = ""
+        predictor_models_dir: str = "/home/michael/mixtral_project/expert_prediction_full/embedding_only_predictors",
+        weights_dir: str = "",
+        predictor_device: str = "gpu",
+        prefetch_experts_count: int = 1,
+        predict_layers: Optional[List[int]] = None,
     ):
         """
         Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
+
+        predictor_device: where to run the TorchScript expert predictor.
+            "gpu"  -> same GPU as the MoE layer (default — use this to benchmark/validate
+                      speculative-loading speedup without NPU hardware)
+            "cpu"  -> CPU, which routes through the Ryzen AI NPU backend on Strix
+            "auto" -> inferred from heterogeneity in config (gpu->GPU, hetero/npu->CPU/NPU)
         """
 
         if backend not in ["base", "predict", "cached"]:
@@ -253,9 +262,35 @@ class Mixtral8x7BW4A16Model:
 
         if config_path is None:
             config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5"))
-        constructor_args.append(config_path)
 
+        # If predictor_device override is requested, write a temp config with the field injected.
+        # The C++ constructor reads predictor_device from the JSON on construction.
+        _temp_config_path = None
+        if predictor_device != "auto" and backend == "predict":
+            import tempfile, json
+            base_cfg = load_config_with_comments(config_path) if config_path else {}
+            base_cfg["predictor_device"] = predictor_device
+            tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+            json.dump(base_cfg, tmp)
+            tmp.close()
+            _temp_config_path = tmp.name
+            print(f"[predictor_device={predictor_device}] Using temp config: {_temp_config_path}")
+            constructor_args.append(_temp_config_path)
+        else:
+            constructor_args.append(config_path)
+        if backend == "predict":
+            constructor_args.append(prefetch_experts_count)
+            constructor_args.append(predict_layers if predict_layers is not None else [])
+            
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
+
+        # Clean up temp config after C++ has read it
+        if _temp_config_path:
+            import os as _os
+            try:
+                _os.unlink(_temp_config_path)
+            except OSError:
+                pass
 
         self.config = {}
         self.use_pre_saved_weights = False
@@ -281,7 +316,7 @@ class Mixtral8x7BW4A16Model:
         elif model_path:
             self._load_quantized_weights(model_path, weights_folder="model_weights")
 
-        if backend == "cached":
+        if backend in ["cached", "predict"]:
             print(f"Pre-warming expert cache with {max_cached_experts_per_layer} experts...")
             self.model.prewarm_experts(max_cached_experts_per_layer)
 
@@ -786,7 +821,7 @@ def main():
     parser.add_argument(
         "--expert-cache",
         type=int,
-        default=8,
+        default=2,
         help="Maximum number of cached experts per layer (for cached backend)"
     )
     parser.add_argument(
@@ -798,7 +833,7 @@ def main():
     parser.add_argument(
         "--predictor-model",
         type=str,
-        default="",
+        default="/home/michael/mixtral_project/expert_prediction_full/embedding_only_predictors",
         help="Path to predictor model directory (containing layer_X subdirs) for 'predict' backend"
     )
     parser.add_argument(
@@ -872,6 +907,41 @@ def main():
         help="Path to a file containing prompts for benchmarking. If set, runs benchmark mode."
     )
     
+    parser.add_argument(
+        "--predictor-device",
+        type=str,
+        default="gpu",
+        choices=["gpu", "cpu", "auto"],
+        help=(
+            "Device for expert predictor TorchScript inference (predict backend only). "
+            "'gpu' = same GPU as MoE (default — validates GPU-based speculative-loading speedup), "
+            "'cpu' = CPU, routes through Ryzen AI NPU on Strix, "
+            "'auto' = inferred from heterogeneity config."
+        )
+    )
+    
+    parser.add_argument(
+        "--predict-layers",
+        type=int,
+        nargs="+",
+        default=None,
+        help="List of layer indices (e.g., 0 1 2) to enable the predictor. If not specified, runs on all layers."
+    )
+    
+    parser.add_argument(
+        "--prefetch-experts-count",
+        type=int,
+        default=1,
+        help="Number of top experts for the predictor engine to proactively prefetch."
+    )
+    
+    parser.add_argument(
+        "--sweep-prompts-file",
+        type=str,
+        default=None,
+        help="Path to a JSON file containing a list of prompts. Runs all prompts sequentially without reloading."
+    )
+    
     args = parser.parse_args()
 
     if args.prompt_test is not None:
@@ -901,7 +971,10 @@ def main():
             backend=args.backend,
             config_path=args.config_path,
             max_cached_experts_per_layer=args.expert_cache,
-            predictor_models_dir=args.predictor_model
+            predictor_models_dir=args.predictor_model,
+            predictor_device=args.predictor_device,
+            prefetch_experts_count=args.prefetch_experts_count,
+            predict_layers=args.predict_layers,
         )
 
         print("Model initialized successfully!")
@@ -1023,6 +1096,77 @@ def main():
             
         return 0
 
+    if args.sweep_prompts_file:
+        print(f"\nRunning sweep using prompts from JSON: {args.sweep_prompts_file}")
+        if not os.path.exists(args.sweep_prompts_file):
+            print(f"Error: Prompts file {args.sweep_prompts_file} not found.")
+            return 1
+            
+        with open(args.sweep_prompts_file, 'r') as f:
+            prompts = json.load(f)
+            
+        print(f"Loaded {len(prompts)} prompts for sweeping.")
+        
+        total_ppl = 0.0
+        valid_ppl_count = 0
+        total_time = 0.0
+        total_generated_tokens = 0
+        
+        # Reset stats globally before starting sweep
+        model.reset_cache_stats()
+
+        for i, prompt in enumerate(prompts):
+            print(f"\nProcessing Prompt {i+1}/{len(prompts)}...")
+            try:
+                if args.generation_perplexity:
+                    gppl = model.calculate_generation_perplexity(prompt)
+                    total_ppl += gppl
+                    valid_ppl_count += 1
+                
+                if args.generate:
+                    input_ids = model.tokenize(prompt)
+                    start_time = time.time()
+                    generated = model.generate(
+                        input_ids,
+                        max_new_tokens=args.max_new_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        top_k=args.top_k
+                    )
+                    end_time = time.time()
+                    elapsed = end_time - start_time
+                    num_generated = generated.size(1) - input_ids.size(1)
+                    
+                    if num_generated > 0:
+                        total_time += elapsed
+                        total_generated_tokens += num_generated
+
+            except Exception as e:
+                print(f"  Error on prompt {i+1}: {e}")
+                import traceback
+                traceback.print_exc()
+
+        print(f"\n{'=' * 60}")
+        print("Sweep Complete.")
+        
+        if args.generation_perplexity and valid_ppl_count > 0:
+            avg_ppl = total_ppl / valid_ppl_count
+            print(f"Generation Perplexity: {avg_ppl:.4f}")
+            
+        if args.generate and total_generated_tokens > 0:
+            avg_tps = total_generated_tokens / total_time
+            print(f"Average Time per Token: {1.0 / avg_tps:.6f}") # Output inverse since parser expects time per token
+            print(f"End-to-End TPS: {avg_tps:.4f}")
+
+        # Get and print cache stats for entire sweep
+        hits, misses = model.get_cache_stats()
+        total = hits + misses
+        hit_rate = (hits / total * 100.0) if total > 0 else 0.0
+        print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
+        
+        model.print_cache_stats()
+        return 0
+
     # Normal execution path (Single Text)
     print(f"Processing text: '{args.text}'")
 
@@ -1065,6 +1209,8 @@ def main():
                 generated_tokens = generated[0, prompt_len:].tolist()
                 decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
 
+                num_generated_tokens = len(generated_tokens)
+
                 print(f"\n{'='*60}")
                 print("Full output (prompt + generated):")
                 print(f"{'='*60}")
@@ -1074,7 +1220,8 @@ def main():
                 print(f"{'='*60}")
                 print(decoded_generated)
                 print(f"{'='*60}")
-                
+
+
                 # Get and print cache stats
                 hits, misses = model.get_cache_stats()
                 total = hits + misses
@@ -1121,4 +1268,12 @@ def main():
 
 
 if __name__ == "__main__":
-    exit(main())
+    exit_code = main()
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+            torch.cuda.empty_cache()
+    except Exception:
+        pass
+    exit(exit_code)

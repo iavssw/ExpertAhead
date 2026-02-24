@@ -554,11 +554,19 @@ void QuantizedLinearImpl::set_quantized_weights(torch::Tensor qweight, torch::Te
 }
 
 void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torch::Tensor scale, torch::Tensor zero_point) {
-    auto device = quantized_weight_.device();
+    if (quantized_weight_.sizes() != qweight_packed.sizes()) {
+        quantized_weight_.resize_as_(qweight_packed);
+    }
+    if (scale_.sizes() != scale.sizes()) {
+        scale_.resize_as_(scale);
+    }
+    if (zero_point_.sizes() != zero_point.sizes()) {
+        zero_point_.resize_as_(zero_point);
+    }
 
-    quantized_weight_ = qweight_packed.to(torch::kUInt8).contiguous().to(device);
-    scale_ = scale.to(torch::kBFloat16).contiguous().to(device);
-    zero_point_ = zero_point.to(torch::kInt8).contiguous().to(device);
+    quantized_weight_.copy_(qweight_packed.to(torch::kUInt8).contiguous(), /*non_blocking=*/true);
+    scale_.copy_(scale.to(torch::kBFloat16).contiguous(), /*non_blocking=*/true);
+    zero_point_.copy_(zero_point.to(torch::kInt8).contiguous(), /*non_blocking=*/true);
 }
 
 // MixtureOfExpertsImpl Implementation
@@ -607,7 +615,6 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
     // Linear scan of slots to find if expert is already loaded
     for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
         if (expert_slots_indices[s] == global_expert_idx) {
-            // std::cout << "Layer " << layer_idx_ << " - Hit" << std::endl;
             if (update_stats) {
                 cache_hits_++;
             }
@@ -624,8 +631,6 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
         }
     }
     
-    // Miss: Evict the Least Recently Used slot (front of the vector)
-    // std::cout << "Layer " << layer_idx_ << " - Miss" << std::endl;
     if (update_stats) {
         cache_misses_++;
     }
@@ -635,7 +640,7 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
     // Load new expert into the evicted slot
     load_expert_weights(lru_slot, global_expert_idx, weights_dir_);
     // Ensure weights are fully on device before usage (critical for cache=2 and generation perplexity)
-    hipDeviceSynchronize();
+    (void)hipDeviceSynchronize();
     
     // Update slot mapping and mark as MRU
     expert_slots_indices[lru_slot] = global_expert_idx;
@@ -2126,6 +2131,9 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
 
     start_pos = token_len - 1;
 
+    // Reset cache stats before generation to ensure accurate measurements
+    reset_cache_stats();
+
     // Generate remaining tokens
     if (should_sync_device) {
         torch::cuda::synchronize();
@@ -2199,6 +2207,9 @@ double UnifiedLLMW4A16Impl::calculate_generation_perplexity(torch::Tensor input_
     //   ...
     
     auto start_time = std::chrono::high_resolution_clock::now();
+    
+    // Reset cache stats before calculating perplexity to ensure accurate measurements
+    reset_cache_stats();
     
     for (int64_t i = 0; i < seq_len - 1; ++i) {
         // Prepare input token [1, 1]

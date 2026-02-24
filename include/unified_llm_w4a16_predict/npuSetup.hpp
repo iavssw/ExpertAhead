@@ -70,6 +70,12 @@ struct NPUGlobalConfig {
     bool preload_moe_kernels = false;
     bool minimal_pdi = false;
 
+    // Device for the expert predictor TorchScript model.
+    // "auto"  -> inferred from heterogeneity ("gpu"->GPU, "hetero"/"npu"->CPU/NPU, "cpu"->CPU)
+    // "cpu"   -> always run predictor on CPU (NPU path on Ryzen AI)
+    // "gpu"   -> always run predictor on the same GPU as the MoE layer
+    std::string predictor_device = "auto";
+
     NPURopeScalingConfig rope_scaling;
     std::vector<NPUKernelConfig> kernels;
 };

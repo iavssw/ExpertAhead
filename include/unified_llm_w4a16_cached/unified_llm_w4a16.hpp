@@ -154,6 +154,14 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::vector<QuantizedLinear> down_experts;
 
   private:
+    // Pinned memory buffers for fast expert weight loading (one per slot)
+    std::vector<torch::Tensor> gate_up_q_pinned_;
+    std::vector<torch::Tensor> gate_up_s_pinned_;
+    std::vector<torch::Tensor> gate_up_z_pinned_;
+    std::vector<torch::Tensor> down_q_pinned_;
+    std::vector<torch::Tensor> down_s_pinned_;
+    std::vector<torch::Tensor> down_z_pinned_;
+
     int64_t hidden_size_;
     int64_t intermediate_size_;
     int64_t num_experts_;

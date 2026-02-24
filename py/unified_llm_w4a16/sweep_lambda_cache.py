@@ -6,7 +6,7 @@ import os
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import time
 # Try importing datasets
 try:
     from datasets import load_dataset
@@ -52,7 +52,7 @@ def parse_cache_stats(output):
 
 def run_sweep():
     parser = argparse.ArgumentParser(description="Sweep lambda and cache size for Generation Perplexity/TPS.")
-    parser.add_argument("--cache-sizes", type=int, nargs="+", default=[2,3,4,5,6,7,8], help="List of cache sizes to test")
+    parser.add_argument("--cache-sizes", type=int, nargs="+", default=[2], help="List of cache sizes to test")
     parser.add_argument("--lambdas", type=float, nargs="+", default=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0], help="List of lambda values to test")
     parser.add_argument("--mode", type=str, choices=["perplexity", "generation", "both"], default="both",
                         help="Mode: 'perplexity' for quality eval, 'generation' for speed eval, 'both' for combined")
@@ -211,6 +211,9 @@ def run_sweep():
         print(f"Error generating plots: {e}")
 
 def generate_plots(df, mode):
+    # Compute a single timestamp string for all plot filenames this run.
+    ts = time.strftime("%Y%m%d_%H%M%S")
+
     # Determine numeric columns based on mode
     numeric_cols = []
     if "gen_perplexity" in df.columns: numeric_cols.append("gen_perplexity")
@@ -241,8 +244,8 @@ def generate_plots(df, mode):
         plt.title("Impact of Lambda on Generation Speed")
         plt.legend()
         plt.grid(True)
-        plt.savefig(f"lambda_vs_tps_{mode}.png")
-        print(f"Saved lambda_vs_tps_{mode}.png")
+        plt.savefig(f"lambda_vs_tps_{mode}_strix_{ts}.png")
+        print(f"Saved lambda_vs_tps_{mode}_strix_{ts}.png")
 
     # 2. Lambda vs Perplexity
     if "gen_perplexity" in grouped.columns and not grouped["gen_perplexity"].isnull().all():
@@ -256,8 +259,8 @@ def generate_plots(df, mode):
         plt.title("Impact of Lambda on Generation Perplexity")
         plt.legend()
         plt.grid(True)
-        plt.savefig(f"lambda_vs_gen_perplexity_{mode}.png")
-        print(f"Saved lambda_vs_gen_perplexity_{mode}.png")
+        plt.savefig(f"lambda_vs_gen_perplexity_{mode}_strix_{ts}.png")
+        print(f"Saved lambda_vs_gen_perplexity_{mode}_strix_{ts}.png")
 
     # 3. Lambda vs Hit Rate
     # Plot both PPL and Gen hit rates if available
@@ -282,8 +285,8 @@ def generate_plots(df, mode):
         plt.legend()
         plt.grid(True)
         plt.ylim(0, 100)
-        plt.savefig(f"lambda_vs_hit_rate_{mode}.png")
-        print(f"Saved lambda_vs_hit_rate_{mode}.png")
+        plt.savefig(f"lambda_vs_hit_rate_{mode}_strix_{ts}.png")
+        print(f"Saved lambda_vs_hit_rate_{mode}_strix_{ts}.png")
 
 if __name__ == "__main__":
     run_sweep()
