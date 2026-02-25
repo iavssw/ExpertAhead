@@ -348,6 +348,12 @@ def generate_plots(df, mode):
     # Single timestamp for all plots from this run
     ts = time.strftime("%Y%m%d_%H%M%S")
 
+    import textwrap
+    cmd_args_str = " ".join(sys.argv)
+    wrapped_args = textwrap.fill(f"Cmd: {cmd_args_str}", width=110)
+    num_lines = wrapped_args.count('\n') + 1
+    bottom_margin = 0.03 + 0.025 * num_lines
+
     if df.empty:
         print("No data to plot")
         return
@@ -377,7 +383,9 @@ def generate_plots(df, mode):
             plt.title("Cached vs Predict: Tokens per Second")
             plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
             plt.grid(True)
-            plt.tight_layout()
+            plt.figtext(0.5, 0.02, wrapped_args, ha="center", va="bottom", fontsize=8,
+                        bbox=dict(boxstyle="round,pad=0.3", facecolor="whitesmoke", edgecolor="gray", alpha=0.8))
+            plt.tight_layout(rect=[0, bottom_margin, 1, 1])
             fname = f"predict_vs_cached_tps_strix_{ts}.png"
             plt.savefig(fname)
             print(f"Saved {fname}")
@@ -395,7 +403,9 @@ def generate_plots(df, mode):
             plt.title("Cached vs Predict: Generation Perplexity")
             plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
             plt.grid(True)
-            plt.tight_layout()
+            plt.figtext(0.5, 0.02, wrapped_args, ha="center", va="bottom", fontsize=8,
+                        bbox=dict(boxstyle="round,pad=0.3", facecolor="whitesmoke", edgecolor="gray", alpha=0.8))
+            plt.tight_layout(rect=[0, bottom_margin, 1, 1])
             fname = f"predict_vs_cached_ppl_strix_{ts}.png"
             plt.savefig(fname)
             print(f"Saved {fname}")
@@ -413,7 +423,9 @@ def generate_plots(df, mode):
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.grid(True)
         plt.ylim(0, 100)
-        plt.tight_layout()
+        plt.figtext(0.5, 0.02, wrapped_args, ha="center", va="bottom", fontsize=8,
+                    bbox=dict(boxstyle="round,pad=0.3", facecolor="whitesmoke", edgecolor="gray", alpha=0.8))
+        plt.tight_layout(rect=[0, bottom_margin, 1, 1])
         fname = f"predict_vs_cached_hitrate_strix_{ts}.png"
         plt.savefig(fname)
         print(f"Saved {fname}")
@@ -430,7 +442,9 @@ def generate_plots(df, mode):
                 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
                 plt.grid(axis='y', linestyle='--', alpha=0.7)
                 plt.xticks(rotation=0)
-                plt.tight_layout()
+                plt.figtext(0.5, 0.02, wrapped_args, ha="center", va="bottom", fontsize=8,
+                            bbox=dict(boxstyle="round,pad=0.3", facecolor="whitesmoke", edgecolor="gray", alpha=0.8))
+                plt.tight_layout(rect=[0, bottom_margin, 1, 1])
                 fname = f"predict_vs_cached_tps_bar_strix_{ts}.png"
                 plt.savefig(fname)
                 print(f"Saved {fname}")

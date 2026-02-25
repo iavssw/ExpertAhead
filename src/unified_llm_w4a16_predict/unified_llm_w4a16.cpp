@@ -624,7 +624,12 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
 
     if (!predictor_model_path.empty()) {
         try {
-            predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
+            if (predictor_model_path == "random") {
+                predictor_ = std::make_unique<RandomExpertPredictor>(num_experts_);
+                std::cout << "Initialized RandomExpertPredictor" << std::endl;
+            } else {
+                predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
+            }
         } catch (const std::exception& e) {
             std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
         }

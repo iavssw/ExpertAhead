@@ -1,3 +1,5 @@
 cache_size,prefetch_count,lambda,backend,gen_perplexity,hit_rate,tokens_per_second
-2,,0.0,Cached (LRU),,,
-2,1.0,0.0,Predict (Spec),,,
+3,,0.0,Cached (LRU),,45.581896551724135,2.2456
+3,1.0,0.0,Predict (Spec),,45.689655172413794,2.2824
+3,,1.0,Cached (LRU),,66.91810344827587,2.8844
+3,1.0,1.0,Predict (Spec),,66.8103448275862,2.8567
