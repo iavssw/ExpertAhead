@@ -317,8 +317,19 @@ private:
             torch::NoGradGuard no_grad;
             auto output = model_.forward(inputs).toTensor();
             
+            auto max_logits = std::get<0>(torch::max(output, /*dim=*/-1));
+            auto min_logits = std::get<0>(torch::min(output, /*dim=*/-1));
+            double current_range = (max_logits - min_logits).mean().item<double>();
+            
+            if (delta_avg_ == 0.0) {
+                delta_avg_ = current_range;
+            } else {
+                delta_avg_ = 0.9 * delta_avg_ + 0.1 * current_range;
+            }
+            
             if (job.expert_bias.has_value()) {
                 auto bias = job.expert_bias.value().to(torch::kFloat32).to(device_);
+                bias = bias * delta_avg_;
                 output = output + bias;
             }
             
@@ -377,6 +388,8 @@ private:
     double prediction_time_ms_ = 0.0;
     std::mutex result_mutex_;
     std::condition_variable result_cv_;
+    
+    double delta_avg_ = 0.0;
     
     std::atomic<int64_t> next_job_id_{0};
 };
