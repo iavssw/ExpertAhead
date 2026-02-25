@@ -403,7 +403,7 @@ public:
         : num_experts_(num_experts),
           gen_(std::random_device{}()) {}
 
-    void predict_async(torch::Tensor embedding) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> expert_bias = c10::nullopt) override {
         // Generate a random ranking of all experts
         std::vector<int64_t> experts(num_experts_);
         std::iota(experts.begin(), experts.end(), 0);
