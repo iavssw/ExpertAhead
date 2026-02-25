@@ -142,6 +142,10 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     }
     double get_lambda() const { return lambda_; }
     
+    // Correlation-based expert bias
+    void set_correlation_constant(double constant) { correlation_constant_ = constant; }
+    double get_correlation_constant() const { return correlation_constant_; }
+    
     // Training data collection
     torch::Tensor get_last_router_logits() const { return last_router_logits_; }
     
@@ -188,6 +192,10 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double lambda_ = 0.0;                        // Bias parameter [0, 1]
     double delta_avg_ = 0.0;                     // Running average of logit ranges
     std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
+
+    // Correlation-based expert bias
+    double correlation_constant_ = 0.0;
+    torch::Tensor prefill_expert_counts_;
 
     // Cache State
     std::vector<int64_t> expert_slots_indices; // Maps Slot ID [0..max_cached] -> Global Expert ID. -1 if empty.
@@ -256,6 +264,9 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Lambda parameter control for router logit biasing
     void set_lambda(double lambda, int64_t layer_idx = -1);
     double get_lambda(int64_t layer_idx = 0) const;
+
+    // Correlation-based expert bias
+    void set_layer_correlation_constants(const std::vector<double>& constants);
 
     // Move model to device
     // Move model to device

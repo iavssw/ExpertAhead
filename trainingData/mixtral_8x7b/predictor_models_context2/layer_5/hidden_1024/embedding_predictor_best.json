@@ -1,0 +1,10 @@
+{
+  "vocab_size": 32000,
+  "base_embedding_dim": 4096,
+  "embedding_history_size": 1,
+  "embedding_dim": 4096,
+  "num_experts": 8,
+  "top_k": 1,
+  "context_window_k": 10,
+  "use_embedding": true
+}

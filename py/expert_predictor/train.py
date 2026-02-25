@@ -383,7 +383,13 @@ def train_epoch(model, loader, optimizer, criterion, device):
 
         optimizer.zero_grad()
         logits = model(post_attn_embedding=emb)
-        loss = criterion(logits, lbl)
+        
+        if isinstance(criterion, nn.CrossEntropyLoss):
+            # For CrossEntropyLoss, the target should be the class index
+            loss = criterion(logits, true[:, 0])
+        else:
+            loss = criterion(logits, lbl)
+            
         loss.backward()
         optimizer.step()
 
@@ -408,7 +414,12 @@ def evaluate(model, loader, criterion, device):
             lbl  = batch['label'].to(device)
 
             logits = model(post_attn_embedding=emb)
-            loss   = criterion(logits, lbl)
+            
+            true = batch['top_k_indices'].to(device)
+            if isinstance(criterion, nn.CrossEntropyLoss):
+                loss = criterion(logits, true[:, 0])
+            else:
+                loss = criterion(logits, lbl)
 
             true_logits = lbl
             sums, n = compute_metrics(logits, true_logits, top_k)
@@ -436,6 +447,7 @@ def train_embedding_predictor(
     num_experts: int = 8,
     top_k: int = 2,
     hidden_dim: Optional[int] = None,
+    use_cross_entropy: bool = False,
 ):
     """Train one per-layer expert predictor MLP."""
     _base_out = Path(output_dir) / f"layer_{layer_idx}"
@@ -465,33 +477,32 @@ def train_embedding_predictor(
 
     input_dim        = base_embedding_dim * embedding_history_size
     _hidden_dim      = hidden_dim if hidden_dim else min(2048, max(256, input_dim // 4))
-    _emb_output_dim  = min(512, max(64, input_dim // 8))
-    _fusion_hidden   = min(1024, max(128, _emb_output_dim * 2))
 
     output_dir = _base_out / f"hidden_{_hidden_dim}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(
         f"Layer {layer_idx} — input_dim={input_dim}, hidden_dim={_hidden_dim}, "
-        f"emb_out={_emb_output_dim}, fusion={_fusion_hidden}, "
         f"num_experts={num_experts}, top_k={top_k}"
     )
 
     model = ExpertPredictor(
         pretrained_embeddings=None,
         vocab_size=32000,
-        embedding_dim=input_dim,
+        base_embedding_dim=base_embedding_dim,
+        embedding_history_size=embedding_history_size,
         num_experts=num_experts,
         top_k=top_k,
-        embedding_output_dim=_emb_output_dim,
-        fusion_hidden_dim=_fusion_hidden,
-        use_context_tokens=False,
-        use_embedding=True,
-        use_router_history=False,
+        hidden_dim=_hidden_dim,
+        use_embedding=True
     ).to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    criterion = FocalLoss(alpha=pos_weights)
+    
+    if use_cross_entropy:
+        criterion = nn.CrossEntropyLoss(weight=pos_weights)
+    else:
+        criterion = FocalLoss(alpha=pos_weights)
 
     best_acc = 0.0
     metrics  = []
@@ -500,8 +511,6 @@ def train_embedding_predictor(
     run_config = {
         "layer_idx": layer_idx,
         "hidden_dim": _hidden_dim,
-        "emb_output_dim": _emb_output_dim,
-        "fusion_hidden_dim": _fusion_hidden,
         "embedding_history_size": embedding_history_size,
         "base_embedding_dim": base_embedding_dim,
         "num_experts": num_experts,
@@ -568,7 +577,9 @@ if __name__ == "__main__":
     parser.add_argument('--device',        type=str, default='cuda')
     parser.add_argument('--embedding_dim', type=int, default=4096)
     parser.add_argument('--num_experts',   type=int, default=8)
-    parser.add_argument('--top_k',         type=int, default=2)
+    parser.add_argument('--top_k',         type=int, default=1)
+    parser.add_argument('--use_cross_entropy', action='store_true', default=True,
+                        help="Use CrossEntropyLoss for top-1 prediction")
     parser.add_argument('--hidden_dim',    type=int, default=None)
     parser.add_argument('--batch_size',    type=int, default=32)
     parser.add_argument('--lr',            type=float, default=1e-3)
@@ -590,6 +601,7 @@ if __name__ == "__main__":
         num_experts=n_exp,
         top_k=k,
         hidden_dim=args.hidden_dim,
+        use_cross_entropy=args.use_cross_entropy,
     )
 
     layers = [args.layer_idx] if args.layer_idx is not None else list(range(n_layers))

@@ -641,6 +641,9 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
 
     router = register_module("router", LinearMatmul(hidden_size_, num_experts_, false));
 
+    // Initialize correlation counting
+    prefill_expert_counts_ = torch::zeros({num_experts_}, torch::kFloat32);
+
     // Initialize cache with empty slots
     expert_slots_indices.assign(max_cached_experts_, -1);
     
@@ -713,10 +716,19 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
     // Capture necessary data by deep copy to avoid lifetime issues across async barrier
     torch::Tensor embedding_copy = embedding.detach().clone();
     
+    c10::optional<torch::Tensor> expert_bias = c10::nullopt;
+    if (correlation_constant_ > 0.0) {
+        float sum = prefill_expert_counts_.sum().item<float>();
+        if (sum > 0.0f) {
+            auto distribution = prefill_expert_counts_ / sum;
+            expert_bias = (correlation_constant_ * distribution).unsqueeze(0);
+        }
+    }
+    
     speculative_load_future_ = std::async(std::launch::async, 
-        [this, embedding_copy]() {
+        [this, embedding_copy, expert_bias]() {
             // Predict
-            predictor_->predict_async(embedding_copy);
+            predictor_->predict_async(embedding_copy, expert_bias);
             
             // Wait for prediction
             std::vector<int64_t> predicted_experts_res = predictor_->get_prediction();
@@ -1139,6 +1151,10 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
     auto x_flat = x.view({-1, hidden_size_});
     auto opts = x.options();
 
+    if (x_flat.size(0) > 1) {
+        prefill_expert_counts_.zero_();
+    }
+
     torch::Tensor router_out = router->forward(x_flat);
     
     // Store router logits for training data collection
@@ -1227,6 +1243,17 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
             }
         } else {
             topk_vals = torch::softmax(topk_vals.to(torch::kFloat32), -1).to(router_out.dtype());
+        }
+    }
+    
+    // Track prefill counts
+    if (x_flat.size(0) > 1) {
+        auto topk_cpu = topk_idx.to(torch::kCPU);
+        auto acc = topk_cpu.accessor<int64_t, 2>();
+        for (int t = 0; t < topk_cpu.size(0); ++t) {
+            for (int i = 0; i < topk_cpu.size(1); ++i) {
+                prefill_expert_counts_[acc[t][i]] += 1.0f;
+            }
         }
     }
 
@@ -1703,6 +1730,14 @@ void UnifiedLLMW4A16Impl::preload_moe_kernels() {
 
     if (debug_verbosity >= 1) {
         std::cout << "MoE kernels preloaded." << std::endl;
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_layer_correlation_constants(const std::vector<double>& constants) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (size_t i = 0; i < std::min(moe_layers.size(), constants.size()); ++i) {
+            moe_layers[i]->set_correlation_constant(constants[i]);
+        }
     }
 }
 
