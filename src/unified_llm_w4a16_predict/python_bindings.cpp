@@ -160,6 +160,8 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
         .def("print_cache_stats", &UnifiedLLMW4A16Impl::print_cache_stats)
         .def("reset_cache_stats", &UnifiedLLMW4A16Impl::reset_cache_stats)
         .def("get_cache_stats", &UnifiedLLMW4A16Impl::get_cache_stats)
+        .def("get_predictor_stats", &UnifiedLLMW4A16Impl::get_predictor_stats)
+        .def("reset_predictor_stats", &UnifiedLLMW4A16Impl::reset_predictor_stats)
         .def("prewarm_experts", &UnifiedLLMW4A16Impl::prewarm_experts, py::arg("num_to_warm"), py::arg("verbose") = true)
 
         .def("initialize_dummy_weights", &UnifiedLLMW4A16Impl::initialize_dummy_weights, py::arg("seed") = 42,

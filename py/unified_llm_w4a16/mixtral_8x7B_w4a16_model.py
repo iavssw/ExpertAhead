@@ -619,6 +619,23 @@ class Mixtral8x7BW4A16Model:
             return self.model.get_cache_stats()
         return (0, 0)
 
+    def get_predictor_stats(self):
+        """
+        Get per-layer predictor hit-rate stats.
+
+        Returns a list of (no_bias_hits, with_bias_hits, total) tuples,
+        one per MoE layer. 'total' is the number of generation tokens for
+        which a prior prediction existed and was evaluated.
+        """
+        if hasattr(self.model, "get_predictor_stats"):
+            return self.model.get_predictor_stats()
+        return []
+
+    def reset_predictor_stats(self):
+        """Reset predictor hit-rate counters across all layers."""
+        if hasattr(self.model, "reset_predictor_stats"):
+            self.model.reset_predictor_stats()
+
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
                     max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50, generate=True, config_path=None):

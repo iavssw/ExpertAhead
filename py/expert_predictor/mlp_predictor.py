@@ -173,33 +173,6 @@ class ExpertPredictor(nn.Module):
         with open(config_path, 'w') as f:
             json.dump(self.get_config(), f, indent=2)
             
-        # Export as TorchScript
-        if self.use_embedding:
-            class PredictorWrapper(nn.Module):
-                def __init__(self, predictor):
-                    super().__init__()
-                    self.predictor = predictor
-                def forward(self, embedding: torch.Tensor) -> torch.Tensor:
-                    return self.predictor(None, embedding, None)
-                    
-            try:
-                params = list(self.parameters())
-                orig_device = params[0].device if params else torch.device('cpu')
-                self.to('cpu')
-                
-                wrapper = PredictorWrapper(self)
-                wrapper.eval()
-                example_input = torch.randn(1, self.embedding_dim)
-                with torch.no_grad():
-                    traced_model = torch.jit.trace(wrapper, example_input)
-                
-                ts_path = path.with_suffix('.pt')
-                traced_model.save(str(ts_path))
-                
-                self.to(orig_device)
-            except Exception as e:
-                print(f"Warning: Failed to export TorchScript model: {e}")
-    
     @classmethod
     def load(cls, path: str, device: str = 'cpu', pretrained_embeddings: Optional[torch.Tensor] = None):
         """
@@ -321,7 +294,6 @@ def create_ablation_models(
             num_experts=num_experts,
             top_k=top_k,
             context_window_k=context_window_k,
-            use_embedding=True,
         )
     }
     

@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <vector>
 #include <algorithm>
+#include <unordered_set>
 
 namespace {
 
@@ -724,21 +725,34 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
             expert_bias = (correlation_constant_ * distribution).unsqueeze(0);
         }
     }
+
+    // Reset ready flag before launching new async work
+    pred_results_ready_.store(false);
     
     speculative_load_future_ = std::async(std::launch::async, 
         [this, embedding_copy, expert_bias]() {
-            // Predict
+            // ── Run 1: NO bias (pure MLP) ────────────────────────────────────
+            predictor_->predict_async(embedding_copy, c10::nullopt);
+            std::vector<int64_t> no_bias_result = predictor_->get_prediction();
+
+            // ── Run 2: WITH bias ─────────────────────────────────────────────
             predictor_->predict_async(embedding_copy, expert_bias);
+            std::vector<int64_t> with_bias_result = predictor_->get_prediction();
+
+            // Store both rankings safely for forward_generation to compare
+            {
+                std::lock_guard<std::mutex> lock(pred_results_mutex_);
+                last_pred_no_bias_   = no_bias_result;
+                last_pred_with_bias_ = with_bias_result;
+            }
+            pred_results_ready_.store(true);
             
-            // Wait for prediction
-            std::vector<int64_t> predicted_experts_res = predictor_->get_prediction();
-            
-            if (!predicted_experts_res.empty()) {
-                int limit = std::min((int)predicted_experts_res.size(), (int)prefetch_experts_count_);
-                std::vector<int64_t> top_experts(predicted_experts_res.begin(), predicted_experts_res.begin() + limit);
+            if (!with_bias_result.empty()) {
+                int limit = std::min((int)with_bias_result.size(), (int)prefetch_experts_count_);
+                std::vector<int64_t> top_experts(with_bias_result.begin(), with_bias_result.begin() + limit);
                 
                 if (debug_verbosity >= 2) {
-                    std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted experts: ";
+                    std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted experts (with bias): ";
                     for (auto e : top_experts) std::cout << e << " ";
                     std::cout << std::endl;
                 }
@@ -746,6 +760,7 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
             }
         });
 }
+
 
 void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids) {
     // Iterate in reverse so the most confident expert becomes the most recently used (pushed to back of LRU last)
@@ -1063,8 +1078,32 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     // std::cout << "weights: " << weights << std::endl;
     down_batched.mul_(weights);
     output.add_(down_batched.sum(0, true));
-    
-    // Trigger speculative loading for the next token based on recent history
+
+    // ── Predictor hit-rate accounting ────────────────────────────────────────
+    // Compare the previous token's predictions against this token's ground-truth
+    // top-k experts. We only do this if the async thread finished writing results.
+    if (predictor_ && pred_results_ready_.load()) {
+        std::lock_guard<std::mutex> lock(pred_results_mutex_);
+        if (!last_pred_no_bias_.empty()) {
+            // Build actual expert set from topk_accessor (already on CPU)
+            std::unordered_set<int64_t> actual_set;
+            for (int64_t k = 0; k < num_experts_per_tok_; ++k)
+                actual_set.insert(topk_accessor[k]);
+
+            int n_check = std::min((int64_t)prefetch_experts_count_,
+                                   (int64_t)std::min(last_pred_no_bias_.size(), last_pred_with_bias_.size()));
+            int hits_no_bias = 0, hits_with_bias = 0;
+            for (int i = 0; i < n_check; ++i) {
+                if (actual_set.count(last_pred_no_bias_[i]))   hits_no_bias++;
+                if (actual_set.count(last_pred_with_bias_[i])) hits_with_bias++;
+            }
+            pred_hits_no_bias_   += hits_no_bias;
+            pred_hits_with_bias_ += hits_with_bias;
+            pred_total_++;
+        }
+    }
+
+    // Trigger speculative loading for the next token based on current embedding
     trigger_speculative_loading(x_flat);
     
     return output;
@@ -2717,6 +2756,25 @@ std::pair<int64_t, int64_t> UnifiedLLMW4A16Impl::get_cache_stats() const {
     }
     
     return {total_hits, total_misses};
+}
+
+void UnifiedLLMW4A16Impl::reset_predictor_stats() {
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        for (auto& layer : moe_layers) {
+            layer->reset_predictor_stats();
+        }
+    }
+}
+
+std::vector<std::tuple<int64_t, int64_t, int64_t>> UnifiedLLMW4A16Impl::get_predictor_stats() const {
+    std::vector<std::tuple<int64_t, int64_t, int64_t>> result;
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        result.reserve(moe_layers.size());
+        for (const auto& layer : moe_layers) {
+            result.push_back(layer->get_predictor_stats());
+        }
+    }
+    return result;
 }
 
 // Training data collection methods

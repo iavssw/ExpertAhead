@@ -154,6 +154,16 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::pair<int64_t, int64_t> get_cache_stats() const { return {cache_hits_, cache_misses_}; }
     void reset_cache_stats();
 
+    // Predictor hit-rate stats (no-bias vs with-bias, generation only)
+    std::tuple<int64_t, int64_t, int64_t> get_predictor_stats() const {
+        return {pred_hits_no_bias_, pred_hits_with_bias_, pred_total_};
+    }
+    void reset_predictor_stats() {
+        pred_hits_no_bias_ = 0;
+        pred_hits_with_bias_ = 0;
+        pred_total_ = 0;
+    }
+
     // Prediction & Speculative Loading
     void set_context_token_ids(const std::vector<int64_t>& token_ids);
     void trigger_speculative_loading(const torch::Tensor& embedding);
@@ -204,6 +214,16 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t cache_hits_ = 0;
     int64_t cache_misses_ = 0;
     double total_expert_load_time_ms_ = 0.0;
+
+    // Predictor hit-rate counters (generation only)
+    int64_t pred_hits_no_bias_   = 0;  // tokens where no-bias top-k had ≥1 correct expert
+    int64_t pred_hits_with_bias_ = 0;  // tokens where with-bias top-k had ≥1 correct expert
+    int64_t pred_total_          = 0;  // total evaluated generation tokens
+    // Ranked predictions from the previous token (set in async lambda, read next token)
+    std::vector<int64_t> last_pred_no_bias_;
+    std::vector<int64_t> last_pred_with_bias_;
+    std::mutex pred_results_mutex_;
+    std::atomic<bool> pred_results_ready_{false};
     
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
@@ -278,6 +298,11 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void print_cache_stats() const;
     void reset_cache_stats();
     std::pair<int64_t, int64_t> get_cache_stats() const;  // Returns (total_hits, total_misses)
+
+    // Predictor hit-rate stats across all MoE layers
+    // Each element: (no_bias_hits, with_bias_hits, total) for that layer
+    std::vector<std::tuple<int64_t, int64_t, int64_t>> get_predictor_stats() const;
+    void reset_predictor_stats();
     
     // Training data collection
     void enable_training_data_collection() { collect_training_data_ = true; }

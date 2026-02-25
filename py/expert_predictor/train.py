@@ -384,10 +384,13 @@ def train_epoch(model, loader, optimizer, criterion, device):
         optimizer.zero_grad()
         logits = model(post_attn_embedding=emb)
         
-        if isinstance(criterion, nn.CrossEntropyLoss):
-            # For CrossEntropyLoss, the target should be the class index
-            loss = criterion(logits, true[:, 0])
+        if isinstance(criterion, (nn.CrossEntropyLoss, nn.BCEWithLogitsLoss)):
+            if isinstance(criterion, nn.CrossEntropyLoss):
+                loss = criterion(logits, true[:, 0])
+            else:
+                loss = criterion(logits, lbl)
         else:
+            # FocalLoss uses the one-hot/multi-hot label
             loss = criterion(logits, lbl)
             
         loss.backward()
@@ -416,8 +419,13 @@ def evaluate(model, loader, criterion, device):
             logits = model(post_attn_embedding=emb)
             
             true = batch['top_k_indices'].to(device)
-            if isinstance(criterion, nn.CrossEntropyLoss):
-                loss = criterion(logits, true[:, 0])
+            if isinstance(criterion, (nn.CrossEntropyLoss, nn.BCEWithLogitsLoss)):
+                # CrossEntropyLoss expects target class indices, BCE expects multi-hot probs
+                # pos_weights are automatically handled inside the criterion object
+                if isinstance(criterion, nn.CrossEntropyLoss):
+                    loss = criterion(logits, true[:, 0])
+                else:
+                    loss = criterion(logits, lbl)
             else:
                 loss = criterion(logits, lbl)
 
@@ -447,7 +455,7 @@ def train_embedding_predictor(
     num_experts: int = 8,
     top_k: int = 2,
     hidden_dim: Optional[int] = None,
-    use_cross_entropy: bool = False,
+    loss_type: str = 'ce',
 ):
     """Train one per-layer expert predictor MLP."""
     _base_out = Path(output_dir) / f"layer_{layer_idx}"
@@ -499,8 +507,10 @@ def train_embedding_predictor(
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
-    if use_cross_entropy:
+    if loss_type == 'ce':
         criterion = nn.CrossEntropyLoss(weight=pos_weights)
+    elif loss_type == 'bce':
+        criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weights)
     else:
         criterion = FocalLoss(alpha=pos_weights)
 
@@ -578,8 +588,8 @@ if __name__ == "__main__":
     parser.add_argument('--embedding_dim', type=int, default=4096)
     parser.add_argument('--num_experts',   type=int, default=8)
     parser.add_argument('--top_k',         type=int, default=1)
-    parser.add_argument('--use_cross_entropy', action='store_true', default=True,
-                        help="Use CrossEntropyLoss for top-1 prediction")
+    parser.add_argument('--loss_type',     choices=['ce', 'bce', 'focal'], default='ce',
+                        help="Loss function type (ce for top-1, bce/focal for multi-label)")
     parser.add_argument('--hidden_dim',    type=int, default=None)
     parser.add_argument('--batch_size',    type=int, default=32)
     parser.add_argument('--lr',            type=float, default=1e-3)
@@ -601,7 +611,7 @@ if __name__ == "__main__":
         num_experts=n_exp,
         top_k=k,
         hidden_dim=args.hidden_dim,
-        use_cross_entropy=args.use_cross_entropy,
+        loss_type=args.loss_type,
     )
 
     layers = [args.layer_idx] if args.layer_idx is not None else list(range(n_layers))
