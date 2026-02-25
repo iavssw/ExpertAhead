@@ -1,16 +1,7 @@
 """
-Modular MLP Expert Predictor with Ablation Study Support
+Modular MLP Expert Predictor Using Post-attention, post-RMS norm embeddings
 
-This module implements a multi-stage MLP architecture for predicting which experts
-will be selected by the router in Mixtral 8x7B. It supports ablation studies by
-allowing selective enabling/disabling of different input features:
 
-1. Context tokens (t-k to t-1)
-2. Post-attention, post-RMS norm embeddings
-3. Router logits history
-
-Architecture:
-    Input Features → Feature-specific MLPs → Fusion MLP → Expert Predictions
 """
 
 import torch
@@ -28,14 +19,17 @@ class EmbeddingMLP(nn.Module):
     def __init__(
         self,
         embedding_dim: int = 4096,  # Mixtral hidden size
+        embedding_history_size: int = 1,
         hidden_dim: int = 1024,
-        output_dim: int = 256,
+        output_dim: int = 8,
         dropout: float = 0.1
     ):
         super().__init__()
         
+        input_dim = embedding_dim * embedding_history_size
+        
         self.mlp = nn.Sequential(
-            nn.Linear(embedding_dim, hidden_dim),
+            nn.Linear(input_dim, hidden_dim),
             nn.LayerNorm(hidden_dim),
             nn.ReLU(),
             nn.Dropout(dropout),
@@ -69,48 +63,42 @@ class ExpertPredictor(nn.Module):
         self,
         pretrained_embeddings: Optional[torch.Tensor] = None,
         vocab_size: int = 32000,
-        embedding_dim: int = 4096,
+        base_embedding_dim: int = 4096,
+        embedding_history_size: int = 1,
         num_experts: int = 8,
         top_k: int = 2,
         context_window_k: int = 10,
-        # Feature-specific MLP dimensions
-        embedding_output_dim: int = 256,
-        # Fusion MLP dimensions
-        fusion_hidden_dim: int = 512,
+        hidden_dim: int = 1024,
         dropout: float = 0.1,
-        # Ablation flags
         use_embedding: bool = True,
     ):
         super().__init__()
         
         self.vocab_size = vocab_size
-        self.embedding_dim = embedding_dim
+        self.base_embedding_dim = base_embedding_dim
+        self.embedding_history_size = embedding_history_size
+        self.embedding_dim = base_embedding_dim * embedding_history_size
         self.num_experts = num_experts
         self.top_k = top_k
         self.context_window_k = context_window_k
+        self.hidden_dim = hidden_dim
         
         # Ablation flags
         self.use_embedding = use_embedding
-        
         if use_embedding:
             self.embedding_mlp = EmbeddingMLP(
-                embedding_dim=embedding_dim,
-                hidden_dim=1024,
-                output_dim=embedding_output_dim,
+                embedding_dim=self.base_embedding_dim,
+                embedding_history_size=self.embedding_history_size,
+                hidden_dim=self.hidden_dim,
+                output_dim=self.num_experts,
                 dropout=dropout
             )
-        
-        
-        # Build feature dimensions dict for fusion
-        feature_dims = {}
-        if use_embedding:
-            feature_dims['embedding'] = embedding_output_dim
-   
     
     def forward(
         self,
         post_attn_embedding: Optional[torch.Tensor] = None,
         router_logits_history: Optional[torch.Tensor] = None,
+        expert_bias: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """
         Forward pass through the expert predictor.
@@ -123,22 +111,23 @@ class ExpertPredictor(nn.Module):
         Returns:
             [batch_size, num_experts] logits for expert selection
         """
-        features = {}
-
         if self.use_embedding:
             if post_attn_embedding is None:
                 raise ValueError("post_attn_embedding required when use_embedding=True")
-            features['embedding'] = self.embedding_mlp(post_attn_embedding)
+            logits = self.embedding_mlp(post_attn_embedding)
+        else:
+            raise ValueError("use_embedding must be True")
         
-
-        # Fuse features and predict
-        return self.fusion_mlp(features)
+        if expert_bias is not None:
+            logits = logits + expert_bias
+            
+        return logits
     
     def predict_top_k(
         self,
-        context_tokens: Optional[torch.Tensor] = None,
         post_attn_embedding: Optional[torch.Tensor] = None,
         router_logits_history: Optional[torch.Tensor] = None,
+        expert_bias: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Predict top-k experts.
@@ -147,7 +136,7 @@ class ExpertPredictor(nn.Module):
             top_k_indices: [batch_size, top_k] indices of top experts
             top_k_probs: [batch_size, top_k] probabilities for top experts
         """
-        logits = self.forward(context_tokens, post_attn_embedding, router_logits_history)
+        logits = self.forward(post_attn_embedding, router_logits_history, expert_bias)
         probs = F.softmax(logits, dim=-1)
         top_k_probs, top_k_indices = torch.topk(probs, self.top_k, dim=-1)
         return top_k_indices, top_k_probs
@@ -156,13 +145,13 @@ class ExpertPredictor(nn.Module):
         """Get model configuration for saving/loading"""
         return {
             'vocab_size': self.vocab_size,
+            'base_embedding_dim': self.base_embedding_dim,
+            'embedding_history_size': self.embedding_history_size,
             'embedding_dim': self.embedding_dim,
             'num_experts': self.num_experts,
             'top_k': self.top_k,
             'context_window_k': self.context_window_k,
-            'use_context_tokens': self.use_context_tokens,
             'use_embedding': self.use_embedding,
-            'use_router_history': self.use_router_history,
         }
     
     def save(self, path: str):
@@ -185,7 +174,7 @@ class ExpertPredictor(nn.Module):
             json.dump(self.get_config(), f, indent=2)
             
         # Export as TorchScript
-        if self.use_embedding and not self.use_context_tokens and not self.use_router_history:
+        if self.use_embedding:
             class PredictorWrapper(nn.Module):
                 def __init__(self, predictor):
                     super().__init__()
@@ -325,83 +314,15 @@ def create_ablation_models(
     - 'embedding_router': Uses embeddings + router history
     """
     models = {
-        'all': ExpertPredictor(
-            pretrained_embeddings=pretrained_embeddings,
-            vocab_size=vocab_size,
-            embedding_dim=embedding_dim,
-            num_experts=num_experts,
-            top_k=top_k,
-            context_window_k=context_window_k,
-            use_context_tokens=True,
-            use_embedding=True,
-            use_router_history=True,
-        ),
-        'context_only': ExpertPredictor(
-            pretrained_embeddings=pretrained_embeddings,
-            vocab_size=vocab_size,
-            embedding_dim=embedding_dim,
-            num_experts=num_experts,
-            top_k=top_k,
-            context_window_k=context_window_k,
-            use_context_tokens=True,
-            use_embedding=False,
-            use_router_history=False,
-        ),
         'embedding_only': ExpertPredictor(
             pretrained_embeddings=pretrained_embeddings,
             vocab_size=vocab_size,
-            embedding_dim=embedding_dim,
+            base_embedding_dim=embedding_dim,
             num_experts=num_experts,
             top_k=top_k,
             context_window_k=context_window_k,
-            use_context_tokens=False,
             use_embedding=True,
-            use_router_history=False,
-        ),
-        'router_history_only': ExpertPredictor(
-            pretrained_embeddings=pretrained_embeddings,
-            vocab_size=vocab_size,
-            embedding_dim=embedding_dim,
-            num_experts=num_experts,
-            top_k=top_k,
-            context_window_k=context_window_k,
-            use_context_tokens=False,
-            use_embedding=False,
-            use_router_history=True,
-        ),
-        'context_embedding': ExpertPredictor(
-            pretrained_embeddings=pretrained_embeddings,
-            vocab_size=vocab_size,
-            embedding_dim=embedding_dim,
-            num_experts=num_experts,
-            top_k=top_k,
-            context_window_k=context_window_k,
-            use_context_tokens=True,
-            use_embedding=True,
-            use_router_history=False,
-        ),
-        'context_router': ExpertPredictor(
-            pretrained_embeddings=pretrained_embeddings,
-            vocab_size=vocab_size,
-            embedding_dim=embedding_dim,
-            num_experts=num_experts,
-            top_k=top_k,
-            context_window_k=context_window_k,
-            use_context_tokens=True,
-            use_embedding=False,
-            use_router_history=True,
-        ),
-        'embedding_router': ExpertPredictor(
-            pretrained_embeddings=pretrained_embeddings,
-            vocab_size=vocab_size,
-            embedding_dim=embedding_dim,
-            num_experts=num_experts,
-            top_k=top_k,
-            context_window_k=context_window_k,
-            use_context_tokens=False,
-            use_embedding=True,
-            use_router_history=True,
-        ),
+        )
     }
     
     return models
@@ -420,12 +341,10 @@ if __name__ == "__main__":
     for name, model in models.items():
         config = model.get_config()
         features = []
-        if config['use_context_tokens']:
-            features.append('context')
+
         if config['use_embedding']:
             features.append('embedding')
-        if config['use_router_history']:
-            features.append('router_history')
+        
         
         total_params = sum(p.numel() for p in model.parameters())
         print(f"  {name:20s}: {', '.join(features):40s} ({total_params:,} params)")

@@ -55,7 +55,7 @@ class IExpertPredictor {
 public:
     virtual ~IExpertPredictor() = default;
     
-    virtual void predict_async(torch::Tensor embedding) = 0;
+    virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> expert_bias = c10::nullopt) = 0;
     virtual bool is_ready() = 0;
     virtual std::vector<int64_t> get_prediction() = 0;
     virtual std::vector<int64_t> try_get_prediction() = 0;
@@ -108,7 +108,7 @@ public:
         shm_unlink(shm_name_.c_str());
     }
     
-    void predict_async(torch::Tensor embedding) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> expert_bias = c10::nullopt) override {
         response_->reset();
         
         request_->token_id = 0; // Deprecated
@@ -167,6 +167,7 @@ class ThreadedTorchScriptPredictor : public IExpertPredictor {
 public:
     struct PredictionJob {
         torch::Tensor embedding;
+        c10::optional<torch::Tensor> expert_bias;
         int64_t job_id;
     };
     
@@ -220,9 +221,10 @@ public:
                   << "] Shutdown complete" << std::endl;
     }
     
-    void predict_async(torch::Tensor embedding) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> expert_bias = c10::nullopt) override {
         PredictionJob job;
         job.embedding = embedding;
+        job.expert_bias = expert_bias;
         job.job_id = next_job_id_++;
         
         {
@@ -314,6 +316,11 @@ private:
             
             torch::NoGradGuard no_grad;
             auto output = model_.forward(inputs).toTensor();
+            
+            if (job.expert_bias.has_value()) {
+                auto bias = job.expert_bias.value().to(torch::kFloat32).to(device_);
+                output = output + bias;
+            }
             
             // Extract prediction (get fully ranked list of experts)
             // Perform argsort on the dedicated stream/device before safely copying to CPU

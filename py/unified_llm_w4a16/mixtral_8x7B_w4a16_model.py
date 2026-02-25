@@ -578,6 +578,11 @@ class Mixtral8x7BW4A16Model:
         """Get lambda parameter for specified layer."""
         return self.model.get_lambda(layer_idx)
 
+    def set_layer_correlation_constants(self, constants: List[float]):
+        """Set the correlation constant for each layer."""
+        if hasattr(self.model, "set_layer_correlation_constants"):
+            self.model.set_layer_correlation_constants(constants)
+
     def calculate_generation_perplexity(self, text: str) -> float:
         """
         Calculate generation-time perplexity using the optimized C++ backend loop.
@@ -886,6 +891,12 @@ def main():
         help="Lambda value for router logit biasing (range [0, 1])"
     )
     parser.add_argument(
+        "--expert-correlation-csv",
+        type=str,
+        default=None,
+        help="Path to CSV containing layer correlation multipliers."
+    )
+    parser.add_argument(
         "--perplexity",
         action="store_true",
         default=False,
@@ -992,6 +1003,14 @@ def main():
     if args.lambda_val != 0.0:
         print(f"Setting lambda to {args.lambda_val}")
         model.set_lambda(args.lambda_val)
+
+    if args.expert_correlation_csv:
+        print(f"Loading correlations from {args.expert_correlation_csv}")
+        import pandas as pd
+        df = pd.read_csv(args.expert_correlation_csv)
+        df = df.sort_values(by="layer")
+        correlations = df['correlation'].tolist()
+        model.set_layer_correlation_constants(correlations)
 
     # Benchmark Mode
     if args.benchmark_prompts:

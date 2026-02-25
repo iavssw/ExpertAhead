@@ -93,6 +93,7 @@ def run_sweep():
     parser.add_argument("--mode", type=str, choices=["perplexity", "generation", "both"], default="generation",
                         help="Mode: 'perplexity' for quality eval, 'generation' for speed eval, 'both' for combined")
     parser.add_argument("--prefetch-count", type=int, nargs="+", default=[1], help="Number of predicted experts to prefetched.")
+    parser.add_argument("--expert-correlation-csv", type=str, default=None, help="Path to CSV containing layer correlation multipliers.")
     parser.add_argument("--plot-only", action="store_true", help="Just plot the results from sweep_predict_vs_cached_results.csv")
 
     parser.add_argument(
@@ -234,6 +235,10 @@ def run_sweep():
                             if args.predict_layers is not None:
                                 cmd.append("--predict-layers")
                                 cmd.extend(map(str, args.predict_layers))
+                        
+                        if args.expert_correlation_csv:
+                            cmd.extend(["--expert-correlation-csv", args.expert_correlation_csv])
+                        
                         output = run_subprocess(cmd)
     
                         if output:
@@ -269,6 +274,10 @@ def run_sweep():
                             if args.predict_layers is not None:
                                 cmd.append("--predict-layers")
                                 cmd.extend(map(str, args.predict_layers))
+                        
+                        if args.expert_correlation_csv:
+                            cmd.extend(["--expert-correlation-csv", args.expert_correlation_csv])
+
                         output = run_subprocess(cmd)
     
                         if output:
