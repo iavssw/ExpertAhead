@@ -12,6 +12,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <iostream>
+#include <random>
+#include <numeric>
+#include <algorithm>
 #include <torch/script.h>
 
 // ============================================================================
@@ -372,4 +375,51 @@ private:
     std::condition_variable result_cv_;
     
     std::atomic<int64_t> next_job_id_{0};
+};
+
+class RandomExpertPredictor : public IExpertPredictor {
+public:
+    RandomExpertPredictor(int64_t num_experts) 
+        : num_experts_(num_experts),
+          gen_(std::random_device{}()) {}
+
+    void predict_async(torch::Tensor embedding) override {
+        // Generate a random ranking of all experts
+        std::vector<int64_t> experts(num_experts_);
+        std::iota(experts.begin(), experts.end(), 0);
+        std::shuffle(experts.begin(), experts.end(), gen_);
+        
+        std::lock_guard<std::mutex> lock(mutex_);
+        predicted_experts_ = experts;
+        ready_ = true;
+    }
+
+    bool is_ready() override {
+        return ready_.load();
+    }
+
+    std::vector<int64_t> get_prediction() override {
+        std::lock_guard<std::mutex> lock(mutex_);
+        ready_ = false; // Reset for next prediction
+        return predicted_experts_;
+    }
+
+    std::vector<int64_t> try_get_prediction() override {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (!ready_) return {};
+        // ready_ = false;
+        return predicted_experts_;
+    }
+
+    double get_prediction_time_ms() override {
+        return 0.0; // Negligible time
+    }
+
+private:
+    int64_t num_experts_;
+    std::mt19937 gen_;
+    
+    std::mutex mutex_;
+    std::vector<int64_t> predicted_experts_;
+    std::atomic<bool> ready_{false};
 };

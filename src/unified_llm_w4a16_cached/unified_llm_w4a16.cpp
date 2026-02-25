@@ -612,22 +612,28 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
 }
 
 int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
-    // Linear scan of slots to find if expert is already loaded
-    for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
-        if (expert_slots_indices[s] == global_expert_idx) {
-            if (update_stats) {
-                cache_hits_++;
-            }
-            // Hit: Move slot 's' to the back of the LRU vector (Mark as MRU)
-            // We search for 's' in the LRU order list
-            for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
-                if (*it == s) {
-                    expert_lru_order_.erase(it);
-                    expert_lru_order_.push_back(s);
-                    break;
+    // Check if we should force a cache miss
+    static const char* force_miss_env = std::getenv("FORCE_EXPERT_MISS");
+    static bool force_miss = force_miss_env && std::string(force_miss_env) == "1";
+
+    if (!force_miss) {
+        // Linear scan of slots to find if expert is already loaded
+        for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
+            if (expert_slots_indices[s] == global_expert_idx) {
+                if (update_stats) {
+                    cache_hits_++;
                 }
+                // Hit: Move slot 's' to the back of the LRU vector (Mark as MRU)
+                // We search for 's' in the LRU order list
+                for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
+                    if (*it == s) {
+                        expert_lru_order_.erase(it);
+                        expert_lru_order_.push_back(s);
+                        break;
+                    }
+                }
+                return s;
             }
-            return s;
         }
     }
     
