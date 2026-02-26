@@ -194,6 +194,8 @@ def plot_per_layer(results, all_metrics, phases, out_dir: pathlib.Path):
             ax.set_title(_metric_label(metric), fontsize=9)
             ax.set_xlabel("Epoch", fontsize=8)
             ax.grid(True, alpha=0.25)
+            if metric not in ["loss"] + SUMMARY_COUNT_METRICS:
+                ax.set_ylim(0, 1.05)
 
             for h_color, hidden in zip(h_colors, hidden_dims):
                 data = hidden_runs[hidden]
@@ -239,6 +241,8 @@ def plot_cross_layer(results, all_metrics, out_dir: pathlib.Path):
         ax.set_xlabel("Layer Index"); ax.set_ylabel(_metric_label(metric))
         ax.set_xticks(all_layers)
         ax.grid(True, alpha=0.25)
+        if metric not in ["loss"] + SUMMARY_COUNT_METRICS:
+            ax.set_ylim(0, 1.05)
 
         for color, h in zip(h_colors, all_hidden):
             xs, ys = [], []
