@@ -562,11 +562,6 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
         print(f"Error: Prompts file not found at {prompts_file}")
         return 1
 
-    if target_tokens > 4096:
-        print("Error: prompt-test > 4096 is not supported.")
-        print("Did not implement sliding window attention, so only support this size for now.")
-        return 1
-
     print("=" * 60)
     print(f"PROMPT TEST: Target token count = {target_tokens}")
     print("=" * 60 + "\n")

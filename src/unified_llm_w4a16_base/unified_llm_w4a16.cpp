@@ -147,6 +147,50 @@ torch::Tensor repeat_kv(const torch::Tensor &x, int64_t n_rep) {
     return expanded.reshape({batch, num_kv_heads * n_rep, seq_len, head_dim});
 }
 
+int64_t positive_mod(int64_t value, int64_t mod) {
+    if (mod <= 0) {
+        return 0;
+    }
+    int64_t r = value % mod;
+    return (r < 0) ? (r + mod) : r;
+}
+
+void write_kv_ring(torch::Tensor cache_slice, const torch::Tensor &kv, int64_t start_pos, int64_t window_size) {
+    if (window_size <= 0 || kv.numel() == 0) {
+        return;
+    }
+
+    int64_t seq_len = kv.size(2);
+    int64_t tokens_to_write = std::min<int64_t>(seq_len, window_size);
+    int64_t src_start = seq_len - tokens_to_write;
+    int64_t write_head = positive_mod(start_pos + src_start, window_size);
+
+    auto ring_cache = cache_slice.narrow(2, 0, window_size);
+    int64_t first_chunk = std::min<int64_t>(tokens_to_write, window_size - write_head);
+    ring_cache.narrow(2, write_head, first_chunk).copy_(kv.narrow(2, src_start, first_chunk));
+
+    int64_t remaining = tokens_to_write - first_chunk;
+    if (remaining > 0) {
+        ring_cache.narrow(2, 0, remaining).copy_(kv.narrow(2, src_start + first_chunk, remaining));
+    }
+}
+
+torch::Tensor read_kv_window(const torch::Tensor &cache_slice, int64_t kv_len, int64_t oldest_pos, int64_t window_size) {
+    auto ring_cache = cache_slice.narrow(2, 0, window_size);
+    if (kv_len <= 0) {
+        return ring_cache.narrow(2, 0, 0);
+    }
+
+    int64_t oldest_idx = positive_mod(oldest_pos, window_size);
+    if (oldest_idx + kv_len <= window_size) {
+        return ring_cache.narrow(2, oldest_idx, kv_len);
+    }
+
+    int64_t first_chunk = window_size - oldest_idx;
+    int64_t second_chunk = kv_len - first_chunk;
+    return torch::cat({ring_cache.narrow(2, oldest_idx, first_chunk), ring_cache.narrow(2, 0, second_chunk)}, 2);
+}
+
 // Tile sizes
 constexpr int LARGE_TILE_SIZE_ROW = 128;
 constexpr int LARGE_TILE_SIZE_COL = 64;
@@ -913,6 +957,16 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
         throw std::runtime_error("Unsupported architecture.");
     }
 
+    sliding_window_enabled_ = (arch_type_ == ArchitectureType::MIXTRAL);
+    sliding_window_size_ = std::min<int64_t>(4096, max_seq_len_);
+    cache_filled_ = 0;
+    if (sliding_window_size_ <= 0) {
+        sliding_window_size_ = max_seq_len_;
+    }
+    if (debug_verbosity >= 1 && sliding_window_enabled_) {
+        std::cout << "Sliding window enabled (size=" << sliding_window_size_ << ")" << std::endl;
+    }
+
     // GPU placement configuration (GPU mode only): auto-select by free VRAM.
     gpu_count_ = std::max(1, npu_config_.gpu_count);
     embedding_device_ = device;
@@ -1465,17 +1519,29 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
 
     int64_t bsz = x.size(0);
     int64_t seq_len = x.size(1);
+    int64_t active_window_size = sliding_window_enabled_ ? std::min<int64_t>(sliding_window_size_, max_seq_len_) : max_seq_len_;
+    if (active_window_size <= 0) {
+        active_window_size = max_seq_len_;
+    }
+    int64_t abs_end_pos = start_pos + seq_len;
+    int64_t kv_seq_len = std::min<int64_t>(active_window_size, abs_end_pos);
+    int64_t oldest_pos = abs_end_pos - kv_seq_len;
+    if (start_pos == 0) {
+        cache_filled_ = 0;
+    }
+    cache_filled_ = kv_seq_len;
 
     // Embedding
     x = token_embedding->forward(x);
 
-    // Create causal mask
+    // Create causal mask aligned with retained KV window [oldest_pos, abs_end_pos).
     torch::Tensor mask;
-    if (seq_len > 1) {
-        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
-                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
-        mask = torch::triu(mask, 1);
-        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+    if (seq_len > 1 && kv_seq_len > 0) {
+        auto pos_opts = torch::TensorOptions().dtype(torch::kInt64).device(x.device());
+        auto q_pos = torch::arange(start_pos, start_pos + seq_len, pos_opts).unsqueeze(1);
+        auto k_pos = torch::arange(oldest_pos, oldest_pos + kv_seq_len, pos_opts).unsqueeze(0);
+        mask = torch::zeros({seq_len, kv_seq_len}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+        mask.masked_fill_(k_pos > q_pos, -std::numeric_limits<float>::infinity());
         mask = mask.to(x.dtype());
     }
 
@@ -1485,7 +1551,6 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
     auto v_buf = values_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
     auto attn_proj_buf = attn_output_proj_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
 
-    auto out_buf = output_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
     auto normed = norm_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
 
     for (int64_t i = 0; i < num_hidden_layers_; ++i) {
@@ -1520,15 +1585,16 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
         v = v_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
         v = v.view({bsz, seq_len, num_key_value_heads_, head_dim_});
 
-        // Cache K, V
-        auto cache_k = caches_k[i];
-        auto cache_v = caches_v[i];
-        cache_k = cache_k.narrow(2, start_pos, seq_len).copy_(k.transpose(1, 2));
-        cache_v = cache_v.narrow(2, start_pos, seq_len).copy_(v.transpose(1, 2));
+        // Cache K/V in ring-buffer layout and read back in chronological order.
+        auto k_for_cache = k.transpose(1, 2).contiguous();
+        auto v_for_cache = v.transpose(1, 2).contiguous();
+        auto cache_k = caches_k[i].narrow(0, 0, bsz);
+        auto cache_v = caches_v[i].narrow(0, 0, bsz);
+        write_kv_ring(cache_k, k_for_cache, start_pos, active_window_size);
+        write_kv_ring(cache_v, v_for_cache, start_pos, active_window_size);
 
-        // Retrieve full cache in [B, H, S, D]
-        k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
-        v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+        k = read_kv_window(cache_k, kv_seq_len, oldest_pos, active_window_size);
+        v = read_kv_window(cache_v, kv_seq_len, oldest_pos, active_window_size);
 
         // Expand KV heads for GQA (8 KV heads -> 32 Q heads)
         // For SDPA: Skip repeat during decoding (start_pos > 0) to use native GQA.
@@ -1553,7 +1619,7 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
         }
         if (attention_mode_ == 1) {
             // Mode 1: PyTorch SDPA
-            if (start_pos == 0 && seq_len > 1) {
+            if (start_pos == 0 && seq_len > 1 && kv_seq_len == seq_len) {
                 // First prompt pass: use native causal optimization
                 attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
             } else {
@@ -1568,9 +1634,13 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
 
         } else if (attention_mode_ == 2) {
             // Mode 2: Custom HIP Kernel
-            if (start_pos == 0 && seq_len > 1) {
-                // First prompt pass: use native causal optimization (SDPA fallback for prefill)
-                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            if (seq_len > 1) {
+                // Prefill chunks use SDPA; HIP decode kernel path remains for single-token decoding.
+                c10::optional<torch::Tensor> opt_mask;
+                if (mask.defined() && mask.numel() > 0) {
+                    opt_mask = mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                }
+                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
             } else {
                 // Decoding phase: use Custom HIP Kernel
                 int batch_size = q.size(0);
@@ -1959,6 +2029,18 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     this->eval();
     torch::NoGradGuard no_grad;
     const bool should_sync_device = input_ids.is_cuda();
+    const int64_t prefill_chunk_size =
+        std::max<int64_t>(1, sliding_window_enabled_ ? std::min<int64_t>(sliding_window_size_, max_seq_len_) : max_seq_len_);
+
+    auto run_prefill_chunks = [&](const torch::Tensor &prompt_tokens) {
+        torch::Tensor local_output;
+        int64_t total_len = prompt_tokens.size(1);
+        for (int64_t chunk_start = 0; chunk_start < total_len; chunk_start += prefill_chunk_size) {
+            int64_t chunk_len = std::min<int64_t>(prefill_chunk_size, total_len - chunk_start);
+            local_output = forward(prompt_tokens.narrow(1, chunk_start, chunk_len), chunk_start);
+        }
+        return local_output;
+    };
 
     // Warmup cycle
     if (warmup_) {
@@ -1966,7 +2048,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
         int warm_up = 1;
         // Prefill warmup
         for (int i = 0; i < warm_up; i++) {
-            forward(input_ids, start_pos);
+            run_prefill_chunks(input_ids);
         }
 
         // M=1 Warmup (Single token generation after prefill)
@@ -1990,8 +2072,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
         torch::cuda::synchronize();
     }
     auto start_prefill = std::chrono::high_resolution_clock::now();
-
-    output = forward(input_ids, start_pos);
+    output = run_prefill_chunks(input_ids);
 
     if (should_sync_device) {
         torch::cuda::synchronize();

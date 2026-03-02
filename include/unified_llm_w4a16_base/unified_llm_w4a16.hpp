@@ -235,6 +235,9 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // KV caches
     std::vector<torch::Tensor> caches_k;
     std::vector<torch::Tensor> caches_v;
+    bool sliding_window_enabled_ = false;
+    int64_t sliding_window_size_ = 4096;
+    int64_t cache_filled_ = 0;
 
     // Scratch buffers
     torch::Tensor x_buffer;
