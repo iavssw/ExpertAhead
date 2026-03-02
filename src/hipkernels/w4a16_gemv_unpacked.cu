@@ -30,9 +30,6 @@ struct DevicePtrCache {
     uint64_t *d_scales = nullptr;
     uint64_t *d_zeros = nullptr;
     int64_t size = 0;
-    const int64_t *host_q = nullptr;
-    const int64_t *host_s = nullptr;
-    const int64_t *host_z = nullptr;
 };
 
 void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweights, const std::vector<int64_t> &scales,
@@ -40,7 +37,6 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
     TORCH_CHECK(qweights.size() == scales.size() && qweights.size() == zeros.size(), "Pointer array size mismatch");
     int64_t n = static_cast<int64_t>(qweights.size());
     bool need_alloc = (!cache.d_qweights || cache.size != n);
-    bool need_copy = (need_alloc || cache.host_q != qweights.data() || cache.host_s != scales.data() || cache.host_z != zeros.data());
 
     if (need_alloc) {
         if (cache.d_qweights)
@@ -56,14 +52,11 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
         cache.size = n;
     }
 
-    if (need_copy) {
-        HIP_CHECK(hipMemcpy(cache.d_qweights, qweights.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        HIP_CHECK(hipMemcpy(cache.d_scales, scales.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        HIP_CHECK(hipMemcpy(cache.d_zeros, zeros.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        cache.host_q = qweights.data();
-        cache.host_s = scales.data();
-        cache.host_z = zeros.data();
-    }
+    // Pointer vectors are frequently rebuilt per call; host addresses can repeat
+    // while contents change, so refresh device pointer arrays every invocation.
+    HIP_CHECK(hipMemcpy(cache.d_qweights, qweights.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(cache.d_scales, scales.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(cache.d_zeros, zeros.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
 }
 
 DevicePtrCache &gemv_ptr_cache_for_device(int device) {

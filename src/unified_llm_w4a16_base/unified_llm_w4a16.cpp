@@ -730,6 +730,28 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
 
     int64_t actual_num_experts = expert_ids.size();
 
+    // Stable path for long prefill: avoid very large 3D MoE GEMM launches.
+    const int64_t stable_prefill_row_limit = 0;
+    if (max_rows > stable_prefill_row_limit) {
+        for (size_t i = 0; i < actual_num_experts; ++i) {
+            int64_t e = expert_ids[i];
+            auto tok_idx = token_indices[i];
+            auto expert_in = x_flat.index_select(0, tok_idx).contiguous();
+            auto weights = topk_vals.index({tok_idx, top_k_positions[i]}).to(opts.dtype());
+
+            auto gate_up = gate_up_experts[e]->forward(expert_in, "moe_gate_up");
+            auto gate_buf = gate_up.narrow(1, 0, intermediate_size_);
+            auto up_buf = gate_up.narrow(1, intermediate_size_, intermediate_size_);
+            torch::silu_(gate_buf);
+            gate_buf.mul_(up_buf);
+
+            auto down_out = down_experts[e]->forward(gate_buf.contiguous(), "moe_down");
+            down_out.mul_(weights.unsqueeze(-1));
+            output.index_add_(0, tok_idx, down_out);
+        }
+        return output;
+    }
+
     int64_t padded_M = ((max_rows + tile - 1) / tile) * tile;
 
     // Get group sizes once
@@ -746,17 +768,16 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
             down_group_size = intermediate_size_ / n_groups;
     }
 
-    // Allocate batched tensors
+    // Allocate batched input once. GEMM temporaries are chunked by rows to avoid
+    // very large single launches in long-prefill scenarios.
     auto input_batched = torch::zeros({actual_num_experts, padded_M, hidden_size_}, opts);
-    auto gate_up_batched = torch::empty({actual_num_experts, padded_M, intermediate_size_ * 2}, opts);
-    auto down_batched = torch::zeros({actual_num_experts, padded_M, hidden_size_}, opts);
 
     // Build pointer arrays and gather inputs in single loop
     std::vector<int64_t> gate_up_qw_ptrs(actual_num_experts), gate_up_s_ptrs(actual_num_experts), gate_up_z_ptrs(actual_num_experts);
     std::vector<int64_t> down_qw_ptrs(actual_num_experts), down_s_ptrs(actual_num_experts), down_z_ptrs(actual_num_experts);
 
     // For vectorized scatter: collect all token indices and weights
-    std::vector<torch::Tensor> all_token_idx, all_weights, all_down_slices;
+    std::vector<torch::Tensor> all_token_idx, all_weights;
     all_token_idx.reserve(actual_num_experts);
     all_weights.reserve(actual_num_experts);
 
@@ -777,26 +798,42 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
         all_weights.push_back(topk_vals.index({token_indices[i], top_k_positions[i]}).to(opts.dtype()));
     }
 
-    // Gate-up GEMM
-    hipkernels::w4a16_gemm_unpacked_fused_3d(gate_up_batched, input_batched, gate_up_qw_ptrs, gate_up_s_ptrs, gate_up_z_ptrs, hidden_size_,
-                                             intermediate_size_ * 2, group_size, actual_num_experts);
+    // Chunk rows to keep each 3D GEMM launch in a stable region for long prompts.
+    const int64_t gemm_row_chunk = 4096; // must be a multiple of tile (128)
+    for (int64_t row_start = 0; row_start < padded_M; row_start += gemm_row_chunk) {
+        int64_t rows_this = std::min(gemm_row_chunk, padded_M - row_start);
 
-    // Fused SiLU + mul
-    auto gate_buf = gate_up_batched.narrow(2, 0, intermediate_size_);
-    auto up_buf = gate_up_batched.narrow(2, intermediate_size_, intermediate_size_);
-    torch::silu_(gate_buf);
-    gate_buf.mul_(up_buf);
+        auto input_chunk = input_batched.narrow(1, row_start, rows_this).contiguous();
+        auto gate_up_chunk = torch::empty({actual_num_experts, rows_this, intermediate_size_ * 2}, opts);
+        auto down_chunk = torch::zeros({actual_num_experts, rows_this, hidden_size_}, opts);
 
-    // Down GEMM
-    hipkernels::w4a16_gemm_unpacked_fused_3d(down_batched, gate_buf.contiguous(), down_qw_ptrs, down_s_ptrs, down_z_ptrs,
-                                             intermediate_size_, hidden_size_, down_group_size, actual_num_experts);
+        // Gate-up GEMM
+        hipkernels::w4a16_gemm_unpacked_fused_3d(gate_up_chunk, input_chunk, gate_up_qw_ptrs, gate_up_s_ptrs, gate_up_z_ptrs, hidden_size_,
+                                                 intermediate_size_ * 2, group_size, actual_num_experts);
 
-    // Vectorized weight application and scatter
-    for (size_t i = 0; i < actual_num_experts; ++i) {
-        int64_t rows = row_counts[i];
-        auto down_slice = down_batched[i].narrow(0, 0, rows);
-        down_slice.mul_(all_weights[i].unsqueeze(-1));
-        output.index_add_(0, all_token_idx[i], down_slice);
+        // Fused SiLU + mul
+        auto gate_buf = gate_up_chunk.narrow(2, 0, intermediate_size_);
+        auto up_buf = gate_up_chunk.narrow(2, intermediate_size_, intermediate_size_);
+        torch::silu_(gate_buf);
+        gate_buf.mul_(up_buf);
+
+        // Down GEMM
+        hipkernels::w4a16_gemm_unpacked_fused_3d(down_chunk, gate_buf.contiguous(), down_qw_ptrs, down_s_ptrs, down_z_ptrs,
+                                                 intermediate_size_, hidden_size_, down_group_size, actual_num_experts);
+
+        // Apply top-k weights + scatter only for real (unpadded) rows.
+        for (size_t i = 0; i < actual_num_experts; ++i) {
+            int64_t rows = row_counts[i];
+            if (row_start >= rows) {
+                continue;
+            }
+            int64_t local_rows = std::min(rows_this, rows - row_start);
+            auto down_slice = down_chunk[i].narrow(0, 0, local_rows);
+            auto local_weights = all_weights[i].narrow(0, row_start, local_rows);
+            auto local_tokens = all_token_idx[i].narrow(0, row_start, local_rows);
+            down_slice.mul_(local_weights.unsqueeze(-1));
+            output.index_add_(0, local_tokens, down_slice);
+        }
     }
 
     return output;

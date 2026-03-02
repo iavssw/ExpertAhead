@@ -45,9 +45,6 @@ struct DevicePtrCache {
     uint64_t *d_scales = nullptr;
     uint64_t *d_zeros = nullptr;
     int64_t size = 0;
-    const int64_t *host_q = nullptr;
-    const int64_t *host_s = nullptr;
-    const int64_t *host_z = nullptr;
 };
 
 void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweights, const std::vector<int64_t> &scales,
@@ -55,7 +52,6 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
     TORCH_CHECK(qweights.size() == scales.size() && qweights.size() == zeros.size(), "Pointer array size mismatch");
     int64_t n = static_cast<int64_t>(qweights.size());
     bool need_alloc = (!cache.d_qweights || cache.size != n);
-    bool need_copy = (need_alloc || cache.host_q != qweights.data() || cache.host_s != scales.data() || cache.host_z != zeros.data());
 
     if (need_alloc) {
         if (cache.d_qweights)
@@ -71,14 +67,11 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
         cache.size = n;
     }
 
-    if (need_copy) {
-        HIP_CHECK(hipMemcpy(cache.d_qweights, qweights.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        HIP_CHECK(hipMemcpy(cache.d_scales, scales.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        HIP_CHECK(hipMemcpy(cache.d_zeros, zeros.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        cache.host_q = qweights.data();
-        cache.host_s = scales.data();
-        cache.host_z = zeros.data();
-    }
+    // Pointer vectors are often temporary and may reuse host addresses across calls
+    // with different contents. Always refresh the device-side pointer arrays.
+    HIP_CHECK(hipMemcpy(cache.d_qweights, qweights.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(cache.d_scales, scales.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(cache.d_zeros, zeros.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
 }
 
 DevicePtrCache &gemm_ptr_cache_for_device(int device) {
@@ -633,6 +626,21 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
                                   const std::vector<int64_t> &scales_ptrs, const std::vector<int64_t> &zeros_ptrs, int64_t in_features,
                                   int64_t out_features, int64_t group_size, int64_t num_experts) {
     TORCH_CHECK(input.is_cuda(), "input must be on CUDA");
+    TORCH_CHECK(input.dim() == 3, "input must be 3D [E, M, K]");
+    TORCH_CHECK(output.dim() == 3, "output must be 3D [E, M, N]");
+    TORCH_CHECK(input.size(0) == num_experts, "input E dimension mismatch: input.size(0)=", input.size(0), " num_experts=", num_experts);
+    TORCH_CHECK(output.size(0) == num_experts, "output E dimension mismatch: output.size(0)=", output.size(0), " num_experts=", num_experts);
+    TORCH_CHECK(input.size(2) == in_features, "input K dimension mismatch: input.size(2)=", input.size(2), " in_features=", in_features);
+    TORCH_CHECK(output.size(1) == input.size(1), "output M dimension mismatch: output.size(1)=", output.size(1),
+                " input.size(1)=", input.size(1));
+    TORCH_CHECK(output.size(2) == out_features, "output N dimension mismatch: output.size(2)=", output.size(2),
+                " out_features=", out_features);
+    TORCH_CHECK(static_cast<int64_t>(qweights_ptrs.size()) == num_experts, "qweights pointer count mismatch: ", qweights_ptrs.size(),
+                " vs num_experts=", num_experts);
+    TORCH_CHECK(static_cast<int64_t>(scales_ptrs.size()) == num_experts, "scales pointer count mismatch: ", scales_ptrs.size(),
+                " vs num_experts=", num_experts);
+    TORCH_CHECK(static_cast<int64_t>(zeros_ptrs.size()) == num_experts, "zeros pointer count mismatch: ", zeros_ptrs.size(),
+                " vs num_experts=", num_experts);
     const int target_device = input.get_device();
     int current_device = 0;
     HIP_CHECK(hipGetDevice(&current_device));
@@ -664,7 +672,9 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
 
     hipError_t err = hipGetLastError();
     if (err != hipSuccess) {
-        throw std::runtime_error(std::string("HIP kernel 3D error: ") + hipGetErrorString(err));
+        throw std::runtime_error(std::string("HIP kernel 3D error: ") + hipGetErrorString(err) + " [M=" + std::to_string(M) +
+                                 ", K=" + std::to_string(K) + ", N=" + std::to_string(N) + ", E=" + std::to_string(num_experts) +
+                                 ", group_size=" + std::to_string(group_size) + "]");
     }
 }
 
