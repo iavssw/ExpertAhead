@@ -175,6 +175,8 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
 
     // Initialize all weights with dummy values (random) for testing without loading files
     void initialize_dummy_weights(int seed = 42);
+    int64_t get_prefill_chunk_size() const { return prefill_chunk_size_; }
+    int64_t get_sliding_window_size() const { return sliding_window_size_; }
 
     // NPU Helper functions
     // We declare them as friends or static/global if they are not members
@@ -238,6 +240,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     bool sliding_window_enabled_ = false;
     int64_t sliding_window_size_ = 4096;
     int64_t cache_filled_ = 0;
+    int64_t prefill_chunk_size_ = 4096;
 
     // Scratch buffers
     torch::Tensor x_buffer;

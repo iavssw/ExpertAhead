@@ -963,8 +963,13 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
     if (sliding_window_size_ <= 0) {
         sliding_window_size_ = max_seq_len_;
     }
+    prefill_chunk_size_ = sliding_window_enabled_ ? sliding_window_size_ : max_seq_len_;
+    if (prefill_chunk_size_ <= 0) {
+        prefill_chunk_size_ = 1;
+    }
     if (debug_verbosity >= 1 && sliding_window_enabled_) {
-        std::cout << "Sliding window enabled (size=" << sliding_window_size_ << ")" << std::endl;
+        std::cout << "Sliding window enabled (size=" << sliding_window_size_ << ", prefill_chunk_size=" << prefill_chunk_size_ << ")"
+                  << std::endl;
     }
 
     // GPU placement configuration (GPU mode only): auto-select by free VRAM.
@@ -2029,8 +2034,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     this->eval();
     torch::NoGradGuard no_grad;
     const bool should_sync_device = input_ids.is_cuda();
-    const int64_t prefill_chunk_size =
-        std::max<int64_t>(1, sliding_window_enabled_ ? std::min<int64_t>(sliding_window_size_, max_seq_len_) : max_seq_len_);
+    const int64_t prefill_chunk_size = std::max<int64_t>(1, prefill_chunk_size_);
 
     auto run_prefill_chunks = [&](const torch::Tensor &prompt_tokens) {
         torch::Tensor local_output;

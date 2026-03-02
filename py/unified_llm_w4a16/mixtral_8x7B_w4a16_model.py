@@ -210,6 +210,7 @@ class Mixtral8x7BW4A16Model:
         self.num_attention_heads = num_attention_heads
         self.num_key_value_heads = num_key_value_heads
         self.head_dim = head_dim
+        self.max_seq_len = max_seq_len
         self.groupsize = groupsize
         self.num_experts = num_experts
         self.num_experts_per_tok = num_experts_per_tok
@@ -829,6 +830,16 @@ def run_wikitext2_perplexity(
     print(f"Saved tokenized WikiText-2 tensor: {token_cache_path}")
     print(f"Total tokens: {input_ids_full.size(1)}")
     print(f"Eval max_length: {max_length}, stride: {stride}")
+    backend_prefill_chunk = None
+    if hasattr(model, "model") and hasattr(model.model, "get_prefill_chunk_size"):
+        try:
+            backend_prefill_chunk = int(model.model.get_prefill_chunk_size())
+        except Exception:
+            backend_prefill_chunk = None
+    if backend_prefill_chunk is None or backend_prefill_chunk <= 0:
+        backend_prefill_chunk = min(int(getattr(model, "max_seq_len", 4096)), 4096)
+    forward_chunk_size = max(1, min(backend_prefill_chunk, max_length))
+    print(f"Internal forward chunk size: {forward_chunk_size}")
 
     total_nll = 0.0
     total_tokens = 0
@@ -845,25 +856,49 @@ def run_wikitext2_perplexity(
         window_len = input_ids_window.size(1)
         input_ids_window_dev = input_ids_window.to(device)
         tokens_to_ignore = max(0, (window_len - 1) - trg_len)
+        window_loss_sum = 0.0
+        window_valid_tokens = 0
 
         try:
             with torch.no_grad():
-                logits = model(input_ids_window_dev)
-            shift_logits = logits[:, :-1, :].float().contiguous()
-            shift_labels = input_ids_window_dev[:, 1:].contiguous()
-            vocab_size = shift_logits.size(-1)
+                if window_len <= forward_chunk_size:
+                    chunk_ranges = [(0, window_len)]
+                else:
+                    chunk_ranges = [(i, min(i + forward_chunk_size, window_len)) for i in range(0, window_len, forward_chunk_size)]
 
-            if tokens_to_ignore > 0:
-                shift_labels = shift_labels.clone()
-                shift_labels[:, :tokens_to_ignore] = -100
+                for chunk_begin, chunk_end in chunk_ranges:
+                    chunk_input = input_ids_window_dev[:, chunk_begin:chunk_end]
+                    if chunk_begin == 0:
+                        chunk_logits = model(chunk_input)
+                    else:
+                        chunk_logits = model(chunk_input, start_pos=chunk_begin)
 
-            loss_sum = F.cross_entropy(
-                shift_logits.view(-1, vocab_size),
-                shift_labels.view(-1),
-                ignore_index=-100,
-                reduction="sum",
-            )
-            valid_tokens = int((shift_labels != -100).sum().item())
+                    target_begin = chunk_begin + 1
+                    target_end = min(chunk_end + 1, window_len)
+                    if target_begin >= target_end:
+                        continue
+
+                    labels = input_ids_window_dev[:, target_begin:target_end].contiguous()
+                    chunk_token_count = labels.size(1)
+                    logits_for_loss = chunk_logits[:, :chunk_token_count, :].float().contiguous()
+                    vocab_size = logits_for_loss.size(-1)
+
+                    ignore_prefix = max(0, tokens_to_ignore - chunk_begin)
+                    if ignore_prefix >= chunk_token_count:
+                        continue
+                    if ignore_prefix > 0:
+                        labels = labels.clone()
+                        labels[:, :ignore_prefix] = -100
+
+                    loss_sum = F.cross_entropy(
+                        logits_for_loss.view(-1, vocab_size),
+                        labels.view(-1),
+                        ignore_index=-100,
+                        reduction="sum",
+                    )
+                    valid_tokens_chunk = int((labels != -100).sum().item())
+                    window_loss_sum += float(loss_sum.item())
+                    window_valid_tokens += valid_tokens_chunk
         except Exception as e:
             print(
                 f"Error during forward pass at window begin={begin_loc}, end={end_loc}, "
@@ -871,8 +906,8 @@ def run_wikitext2_perplexity(
             )
             return 1
 
-        total_nll += float(loss_sum.item())
-        total_tokens += valid_tokens
+        total_nll += window_loss_sum
+        total_tokens += window_valid_tokens
 
         progress_ratio = float(window_idx + 1) / float(total_windows)
         bar_width = 28
@@ -935,6 +970,7 @@ def main():
         "--model-path",
         type=str,
         default="TheBloke/mixtral-8x7b-v0.1-AWQ",
+        # default="casperhansen/mixtral-instruct-awq",        
         help="Path to quantized model (default: TheBloke/mixtral-8x7b-v0.1-AWQ)"
     )
     parser.add_argument(
