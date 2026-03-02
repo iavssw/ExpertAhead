@@ -8,11 +8,14 @@ import sys
 import json
 import time
 import re
+import math
 import subprocess
 from pathlib import Path
 from typing import Optional, Union, List
+from urllib.request import urlopen
 
 import torch
+import torch.nn.functional as F
 from transformers import AutoTokenizer
 
 _script_dir = Path(__file__).parent.resolve()
@@ -174,7 +177,7 @@ class Mixtral8x7BW4A16Model:
         head_dim: int = 128,
         rms_norm_eps: float = 1e-5,
         rope_theta: float = 10000.0,
-        max_seq_len: int = 8192,
+        max_seq_len: int = 5120,
         max_batch_size: int = 1,
         groupsize: int = 128,
         num_experts: int = 8,
@@ -494,9 +497,58 @@ class Mixtral8x7BW4A16Model:
             input_ids = self.tokenize(input_ids)
         return self.model.forward(input_ids, start_pos)
 
+    def perplexity(self, input_ids: Union[str, torch.Tensor]) -> dict:
+        """
+        Compute causal-LM perplexity for the provided sequence(s).
+        Returns: loss, perplexity, num_tokens.
+        """
+        if isinstance(input_ids, str):
+            input_ids = self.tokenize(input_ids)
+
+        if input_ids.dim() != 2:
+            raise ValueError(f"Expected input_ids with shape [batch, seq_len], got {tuple(input_ids.shape)}")
+        if input_ids.size(1) < 2:
+            raise ValueError("Need at least 2 tokens to compute perplexity.")
+
+        with torch.no_grad():
+            logits = self.model.forward(input_ids, 0)
+
+        shift_logits = logits[:, :-1, :].float().contiguous()
+        shift_labels = input_ids[:, 1:].contiguous()
+        vocab_size = shift_logits.size(-1)
+
+        pad_token_id = self.tokenizer.pad_token_id if self.tokenizer is not None else None
+        if pad_token_id is not None:
+            valid_mask = shift_labels.ne(pad_token_id)
+            num_tokens = int(valid_mask.sum().item())
+            if num_tokens == 0:
+                raise ValueError("No non-pad tokens available for perplexity computation.")
+            labels_for_loss = shift_labels.masked_fill(~valid_mask, -100)
+            loss = F.cross_entropy(
+                shift_logits.view(-1, vocab_size),
+                labels_for_loss.view(-1),
+                ignore_index=-100,
+                reduction="mean",
+            )
+        else:
+            num_tokens = int(shift_labels.numel())
+            loss = F.cross_entropy(
+                shift_logits.view(-1, vocab_size),
+                shift_labels.view(-1),
+                reduction="mean",
+            )
+
+        ppl = torch.exp(loss)
+        return {
+            "loss": float(loss.item()),
+            "perplexity": float(ppl.item()),
+            "num_tokens": num_tokens,
+        }
+
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
-                    max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50, generate=True, config_path=None):
+                    max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50,
+                    generate=True, perplexity=False, config_path=None):
     """
     Run prompt test case: load single long prompt from prompts.txt,
     concatenate base prompt, truncate to requested token count, and generate output.
@@ -508,6 +560,11 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
 
     if not prompts_file.exists():
         print(f"Error: Prompts file not found at {prompts_file}")
+        return 1
+
+    if target_tokens > 4096:
+        print("Error: prompt-test > 4096 is not supported.")
+        print("Did not implement sliding window attention, so only support this size for now.")
         return 1
 
     print("=" * 60)
@@ -600,7 +657,9 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
         return 1
 
     print("\n" + "=" * 60)
-    if generate:
+    if perplexity:
+        print("PERPLEXITY EVALUATION:")
+    elif generate:
         print("GENERATING OUTPUT:")
     else:
         print("FORWARD PASS (NO GENERATION):")
@@ -608,6 +667,17 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
 
     try:
         input_ids = torch.tensor([truncated_tokens], dtype=torch.long, device=device)
+
+        if perplexity:
+            print("Running perplexity evaluation...")
+            start_time = time.time()
+            metrics = model.perplexity(input_ids)
+            end_time = time.time()
+            print(f"Eval time: {end_time - start_time:.4f} seconds")
+            print(f"Tokens evaluated: {metrics['num_tokens']}")
+            print(f"Cross-entropy loss: {metrics['loss']:.6f}")
+            print(f"Perplexity: {metrics['perplexity']:.6f}")
+            return 0
 
         if not generate:
             print("Running forward pass only...")
@@ -658,6 +728,194 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
         print(f"Weight loading time: {model.load_time:.2f} seconds")
     print("Done!")
     print(f"{'=' * 60}\n")
+    return 0
+
+
+def _load_wikitext2_raw_text(model_weights_dir: Path, split: str = "test") -> str:
+    """
+    Load WikiText-2 raw split and cache the plain text under model_weights_dir.
+    Tries Hugging Face datasets first, then falls back to raw text URL.
+    """
+    model_weights_dir.mkdir(parents=True, exist_ok=True)
+    text_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}.txt"
+
+    if text_cache_path.exists():
+        print(f"Using cached WikiText-2 text: {text_cache_path}")
+        return text_cache_path.read_text(encoding="utf-8")
+
+    text = None
+    try:
+        from datasets import load_dataset
+        ds = load_dataset("wikitext", "wikitext-2-raw-v1", split=split)
+        lines = [line for line in ds["text"] if line and line.strip()]
+        text = "\n\n".join(lines)
+        print(f"Downloaded WikiText-2 via datasets ({split} split).")
+    except Exception as e:
+        print(f"Could not load WikiText-2 via datasets ({e}). Falling back to raw text URL.")
+        fallback_urls = {
+            "train": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/train.txt",
+            "validation": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
+            "valid": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
+            "test": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/test.txt",
+        }
+        if split not in fallback_urls:
+            raise ValueError(f"Unsupported WikiText-2 split '{split}'. Use one of train/valid/validation/test.")
+        with urlopen(fallback_urls[split]) as resp:
+            text = resp.read().decode("utf-8")
+        text = "\n\n".join([line for line in text.splitlines() if line.strip()])
+        print(f"Downloaded WikiText-2 from fallback URL ({split} split).")
+
+    text_cache_path.write_text(text, encoding="utf-8")
+    print(f"Saved WikiText-2 text cache: {text_cache_path}")
+    return text
+
+
+def run_wikitext2_perplexity(
+    model_path=None,
+    tokenizer_path=None,
+    device="cuda",
+    backend="base",
+    config_path=None,
+    split: str = "test",
+    max_length: int = 2048,
+    stride: int = 2048,
+):
+    """
+    Evaluate perplexity on WikiText-2 with sliding-window evaluation.
+    Saves fetched text and tokenized IDs under model_weights.
+    """
+    if max_length < 2:
+        raise ValueError("max_length must be >= 2")
+    if stride < 1:
+        raise ValueError("stride must be >= 1")
+
+    script_dir = Path(__file__).parent
+    model_weights_dir = script_dir / "model_weights"
+    model_weights_dir.mkdir(parents=True, exist_ok=True)
+
+    print("=" * 60)
+    print(f"WIKITEXT-2 PERPLEXITY ({split} split)")
+    print("=" * 60 + "\n")
+
+    text = _load_wikitext2_raw_text(model_weights_dir, split=split)
+
+    if model_path is None:
+        model_path = "TheBloke/mixtral-8x7b-v0.1-AWQ"
+
+    print("Initializing Mixtral 8x7B v0.1 AWQ w4a16 quantized model...")
+    try:
+        model = Mixtral8x7BW4A16Model(
+            model_path=model_path,
+            tokenizer_path=tokenizer_path,
+            device=device,
+            backend=backend,
+            config_path=config_path,
+        )
+        print("Model initialized successfully!")
+    except Exception as e:
+        print(f"Error initializing model: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    if model.tokenizer is None:
+        print("Error: tokenizer is required for WikiText-2 perplexity.")
+        return 1
+
+    print("Tokenizing WikiText-2 corpus...")
+    encoded = model.tokenizer(text, return_tensors="pt", add_special_tokens=False)
+    input_ids_full = encoded["input_ids"]
+    if input_ids_full.size(1) < 2:
+        print("Error: tokenized WikiText-2 corpus is too short.")
+        return 1
+
+    token_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}_tokens.pt"
+    torch.save(input_ids_full.cpu(), token_cache_path)
+    print(f"Saved tokenized WikiText-2 tensor: {token_cache_path}")
+    print(f"Total tokens: {input_ids_full.size(1)}")
+    print(f"Eval max_length: {max_length}, stride: {stride}")
+
+    total_nll = 0.0
+    total_tokens = 0
+    prev_end_loc = 0
+    seq_len = input_ids_full.size(1)
+    start_time = time.time()
+    window_starts = list(range(0, seq_len, stride))
+    total_windows = len(window_starts)
+
+    for window_idx, begin_loc in enumerate(window_starts):
+        end_loc = min(begin_loc + max_length, seq_len)
+        trg_len = end_loc - prev_end_loc
+        input_ids_window = input_ids_full[:, begin_loc:end_loc]
+        window_len = input_ids_window.size(1)
+        input_ids_window_dev = input_ids_window.to(device)
+        tokens_to_ignore = max(0, (window_len - 1) - trg_len)
+
+        try:
+            with torch.no_grad():
+                logits = model(input_ids_window_dev)
+            shift_logits = logits[:, :-1, :].float().contiguous()
+            shift_labels = input_ids_window_dev[:, 1:].contiguous()
+            vocab_size = shift_logits.size(-1)
+
+            if tokens_to_ignore > 0:
+                shift_labels = shift_labels.clone()
+                shift_labels[:, :tokens_to_ignore] = -100
+
+            loss_sum = F.cross_entropy(
+                shift_logits.view(-1, vocab_size),
+                shift_labels.view(-1),
+                ignore_index=-100,
+                reduction="sum",
+            )
+            valid_tokens = int((shift_labels != -100).sum().item())
+        except Exception as e:
+            print(
+                f"Error during forward pass at window begin={begin_loc}, end={end_loc}, "
+                f"window_len={end_loc - begin_loc}, stride={stride}: {e}"
+            )
+            return 1
+
+        total_nll += float(loss_sum.item())
+        total_tokens += valid_tokens
+
+        progress_ratio = float(window_idx + 1) / float(total_windows)
+        bar_width = 28
+        filled = int(progress_ratio * bar_width)
+        bar = "#" * filled + "-" * (bar_width - filled)
+        elapsed = time.time() - start_time
+        running_ppl = math.exp(total_nll / total_tokens) if total_tokens > 0 else float("nan")
+        print(
+            f"\rProgress [{bar}] {window_idx + 1}/{total_windows} "
+            f"({progress_ratio * 100.0:5.1f}%) | begin={begin_loc}, end={end_loc}, "
+            f"tokens_evaluated={total_tokens}, running_ppl={running_ppl:.4f}, elapsed={elapsed:.1f}s",
+            end="",
+            flush=True,
+        )
+
+        prev_end_loc = end_loc
+        if end_loc == seq_len:
+            break
+
+    print()
+
+    if total_tokens <= 0:
+        print("Error: no valid tokens were evaluated.")
+        return 1
+
+    avg_nll = total_nll / total_tokens
+    ppl = math.exp(avg_nll)
+    end_time = time.time()
+
+    print("\n" + "=" * 60)
+    print("WIKITEXT-2 PERPLEXITY RESULT")
+    print("=" * 60)
+    print(f"Split: {split}")
+    print(f"Tokens evaluated: {total_tokens}")
+    print(f"Average NLL (loss): {avg_nll:.6f}")
+    print(f"Perplexity: {ppl:.6f}")
+    print(f"Eval time: {end_time - start_time:.2f} seconds")
+    print("=" * 60 + "\n")
     return 0
 
 
@@ -747,8 +1005,49 @@ def main():
         default=None,
         help="Run prompt test case with specified token count."
     )
+    parser.add_argument(
+        "--perplexity",
+        action="store_true",
+        help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
+    )
+    parser.add_argument(
+        "--wikitext2-perplexity",
+        action="store_true",
+        help="Compute perplexity on WikiText-2 and save downloaded/tokenized files under model_weights."
+    )
+    parser.add_argument(
+        "--wikitext2-split",
+        type=str,
+        default="test",
+        choices=["train", "valid", "validation", "test"],
+        help="WikiText-2 split to evaluate."
+    )
+    parser.add_argument(
+        "--wikitext2-max-length",
+        type=int,
+        default=2048,
+        help="Max context length per evaluation window for WikiText-2 perplexity."
+    )
+    parser.add_argument(
+        "--wikitext2-stride",
+        type=int,
+        default=2048,
+        help="Stride for sliding-window WikiText-2 perplexity."
+    )
 
     args = parser.parse_args()
+
+    if args.wikitext2_perplexity:
+        return run_wikitext2_perplexity(
+            model_path=args.model_path,
+            tokenizer_path=args.tokenizer_path,
+            device=args.device,
+            backend=args.backend,
+            config_path=args.config_path,
+            split=args.wikitext2_split,
+            max_length=args.wikitext2_max_length,
+            stride=args.wikitext2_stride,
+        )
 
     if args.prompt_test is not None:
         return run_prompt_test(
@@ -762,6 +1061,7 @@ def main():
             top_p=args.top_p,
             top_k=args.top_k,
             generate=args.generate,
+            perplexity=args.perplexity,
             config_path=args.config_path
         )
 
@@ -791,7 +1091,23 @@ def main():
 
     print(f"Processing text: '{args.text}'")
 
-    if args.generate:
+    if args.perplexity:
+        print("\nRunning perplexity evaluation...")
+        try:
+            input_ids = model.tokenize(args.text)
+            start_time = time.time()
+            metrics = model.perplexity(input_ids)
+            end_time = time.time()
+            print(f"Eval time: {end_time - start_time:.4f} seconds")
+            print(f"Tokens evaluated: {metrics['num_tokens']}")
+            print(f"Cross-entropy loss: {metrics['loss']:.6f}")
+            print(f"Perplexity: {metrics['perplexity']:.6f}")
+        except Exception as e:
+            print(f"Error during perplexity evaluation: {e}")
+            import traceback
+            traceback.print_exc()
+            return 1
+    elif args.generate:
         print(f"Generating {args.max_new_tokens} tokens...\n")
         try:
             input_ids = model.tokenize(args.text)
