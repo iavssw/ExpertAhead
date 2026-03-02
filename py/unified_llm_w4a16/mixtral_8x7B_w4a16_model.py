@@ -174,7 +174,7 @@ class Mixtral8x7BW4A16Model:
         head_dim: int = 128,
         rms_norm_eps: float = 1e-5,
         rope_theta: float = 10000.0,
-        max_seq_len: int = 8192,
+        max_seq_len: int = 16640,
         max_batch_size: int = 1,
         groupsize: int = 128,
         num_experts: int = 8,
