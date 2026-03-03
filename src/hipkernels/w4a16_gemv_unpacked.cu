@@ -1,7 +1,9 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
+#include <c10/hip/HIPStream.h>
 #include <hip/hip_bfloat16.h>
 #include <hip/hip_fp16.h>
 #include <hip/hip_runtime.h>
+#include <cstdint>
 #include <iostream>
 #include <mutex>
 #include <unordered_map>
@@ -59,11 +61,16 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
     HIP_CHECK(hipMemcpy(cache.d_zeros, zeros.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
 }
 
-DevicePtrCache &gemv_ptr_cache_for_device(int device) {
-    static std::unordered_map<int, DevicePtrCache> caches;
+uint64_t make_cache_key(int device, hipStream_t stream) {
+    return (static_cast<uint64_t>(static_cast<uint32_t>(device)) << 32) ^
+           static_cast<uint64_t>(reinterpret_cast<uintptr_t>(stream));
+}
+
+DevicePtrCache &gemv_ptr_cache_for_device_stream(int device, hipStream_t stream) {
+    static std::unordered_map<uint64_t, DevicePtrCache> caches;
     static std::mutex cache_mutex;
     std::lock_guard<std::mutex> lock(cache_mutex);
-    return caches[device];
+    return caches[make_cache_key(device, stream)];
 }
 } // namespace
 
@@ -601,6 +608,7 @@ void w4a16_gemv_unpacked_fused(torch::Tensor &output, const torch::Tensor &input
     dim3 block(256);
     int waves_per_block = 256 / WAVE_SIZE;
     dim3 grid((N + waves_per_block - 1) / waves_per_block);
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
     int group_shift = 0;
     int gs = group_size;
@@ -611,11 +619,11 @@ void w4a16_gemv_unpacked_fused(torch::Tensor &output, const torch::Tensor &input
 
     int num_groups = K >> group_shift;
     if (num_groups <= 128) {
-        w4a16_gemv_unpacked_kernel<128><<<grid, block, 0, 0>>>(
+        w4a16_gemv_unpacked_kernel<128><<<grid, block, 0, stream>>>(
             (bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(), qweights.data_ptr<uint8_t>(),
             (const bfloat16_t *)scales.data_ptr(), (const uint8_t *)zeros.data_ptr(), M, K, N, group_shift, stride_groups, stride_n);
     } else {
-        w4a16_gemv_unpacked_kernel<256><<<grid, block, 0, 0>>>(
+        w4a16_gemv_unpacked_kernel<256><<<grid, block, 0, stream>>>(
             (bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(), qweights.data_ptr<uint8_t>(),
             (const bfloat16_t *)scales.data_ptr(), (const uint8_t *)zeros.data_ptr(), M, K, N, group_shift, stride_groups, stride_n);
     }
@@ -644,6 +652,7 @@ void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
     dim3 block(256);
     int waves_per_block = 256 / WAVE_SIZE;
     dim3 grid((N + waves_per_block - 1) / waves_per_block, 1, static_cast<uint32_t>(num_experts));
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
     int group_shift = 0;
     int gs = group_size;
@@ -655,12 +664,12 @@ void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
     int num_groups = K >> group_shift;
     if (num_groups <= 128) {
         w4a16_gemv_unpacked_kernel_3d<128>
-            <<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
+            <<<grid, block, 0, stream>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
                                     (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(), (const uint64_t *)scales_ptrs.data_ptr<int64_t>(),
                                     (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(), M, K, N, group_shift, stride_groups, stride_n);
     } else {
         w4a16_gemv_unpacked_kernel_3d<256>
-            <<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
+            <<<grid, block, 0, stream>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
                                     (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(), (const uint64_t *)scales_ptrs.data_ptr<int64_t>(),
                                     (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(), M, K, N, group_shift, stride_groups, stride_n);
     }
@@ -681,8 +690,9 @@ void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
     if (current_device != target_device) {
         HIP_CHECK(hipSetDevice(target_device));
     }
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
-    auto &cache = gemv_ptr_cache_for_device(target_device);
+    auto &cache = gemv_ptr_cache_for_device_stream(target_device, stream);
     ensure_device_ptrs(cache, qweights_ptrs, scales_ptrs, zeros_ptrs);
 
     const int K = static_cast<int>(in_features);
@@ -705,11 +715,11 @@ void w4a16_gemv_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
 
     int num_groups = K >> group_shift;
     if (num_groups <= 128) {
-        w4a16_gemv_unpacked_kernel_3d<128><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
+        w4a16_gemv_unpacked_kernel_3d<128><<<grid, block, 0, stream>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
                                                                   cache.d_qweights, cache.d_scales, cache.d_zeros, M, K, N, group_shift,
                                                                   stride_groups, stride_n);
     } else {
-        w4a16_gemv_unpacked_kernel_3d<256><<<grid, block, 0, 0>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
+        w4a16_gemv_unpacked_kernel_3d<256><<<grid, block, 0, stream>>>((bfloat16_t *)output.data_ptr(), (const bfloat16_t *)input.data_ptr(),
                                                                   cache.d_qweights, cache.d_scales, cache.d_zeros, M, K, N, group_shift,
                                                                   stride_groups, stride_n);
     }

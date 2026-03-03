@@ -1333,11 +1333,8 @@ void UnifiedLLMW4A16Impl::preload_moe_kernels() {
         output.index_add_(0, token_idx, down_slice);
     }
 
-    // Warmup the MoE layer as well
-    if (moe_layers.size() > 0) {
-        auto router_input = torch::randn({1, 2, hidden_size_}, opts);
-        moe_layers[0]->forward(router_input);
-    }
+    // Avoid invoking full MoE forward during preload. On some runtimes this can
+    // trip a stale/async HIP error state before first real inference call.
 
     if (debug_verbosity >= 1) {
         std::cout << "MoE kernels preloaded." << std::endl;

@@ -7,6 +7,7 @@
 #include <hip/hip_fp16.h>
 
 #include "hipkernels/w4a16_gemm_unpacked.hpp"
+#include <c10/hip/HIPStream.h>
 #include <hip/hip_bfloat16.h>
 #include <hip/hip_runtime.h>
 #include <rocwmma/rocwmma.hpp>
@@ -17,6 +18,7 @@ using namespace rocwmma;
 using bfloat16_t = hip_bfloat16;
 
 #include <cstdlib>
+#include <cstdint>
 #include <hipblas/hipblas.h>
 #include <iostream>
 #include <mutex>
@@ -74,11 +76,16 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
     HIP_CHECK(hipMemcpy(cache.d_zeros, zeros.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
 }
 
-DevicePtrCache &gemm_ptr_cache_for_device(int device) {
-    static std::unordered_map<int, DevicePtrCache> caches;
+uint64_t make_cache_key(int device, hipStream_t stream) {
+    return (static_cast<uint64_t>(static_cast<uint32_t>(device)) << 32) ^
+           static_cast<uint64_t>(reinterpret_cast<uintptr_t>(stream));
+}
+
+DevicePtrCache &gemm_ptr_cache_for_device_stream(int device, hipStream_t stream) {
+    static std::unordered_map<uint64_t, DevicePtrCache> caches;
     static std::mutex cache_mutex;
     std::lock_guard<std::mutex> lock(cache_mutex);
-    return caches[device];
+    return caches[make_cache_key(device, stream)];
 }
 } // namespace
 
@@ -565,6 +572,7 @@ void w4a16_gemm_unpacked_fused(torch::Tensor &output, const torch::Tensor &input
     // Ensure grid covers M, N with 128x128 blocks (grid.x = N, grid.y = M)
     dim3 block(GEMM_BLOCK_SIZE);
     dim3 grid((N + 127) / 128, (M + 127) / 128);
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
     static bool cache_configured = false;
     if (!cache_configured) {
@@ -575,7 +583,7 @@ void w4a16_gemm_unpacked_fused(torch::Tensor &output, const torch::Tensor &input
         cache_configured = true;
     }
 
-    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked, grid, block, 0, 0, (bfloat16_t *)output.data_ptr(),
+    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked, grid, block, 0, stream, (bfloat16_t *)output.data_ptr(),
                        (const bfloat16_t *)input.data_ptr(), qweights.data_ptr<uint8_t>(), (const bfloat16_t *)scales.data_ptr(),
                        (const uint8_t *)zeros.data_ptr(), M, K, N, group_size);
 
@@ -598,6 +606,7 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
     const int M = static_cast<int>(input.size(1));
     const int K = static_cast<int>(in_features);
     const int N = static_cast<int>(out_features);
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
     dim3 block(GEMM_BLOCK_SIZE);
     dim3 grid((N + 127) / 128, (M + 127) / 128, static_cast<uint32_t>(num_experts));
@@ -611,7 +620,7 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
         cache_configured_3d = true;
     }
 
-    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked_3d, grid, block, 0, 0, (bfloat16_t *)output.data_ptr(),
+    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked_3d, grid, block, 0, stream, (bfloat16_t *)output.data_ptr(),
                        (const bfloat16_t *)input.data_ptr(), (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(),
                        (const uint64_t *)scales_ptrs.data_ptr<int64_t>(), (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(), M, K, N,
                        group_size);
@@ -647,8 +656,9 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
     if (current_device != target_device) {
         HIP_CHECK(hipSetDevice(target_device));
     }
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
-    auto &cache = gemm_ptr_cache_for_device(target_device);
+    auto &cache = gemm_ptr_cache_for_device_stream(target_device, stream);
     ensure_device_ptrs(cache, qweights_ptrs, scales_ptrs, zeros_ptrs);
 
     const int M = static_cast<int>(input.size(1));
@@ -667,7 +677,7 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
         cache_configured_3d = true;
     }
 
-    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked_3d, grid, block, 0, 0, (bfloat16_t *)output.data_ptr(),
+    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked_3d, grid, block, 0, stream, (bfloat16_t *)output.data_ptr(),
                        (const bfloat16_t *)input.data_ptr(), cache.d_qweights, cache.d_scales, cache.d_zeros, M, K, N, group_size);
 
     hipError_t err = hipGetLastError();
