@@ -27,10 +27,11 @@ QWEN3_480B_OUT="/mnt/storage/Michael/michaelg/heteroPredict/trainingData/qwen3_4
 
 
 # ── Collection parameters ─────────────────────────────────────────────────────
-NUM_FINEWEB=100
-NUM_ORCA=100
+NUM_FINEWEB=0
+NUM_ORCA=0
+NUM_WIKITEXT=1000
 MIN_TOKENS=100
-MAX_TOKENS=512
+MAX_TOKENS=1024
 DEVICE="cuda"
 
 COLLECT_MIXTRAL_8x7B=false
@@ -62,6 +63,7 @@ if $COLLECT_MIXTRAL_8x7B; then
         --output-dir      "$MIXTRAL_8x7B_OUT" \
         --num-fineweb     "$NUM_FINEWEB" \
         --num-orca        "$NUM_ORCA" \
+        --num-wikitext    "$NUM_WIKITEXT" \
         --min-tokens      "$MIN_TOKENS" \
         --max-tokens      "$MAX_TOKENS" \
         --device          "$DEVICE"
@@ -79,6 +81,7 @@ if $COLLECT_MIXTRAL_8x22B; then
         --output-dir      "$MIXTRAL_8x22B_OUT" \
         --num-fineweb     "$NUM_FINEWEB" \
         --num-orca        "$NUM_ORCA" \
+        --num-wikitext    "$NUM_WIKITEXT" \
         --min-tokens      "$MIN_TOKENS" \
         --max-tokens      "$MAX_TOKENS" \
         --device          "$DEVICE"
@@ -95,6 +98,7 @@ if $COLLECT_QWEN3_30B; then
         --output-dir      "$QWEN3_30B_OUT" \
         --num-fineweb     "$NUM_FINEWEB" \
         --num-orca        "$NUM_ORCA" \
+        --num-wikitext    "$NUM_WIKITEXT" \
         --min-tokens      "$MIN_TOKENS" \
         --max-tokens      "$MAX_TOKENS" \
         --device          "$DEVICE"
@@ -111,6 +115,7 @@ if $COLLECT_QWEN3_480B; then
         --output-dir      "$QWEN3_480B_OUT" \
         --num-fineweb     "$NUM_FINEWEB" \
         --num-orca        "$NUM_ORCA" \
+        --num-wikitext    "$NUM_WIKITEXT" \
         --min-tokens      "$MIN_TOKENS" \
         --max-tokens      "$MAX_TOKENS" \
         --device          "$DEVICE"

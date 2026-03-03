@@ -31,8 +31,7 @@ Usage:
   python collect_training_data_unified.py \\
       --model <model_tag> \\
       --output-dir <path> \\
-      --num-fineweb 100 \\
-      --num-orca 100 \\
+      --num-wikitext 100 \\
       --max-tokens 512
 """
 
@@ -64,6 +63,8 @@ def _stream_texts(dataset_name: str, min_tokens: int, max_tokens: int, tokenizer
         ds = load_dataset("HuggingFaceFW/fineweb", split="train", streaming=True)
     elif dataset_name == "orca":
         ds = load_dataset("Open-Orca/OpenOrca", split="train", streaming=True)
+    elif dataset_name == "wikitext":
+        ds = load_dataset("wikitext", "wikitext-103-v1", split="train", streaming=True)
     else:
         raise ValueError(f"Unknown dataset: {dataset_name!r}")
 
@@ -73,8 +74,11 @@ def _stream_texts(dataset_name: str, min_tokens: int, max_tokens: int, tokenizer
         elif dataset_name == "orca":
             system   = example.get("system_prompt", "")
             question = example.get("question", "")
-            response = example.get("response", "")
-            text = f"{system}\n{question}\n{response}".strip()
+            text = f"{system}\n{question}\n{example.get('response', '')}".strip()
+        elif dataset_name == "wikitext":
+            text = example.get("text", "").strip()
+            if not text or text.startswith(" = "): # Skip section headers
+                continue
 
         if not text:
             continue
@@ -230,10 +234,17 @@ def collect_from_dataset(
                 emb     = embeddings.squeeze(0).float().cpu()   # [seq_len, hidden_size]
                 rlogits = router_logits.float().cpu()           # [seq_len, num_experts]
                 del embeddings, router_logits                   # release GPU tensors now
+
+                # Prefill expert count: count of token assignments to each expert for this layer
+                top_k = getattr(model, "num_experts_per_tok", 2)
+                top_k_indices = rlogits.topk(top_k, dim=-1).indices
+                prefill_count = torch.bincount(top_k_indices.flatten(), minlength=rlogits.shape[-1])
+
                 layers.append({
-                    "layer_idx":     layer_idx,
-                    "embeddings":    emb,
-                    "router_logits": rlogits,
+                    "layer_idx":          layer_idx,
+                    "embeddings":         emb,
+                    "router_logits":      rlogits,
+                    "prefill_expert_count": prefill_count,
                 })
             del training_data                                   # release the list
             torch.cuda.empty_cache()                            # return freed pages to allocator
@@ -268,19 +279,23 @@ def collect_from_dataset(
 # ─────────────────────────────────────────────────────────────────────────────
 
 def write_metadata(output_dir: Path, model_tag: str, num_fineweb: int, num_orca: int,
-                   min_tokens: int, max_tokens: int, model_path: str):
+                   num_wikitext: int, min_tokens: int, max_tokens: int, model_path: str):
     meta = {
         "model":          model_tag,
         "model_path":     model_path,
         "num_fineweb":    num_fineweb,
         "num_orca":       num_orca,
+        "num_wikitext":   num_wikitext,
         "min_tokens":     min_tokens,
         "max_tokens":     max_tokens,
         "file_format":    "per_sample_pt",
         "description":    (
             "Each .pt file is a dict with keys: sample_idx, dataset, token_count, model, layers. "
             "'layers' is a list of dicts keyed by layer_idx, embeddings [seq_len, hidden_size], "
-            "router_logits [seq_len, num_experts]. Embeddings are post-attention-norm (pre-router)."
+            "router_logits [seq_len, num_experts], prefill_expert_count [num_experts]. "
+            "Embeddings are post-attention-norm (pre-router). "
+            "prefill_expert_count is the raw count of how many times each expert was selected "
+            "over all prefill tokens for this layer."
         ),
     }
     meta_path = output_dir / "metadata.json"
@@ -317,6 +332,10 @@ def main():
     parser.add_argument(
         "--num-orca", type=int, default=100,
         help="Number of samples from OpenOrca (default: 100)."
+    )
+    parser.add_argument(
+        "--num-wikitext", type=int, default=0,
+        help="Number of samples from Wikitext-103 (default: 0)."
     )
     parser.add_argument(
         "--min-tokens", type=int, default=100,
@@ -386,7 +405,6 @@ def main():
     # ── collect Orca ──────────────────────────────────────────────────────────
     orca_collected = 0
     if not args.skip_orca and args.num_orca > 0:
-        # Offset sample_idx so filenames don't collide
         orca_collected = collect_from_dataset(
             model=model,
             tokenizer=tokenizer,
@@ -396,7 +414,22 @@ def main():
             model_tag=model_tag,
             min_tokens=args.min_tokens,
             max_tokens=args.max_tokens,
-            start_sample_idx=args.num_fineweb,   # offset so orca files start after fineweb
+            start_sample_idx=args.num_fineweb,
+        )
+
+    # ── collect Wikitext ──────────────────────────────────────────────────────
+    wikitext_collected = 0
+    if args.num_wikitext > 0:
+        wikitext_collected = collect_from_dataset(
+            model=model,
+            tokenizer=tokenizer,
+            dataset_name="wikitext",
+            num_samples=args.num_wikitext,
+            output_dir=output_dir,
+            model_tag=model_tag,
+            min_tokens=args.min_tokens,
+            max_tokens=args.max_tokens,
+            start_sample_idx=args.num_fineweb + args.num_orca,
         )
 
     # ── write metadata ────────────────────────────────────────────────────────
@@ -405,12 +438,13 @@ def main():
         model_tag=model_tag,
         num_fineweb=fineweb_collected,
         num_orca=orca_collected,
+        num_wikitext=wikitext_collected,
         min_tokens=args.min_tokens,
         max_tokens=args.max_tokens,
         model_path=model_path,
     )
 
-    total = fineweb_collected + orca_collected
+    total = fineweb_collected + orca_collected + wikitext_collected
     print("=" * 60)
     print("COLLECTION COMPLETE")
     print(f"  FineWeb: {fineweb_collected} samples")

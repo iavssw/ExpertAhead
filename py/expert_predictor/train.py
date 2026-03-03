@@ -35,7 +35,7 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
-from mlp_predictor import ExpertPredictor
+from mlp_predictor import ExpertPredictor, DualMLPPredictor
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -87,11 +87,13 @@ class EmbeddingHistoryDataset(Dataset):
         num_experts: int = 8,
         top_k: int = 2,
         embedding_history_size: int = 1,
+        router_history_size: int = 0,
     ):
         self.layer_idx = layer_idx
         self.num_experts = num_experts
         self.top_k = top_k
         self.embedding_history_size = embedding_history_size
+        self.router_history_size = router_history_size
         self.samples = []
 
         if isinstance(data_source, (str, Path)):
@@ -130,15 +132,35 @@ class EmbeddingHistoryDataset(Dataset):
 
                     for t in range(seq_len - 1):
                         emb_parts = []
+                        router_parts = []
                         for h in range(self.embedding_history_size):
                             src = t - (self.embedding_history_size - 1 - h)
                             emb_parts.append(
                                 embeddings[src] if src >= 0 else torch.zeros(hidden_size)
                             )
-                        self.samples.append({
-                            'embedding_features': torch.cat(emb_parts, dim=0),  # [H*hidden]
+                        
+                        for h in range(self.router_history_size):
+                            src = t - (self.router_history_size - 1 - h)
+                            router_parts.append(
+                                router_logits[src] if src >= 0 else torch.zeros(self.num_experts)
+                            )
+                        
+                        prefill_expert_dist = layer_dict.get('prefill_expert_dist')
+                        if prefill_expert_dist is None and 'prefill_expert_count' in layer_dict:
+                            c = layer_dict['prefill_expert_count'].float()
+                            prefill_expert_dist = c / c.sum().clamp(min=1)
+                        if prefill_expert_dist is None:
+                            prefill_expert_dist = torch.softmax(router_logits[:t+1].float(), dim=-1).mean(dim=0)
+
+                        sample = {
+                            'embedding_features': torch.cat(emb_parts, dim=0),
                             'next_token_router_logits': router_logits[t + 1],
-                        })
+                            'prefill_expert_dist': prefill_expert_dist,
+                        }
+                        if self.router_history_size > 0:
+                            sample['router_history'] = torch.cat(router_parts, dim=0)
+                            
+                        self.samples.append(sample)
                 return
 
             # ── Legacy schema ──────────────────────────────────────────────────
@@ -225,8 +247,9 @@ class EmbeddingHistoryDataset(Dataset):
             'post_attn_embedding': emb.float(),
             'label': label,
             'top_k_indices': top_k_idx,
-            'context_tokens': torch.zeros(1, dtype=torch.long),
-            'router_logits_history': torch.zeros(1, dtype=torch.float32),
+            'router_logits_history': s.get('router_history', torch.zeros(1)),
+            'prefill_expert_dist': s.get('prefill_expert_dist',
+                                         torch.full((self.num_experts,), 1.0 / self.num_experts)),
         }
 
     def calculate_class_weights(self):
@@ -374,15 +397,21 @@ def _print_metrics(phase: str, m: dict, top_k: int):
 def train_epoch(model, loader, optimizer, criterion, device):
     model.train()
     top_k = model.top_k
+    is_dual = isinstance(model, DualMLPPredictor)
     acc = {}
     num_batches = 0
     for batch in tqdm(loader, desc="Training", leave=False):
-        emb  = batch['post_attn_embedding'].to(device)
-        lbl  = batch['label'].to(device)
-        true = batch['top_k_indices'].to(device)  # [B, top_k] actual ranked indices
+        emb   = batch['post_attn_embedding'].to(device)
+        lbl   = batch['label'].to(device)
+        true  = batch['top_k_indices'].to(device)
+        hist  = batch['router_logits_history'].to(device)
+        pdist = batch['prefill_expert_dist'].to(device)
 
         optimizer.zero_grad()
-        logits = model(post_attn_embedding=emb)
+        if is_dual:
+            logits = model(embedding=emb, prefill_dist=pdist)
+        else:
+            logits = model(post_attn_embedding=emb, router_logits_history=hist)
         
         if isinstance(criterion, (nn.CrossEntropyLoss, nn.BCEWithLogitsLoss)):
             if isinstance(criterion, nn.CrossEntropyLoss):
@@ -409,14 +438,20 @@ def train_epoch(model, loader, optimizer, criterion, device):
 def evaluate(model, loader, criterion, device):
     model.eval()
     top_k = model.top_k
+    is_dual = isinstance(model, DualMLPPredictor)
     acc = {}
     num_batches = 0
     with torch.no_grad():
         for batch in tqdm(loader, desc="Evaluating", leave=False):
-            emb  = batch['post_attn_embedding'].to(device)
-            lbl  = batch['label'].to(device)
+            emb   = batch['post_attn_embedding'].to(device)
+            lbl   = batch['label'].to(device)
+            hist  = batch['router_logits_history'].to(device)
+            pdist = batch['prefill_expert_dist'].to(device)
 
-            logits = model(post_attn_embedding=emb)
+            if is_dual:
+                logits = model(embedding=emb, prefill_dist=pdist)
+            else:
+                logits = model(post_attn_embedding=emb, router_logits_history=hist)
             
             true = batch['top_k_indices'].to(device)
             if isinstance(criterion, (nn.CrossEntropyLoss, nn.BCEWithLogitsLoss)):
@@ -447,6 +482,7 @@ def train_embedding_predictor(
     output_dir: str,
     layer_idx: int,
     embedding_history_size: int = 1,
+    router_history_size: int = 0,
     num_epochs: int = 10,
     batch_size: int = 32,
     lr: float = 1e-3,
@@ -456,6 +492,8 @@ def train_embedding_predictor(
     top_k: int = 2,
     hidden_dim: Optional[int] = None,
     loss_type: str = 'ce',
+    best_by: str = 'top1_exact',
+    model_type: str = 'dual_mlp',  # 'dual_mlp' or 'expert_predictor'
 ):
     """Train one per-layer expert predictor MLP."""
     _base_out = Path(output_dir) / f"layer_{layer_idx}"
@@ -475,6 +513,7 @@ def train_embedding_predictor(
         num_experts=num_experts,
         top_k=top_k,
         embedding_history_size=embedding_history_size,
+        router_history_size=router_history_size,
     )
     train_ds = EmbeddingHistoryDataset(train_files, **ds_kwargs)
     val_ds   = EmbeddingHistoryDataset(val_files,   **ds_kwargs)
@@ -491,30 +530,42 @@ def train_embedding_predictor(
 
     print(
         f"Layer {layer_idx} — input_dim={input_dim}, hidden_dim={_hidden_dim}, "
-        f"num_experts={num_experts}, top_k={top_k}"
+        f"num_experts={num_experts}, top_k={top_k}, model_type={model_type}"
     )
 
-    model = ExpertPredictor(
-        pretrained_embeddings=None,
-        vocab_size=32000,
-        base_embedding_dim=base_embedding_dim,
-        embedding_history_size=embedding_history_size,
-        num_experts=num_experts,
-        top_k=top_k,
-        hidden_dim=_hidden_dim,
-        use_embedding=True
-    ).to(device)
+    if model_type == 'dual_mlp':
+        model = DualMLPPredictor(
+            hidden_size=base_embedding_dim,
+            num_experts=num_experts,
+            branch_dim=_hidden_dim,
+            top_k=top_k,
+        ).to(device)
+    else:
+        model = ExpertPredictor(
+            pretrained_embeddings=None,
+            vocab_size=32000,
+            base_embedding_dim=base_embedding_dim,
+            embedding_history_size=embedding_history_size,
+            router_history_size=router_history_size,
+            num_experts=num_experts,
+            top_k=top_k,
+            hidden_dim=_hidden_dim,
+            use_embedding=True
+        ).to(device)
 
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2)
     
     if loss_type == 'ce':
-        criterion = nn.CrossEntropyLoss(weight=pos_weights)
+        # Removed weights for CE to focus on raw prediction accuracy
+        criterion = nn.CrossEntropyLoss()
     elif loss_type == 'bce':
         criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weights)
     else:
         criterion = FocalLoss(alpha=pos_weights)
 
     best_acc = 0.0
+    best_metrics = {}
     metrics  = []
     metrics_path = output_dir / "training_metrics.json"
 
@@ -522,19 +573,26 @@ def train_embedding_predictor(
         "layer_idx": layer_idx,
         "hidden_dim": _hidden_dim,
         "embedding_history_size": embedding_history_size,
+        "router_history_size": router_history_size,
         "base_embedding_dim": base_embedding_dim,
         "num_experts": num_experts,
         "top_k": top_k,
     }
 
+    def _get_best_acc():
+        return best_acc
+
     def _save_metrics():
         with open(metrics_path, 'w') as f:
-            json.dump({**run_config, "best_val_acc": best_acc, "epochs": metrics}, f, indent=2)
+            json.dump({**run_config, "best_val_acc": _get_best_acc(), "best_by": best_by, "epochs": metrics}, f, indent=2)
 
     for epoch in range(num_epochs):
         print(f"Epoch {epoch+1}/{num_epochs}")
         train_m = train_epoch(model, train_loader, optimizer, criterion, device)
         val_m   = evaluate(model, val_loader, criterion, device)
+        
+        # Step scheduler using the target metric
+        scheduler.step(val_m.get(best_by, val_m['acc']))
 
         _print_metrics("Train", train_m, top_k)
         _print_metrics("Val",   val_m,   top_k)
@@ -543,21 +601,22 @@ def train_embedding_predictor(
             "epoch": epoch + 1,
             "train": train_m,
             "val":   val_m,
-            # Keep flat aliases for backward compat with plot.py
             "train_loss": train_m['loss'], "train_acc": train_m['acc'],
             "val_loss":   val_m['loss'],   "val_acc":   val_m['acc'],
         }
         metrics.append(epoch_record)
-        _save_metrics()
 
-        if val_m['acc'] > best_acc:
-            best_acc = val_m['acc']
+        current_score = val_m.get(best_by, val_m['acc'])
+        if current_score > best_acc:
+            best_acc = current_score
+            best_metrics = val_m
             save_path = output_dir / "embedding_predictor_best.pt"
             model.save(save_path)
-            print(f"  ↑ New best full_match={best_acc:.4f} — saved to {save_path}")
-            _save_metrics()
+            print(f"  ↑ New best {best_by}={best_acc:.4f} — saved to {save_path}")
+        
+        _save_metrics()
 
-    return best_acc
+    return best_metrics
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -603,6 +662,7 @@ if __name__ == "__main__":
 
     shared = dict(
         embedding_history_size=args.history,
+        router_history_size=args.history, # Default to same as embedding history
         num_epochs=args.epochs,
         batch_size=args.batch_size,
         lr=args.lr,

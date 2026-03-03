@@ -22,7 +22,7 @@ class EmbeddingMLP(nn.Module):
         embedding_history_size: int = 1,
         hidden_dim: int = 1024,
         output_dim: int = 8,
-        dropout: float = 0.1
+        dropout: float = 0.2
     ):
         super().__init__()
         
@@ -51,20 +51,32 @@ class EmbeddingMLP(nn.Module):
         return self.mlp(embedding)
 
 
+class RouterHistoryMLP(nn.Module):
+    """MLP for processing router logit history"""
+    def __init__(self, num_experts: int, history_size: int, hidden_dim: int):
+        super().__init__()
+        # Flattened input: [batch, history_size * num_experts]
+        self.mlp = nn.Sequential(
+            nn.Linear(num_experts * history_size, hidden_dim),
+            nn.GELU(),
+            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.GELU(),
+        )
+        
+    def forward(self, x):
+        return self.mlp(x.view(x.size(0), -1))
+
 class ExpertPredictor(nn.Module):
     """
-    Complete expert prediction model with ablation study support.
-    
-    This model can selectively enable/disable different input features to study
-    their individual contributions to prediction accuracy.
+    Expert prediction model with Embedding + Router History fusion.
     """
-    
     def __init__(
         self,
         pretrained_embeddings: Optional[torch.Tensor] = None,
         vocab_size: int = 32000,
         base_embedding_dim: int = 4096,
         embedding_history_size: int = 1,
+        router_history_size: int = 0, # New: history of past router decisions
         num_experts: int = 8,
         top_k: int = 2,
         context_window_k: int = 10,
@@ -73,7 +85,6 @@ class ExpertPredictor(nn.Module):
         use_embedding: bool = True,
     ):
         super().__init__()
-        
         self.vocab_size = vocab_size
         self.base_embedding_dim = base_embedding_dim
         self.embedding_history_size = embedding_history_size
@@ -82,17 +93,34 @@ class ExpertPredictor(nn.Module):
         self.top_k = top_k
         self.context_window_k = context_window_k
         self.hidden_dim = hidden_dim
-        
-        # Ablation flags
         self.use_embedding = use_embedding
+        self.router_history_size = router_history_size
+        
+        # 1. Feature extractors
+        feat_dim = 0
         if use_embedding:
-            self.embedding_mlp = EmbeddingMLP(
-                embedding_dim=self.base_embedding_dim,
-                embedding_history_size=self.embedding_history_size,
-                hidden_dim=self.hidden_dim,
-                output_dim=self.num_experts,
-                dropout=dropout
+            self.embedding_mlp = nn.Sequential(
+                nn.Linear(base_embedding_dim * embedding_history_size, hidden_dim),
+                nn.LayerNorm(hidden_dim),
+                nn.GELU(),
+                nn.Dropout(dropout)
             )
+            feat_dim += hidden_dim
+            
+        if router_history_size > 0:
+            self.router_mlp = nn.Sequential(
+                nn.Linear(num_experts * router_history_size, hidden_dim // 4),
+                nn.GELU()
+            )
+            feat_dim += (hidden_dim // 4)
+            
+        # 2. Final classifier
+        self.classifier = nn.Sequential(
+            nn.Linear(feat_dim, hidden_dim // 2),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim // 2, num_experts)
+        )
     
     def forward(
         self,
@@ -100,23 +128,16 @@ class ExpertPredictor(nn.Module):
         router_logits_history: Optional[torch.Tensor] = None,
         expert_bias: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
-        """
-        Forward pass through the expert predictor.
+        features = []
         
-        Args:
-            context_tokens: [batch_size, k] token IDs (if use_context_tokens=True)
-            post_attn_embedding: [batch_size, embedding_dim] (if use_embedding=True)
-            router_logits_history: [batch_size, k-1, num_experts] (if use_router_history=True)
-            
-        Returns:
-            [batch_size, num_experts] logits for expert selection
-        """
         if self.use_embedding:
-            if post_attn_embedding is None:
-                raise ValueError("post_attn_embedding required when use_embedding=True")
-            logits = self.embedding_mlp(post_attn_embedding)
-        else:
-            raise ValueError("use_embedding must be True")
+            features.append(self.embedding_mlp(post_attn_embedding))
+            
+        if self.router_history_size > 0 and router_logits_history is not None:
+            features.append(self.router_mlp(router_logits_history.view(router_logits_history.size(0), -1)))
+            
+        combined = torch.cat(features, dim=-1)
+        logits = self.classifier(combined)
         
         if expert_bias is not None:
             logits = logits + expert_bias
@@ -149,8 +170,10 @@ class ExpertPredictor(nn.Module):
             'embedding_history_size': self.embedding_history_size,
             'embedding_dim': self.embedding_dim,
             'num_experts': self.num_experts,
+            'router_history_size': self.router_history_size,
             'top_k': self.top_k,
             'context_window_k': self.context_window_k,
+            'hidden_dim': self.hidden_dim,
             'use_embedding': self.use_embedding,
         }
     
@@ -201,6 +224,135 @@ class ExpertPredictor(nn.Module):
              
         model = cls(pretrained_embeddings=pretrained_embeddings, **config)
         model.load_state_dict(checkpoint['model_state_dict'], strict=False) # strict=False to handle missing embedding buffer if it was stripped
+        return model
+
+
+class DualMLPPredictor(nn.Module):
+    """
+    Dual-branch expert predictor for MoE models.
+
+    Branch 1 — EmbeddingBranch:
+        Input:  post-attention-norm embedding for token t  [batch, hidden_size]
+        Learns the local, token-level semantic context.
+
+    Branch 2 — PrefillBranch:
+        Input:  per-layer expert usage distribution over the full prefill
+                sequence for this prompt  [batch, num_experts]
+                (= mean softmax of router_logits over all prefill tokens)
+        Learns the global "expert prior" for this prompt.
+
+    Both branches are projected to feature vectors, concatenated, then
+    passed through a classifier head that outputs logits over all experts.
+    The predicted top-1 (or top-k) expert is used for preload decisions.
+    """
+
+    def __init__(
+        self,
+        hidden_size: int = 4096,
+        num_experts: int = 8,
+        branch_dim: int = 256,
+        top_k: int = 2,
+        dropout: float = 0.1,
+    ):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.num_experts = num_experts
+        self.branch_dim  = branch_dim
+        self.top_k       = top_k
+
+        prefill_dim = max(branch_dim // 4, num_experts)
+
+        # Branch 1: token embedding → branch_dim features
+        self.embedding_branch = nn.Sequential(
+            nn.Linear(hidden_size, branch_dim),
+            nn.LayerNorm(branch_dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
+        )
+
+        # Branch 2: prefill expert dist → small feature vector
+        self.prefill_branch = nn.Sequential(
+            nn.Linear(num_experts, prefill_dim),
+            nn.GELU(),
+        )
+
+        # Fused classifier
+        fused_dim = branch_dim + prefill_dim
+        self.classifier = nn.Sequential(
+            nn.Linear(fused_dim, fused_dim // 2),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(fused_dim // 2, num_experts),
+        )
+
+    def forward(
+        self,
+        embedding: torch.Tensor,
+        prefill_dist: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        """
+        Args:
+            embedding:    [batch, hidden_size]  post-attn-norm embedding at token t
+            prefill_dist: [batch, num_experts]  expert usage distribution over the
+                          full prefill (mean softmax of router_logits).
+                          If None, a uniform distribution is used as a neutral prior.
+        Returns:
+            logits: [batch, num_experts]
+        """
+        emb_feat = self.embedding_branch(embedding)
+
+        if prefill_dist is None:
+            prefill_dist = torch.full(
+                (embedding.size(0), self.num_experts),
+                1.0 / self.num_experts,
+                dtype=embedding.dtype,
+                device=embedding.device,
+            )
+        pre_feat = self.prefill_branch(prefill_dist)
+
+        fused  = torch.cat([emb_feat, pre_feat], dim=-1)
+        return self.classifier(fused)
+
+    def predict_top_k(
+        self,
+        embedding: torch.Tensor,
+        prefill_dist: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Returns:
+            top_k_indices: [batch, top_k]
+            top_k_probs:   [batch, top_k]
+        """
+        logits = self.forward(embedding, prefill_dist)
+        probs  = F.softmax(logits, dim=-1)
+        top_k_probs, top_k_indices = torch.topk(probs, self.top_k, dim=-1)
+        return top_k_indices, top_k_probs
+
+    def get_config(self) -> Dict:
+        return {
+            'hidden_size':  self.hidden_size,
+            'num_experts':  self.num_experts,
+            'branch_dim':   self.branch_dim,
+            'top_k':        self.top_k,
+        }
+
+    def save(self, path: str):
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        state_path = path.with_suffix('.pth') if path.suffix == '.pt' else path
+        torch.save({'model_state_dict': self.state_dict(), 'config': self.get_config()}, state_path)
+        with open(path.with_suffix('.json'), 'w') as f:
+            json.dump(self.get_config(), f, indent=2)
+
+    @classmethod
+    def load(cls, path: str, device: str = 'cpu') -> 'DualMLPPredictor':
+        path_obj = Path(path)
+        if path_obj.suffix == '.pt' and path_obj.with_suffix('.pth').exists():
+            checkpoint = torch.load(path_obj.with_suffix('.pth'), map_location=device, weights_only=False)
+        else:
+            checkpoint = torch.load(path, map_location=device, weights_only=False)
+        model = cls(**checkpoint['config'])
+        model.load_state_dict(checkpoint['model_state_dict'])
         return model
 
 
