@@ -394,7 +394,7 @@ QuantizedLinearImpl::QuantizedLinearImpl(int64_t in_features, int64_t out_featur
 
 void QuantizedLinearImpl::forward(torch::Tensor output_buffer, torch::Tensor input, std::string layer_type) {
     // we don't care about the future for now
-    if (debug_verbosity >= 2) {
+    if (debug_verbosity >= 3) {
         std::cout << "Forward " << layer_type << " (Target: " << hw_target << ")" << std::endl;
         std::cout << "  input.device=" << input.device() << " output.device=" << output_buffer.device()
                   << " qweight.device=" << quantized_weight_.device() << " scale.device=" << scale_.device()
@@ -431,13 +431,13 @@ void QuantizedLinearImpl::forward(torch::Tensor output_buffer, torch::Tensor inp
     // Compute the GEMV or GEMM on Fused Hip Kernels
     // This does not check input padding correctly for 128 tiles sizes
     if (M == 1) {
-        if (debug_verbosity >= 2) {
+        if (debug_verbosity >= 3) {
             std::cout << "GPU Unpacked GEMV" << std::endl;
         }
         hipkernels::w4a16_gemv_unpacked_fused(output_2d, input_2d, quantized_weight_, scale_, zero_point_, in_features_, out_features_,
                                               group_size);
     } else {
-        if (debug_verbosity >= 2) {
+        if (debug_verbosity >= 3) {
             std::cout << "GPU Unpacked GEMM" << std::endl;
         }
         hipkernels::w4a16_gemm_unpacked_fused(output_2d, input_2d, quantized_weight_, scale_, zero_point_, in_features_, out_features_,
@@ -461,7 +461,7 @@ torch::Tensor QuantizedLinearImpl::forward(torch::Tensor input, std::string laye
             group_size = in_features_ / n_groups;
     }
 
-    if (debug_verbosity >= 2) {
+    if (debug_verbosity >= 3) {
         std::cout << "Forward (Allocating) " << layer_type << " (Target: " << hw_target << ")" << std::endl;
         std::cout << "  input.device=" << input.device() << " qweight.device=" << quantized_weight_.device()
                   << " scale.device=" << scale_.device() << " zeros.device=" << zero_point_.device() << std::endl;
@@ -485,14 +485,14 @@ torch::Tensor QuantizedLinearImpl::forward(torch::Tensor input, std::string laye
     auto input_2d = input.contiguous().view({-1, in_features_});
     torch::Tensor output;
     if (M == 1) {
-        if (debug_verbosity >= 2) {
+        if (debug_verbosity >= 3) {
             std::cout << "GPU Unpacked GEMV (Alloc)" << std::endl;
         }
         output = torch::empty({1, out_features_}, torch::TensorOptions().dtype(torch::kBFloat16).device(input.device()));
         hipkernels::w4a16_gemv_unpacked_fused(output, input_2d, quantized_weight_, scale_, zero_point_, in_features_, out_features_,
                                               group_size);
     } else {
-        if (debug_verbosity >= 2) {
+        if (debug_verbosity >= 3) {
             std::cout << "GPU Unpacked GEMM (Alloc)" << std::endl;
         }
 
@@ -884,6 +884,12 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
 }
 
 torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
+
+    if (debug_verbosity >= 2) {
+        std::cout << "Forward MixtureOfExperts" << std::endl;
+        std::cout << "  x shape=" << x.sizes() << std::endl;
+    }
+    
     auto x_flat = x.view({-1, hidden_size_});
     auto opts = x.options();
 
