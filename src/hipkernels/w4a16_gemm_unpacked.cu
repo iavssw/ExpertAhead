@@ -103,6 +103,7 @@ constexpr int WAVE_SIZE = 64;
 constexpr int GEMM_BLOCK_SIZE = 256;
 constexpr int WAVE_SIZE = 32;
 #endif
+constexpr bool NEED_W_ROW_GUARD = (GEMM_BLOCK_SIZE > 256);
 
 // Kernel assumes Block M=128, N=128, K_step=128
 // Grid dimensions: (N / 128), (M / 128)
@@ -135,32 +136,25 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
 
     const int groups = K / group_size;
 
+    // Invariants for this thread across all K-tiles.
+    const int w_row = tid >> 1; // 0..127 (N-index)
+    const int w_blk = tid & 1;  // 0..1 (64 K-values each)
+    const int k_base = w_blk * 64;
+    const int gn = global_n_start + w_row;
+    const bool active_n = (w_row < 128) && (gn < N);
+    const int q_row_base = active_n ? (gn * (K / 2) + w_blk * 32) : 0;
+    const int s_row_base = active_n ? (gn * groups) : 0;
+
     for (int k_outer = 0; k_outer < K; k_outer += 128) {
         int group_idx = k_outer / group_size;
 
-        // Load weights: 2 threads per N-row, each loads 64 K-values
-        int w_row = tid >> 1; // 0..127 (N-index)
-        int w_blk = tid & 1;  // 0..1 (64 K-values each)
+        if (!NEED_W_ROW_GUARD || w_row < 128) {
+            if (active_n) {
+                int idx = s_row_base + group_idx;
+                float scale = bf16_to_float(scales[idx]);
+                int zero = (int8_t)zeros[idx];
 
-        if (w_row < 128) {
-            int gn = global_n_start + w_row;
-            int k_base = w_blk * 64;
-            if (gn < N) {
-                float scale = 0.0f;
-                int zero = 0;
-                if (w_blk == 0) {
-                    int idx = gn * groups + group_idx;
-                    scale = bf16_to_float(scales[idx]);
-                    zero = (int8_t)zeros[idx];
-                }
-                float scale_peer = __shfl_xor(scale, 1);
-                int zero_peer = __shfl_xor(zero, 1);
-                if (w_blk == 1) {
-                    scale = scale_peer;
-                    zero = zero_peer;
-                }
-
-                const uint8_t *w_src_base = &qweights[gn * (K / 2) + (k_outer / 2) + w_blk * 32];
+                const uint8_t *w_src_base = &qweights[q_row_base + (k_outer / 2)];
                 const uint4 *src_u4 = reinterpret_cast<const uint4 *>(w_src_base);
                 uint4 v0 = src_u4[0];
                 uint4 v1 = src_u4[1];
@@ -262,6 +256,7 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
 
         int tid_offset = tid * 8;
         if (tid_offset < 2048) {
+#pragma unroll
             for (int k = 0; k < 8; ++k) {
                 int idx = tid_offset + k;
                 int r = idx / 64; // 0..31
@@ -318,7 +313,8 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
     // Pre-calculate invariant offsets
     int q_base_offset = 0;
     int s_base_offset = 0;
-    bool active_n = (gn < N);
+    const bool valid_w_row = (!NEED_W_ROW_GUARD || w_row < 128);
+    bool active_n = valid_w_row && (gn < N);
     const uint8_t *__restrict__ w_ptr = nullptr;
 
     if (active_n) {
@@ -335,19 +331,9 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
             int k_base = w_blk * 64;
 
             if (active_n) {
-                float scale = 0.0f;
-                int zero = 0;
-                if (w_blk == 0) {
-                    int idx = s_base_offset + group_idx;
-                    scale = bf16_to_float(scales[idx]);
-                    zero = (int8_t)zeros[idx];
-                }
-                float scale_peer = __shfl_xor(scale, 1);
-                int zero_peer = __shfl_xor(zero, 1);
-                if (w_blk == 1) {
-                    scale = scale_peer;
-                    zero = zero_peer;
-                }
+                int idx = s_base_offset + group_idx;
+                float scale = bf16_to_float(scales[idx]);
+                int zero = (int8_t)zeros[idx];
 
                 const uint4 *src_u4 = reinterpret_cast<const uint4 *>(w_ptr);
                 w_ptr += 64;
@@ -431,19 +417,9 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
             int k_base = w_blk * 64;
 
             if (active_n) {
-                float scale = 0.0f;
-                int zero = 0;
-                if (w_blk == 0) {
-                    int idx = s_base_offset + group_idx;
-                    scale = bf16_to_float(scales[idx]);
-                    zero = (int8_t)zeros[idx];
-                }
-                float scale_peer = __shfl_xor(scale, 1);
-                int zero_peer = __shfl_xor(zero, 1);
-                if (w_blk == 1) {
-                    scale = scale_peer;
-                    zero = zero_peer;
-                }
+                int idx = s_base_offset + group_idx;
+                float scale = bf16_to_float(scales[idx]);
+                int zero = (int8_t)zeros[idx];
 
                 const uint4 *src_u4 = reinterpret_cast<const uint4 *>(w_ptr);
                 w_ptr += 64;
@@ -543,6 +519,7 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
 
         int tid_offset = tid * 8;
         if (tid_offset < 2048) {
+#pragma unroll
             for (int k = 0; k < 8; ++k) {
                 int idx = tid_offset + k;
                 int r = idx / 64;
