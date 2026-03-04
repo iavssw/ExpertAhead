@@ -679,12 +679,41 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
             print("Running forward pass only...")
             with torch.no_grad():
                 start_time = time.time()
-                logits = model(input_ids)
+                seq_len = int(input_ids.size(1))
+                backend_prefill_chunk = None
+                if hasattr(model, "model") and hasattr(model.model, "get_prefill_chunk_size"):
+                    try:
+                        backend_prefill_chunk = int(model.model.get_prefill_chunk_size())
+                    except Exception:
+                        backend_prefill_chunk = None
+                if backend_prefill_chunk is None or backend_prefill_chunk <= 0:
+                    backend_prefill_chunk = min(int(getattr(model, "max_seq_len", 4096)), 4096)
+
+                if seq_len <= backend_prefill_chunk:
+                    logits = model(input_ids)
+                    logits_shape = logits.shape
+                    last_token_first4 = logits[0, -1, :4].tolist()
+                else:
+                    print(
+                        f"Using chunked prefill forward: seq_len={seq_len}, "
+                        f"chunk_size={backend_prefill_chunk}"
+                    )
+                    last_chunk_logits = None
+                    for chunk_start in range(0, seq_len, backend_prefill_chunk):
+                        chunk_end = min(chunk_start + backend_prefill_chunk, seq_len)
+                        chunk_input = input_ids[:, chunk_start:chunk_end]
+                        last_chunk_logits = model(chunk_input, start_pos=chunk_start)
+
+                    if last_chunk_logits is None:
+                        raise RuntimeError("Chunked forward produced no logits.")
+
+                    logits_shape = torch.Size([input_ids.size(0), seq_len, last_chunk_logits.size(-1)])
+                    last_token_first4 = last_chunk_logits[0, -1, :4].tolist()
                 end_time = time.time()
             print(f"Prefill time: {end_time - start_time:.4f} seconds")
 
-            print(f"Logits shape: {logits.shape}")
-            print(f"First 4 logits (last token in batch 0): {logits[0, -1, :4].tolist()}")
+            print(f"Logits shape: {logits_shape}")
+            print(f"First 4 logits (last token in batch 0): {last_token_first4}")
             return 0
 
         print(f"Input prompt length: {actual_token_count} tokens")

@@ -1620,6 +1620,9 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
         // Transpose for attention
         q = q.transpose(1, 2);
 
+        std::cout << "[DEBUG] Layer " << i << std::endl;
+        std::cout << "[DEBUG] q shape: " << q.sizes() << ", k shape: " << k.sizes() << ", v shape: " << v.sizes() << std::endl;
+
         torch::Tensor attn_output;
         if (debug_verbosity >= 2) {
             const char *attn_backend = (attention_mode_ == 1) ? "SDPA" : (attention_mode_ == 2) ? "HIP_FA_KERNEL" : "EAGER";
