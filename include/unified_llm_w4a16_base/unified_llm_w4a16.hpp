@@ -119,7 +119,8 @@ TORCH_MODULE(LinearMatmul);
 class MixtureOfExpertsImpl : public torch::nn::Module {
   public:
     MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
-                         int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false);
+                         int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false,
+                         int64_t random_replace_rank_start_idx = -1);
 
     torch::Tensor forward(const torch::Tensor &x);
 
@@ -135,6 +136,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t num_experts_per_tok_;
     bool use_softmax_before_topk_;
     bool normalize_topk_prob_;
+    int64_t random_replace_rank_start_idx_;
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);

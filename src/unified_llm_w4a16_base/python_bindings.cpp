@@ -54,6 +54,8 @@ PYBIND11_MODULE(unified_llm_w4a16_base_libtorch, m) {
                             config.preload_moe_kernels = data["preload_moe_kernels"].cast<bool>();
                         if (data.contains("minimal_pdi"))
                             config.minimal_pdi = data["minimal_pdi"].cast<bool>();
+                        if (data.contains("random_replace_rank_start_idx"))
+                            config.random_replace_rank_start_idx = data["random_replace_rank_start_idx"].cast<int>();
 
                         if (data.contains("rope_scaling")) {
                             py::dict rs = data["rope_scaling"].cast<py::dict>();

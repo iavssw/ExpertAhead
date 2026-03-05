@@ -8,9 +8,11 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_base/helper.hpp"
 #include "unified_llm_w4a16_base/npuSetup.hpp"
+#include <algorithm>
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
 #include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <hip/hip_runtime.h>
 #include <iomanip>
@@ -19,7 +21,6 @@
 #include <torch/torch.h>
 #include <unistd.h>
 #include <vector>
-#include <algorithm>
 
 namespace {
 
@@ -607,10 +608,11 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 
 // MixtureOfExpertsImpl Implementation
 MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
-                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob)
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob,
+                                           int64_t random_replace_rank_start_idx)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), use_softmax_before_topk_(use_softmax_before_topk),
-      normalize_topk_prob_(normalize_topk_prob) {
+      normalize_topk_prob_(normalize_topk_prob), random_replace_rank_start_idx_(random_replace_rank_start_idx) {
     router = register_module("router", LinearMatmul(hidden_size_, num_experts_, false));
 
     gate_up_experts.reserve(num_experts_);
@@ -731,9 +733,56 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
 
 torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
                                                     const torch::Tensor &topk_idx, torch::Tensor &output) {
+    // Use original routing by default; may be replaced below.
+    torch::Tensor topk_idx_effective = topk_idx;
+    if (random_replace_rank_start_idx_ >= 0 && random_replace_rank_start_idx_ < num_experts_per_tok_) {
+        // Do index edits on CPU to avoid per-element GPU sync from repeated item()/writes.
+        auto topk_idx_cpu = topk_idx.to(torch::kCPU).contiguous();
+        auto topk_idx_acc = topk_idx_cpu.accessor<int64_t, 2>();
+        const int64_t num_tokens = topk_idx_cpu.size(0);
+        // Reuse buffers across tokens to avoid reallocating in the inner loop.
+        std::vector<uint8_t> preserved_mask(static_cast<size_t>(num_experts_), 0);
+        std::vector<int64_t> candidate_experts;
+        candidate_experts.reserve(static_cast<size_t>(num_experts_));
+
+        for (int64_t t = 0; t < num_tokens; ++t) {
+            std::fill(preserved_mask.begin(), preserved_mask.end(), 0);
+            for (int64_t p = 0; p < random_replace_rank_start_idx_; ++p) {
+                const int64_t preserved = topk_idx_acc[t][p];
+                if (preserved >= 0 && preserved < num_experts_) {
+                    preserved_mask[static_cast<size_t>(preserved)] = 1;
+                }
+            }
+
+            candidate_experts.clear();
+            for (int64_t e = 0; e < num_experts_; ++e) {
+                if (!preserved_mask[static_cast<size_t>(e)]) {
+                    candidate_experts.push_back(e);
+                }
+            }
+
+            for (int64_t k = random_replace_rank_start_idx_; k < num_experts_per_tok_; ++k) {
+                const int64_t old_expert = topk_idx_acc[t][k];
+                int64_t candidate = old_expert;
+                if (!candidate_experts.empty()) {
+                    const int64_t rand_idx = std::rand() % static_cast<int64_t>(candidate_experts.size());
+                    candidate = candidate_experts[static_cast<size_t>(rand_idx)];
+                }
+                topk_idx_acc[t][k] = candidate;
+                if (debug_verbosity >= 3) {
+                    std::cout << "[MoE Replace] token=" << t << " rank=" << k << " old_expert=" << old_expert
+                              << " new_expert=" << candidate << std::endl;
+                }
+            }
+        }
+
+        // Copy updated routing indices back to the original device.
+        topk_idx_effective = topk_idx_cpu.to(topk_idx.device(), topk_idx.scalar_type());
+    }
+
     auto opts = x_flat.options();
 
-    torch::Tensor expert_mask = torch::one_hot(topk_idx, num_experts_).to(torch::kBool);
+    torch::Tensor expert_mask = torch::one_hot(topk_idx_effective, num_experts_).to(torch::kBool);
     expert_mask = expert_mask.permute({2, 1, 0}); // [experts, top_k, tokens]
     torch::Tensor expert_hit = torch::nonzero(expert_mask.sum({1, 2}) > 0).squeeze();
 
@@ -889,7 +938,7 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
         std::cout << "Forward MixtureOfExperts" << std::endl;
         std::cout << "  x shape=" << x.sizes() << std::endl;
     }
-    
+
     auto x_flat = x.view({-1, hidden_size_});
     auto opts = x.options();
 
@@ -1084,10 +1133,16 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                                            QuantizedLinear(num_attention_heads_ * head_dim_, hidden_size_, false, max_seq_len_, "o")));
 
         bool use_qwen_router = (arch_type_ == ArchitectureType::QWEN);
+        // -2 uses architecture default (Mixtral=1, Qwen/others=-1). Any other value overrides it from config.
+        int64_t random_replace_rank_start_idx = npu_config_.random_replace_rank_start_idx;
+        if (random_replace_rank_start_idx == -2) {
+            random_replace_rank_start_idx = (arch_type_ == ArchitectureType::MIXTRAL) ? 1 : -1;
+        }
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
             moe_layers.push_back(register_module("moe_" + std::to_string(i),
                                                  MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router)));
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router,
+                                                                  random_replace_rank_start_idx)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
