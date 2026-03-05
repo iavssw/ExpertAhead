@@ -93,5 +93,25 @@ set_target_properties(test_layout_hip_3d PROPERTIES
     CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON
 )
 
-
-
+add_executable(benchmark_loader benchmark_loader.cpp)
+target_include_directories(benchmark_loader PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/unified_llm_w4a16_base
+    ${CMAKE_SOURCE_DIR}/include
+    ${ROCM_PATH}/include
+    ${ROCM_PATH}/include/hip
+    ${TORCH_INCLUDE_DIRS}
+)
+target_link_libraries(benchmark_loader PRIVATE
+    unified_llm_w4a16_base_lib
+    "${TORCH_LIBRARIES}"
+    amdhip64
+)
+target_compile_definitions(benchmark_loader PRIVATE
+    __HIP_PLATFORM_AMD__=1
+)
+target_compile_options(benchmark_loader PRIVATE
+    -O3 -march=native
+)
+set_target_properties(benchmark_loader PROPERTIES
+    CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON
+)

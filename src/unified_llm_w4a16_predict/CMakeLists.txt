@@ -1,6 +1,6 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/rocm-7.1.1/include")
 
-add_library(unified_llm_w4a16_hetero_lib STATIC
+add_library(unified_llm_w4a16_predict_lib STATIC
     unified_llm_w4a16.cpp
     npuSetup.cpp
     helper.cpp
@@ -16,7 +16,7 @@ find_package(hip REQUIRED)
 
 message(STATUS "Using ROCM_PATH: ${ROCM_PATH}")
 
-target_include_directories(unified_llm_w4a16_hetero_lib PUBLIC
+target_include_directories(unified_llm_w4a16_predict_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include
     /opt/rocm-7.1.1/include
 )
@@ -26,7 +26,7 @@ include_directories(
     ${ROCM_PATH}/include
     ${ROCM_PATH}/include/hip
 )
-target_include_directories(unified_llm_w4a16_hetero_lib PUBLIC
+target_include_directories(unified_llm_w4a16_predict_lib PUBLIC
     ${ROCM_PATH}/include
     ${ROCM_PATH}/include/hip
 )
@@ -34,7 +34,7 @@ target_include_directories(unified_llm_w4a16_hetero_lib PUBLIC
 # Dependencies
 find_library(HSA_RUNTIME_LIB hsa-runtime64 PATHS ${ROCM_PATH}/lib NO_DEFAULT_PATH)
 
-target_link_libraries(unified_llm_w4a16_hetero_lib PUBLIC 
+target_link_libraries(unified_llm_w4a16_predict_lib PUBLIC 
     "${TORCH_LIBRARIES}"
     npu_matmul_func
     hipkernels
@@ -42,11 +42,11 @@ target_link_libraries(unified_llm_w4a16_hetero_lib PUBLIC
     amdhip64
 )
 
-target_compile_definitions(unified_llm_w4a16_hetero_lib PUBLIC 
+target_compile_definitions(unified_llm_w4a16_predict_lib PUBLIC 
     __HIP_PLATFORM_AMD__=1
 )
 
-target_compile_options(unified_llm_w4a16_hetero_lib PRIVATE 
+target_compile_options(unified_llm_w4a16_predict_lib PRIVATE 
     -march=native
     -O3
     -march=native
@@ -55,10 +55,10 @@ target_compile_options(unified_llm_w4a16_hetero_lib PRIVATE
 
 find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
-    target_link_libraries(unified_llm_w4a16_hetero_lib PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(unified_llm_w4a16_predict_lib PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
-set_target_properties(unified_llm_w4a16_hetero_lib PROPERTIES CXX_STANDARD 17)
+set_target_properties(unified_llm_w4a16_predict_lib PROPERTIES CXX_STANDARD 17)
 
 # PyBind module (combined into this directory)
 find_package(pybind11 REQUIRED)
@@ -101,20 +101,20 @@ if(NOT PYBIND11_INCLUDE_DIR)
 endif()
 
 # Create Python module
-add_library(unified_llm_w4a16_hetero_libtorch MODULE
+add_library(unified_llm_w4a16_predict_libtorch MODULE
     python_bindings.cpp
 )
 
 # Set Python module properties
-set_target_properties(unified_llm_w4a16_hetero_libtorch PROPERTIES
+set_target_properties(unified_llm_w4a16_predict_libtorch PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     PREFIX ""
-    OUTPUT_NAME "unified_llm_w4a16_hetero_libtorch"
+    OUTPUT_NAME "unified_llm_w4a16_predict_libtorch"
 )
 
 # Include directories
-target_include_directories(unified_llm_w4a16_hetero_libtorch PRIVATE
+target_include_directories(unified_llm_w4a16_predict_libtorch PRIVATE
     ${PYBIND11_INCLUDE_DIR}
     ${Python_INCLUDE_DIRS}
     ${DRIVER_PATH}/src/include/uapi/drm_local
@@ -124,10 +124,10 @@ target_include_directories(unified_llm_w4a16_hetero_libtorch PRIVATE
 # Add PyTorch include directories if found in Python environment
 if(TORCH_PYTHON_PATH)
     if(EXISTS "${TORCH_PYTHON_PATH}/include")
-        target_include_directories(unified_llm_w4a16_hetero_libtorch PRIVATE "${TORCH_PYTHON_PATH}/include")
+        target_include_directories(unified_llm_w4a16_predict_libtorch PRIVATE "${TORCH_PYTHON_PATH}/include")
     endif()
     if(EXISTS "${TORCH_PYTHON_PATH}/include/torch/csrc/api/include")
-        target_include_directories(unified_llm_w4a16_hetero_libtorch PRIVATE "${TORCH_PYTHON_PATH}/include/torch/csrc/api/include")
+        target_include_directories(unified_llm_w4a16_predict_libtorch PRIVATE "${TORCH_PYTHON_PATH}/include/torch/csrc/api/include")
     endif()
 endif()
 
@@ -142,8 +142,8 @@ if(NOT HSA_RUNTIME_LIB)
     message(FATAL_ERROR "hsa-runtime64 not found in ${ROCM_PATH}/lib")
 endif()
 
-target_link_libraries(unified_llm_w4a16_hetero_libtorch PRIVATE
-    unified_llm_w4a16_hetero_lib
+target_link_libraries(unified_llm_w4a16_predict_libtorch PRIVATE
+    unified_llm_w4a16_predict_lib
     "${TORCH_LIBRARIES}"
     pybind11::module
     pybind11::windows_extras
@@ -156,7 +156,7 @@ target_link_libraries(unified_llm_w4a16_hetero_libtorch PRIVATE
 if(TORCH_PYTHON_PATH AND EXISTS "${TORCH_PYTHON_PATH}/lib")
     find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_PYTHON_PATH}/lib" NO_DEFAULT_PATH)
     if(TORCH_PYTHON_LIBRARY)
-        target_link_libraries(unified_llm_w4a16_hetero_libtorch PRIVATE ${TORCH_PYTHON_LIBRARY})
+        target_link_libraries(unified_llm_w4a16_predict_libtorch PRIVATE ${TORCH_PYTHON_LIBRARY})
         message(STATUS "Found torch_python library: ${TORCH_PYTHON_LIBRARY}")
     else()
         message(WARNING "torch_python library not found in ${TORCH_PYTHON_PATH}/lib")
@@ -165,26 +165,26 @@ endif()
 
 # Set rpath
 if(TORCH_PYTHON_PATH AND EXISTS "${TORCH_PYTHON_PATH}/lib")
-    set_target_properties(unified_llm_w4a16_hetero_libtorch PROPERTIES
+    set_target_properties(unified_llm_w4a16_predict_libtorch PROPERTIES
         INSTALL_RPATH "${TORCH_PYTHON_PATH}/lib"
         BUILD_RPATH "${TORCH_PYTHON_PATH}/lib"
         INSTALL_RPATH_USE_LINK_PATH TRUE
     )
 else()
-    set_target_properties(unified_llm_w4a16_hetero_libtorch PROPERTIES
+    set_target_properties(unified_llm_w4a16_predict_libtorch PROPERTIES
         INSTALL_RPATH_USE_LINK_PATH TRUE
     )
 endif()
 
 # Set compile definitions
-target_compile_definitions(unified_llm_w4a16_hetero_libtorch PRIVATE
+target_compile_definitions(unified_llm_w4a16_predict_libtorch PRIVATE
     VERSION_INFO=${pybind11_VERSION}
     __HIP_PLATFORM_AMD__=1
 )
 
 # Set output directory
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/py/unified_llm_w4a16")
-set_target_properties(unified_llm_w4a16_hetero_libtorch PROPERTIES
+set_target_properties(unified_llm_w4a16_predict_libtorch PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/py/unified_llm_w4a16"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/py/unified_llm_w4a16"
 )

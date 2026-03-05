@@ -6,8 +6,8 @@
 #include <chrono>
 #include <cmath>
 #include <cstring>
-#include <filesystem>
 #include <fcntl.h>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -393,7 +393,7 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors(const std::str
         }
 
         if (qweight.defined() && scales.defined()) {
-            auto device = token_embedding->weight.device();
+            auto device = layer->get_quantized_weights().device();
 
             std::string qweight_dtype = it_qweight->second.dtype;
             std::string scales_dtype = it_scales->second.dtype;
@@ -406,8 +406,8 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors(const std::str
             int64_t in_feat = layer->in_features();
             int64_t out_feat = layer->out_features();
             if (!(qweight.size(0) == in_feat && qweight.size(1) == out_feat / 8)) {
-                std::cerr << "Warning: Weight shape " << qweight.sizes()
-                          << " does not match AWQ layout In=" << in_feat << " Out=" << out_feat << std::endl;
+                std::cerr << "Warning: Weight shape " << qweight.sizes() << " does not match AWQ layout In=" << in_feat
+                          << " Out=" << out_feat << std::endl;
                 skipped++;
                 return;
             }
@@ -465,6 +465,99 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors(const std::str
         }
     };
 
+    auto has_quantized = [&](const std::string &base_name) {
+        auto it_qweight = tensor_map.find(base_name + ".qweight");
+        auto it_scales = tensor_map.find(base_name + ".scales");
+        auto it_qzeros = tensor_map.find(base_name + ".qzeros");
+        return it_qweight != tensor_map.end() && it_qweight->second.valid && it_scales != tensor_map.end() && it_scales->second.valid &&
+               it_qzeros != tensor_map.end() && it_qzeros->second.valid;
+    };
+
+    auto slice_out_dim = [&](torch::Tensor t, int64_t out_offset, int64_t out_features) {
+        if (!t.defined()) {
+            return t;
+        }
+        if (t.dim() == 1 && t.size(0) >= out_offset + out_features) {
+            return t.slice(0, out_offset, out_offset + out_features);
+        }
+        if (t.dim() == 2) {
+            if (t.size(0) >= out_offset + out_features) {
+                return t.slice(0, out_offset, out_offset + out_features);
+            }
+            if (t.size(1) >= out_offset + out_features) {
+                return t.slice(1, out_offset, out_offset + out_features);
+            }
+        }
+        return t;
+    };
+
+    auto load_linear_layer_from_combined = [&](QuantizedLinear &layer, const std::string &base_name, int64_t expert_idx,
+                                               int64_t out_offset) {
+        auto it_qweight = tensor_map.find(base_name + ".qweight");
+        auto it_scales = tensor_map.find(base_name + ".scales");
+        auto it_qzeros = tensor_map.find(base_name + ".qzeros");
+
+        if (it_qweight == tensor_map.end() || it_scales == tensor_map.end() || it_qzeros == tensor_map.end() || !it_qweight->second.valid ||
+            !it_scales->second.valid || !it_qzeros->second.valid) {
+            std::cerr << "Warning: Missing quantized weights for " << base_name << std::endl;
+            skipped++;
+            return;
+        }
+
+        torch::Tensor qweight = load_tensor(it_qweight->second);
+        torch::Tensor scales = load_tensor(it_scales->second);
+        torch::Tensor qzeros = load_tensor(it_qzeros->second);
+
+        if (qweight.dim() == 3) {
+            qweight = qweight.select(0, expert_idx);
+        }
+        if (scales.dim() == 3) {
+            scales = scales.select(0, expert_idx);
+        }
+        if (qzeros.dim() == 3) {
+            qzeros = qzeros.select(0, expert_idx);
+        }
+
+        int64_t in_feat = layer->in_features();
+        int64_t out_feat = layer->out_features();
+        int64_t start_block = out_offset / 8;
+        int64_t end_block = (out_offset + out_feat) / 8;
+
+        if (qweight.dim() != 2 || qweight.size(0) != in_feat || qweight.size(1) < end_block) {
+            std::cerr << "Warning: Weight shape " << qweight.sizes() << " does not match AWQ layout for " << base_name << std::endl;
+            skipped++;
+            return;
+        }
+
+        qweight = qweight.slice(1, start_block, end_block).contiguous();
+        scales = slice_out_dim(scales, out_offset, out_feat).contiguous();
+
+        if (qzeros.dim() == 2 && qzeros.size(1) >= end_block) {
+            qzeros = qzeros.slice(1, start_block, end_block).contiguous();
+        } else {
+            qzeros = qzeros.contiguous();
+        }
+
+        if (debug_verbosity >= 1) {
+            std::cout << "  -> Detected AWQ layout [In, Out/8], using AWQ unpack (combined) for " << base_name << std::endl;
+        }
+
+        auto device = layer->get_quantized_weights().device();
+        qweight = unpack_awq_qweight(qweight.to(device));
+        scales = scales.to(torch::kBFloat16).to(device).contiguous();
+        qzeros = unpack_awq_qzeros(qzeros.to(device));
+
+        layer->set_quantized_weights(qweight, scales, qzeros);
+        loaded++;
+    };
+
+    auto set_gate_up_from_separate = [&](QuantizedLinear &gate_up, QuantizedLinear &gate, QuantizedLinear &up) {
+        auto q = torch::cat({gate->get_quantized_weights(), up->get_quantized_weights()}, 0).contiguous();
+        auto s = torch::cat({gate->get_scales(), up->get_scales()}, 0).contiguous();
+        auto z = torch::cat({gate->get_zeros(), up->get_zeros()}, 0).contiguous();
+        gate_up->set_unpacked_params(q, s, z);
+    };
+
     std::vector<int64_t> layers_vec(present_layers.begin(), present_layers.end());
 
 #pragma omp parallel for
@@ -482,12 +575,43 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors(const std::str
             load_linear_layer(layer, layer_prefix + "." + suffix);
         }
 
-        // MLP layers: gate_proj, up_proj, down_proj
-        std::vector<std::pair<QuantizedLinear, std::string>> mlp_layers = {
-            {gate_layers[i], "mlp.gate_proj"}, {up_layers[i], "mlp.up_proj"}, {down_layers[i], "mlp.down_proj"}};
-
-        for (auto &[layer, suffix] : mlp_layers) {
-            load_linear_layer(layer, layer_prefix + "." + suffix);
+        if (arch_type_ == ArchitectureType::MIXTRAL) {
+            for (int64_t e = 0; e < num_experts_; ++e) {
+                std::string expert_prefix = layer_prefix + ".block_sparse_moe.experts." + std::to_string(e);
+                if (has_quantized(expert_prefix + ".w1")) {
+                    QuantizedLinear tmp_gate(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_gate");
+                    QuantizedLinear tmp_up(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_up");
+                    load_linear_layer(tmp_gate, expert_prefix + ".w1");
+                    load_linear_layer(tmp_up, expert_prefix + ".w3");
+                    set_gate_up_from_separate(moe_layers[i]->gate_up_experts[e], tmp_gate, tmp_up);
+                    load_linear_layer(moe_layers[i]->down_experts[e], expert_prefix + ".w2");
+                } else if (has_quantized(expert_prefix + ".gate_proj")) {
+                    QuantizedLinear tmp_gate(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_gate");
+                    QuantizedLinear tmp_up(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_up");
+                    load_linear_layer(tmp_gate, expert_prefix + ".gate_proj");
+                    load_linear_layer(tmp_up, expert_prefix + ".up_proj");
+                    set_gate_up_from_separate(moe_layers[i]->gate_up_experts[e], tmp_gate, tmp_up);
+                    load_linear_layer(moe_layers[i]->down_experts[e], expert_prefix + ".down_proj");
+                } else if (has_quantized(layer_prefix + ".block_sparse_moe.experts.gate_up_proj")) {
+                    load_linear_layer_from_combined(moe_layers[i]->gate_up_experts[e],
+                                                    layer_prefix + ".block_sparse_moe.experts.gate_up_proj", e, 0);
+                    load_linear_layer_from_combined(moe_layers[i]->down_experts[e], layer_prefix + ".block_sparse_moe.experts.down_proj", e,
+                                                    0);
+                } else {
+                    std::cerr << "Warning: Missing Mixtral expert weights for " << expert_prefix << std::endl;
+                    skipped++;
+                }
+            }
+        } else if (arch_type_ == ArchitectureType::QWEN) {
+            for (int64_t e = 0; e < num_experts_; ++e) {
+                std::string expert_prefix = layer_prefix + ".mlp.experts." + std::to_string(e);
+                QuantizedLinear tmp_gate(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_gate");
+                QuantizedLinear tmp_up(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_up");
+                load_linear_layer(tmp_gate, expert_prefix + ".gate_proj");
+                load_linear_layer(tmp_up, expert_prefix + ".up_proj");
+                set_gate_up_from_separate(moe_layers[i]->gate_up_experts[e], tmp_gate, tmp_up);
+                load_linear_layer(moe_layers[i]->down_experts[e], expert_prefix + ".down_proj");
+            }
         }
 
         // RMSNorm layers (not quantized)
@@ -517,6 +641,45 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors(const std::str
                               << "  Dtype: " << it_post_norm->second.dtype << " (" << loaded_tensor.dtype() << ")" << std::endl;
                     std::cout << "Model param: post_attn_norms[" << i << "].weight" << std::endl;
                     std::cout << "  -> Loaded" << std::endl;
+                }
+            }
+        }
+
+        if (arch_type_ == ArchitectureType::QWEN) {
+            auto it_q_norm = tensor_map.find(layer_prefix + ".self_attn.q_norm.weight");
+            if (it_q_norm != tensor_map.end() && it_q_norm->second.valid) {
+                torch::Tensor loaded_tensor = load_tensor(it_q_norm->second);
+                if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                    q_norms[i]->set_weight(loaded_tensor);
+                    loaded++;
+                }
+            }
+
+            auto it_k_norm = tensor_map.find(layer_prefix + ".self_attn.k_norm.weight");
+            if (it_k_norm != tensor_map.end() && it_k_norm->second.valid) {
+                torch::Tensor loaded_tensor = load_tensor(it_k_norm->second);
+                if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                    k_norms[i]->set_weight(loaded_tensor);
+                    loaded++;
+                }
+            }
+        }
+
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            auto it_router = tensor_map.find(layer_prefix + ".block_sparse_moe.gate.weight");
+            if (it_router == tensor_map.end() || !it_router->second.valid) {
+                it_router = tensor_map.find(layer_prefix + ".block_sparse_moe.router.weight");
+            }
+            if ((it_router == tensor_map.end() || !it_router->second.valid) && arch_type_ == ArchitectureType::QWEN) {
+                it_router = tensor_map.find(layer_prefix + ".mlp.gate.weight");
+            }
+            if (it_router != tensor_map.end() && it_router->second.valid) {
+                torch::Tensor loaded_tensor = load_tensor(it_router->second);
+                if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                    moe_layers[i]->router->weight.set_requires_grad(false);
+                    moe_layers[i]->router->weight.copy_(
+                        loaded_tensor.to(moe_layers[i]->router->weight.dtype()).to(moe_layers[i]->router->weight.device()));
+                    loaded++;
                 }
             }
         }
@@ -665,6 +828,48 @@ void UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors(const std:
         }
     }
 
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+            std::string layer_prefix = "model.layers." + std::to_string(i);
+            auto it_router = tensor_map.find(layer_prefix + ".block_sparse_moe.gate.weight");
+            if (it_router == tensor_map.end() || !it_router->second.valid) {
+                it_router = tensor_map.find(layer_prefix + ".block_sparse_moe.router.weight");
+            }
+            if ((it_router == tensor_map.end() || !it_router->second.valid) && arch_type_ == ArchitectureType::QWEN) {
+                it_router = tensor_map.find(layer_prefix + ".mlp.gate.weight");
+            }
+            if (it_router != tensor_map.end() && it_router->second.valid) {
+                torch::Tensor loaded_tensor = load_tensor(it_router->second);
+                if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                    moe_layers[i]->router->weight.set_requires_grad(false);
+                    moe_layers[i]->router->weight.copy_(
+                        loaded_tensor.to(moe_layers[i]->router->weight.dtype()).to(moe_layers[i]->router->weight.device()));
+                    loaded++;
+                }
+            }
+
+            if (arch_type_ == ArchitectureType::QWEN) {
+                auto it_q_norm = tensor_map.find(layer_prefix + ".self_attn.q_norm.weight");
+                if (it_q_norm != tensor_map.end() && it_q_norm->second.valid) {
+                    torch::Tensor loaded_tensor = load_tensor(it_q_norm->second);
+                    if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                        q_norms[i]->set_weight(loaded_tensor);
+                        loaded++;
+                    }
+                }
+
+                auto it_k_norm = tensor_map.find(layer_prefix + ".self_attn.k_norm.weight");
+                if (it_k_norm != tensor_map.end() && it_k_norm->second.valid) {
+                    torch::Tensor loaded_tensor = load_tensor(it_k_norm->second);
+                    if (loaded_tensor.defined() && loaded_tensor.numel() > 0) {
+                        k_norms[i]->set_weight(loaded_tensor);
+                        loaded++;
+                    }
+                }
+            }
+        }
+    }
+
     // Quantized layer biases (q/k/v/o and MLP) are stored as regular tensors in some models (e.g., Qwen).
     // When using pre-saved quantized bins, load these biases here to match the full safetensors path.
     auto load_bias = [&](QuantizedLinear &layer, const std::string &base_name) {
@@ -678,7 +883,7 @@ void UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors(const std:
             return;
         }
 
-        auto device = token_embedding->weight.device();
+        auto device = layer->get_quantized_weights().device();
         for (auto &param : layer->named_parameters()) {
             if (param.key() == "bias") {
                 param.value().set_requires_grad(false);
@@ -700,11 +905,6 @@ void UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors(const std:
         load_bias(k_layers[i], layer_prefix + ".self_attn.k_proj");
         load_bias(v_layers[i], layer_prefix + ".self_attn.v_proj");
         load_bias(o_layers[i], layer_prefix + ".self_attn.o_proj");
-
-        // MLP layers
-        load_bias(gate_layers[i], layer_prefix + ".mlp.gate_proj");
-        load_bias(up_layers[i], layer_prefix + ".mlp.up_proj");
-        load_bias(down_layers[i], layer_prefix + ".mlp.down_proj");
     }
 
     // Final norm
@@ -744,30 +944,87 @@ void UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors(const std:
     munmap((void *)map, file_size);
 }
 
-
+// Fast binary tensor loader using mmap + MADV_SEQUENTIAL.
+// Avoids kernel-buffered ifstream overhead; the OS DMA-reads directly into
+// the mapped pages which we then memcpy into a pinned CPU tensor for fast H2D.
 static torch::Tensor read_bin_tensor(const std::string &path, torch::ScalarType dtype, const std::vector<int64_t> &shape) {
-    std::ifstream input_file(path, std::ios::binary);
-    if (!input_file) {
-        throw std::runtime_error("Could not open file: " + path);
+    int fd = open(path.c_str(), O_RDONLY);
+    if (fd == -1) {
+        throw std::runtime_error("Could not open file: " + path + " (" + strerror(errno) + ")");
     }
 
-    auto tensor = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU));
-    size_t expected_bytes = tensor.numel() * tensor.element_size();
+    struct stat sb;
+    if (fstat(fd, &sb) == -1) {
+        close(fd);
+        throw std::runtime_error("fstat failed for: " + path);
+    }
+    size_t file_size = static_cast<size_t>(sb.st_size);
 
-    input_file.seekg(0, std::ios::end);
-    size_t file_size = static_cast<size_t>(input_file.tellg());
-    input_file.seekg(0, std::ios::beg);
+    // Allocate pinned (page-locked) CPU tensor so H2D DMA is ~2x faster.
+    auto tensor = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU).pinned_memory(true));
+    size_t expected_bytes = static_cast<size_t>(tensor.numel()) * tensor.element_size();
 
     if (file_size != expected_bytes) {
-        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(expected_bytes) + ", got " +
-                                 std::to_string(file_size) + ")");
+        close(fd);
+        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(expected_bytes) +
+                                 ", got " + std::to_string(file_size) + ")");
     }
 
-    input_file.read(reinterpret_cast<char *>(tensor.data_ptr()), file_size);
-    if (!input_file) {
-        throw std::runtime_error("Failed to read file: " + path);
+    void *map = mmap(nullptr, file_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd);
+    if (map == MAP_FAILED) {
+        throw std::runtime_error("mmap failed for: " + path);
     }
+    // Hint to the kernel: read sequentially, prefetch aggressively.
+    madvise(map, file_size, MADV_SEQUENTIAL);
+
+    std::memcpy(tensor.data_ptr(), map, file_size);
+    munmap(map, file_size);
+
     return tensor;
+}
+
+static void read_bin_tensor_pread(const std::string &path, void* dest_ptr, size_t copy_size) {
+    int flags = O_RDONLY | O_DIRECT;
+    int fd = open(path.c_str(), flags);
+    if (fd == -1 && errno == EINVAL) {
+        // Fallback if the filesystem (e.g. tmpfs) doesn't support O_DIRECT
+        fd = open(path.c_str(), O_RDONLY);
+    }
+    
+    if (fd == -1) {
+        throw std::runtime_error("Could not open file: " + path + " (" + strerror(errno) + ")");
+    }
+    
+    struct stat sb;
+    if (fstat(fd, &sb) == -1) {
+        close(fd);
+        throw std::runtime_error("fstat failed for: " + path);
+    }
+    size_t file_size = static_cast<size_t>(sb.st_size);
+    if (file_size != copy_size) {
+        close(fd);
+        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(copy_size) +
+                                 ", got " + std::to_string(file_size) + ")");
+    }
+
+    bool is_direct = (fcntl(fd, F_GETFL) & O_DIRECT) != 0;
+    char* ptr = static_cast<char*>(dest_ptr);
+
+    // O_DIRECT explicitly requires 512-byte block alignment for both the target RAM pointer and the read size.
+    // If PyTorch's memory allocator doesn't give us perfect OS alignment, we disable O_DIRECT on the fly.
+    if (is_direct && (((uintptr_t)ptr % 512 != 0) || (copy_size % 512 != 0))) {
+        int current_flags = fcntl(fd, F_GETFL);
+        fcntl(fd, F_SETFL, current_flags & ~O_DIRECT);
+    }
+
+    size_t bytes_read = 0;
+    while (bytes_read < copy_size) {
+        ssize_t ret = pread(fd, ptr + bytes_read, copy_size - bytes_read, bytes_read);
+        if (ret <= 0) break;
+        bytes_read += ret;
+    }
+    close(fd);
 }
 
 void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir) {
@@ -796,8 +1053,8 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &we
             if (s_groups * out_features != s_numel) {
                 throw std::runtime_error("Invalid scales shape for " + s_path);
             }
-            std::vector<int64_t> s_shape = (s_groups <= 1) ? std::vector<int64_t>{out_features}
-                                                           : std::vector<int64_t>{out_features, s_groups};
+            std::vector<int64_t> s_shape =
+                (s_groups <= 1) ? std::vector<int64_t>{out_features} : std::vector<int64_t>{out_features, s_groups};
             auto s = read_bin_tensor(s_path, torch::kBFloat16, s_shape);
 
             size_t z_bytes = std::filesystem::file_size(z_path);
@@ -806,8 +1063,8 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &we
             if (z_groups * out_features != z_numel) {
                 throw std::runtime_error("Invalid zeros shape for " + z_path);
             }
-            std::vector<int64_t> z_shape = (z_groups <= 1) ? std::vector<int64_t>{out_features}
-                                                           : std::vector<int64_t>{out_features, z_groups};
+            std::vector<int64_t> z_shape =
+                (z_groups <= 1) ? std::vector<int64_t>{out_features} : std::vector<int64_t>{out_features, z_groups};
             auto z = read_bin_tensor(z_path, torch::kInt8, z_shape);
 
             layer->set_unpacked_params(q, s, z);
@@ -817,14 +1074,54 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &we
         }
     };
 
+    auto load_gate_up_from_bins = [&](QuantizedLinear &gate_up, const std::string &gate_prefix, const std::string &up_prefix) {
+        QuantizedLinear tmp_gate(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_gate");
+        QuantizedLinear tmp_up(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_up");
+        load_layer(tmp_gate, gate_prefix);
+        load_layer(tmp_up, up_prefix);
+        auto q = torch::cat({tmp_gate->get_quantized_weights(), tmp_up->get_quantized_weights()}, 0).contiguous();
+        auto s = torch::cat({tmp_gate->get_scales(), tmp_up->get_scales()}, 0).contiguous();
+        auto z = torch::cat({tmp_gate->get_zeros(), tmp_up->get_zeros()}, 0).contiguous();
+        gate_up->set_unpacked_params(q, s, z);
+    };
+
     for (int64_t i = 0; i < num_hidden_layers_; ++i) {
         load_layer(q_layers[i], "layer_" + std::to_string(i) + "_q");
         load_layer(k_layers[i], "layer_" + std::to_string(i) + "_k");
         load_layer(v_layers[i], "layer_" + std::to_string(i) + "_v");
         load_layer(o_layers[i], "layer_" + std::to_string(i) + "_o");
-        load_layer(gate_layers[i], "layer_" + std::to_string(i) + "_gate");
-        load_layer(up_layers[i], "layer_" + std::to_string(i) + "_up");
-        load_layer(down_layers[i], "layer_" + std::to_string(i) + "_down");
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+             // For cached backend, we rely on on-demand loading.
+             // For cached backend, we rely on on-demand loading.
+             // We just set the directory for each MoE layer.
+             for (int64_t lay = 0; lay < num_hidden_layers_; ++lay) {
+                  moe_layers[lay]->set_weights_dir(weights_dir);
+             }
+             
+             // If we wanted to pre-load some, we could do it here, but let's stick to pure lazy loading for now.
+             // The original code loaded all experts:
+             /*
+             for (int64_t e = 0; e < num_experts_; ++e) {
+                 std::string expert_prefix = "layer_" + std::to_string(i) + "_expert_" + std::to_string(e);
+                 load_gate_up_from_bins(moe_layers[i]->gate_up_experts[e], expert_prefix + "_gate", expert_prefix + "_up");
+                 load_layer(moe_layers[i]->down_experts[e], expert_prefix + "_down");
+             }
+             */
+        }
+    }
+}
+
+void UnifiedLLMW4A16Impl::prewarm_experts(int64_t num_to_warm, bool verbose) {
+    if (verbose || debug_verbosity >= 1) {
+        std::cout << "Pre-warming " << num_to_warm << " experts for all layers..." << std::endl;
+    }
+    for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        if (moe_layers[i]) {
+            moe_layers[i]->prewarm_experts(num_to_warm);
+            if (verbose && (i + 1) % 4 == 0) {
+                 std::cout << "Prewarmed experts for layer " << (i + 1) << "/" << num_hidden_layers_ << std::endl;
+            }
+        }
     }
 }
 
@@ -844,26 +1141,32 @@ void UnifiedLLMW4A16Impl::initialize_dummy_weights(int seed) {
 
     for (int i = 0; i < num_hidden_layers_; ++i) {
         // Initialize norms
-        input_norms[i]->set_weight(torch::ones({hidden_size_}).to(device));
-        post_attn_norms[i]->set_weight(torch::ones({hidden_size_}).to(device));
+        auto layer_device = q_layers[i]->get_quantized_weights().device();
+        input_norms[i]->set_weight(torch::ones({hidden_size_}).to(layer_device));
+        post_attn_norms[i]->set_weight(torch::ones({hidden_size_}).to(layer_device));
+        if (arch_type_ == ArchitectureType::QWEN) {
+            q_norms[i]->set_weight(torch::ones({head_dim_}).to(layer_device));
+            k_norms[i]->set_weight(torch::ones({head_dim_}).to(layer_device));
+        }
 
         // Helper to init quantized linear
         auto init_layer = [&](QuantizedLinear &layer) {
             int64_t in_feat = layer->in_features();
             int64_t out_feat = layer->out_features();
 
+            auto layer_device = layer->get_quantized_weights().device();
             // qweight: [In, Out] uint8 (values 0-15)
-            auto qweight = torch::randint(0, 16, {in_feat, out_feat}, torch::TensorOptions().dtype(torch::kUInt8).device(device));
+            auto qweight = torch::randint(0, 16, {in_feat, out_feat}, torch::TensorOptions().dtype(torch::kUInt8).device(layer_device));
 
             // scales: [Groups, Out] bf16
             int64_t groups = in_feat / groupsize_;
             if (groups < 1)
                 groups = 1;
 
-            auto scales = torch::rand({groups, out_feat}, torch::TensorOptions().dtype(torch::kBFloat16).device(device));
+            auto scales = torch::rand({groups, out_feat}, torch::TensorOptions().dtype(torch::kBFloat16).device(layer_device));
 
             // qzeros: [Groups, Out] int8 (values 0-15, usually around 8)
-            auto qzeros = torch::full({groups, out_feat}, 8, torch::TensorOptions().dtype(torch::kInt8).device(device));
+            auto qzeros = torch::full({groups, out_feat}, 8, torch::TensorOptions().dtype(torch::kInt8).device(layer_device));
 
             layer->set_quantized_weights(qweight, scales, qzeros);
         };
@@ -874,13 +1177,184 @@ void UnifiedLLMW4A16Impl::initialize_dummy_weights(int seed) {
         init_layer(v_layers[i]);
         init_layer(o_layers[i]);
 
-        // MLP
-        init_layer(gate_layers[i]);
-        init_layer(up_layers[i]);
-        init_layer(down_layers[i]);
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            moe_layers[i]->router->weight.uniform_(-0.1, 0.1);
+            size_t num_slots = moe_layers[i]->gate_up_experts.size();
+            for (size_t e = 0; e < num_slots; ++e) {
+                init_layer(moe_layers[i]->gate_up_experts[e]);
+                init_layer(moe_layers[i]->down_experts[e]);
+            }
+            moe_layers[i]->set_weights_dir("DUMMY");
+            moe_layers[i]->prefill_cache_for_testing();
+        }
     }
 
     if (debug_verbosity >= 1) {
         std::cout << "Dummy weights initialized." << std::endl;
     }
+}
+
+
+
+void MixtureOfExpertsImpl::prefill_cache_for_testing() {
+    for (size_t i = 0; i < expert_slots_indices.size(); ++i) {
+        expert_slots_indices[i] = i; // Map slot i to expert i
+    }
+}
+
+void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
+    if (num_to_warm > max_cached_experts_) {
+        num_to_warm = max_cached_experts_;
+    }
+    if (num_to_warm > num_experts_) {
+        num_to_warm = num_experts_;
+    }
+
+    if (debug_verbosity >= 1) {
+        std::cout << "Layer " << layer_idx_ << ": Pre-warming " << num_to_warm << " experts." << std::endl;
+    }
+
+    for (int64_t i = 0; i < num_to_warm; ++i) {
+        // Load global expert i into slot i
+        load_expert_weights(i, i, weights_dir_);
+        expert_slots_indices[i] = i;
+        
+        // Ensure slot i is in LRU order (as MRU)
+        bool found = false;
+        for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
+            if (*it == (size_t)i) {
+                expert_lru_order_.erase(it);
+                found = true;
+                break;
+            }
+        }
+        expert_lru_order_.push_back(i);
+    }
+
+    // Update cache bitmask so the main thread routing knows these experts are loaded
+    if (expert_cache_bitmask_.size() == num_experts_) {
+        std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
+        for (auto current_eid : expert_slots_indices) {
+            if (current_eid >= 0 && current_eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
+                expert_cache_bitmask_[current_eid] = 1;
+            }
+        }
+    }
+}
+
+void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    if (weights_dir.empty()) {
+        throw std::runtime_error("Weights directory not set for MoE layer " + std::to_string(layer_idx_));
+    }
+
+    if (weights_dir == "DUMMY") {
+        if (debug_verbosity >= 2)
+            std::cout << "DUMMY load for expert " << expert_idx << " into slot " << slot_idx << std::endl;
+        return;
+    }
+
+    std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
+    std::string gate_prefix   = expert_prefix + "_gate";
+    std::string up_prefix     = expert_prefix + "_up";
+    std::string down_prefix   = expert_prefix + "_down";
+
+    auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot, const std::vector<int64_t>& shape, torch::ScalarType dtype) {
+        if (bufs.size() <= static_cast<size_t>(slot)) bufs.resize(max_cached_experts_);
+        if (!bufs[slot].defined()) {
+            bufs[slot] = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU).pinned_memory(true));
+        } else if (bufs[slot].sizes() != shape) {
+            bufs[slot].resize_(shape);
+        }
+        return bufs[slot];
+    };
+
+    // ---- gate_up slot ----
+    {
+        int64_t out_feat   = intermediate_size_;
+        int64_t in_feat    = hidden_size_;
+        int64_t packed_in  = (in_feat + 1) / 2;
+
+        std::string gq = weights_dir + "/" + gate_prefix + ".qweight.bin";
+        std::string gs = weights_dir + "/" + gate_prefix + ".scales.bin";
+        std::string gz = weights_dir + "/" + gate_prefix + ".zeros.bin";
+        std::string uq = weights_dir + "/" + up_prefix   + ".qweight.bin";
+        std::string us = weights_dir + "/" + up_prefix   + ".scales.bin";
+        std::string uz = weights_dir + "/" + up_prefix   + ".zeros.bin";
+
+        // Determine scales/zeros shape from file sizes.
+        size_t gs_bytes  = std::filesystem::file_size(gs);
+        int64_t gs_numel = static_cast<int64_t>(gs_bytes / 2); // bf16
+        int64_t gs_grps  = gs_numel / out_feat;
+        std::vector<int64_t> s_shape = (gs_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                       : std::vector<int64_t>{out_feat, gs_grps};
+        size_t gz_bytes  = std::filesystem::file_size(gz);
+        int64_t gz_numel = static_cast<int64_t>(gz_bytes);
+        int64_t gz_grps  = gz_numel / out_feat;
+        std::vector<int64_t> z_shape = (gz_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                       : std::vector<int64_t>{out_feat, gz_grps};
+
+        auto dest_q = ensure_pinned_buffer(gate_up_q_pinned_, slot_idx, {out_feat * 2, packed_in}, torch::kUInt8);
+        auto dest_s = ensure_pinned_buffer(gate_up_s_pinned_, slot_idx, {s_shape[0] * 2, s_shape.size() > 1 ? s_shape[1] : 1}, torch::kBFloat16);
+        auto dest_z = ensure_pinned_buffer(gate_up_z_pinned_, slot_idx, {z_shape[0] * 2, z_shape.size() > 1 ? z_shape[1] : 1}, torch::kInt8);
+
+        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
+        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
+        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
+
+        char* ptr_q = static_cast<char*>(dest_q.data_ptr());
+        char* ptr_s = static_cast<char*>(dest_s.data_ptr());
+        char* ptr_z = static_cast<char*>(dest_z.data_ptr());
+
+        read_bin_tensor_pread(gq, ptr_q, expected_q);
+        read_bin_tensor_pread(uq, ptr_q + expected_q, expected_q);
+        read_bin_tensor_pread(gs, ptr_s, expected_s);
+        read_bin_tensor_pread(us, ptr_s + expected_s, expected_s);
+        read_bin_tensor_pread(gz, ptr_z, expected_z);
+        read_bin_tensor_pread(uz, ptr_z + expected_z, expected_z);
+
+        gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+    }
+
+    // ---- down slot ----
+    {
+        auto &down_layer = down_experts[slot_idx];
+        int64_t out_feat  = down_layer->out_features();
+        int64_t in_feat   = down_layer->in_features();
+        int64_t packed_in = (in_feat + 1) / 2;
+
+        std::string dq = weights_dir + "/" + down_prefix + ".qweight.bin";
+        std::string ds = weights_dir + "/" + down_prefix + ".scales.bin";
+        std::string dz = weights_dir + "/" + down_prefix + ".zeros.bin";
+
+        size_t ds_bytes  = std::filesystem::file_size(ds);
+        int64_t ds_numel = static_cast<int64_t>(ds_bytes / 2);
+        int64_t ds_grps  = ds_numel / out_feat;
+        std::vector<int64_t> s_shape = (ds_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                       : std::vector<int64_t>{out_feat, ds_grps};
+        size_t dz_bytes  = std::filesystem::file_size(dz);
+        int64_t dz_numel = static_cast<int64_t>(dz_bytes);
+        int64_t dz_grps  = dz_numel / out_feat;
+        std::vector<int64_t> z_shape = (dz_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                       : std::vector<int64_t>{out_feat, dz_grps};
+
+        auto dest_q = ensure_pinned_buffer(down_q_pinned_, slot_idx, {out_feat, packed_in}, torch::kUInt8);
+        auto dest_s = ensure_pinned_buffer(down_s_pinned_, slot_idx, s_shape, torch::kBFloat16);
+        auto dest_z = ensure_pinned_buffer(down_z_pinned_, slot_idx, z_shape, torch::kInt8);
+
+        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
+        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
+        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
+
+        read_bin_tensor_pread(dq, dest_q.data_ptr(), expected_q);
+        read_bin_tensor_pread(ds, dest_s.data_ptr(), expected_s);
+        read_bin_tensor_pread(dz, dest_z.data_ptr(), expected_z);
+
+        down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
+    }
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
+    total_expert_load_time_ms_ += ms;
 }

@@ -109,5 +109,6 @@ add_subdirectory(src/microbenchmarks)
 # Implementation libraries
 add_subdirectory(src/unified_llm_w4a16_predict)
 add_subdirectory(src/unified_llm_w4a16_base)
+add_subdirectory(src/unified_llm_w4a16_cached)
 
 ### PyBind module now lives in src/unified_llm_w4a16_predict

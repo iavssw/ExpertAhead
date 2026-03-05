@@ -8,24 +8,173 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_predict/helper.hpp"
 #include "unified_llm_w4a16_predict/npuSetup.hpp"
+#include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <hip/hip_runtime.h>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <torch/torch.h>
 #include <unistd.h>
 #include <vector>
+#include <algorithm>
+#include <unordered_set>
+
+namespace {
+
+struct GpuVramInfo {
+    int index = -1;
+    size_t free_bytes = 0;
+    size_t total_bytes = 0;
+};
+
+struct GpuSelectionInfo {
+    std::vector<GpuVramInfo> ranked;
+    std::vector<int> selected;
+    bool used_fallback = false;
+    std::string fallback_reason;
+};
+
+double bytes_to_gib(size_t bytes) { return static_cast<double>(bytes) / (1024.0 * 1024.0 * 1024.0); }
+
+std::string join_gpu_indices(const std::vector<int> &gpu_indices) {
+    std::ostringstream oss;
+    oss << "[";
+    for (size_t i = 0; i < gpu_indices.size(); ++i) {
+        if (i > 0) {
+            oss << ", ";
+        }
+        oss << gpu_indices[i];
+    }
+    oss << "]";
+    return oss.str();
+}
+
+GpuSelectionInfo select_gpus_by_free_vram(int requested_gpu_count, int available_gpus) {
+    GpuSelectionInfo selection;
+    if (requested_gpu_count <= 0 || available_gpus <= 0) {
+        return selection;
+    }
+
+    int original_device = 0;
+    bool has_original_device = (hipGetDevice(&original_device) == hipSuccess);
+
+    for (int gpu_idx = 0; gpu_idx < available_gpus; ++gpu_idx) {
+        hipError_t set_err = hipSetDevice(gpu_idx);
+        if (set_err != hipSuccess) {
+            selection.used_fallback = true;
+            selection.fallback_reason = "hipSetDevice(" + std::to_string(gpu_idx) + ") failed: " + hipGetErrorString(set_err);
+            break;
+        }
+
+        size_t free_bytes = 0;
+        size_t total_bytes = 0;
+        hipError_t mem_err = hipMemGetInfo(&free_bytes, &total_bytes);
+        if (mem_err != hipSuccess) {
+            selection.used_fallback = true;
+            selection.fallback_reason = "hipMemGetInfo failed on gpu " + std::to_string(gpu_idx) + ": " + hipGetErrorString(mem_err);
+            break;
+        }
+
+        selection.ranked.push_back({gpu_idx, free_bytes, total_bytes});
+    }
+
+    if (has_original_device) {
+        (void)hipSetDevice(original_device);
+    }
+
+    if (!selection.used_fallback && static_cast<int>(selection.ranked.size()) == available_gpus) {
+        std::sort(selection.ranked.begin(), selection.ranked.end(), [](const GpuVramInfo &a, const GpuVramInfo &b) {
+            if (a.free_bytes != b.free_bytes) {
+                return a.free_bytes > b.free_bytes;
+            }
+            return a.index < b.index;
+        });
+
+        for (const auto &info : selection.ranked) {
+            if (static_cast<int>(selection.selected.size()) >= requested_gpu_count) {
+                break;
+            }
+            selection.selected.push_back(info.index);
+        }
+        return selection;
+    }
+
+    selection.used_fallback = true;
+    selection.ranked.clear();
+    selection.selected.clear();
+    for (int gpu_idx = 0; gpu_idx < available_gpus && static_cast<int>(selection.selected.size()) < requested_gpu_count; ++gpu_idx) {
+        selection.selected.push_back(gpu_idx);
+    }
+    return selection;
+}
+
+} // namespace
+
+// ---------------------------------------------------------------------------
+// find_predictor_model_path
+// Resolve the TorchScript predictor file for a given layer index.
+//
+// Strategy:
+//  1. <base>/layer_<i>/embedding_predictor_best.pt  (flat layout)
+//  2. <base>/layer_<i>/<any subdir>/embedding_predictor_best.pt
+//     e.g. <base>/layer_<i>/hidden_1024/embedding_predictor_best.pt
+//
+// Returns the first path that exists, or empty string if none found.
+// ---------------------------------------------------------------------------
+static std::string find_predictor_model_path(const std::string& base_dir, int64_t layer_idx) {
+    namespace fs = std::filesystem;
+
+    if (base_dir.empty()) return "";
+
+    fs::path layer_dir = fs::path(base_dir) / ("layer_" + std::to_string(layer_idx));
+    
+    std::vector<std::string> model_files = {"best_jit.pt", "best_jit.pth"};
+
+    for (const auto& kModelFile : model_files) {
+        // 1. Flat: base/layer_X/best_jit.pt(h)
+        fs::path direct = layer_dir / kModelFile;
+        if (fs::exists(direct)) {
+            return direct.string();
+        }
+
+        // 2. One level of subdirectories: base/layer_X/<subdir>/best_jit.pt(h)
+        std::error_code ec;
+        if (fs::is_directory(layer_dir, ec)) {
+            for (const auto& entry : fs::directory_iterator(layer_dir, ec)) {
+                if (entry.is_directory()) {
+                    fs::path candidate = entry.path() / kModelFile;
+                    if (fs::exists(candidate)) {
+                        return candidate.string();
+                    }
+                }
+            }
+        }
+    }
+
+    return "";  // Not found
+}
 
 template <typename Func> void time_op(const std::string &name, Func func) {
-    torch::cuda::synchronize();
-    auto start = std::chrono::high_resolution_clock::now();
+    auto sync0 = hipDeviceSynchronize();
+    if (sync0 != hipSuccess) {
+        std::cerr << "HIP sync error before " << name << ": " << hipGetErrorString(sync0) << std::endl;
+    }
+    auto t0 = std::chrono::high_resolution_clock::now();
     func();
-    torch::cuda::synchronize();
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> ms = end - start;
-    std::cout << name << ": " << ms.count() << " ms" << std::endl;
+    auto sync1 = hipDeviceSynchronize();
+    if (sync1 != hipSuccess) {
+        std::cerr << "HIP sync error after " << name << ": " << hipGetErrorString(sync1) << std::endl;
+    }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    double ms = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;
+    if (ms > 0.001) {
+        std::cout << "Node: " << std::left << std::setw(20) << name << " | time = " << std::fixed << std::setprecision(3) << std::setw(8)
+                  << ms << " ms" << std::endl;
+    }
 }
 
 torch::Tensor repeat_kv(const torch::Tensor &x, int64_t n_rep) {
@@ -119,19 +268,37 @@ HipEmbeddingImpl::HipEmbeddingImpl(int64_t num_embeddings, int64_t embedding_dim
 }
 
 torch::Tensor HipEmbeddingImpl::forward(torch::Tensor input) {
-#if USE_HIP_EMBEDDING
-    int64_t bsz = input.size(0);
-    int64_t seq_len = input.size(1);
-    int64_t total_tokens = bsz * seq_len;
+    if (use_hip_) {
+        int64_t bsz = input.size(0);
+        int64_t seq_len = input.size(1);
+        int64_t total_tokens = bsz * seq_len;
 
-    if (total_tokens == 1) {
-        auto output = output_buffer.slice(0, 0, bsz).slice(1, 0, seq_len);
+        if (total_tokens == 1) {
+            auto output = output_buffer.slice(0, 0, bsz).slice(1, 0, seq_len);
 
-        hipkernels::launch_embedding_forward(weight, input, output, c10::hip::getCurrentHIPStream().stream());
-        return output;
+            hipkernels::launch_embedding_forward(weight, input, output, c10::hip::getCurrentHIPStream().stream());
+            return output;
+        }
     }
-#endif
     return torch::nn::functional::embedding(input, weight);
+}
+
+// LinearMatmulImpl Implementation
+LinearMatmulImpl::LinearMatmulImpl(int64_t in_features, int64_t out_features, bool bias) {
+    weight = register_parameter("weight", torch::empty({out_features, in_features}, torch::kBFloat16));
+    if (bias) {
+        this->bias = register_parameter("bias", torch::empty({out_features}, torch::kBFloat16));
+    } else {
+        this->register_parameter("bias", torch::Tensor(), false);
+    }
+}
+
+torch::Tensor LinearMatmulImpl::forward(torch::Tensor input) {
+    auto res = torch::matmul(input, weight.t());
+    if (bias.defined()) {
+        res += bias;
+    }
+    return res;
 }
 
 // LmHeadLinearImpl Implementation
@@ -145,23 +312,24 @@ LmHeadLinearImpl::LmHeadLinearImpl(int64_t in_features, int64_t out_features, in
 }
 
 torch::Tensor LmHeadLinearImpl::forward(torch::Tensor input) {
-#if USE_HIP_LM_HEAD
-    int64_t bsz = input.size(0);
-    int64_t seq_len = input.size(1);
-    int64_t total_tokens = bsz * seq_len;
+    if (use_hip_) {
+        int64_t bsz = input.size(0);
+        int64_t seq_len = input.size(1);
+        int64_t total_tokens = bsz * seq_len;
 
-    if (total_tokens == 1) {
-        int64_t vocab_size = weight.size(0);
-        int64_t hidden_size = weight.size(1);
+        if (total_tokens == 1) {
+            int64_t vocab_size = weight.size(0);
+            int64_t hidden_size = weight.size(1);
 
-        auto logits = logits_buffer.slice(0, 0, bsz).slice(1, 0, seq_len);
+            auto logits = logits_buffer.slice(0, 0, bsz).slice(1, 0, seq_len);
 
-        hipkernels::launch_lm_head_forward(
-            (hip_bfloat16 *)logits.data_ptr<at::BFloat16>(), (const hip_bfloat16 *)input.data_ptr<at::BFloat16>(),
-            (const hip_bfloat16 *)weight.data_ptr<at::BFloat16>(), 1, hidden_size, vocab_size, c10::hip::getCurrentHIPStream().stream());
-        return logits.to(torch::kFloat32);
+            hipkernels::launch_lm_head_forward((hip_bfloat16 *)logits.data_ptr<at::BFloat16>(),
+                                               (const hip_bfloat16 *)input.data_ptr<at::BFloat16>(),
+                                               (const hip_bfloat16 *)weight.data_ptr<at::BFloat16>(), 1, hidden_size, vocab_size,
+                                               c10::hip::getCurrentHIPStream().stream());
+            return logits.to(torch::kFloat32);
+        }
     }
-#endif
     return torch::nn::functional::linear(input, weight).to(torch::kFloat32);
 }
 
@@ -226,12 +394,15 @@ QuantizedLinearImpl::QuantizedLinearImpl(int64_t in_features, int64_t out_featur
     }
 }
 
-std::future<int> QuantizedLinearImpl::forward(torch::Tensor output_buffer, torch::Tensor input, std::string layer_type) {
+void QuantizedLinearImpl::forward(torch::Tensor output_buffer, torch::Tensor input, std::string layer_type) {
     // we don't care about the future for now
-    std::future<int> fut;
-
     if (debug_verbosity >= 2) {
         std::cout << "Forward " << layer_type << " (Target: " << hw_target << ")" << std::endl;
+        std::cout << "  input.device=" << input.device() << " output.device=" << output_buffer.device()
+                  << " qweight.device=" << quantized_weight_.device() << " scale.device=" << scale_.device()
+                  << " zeros.device=" << zero_point_.device() << std::endl;
+        std::cout << "  input.shape=" << input.sizes() << " qweight.shape=" << quantized_weight_.sizes()
+                  << " scale.shape=" << scale_.sizes() << " zeros.shape=" << zero_point_.sizes() << std::endl;
     }
 
     int64_t M = input.numel() / in_features_;
@@ -241,10 +412,26 @@ std::future<int> QuantizedLinearImpl::forward(torch::Tensor output_buffer, torch
         if (n_groups > 0)
             group_size = in_features_ / n_groups;
     }
-    auto input_2d = input.view({-1, in_features_});
+    auto input_2d = input.contiguous().view({-1, in_features_});
     auto output_2d = output_buffer.view({-1, out_features_});
 
+    if (!input.is_cuda()) {
+        // Fallback to dequantize + matmul for CPU
+        auto dequant = dequantize_weights();
+        auto result = torch::matmul(input_2d.to(torch::kBFloat16), dequant.t());
+        output_2d.copy_(result);
+
+        if (bias_.defined()) {
+            if (output_buffer.size(-1) != bias_.size(-1)) {
+                throw std::runtime_error("Bias size mismatch with output buffer.");
+            }
+            output_buffer.add_(bias_);
+        }
+        return;
+    }
+
     // Compute the GEMV or GEMM on Fused Hip Kernels
+    // This does not check input padding correctly for 128 tiles sizes
     if (M == 1) {
         if (debug_verbosity >= 2) {
             std::cout << "GPU Unpacked GEMV" << std::endl;
@@ -260,18 +447,82 @@ std::future<int> QuantizedLinearImpl::forward(torch::Tensor output_buffer, torch
     }
 
     if (bias_.defined()) {
-        // If bias is defined, we must wait for GEMM to finish before adding bias
-        if (fut.valid()) {
-            fut.wait();
-        }
-
         if (output_buffer.size(-1) != bias_.size(-1)) {
             throw std::runtime_error("Bias size mismatch with output buffer.");
         }
         output_buffer.add_(bias_);
-        return std::future<int>(); // Return invalid/empty future as we are done
     }
-    return fut;
+}
+
+torch::Tensor QuantizedLinearImpl::forward(torch::Tensor input, std::string layer_type) {
+    int64_t M = input.numel() / in_features_;
+    int64_t group_size = in_features_;
+    if (scale_.dim() == 2) {
+        int64_t n_groups = scale_.size(1);
+        if (n_groups > 0)
+            group_size = in_features_ / n_groups;
+    }
+
+    if (debug_verbosity >= 2) {
+        std::cout << "Forward (Allocating) " << layer_type << " (Target: " << hw_target << ")" << std::endl;
+        std::cout << "  input.device=" << input.device() << " qweight.device=" << quantized_weight_.device()
+                  << " scale.device=" << scale_.device() << " zeros.device=" << zero_point_.device() << std::endl;
+        std::cout << "  input.shape=" << input.sizes() << " qweight.shape=" << quantized_weight_.sizes()
+                  << " scale.shape=" << scale_.sizes() << " zeros.shape=" << zero_point_.sizes() << std::endl;
+    }
+
+    if (!input.is_cuda()) {
+        // Fallback to dequantize + matmul for CPU
+        auto dequant = dequantize_weights();
+        auto input_2d = input.contiguous().view({-1, in_features_});
+        auto result = torch::matmul(input_2d.to(torch::kBFloat16), dequant.t());
+
+        if (bias_.defined()) {
+            result.add_(bias_);
+        }
+        return result;
+    }
+
+    // HIP Path
+    auto input_2d = input.contiguous().view({-1, in_features_});
+    torch::Tensor output;
+    if (M == 1) {
+        if (debug_verbosity >= 2) {
+            std::cout << "GPU Unpacked GEMV (Alloc)" << std::endl;
+        }
+        output = torch::empty({1, out_features_}, torch::TensorOptions().dtype(torch::kBFloat16).device(input.device()));
+        hipkernels::w4a16_gemv_unpacked_fused(output, input_2d, quantized_weight_, scale_, zero_point_, in_features_, out_features_,
+                                              group_size);
+    } else {
+        if (debug_verbosity >= 2) {
+            std::cout << "GPU Unpacked GEMM (Alloc)" << std::endl;
+        }
+
+        int64_t rows = input_2d.size(0);
+        int64_t padded_rows = rows;
+        if (rows > 1) {
+            const int64_t tile = 128;
+            padded_rows = ((rows + tile - 1) / tile) * tile;
+        }
+
+        torch::Tensor input_padded = input_2d;
+        if (padded_rows != rows) {
+            input_padded = torch::zeros({padded_rows, in_features_}, input_2d.options());
+            input_padded.narrow(0, 0, rows).copy_(input_2d);
+        }
+
+        output = hipkernels::w4a16_gemm_unpacked_alloc_and_compute(input_padded, quantized_weight_, scale_, zero_point_, in_features_,
+                                                                   out_features_, group_size);
+        if (padded_rows != rows) {
+            output = output.narrow(0, 0, rows).contiguous();
+        }
+    }
+
+    if (bias_.defined()) {
+        output.add_(bias_);
+    }
+
+    return output;
 }
 
 void QuantizedLinearImpl::set_quantized_weights(torch::Tensor qweight, torch::Tensor scale, torch::Tensor zero_point, torch::Tensor g_idx) {
@@ -349,29 +600,750 @@ void QuantizedLinearImpl::set_quantized_weights(torch::Tensor qweight, torch::Te
 }
 
 void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torch::Tensor scale, torch::Tensor zero_point) {
-    auto device = quantized_weight_.device();
+    if (quantized_weight_.sizes() != qweight_packed.sizes()) {
+        quantized_weight_.resize_as_(qweight_packed);
+    }
+    if (scale_.sizes() != scale.sizes()) {
+        scale_.resize_as_(scale);
+    }
+    if (zero_point_.sizes() != zero_point.sizes()) {
+        zero_point_.resize_as_(zero_point);
+    }
 
-    quantized_weight_ = qweight_packed.to(torch::kUInt8).contiguous().to(device);
-    scale_ = scale.to(torch::kBFloat16).contiguous().to(device);
-    zero_point_ = zero_point.to(torch::kInt8).contiguous().to(device);
+    quantized_weight_.copy_(qweight_packed.to(torch::kUInt8).contiguous(), /*non_blocking=*/true);
+    scale_.copy_(scale.to(torch::kBFloat16).contiguous(), /*non_blocking=*/true);
+    zero_point_.copy_(zero_point.to(torch::kInt8).contiguous(), /*non_blocking=*/true);
 }
 
-void QuantizedLinearImpl::import_weights_to_xdna() {
-    // Import buffers to XDNA to allow CPU access to GPU memory
-    // This is crucial for the CPU path in hetero mode
-    if (quantized_weight_.defined()) {
-        import_dma_buf_to_xdna(quantized_weight_.data_ptr(), quantized_weight_.numel(), 1); // uint8
-    }
-    if (scale_.defined()) {
-        import_dma_buf_to_xdna(scale_.data_ptr(), scale_.numel(), 2); // bf16
-    }
-    if (zero_point_.defined()) {
-        import_dma_buf_to_xdna(zero_point_.data_ptr(), zero_point_.numel(), 1); // int8
+// MixtureOfExpertsImpl Implementation
+// MixtureOfExpertsImpl Implementation
+
+MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
+                                           int64_t max_cached_experts, int64_t layer_idx,
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device, int64_t prefetch_experts_count)
+    : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
+      num_experts_per_tok_(num_experts_per_tok), max_cached_experts_(max_cached_experts), layer_idx_(layer_idx),
+      prefetch_experts_count_(prefetch_experts_count),
+      use_softmax_before_topk_(use_softmax_before_topk), normalize_topk_prob_(normalize_topk_prob), lambda_(lambda) {
+
+    if (!predictor_model_path.empty()) {
+        try {
+            if (predictor_model_path == "random") {
+                predictor_ = std::make_unique<RandomExpertPredictor>(num_experts_);
+                std::cout << "Initialized RandomExpertPredictor" << std::endl;
+            } else {
+                predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
+        }
     }
 
-    if (bias_.defined()) {
-        import_dma_buf_to_xdna(bias_.data_ptr(), bias_.numel(), bias_.element_size());
+    if (prefetch_experts_count_ > max_cached_experts_) {
+        prefetch_experts_count_ = max_cached_experts_;
     }
+
+    router = register_module("router", LinearMatmul(hidden_size_, num_experts_, false));
+
+    // Initialize correlation counting
+    prefill_expert_counts_ = torch::zeros({num_experts_}, torch::kFloat32);
+
+    // Initialize cache with empty slots
+    expert_slots_indices.assign(max_cached_experts_, -1);
+    
+    // Initialize cache bitmask
+    expert_cache_bitmask_.assign(num_experts_, 0);
+    
+    // Initialize slot ready state
+    expert_slot_ready_.assign(max_cached_experts_, true);
+    
+    // Initialize LRU order (initially 0, 1, 2, ..., max-1)
+    for (size_t i = 0; i < max_cached_experts_; ++i) {
+        expert_lru_order_.push_back(i);
+    }
+
+    gate_up_experts.reserve(max_cached_experts_);
+    down_experts.reserve(max_cached_experts_);
+
+    for (int64_t e = 0; e < max_cached_experts_; ++e) {
+        // We create "slots" 0..max_cached_experts-1
+        // They are initialized with dummy weights (since they are empty)
+        // Or we just reserve them.
+        // We register them as modules so they appear in state_dict/etc (maybe as slot_X?)
+        // Wait, if we register as "gate_up_0", "gate_up_1" etc, these match "experts.0", "experts.1" in base.
+        // But here slot 0 might hold expert 5.
+        // If we want state_dict compatibility we might have issues if we try to save/load from this backend.
+        // But the requirement is to run inference. Loading is handled manually via load_quantized_weights_from_bins.
+        // So naming doesn't strictly matter for loading functionality if we don't rely on pytorch load_state_dict.
+        
+        gate_up_experts.push_back(register_module(
+            "slot_gate_up_" + std::to_string(e), QuantizedLinear(hidden_size_, 2 * intermediate_size_, false, max_seq_len, "moe_gate_up")));
+        down_experts.push_back(register_module("slot_down_" + std::to_string(e),
+                                               QuantizedLinear(intermediate_size_, hidden_size_, false, max_seq_len, "moe_down")));
+    }
+}
+
+void MixtureOfExpertsImpl::set_context_token_ids(const std::vector<int64_t>& token_ids) {
+    recent_token_ids_ = token_ids;
+    // Keep only the last 32 tokens (predictor usually expects fixed context)
+    if (recent_token_ids_.size() > 32) {
+        recent_token_ids_.erase(
+            recent_token_ids_.begin(), 
+            recent_token_ids_.begin() + (recent_token_ids_.size() - 32)
+        );
+    }
+}
+
+void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embedding) {
+    // Check if predictor is available
+    if (!predictor_) {
+        return;
+    }
+    
+    // Only do speculative loading during generation (single token at a time usually, but here based on mode)
+    if (!in_generation_mode_) {
+        return;
+    }
+    
+    // std::future assignment blocks until the previous async task completes!
+    // If the disk/PCIe is still busy loading the previous guess, skip this token's guess
+    // rather than stalling the entire main inference thread waiting for it to finish.
+    if (speculative_load_future_.valid() && 
+        speculative_load_future_.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+        if (debug_verbosity >= 2) {
+            std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Skipping prefetch, previous still running." << std::endl;
+        }
+        // Ensure ready flag is cleared if we skip, so we don't use STALE results on the next token
+        pred_results_ready_.store(false); 
+        return;
+    }
+    
+    // Launch async prediction and loading
+    // Capture necessary data by deep copy to avoid lifetime issues across async barrier
+    torch::Tensor embedding_copy = embedding.detach().clone();
+    
+    float sum_counts = prefill_expert_counts_.sum().item<float>();
+    torch::Tensor prefill_dist = (sum_counts > 0.0f) 
+                                 ? (prefill_expert_counts_ / sum_counts) 
+                                 : (torch::full({num_experts_}, 1.0f / num_experts_, torch::kFloat32));
+    c10::optional<torch::Tensor> pdist_opt = prefill_dist.unsqueeze(0);
+
+    c10::optional<torch::Tensor> prev_expert_opt;
+    if (last_true_top1_expert_ >= 0 && last_true_top1_expert_ < num_experts_) {
+        torch::Tensor prev_onehot = torch::zeros({num_experts_}, torch::kFloat32);
+        prev_onehot[last_true_top1_expert_] = 1.0f;
+        prev_expert_opt = prev_onehot.unsqueeze(0);
+    } else {
+        prev_expert_opt = torch::zeros({1, num_experts_}, torch::kFloat32);
+    }
+
+    // Reset ready flag before launching new async work
+    pred_results_ready_.store(false);
+    
+    speculative_load_future_ = std::async(std::launch::async, 
+        [this, embedding_copy, pdist_opt, prev_expert_opt]() {
+            // ── Run 1: Predict experts ────────────────────────────────────
+            // Fix: Use sync call HERE inside the background thread to ensure we get 
+            // the result for the CURRENT embedding before proceeding.
+            std::vector<int64_t> pred_result = predictor_->predict_sync(embedding_copy, pdist_opt, prev_expert_opt);
+
+            // Store rankings safely for forward_generation to compare
+            {
+                std::lock_guard<std::mutex> lock(pred_results_mutex_);
+                last_pred_no_bias_   = pred_result;
+            }
+            pred_results_ready_.store(true);
+            
+            if (!pred_result.empty()) {
+                int limit = std::min((int)pred_result.size(), (int)prefetch_experts_count_);
+                std::vector<int64_t> top_experts(pred_result.begin(), pred_result.begin() + limit);
+                
+                if (debug_verbosity >= 2) {
+                    std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted experts: ";
+                    for (auto e : top_experts) std::cout << e << " ";
+                    std::cout << std::endl;
+                }
+                load_predicted_experts(top_experts);
+            }
+        });
+}
+
+
+void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids) {
+    // Iterate in reverse so the most confident expert becomes the most recently used (pushed to back of LRU last)
+    for (auto pred_it = predicted_expert_ids.rbegin(); pred_it != predicted_expert_ids.rend(); ++pred_it) {
+        int64_t eid = *pred_it;
+        std::unique_lock<std::mutex> lock(expert_slots_mutex_);
+        
+        // Check if expert is already loaded or being loaded
+        auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
+        
+        if (it != expert_slots_indices.end()) {
+            // Already loaded - just update LRU
+            size_t slot_idx = std::distance(expert_slots_indices.begin(), it);
+            // Move to back (MRU)
+             for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+                if (*lit == slot_idx) {
+                    expert_lru_order_.erase(lit);
+                    expert_lru_order_.push_back(slot_idx);
+                    break;
+                }
+            }
+        } else {
+            // Not loaded - need to load it
+            size_t slot_to_use;
+            
+            // Find an empty slot or use LRU
+            auto empty_it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), -1);
+            if (empty_it != expert_slots_indices.end()) {
+                // Use empty slot
+                slot_to_use = std::distance(expert_slots_indices.begin(), empty_it);
+                
+                // Remove from LRU list wherever it is (it's initialized there)
+                for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+                    if (*lit == slot_to_use) {
+                        expert_lru_order_.erase(lit);
+                        break;
+                    }
+                }
+            } else {
+                // All slots full - evict LRU (front of vector)
+                // BUT we must find an LRU slot that is actually ready!
+                // Skip slots that are currently being loaded by another thread.
+                bool found = false;
+                for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+                    if (expert_slot_ready_[*lit]) {
+                        slot_to_use = *lit;
+                        expert_lru_order_.erase(lit);
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                     // All slots are currently busy being loaded. Don't prefetch this expert.
+                     continue;
+                }
+                
+                if (debug_verbosity >= 2) {
+                     std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Evicting expert " 
+                               << expert_slots_indices[slot_to_use] << " from slot " << slot_to_use << std::endl;
+                }
+            }
+            
+            // Mark slot as busy and update indices
+            expert_slot_ready_[slot_to_use] = false;
+            expert_slots_indices[slot_to_use] = eid;
+            expert_lru_order_.push_back(slot_to_use);
+            
+            // Update cache bitmask early so main thread routing knows it's eventually coming
+            if (expert_cache_bitmask_.size() == num_experts_) {
+                std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
+                for (auto current_eid : expert_slots_indices) {
+                    if (current_eid >= 0 && current_eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
+                        expert_cache_bitmask_[current_eid] = 1;
+                    }
+                }
+            }
+            
+            // Release the lock BEFORE the slow disk I/O!
+            lock.unlock();
+            
+            if (debug_verbosity >= 2) {
+                std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Loading predicted expert " << eid << " into slot " << slot_to_use << std::endl;
+            }
+            
+            // Perform the slow disk read
+            try {
+                load_expert_weights(slot_to_use, eid, weights_dir_);
+            } catch (...) {
+                lock.lock();
+                expert_slot_ready_[slot_to_use] = true;
+                expert_slots_indices[slot_to_use] = -1; // Reset it so it can be used again
+                expert_slots_cv_.notify_all();
+                throw;
+            }
+            
+            // Re-acquire lock to mark as ready and notify waiting inference threads
+            lock.lock();
+            expert_slot_ready_[slot_to_use] = true;
+            expert_slots_cv_.notify_all();
+        }
+    }
+}
+
+int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
+    std::unique_lock<std::mutex> lock(expert_slots_mutex_);
+
+    for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
+        if (expert_slots_indices[s] == global_expert_idx) {
+            
+            // If it's already here but the predictive thread is currently loading it, sleep until it finishes
+            expert_slots_cv_.wait(lock, [this, s]() { return expert_slot_ready_[s]; });
+            
+            if (update_stats) {
+                cache_hits_++;
+            }
+            
+            // Move slot 's' to the back of the LRU vector (Mark as MRU)
+            for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
+                if (*it == s) {
+                    expert_lru_order_.erase(it);
+                    expert_lru_order_.push_back(s);
+                    break;
+                }
+            }
+            return s;
+        }
+    }
+    
+    // Miss: Evict the Least Recently Used slot (front of the vector)
+    if (update_stats) {
+        cache_misses_++;
+    }
+    
+    // Find an LRU slot that isn't currently being overwritten by the predictor
+    size_t lru_slot = -1;
+    for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+        if (expert_slot_ready_[*lit]) {
+            lru_slot = *lit;
+            expert_lru_order_.erase(lit);
+            break;
+        }
+    }
+    
+    // If somehow all slots are being loaded by predictor right now, wait for one to finish
+    if (lru_slot == size_t(-1)) {
+        expert_slots_cv_.wait(lock, [this]() {
+            for (auto r : expert_slot_ready_) if (r) return true;
+            return false;
+        });
+        
+        // Re-find the free slot now that we woke up
+        for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+            if (expert_slot_ready_[*lit]) {
+                lru_slot = *lit;
+                expert_lru_order_.erase(lit);
+                break;
+            }
+        }
+    }
+    
+    // Mark as busy
+    expert_slot_ready_[lru_slot] = false;
+    expert_slots_indices[lru_slot] = global_expert_idx;
+    expert_lru_order_.push_back(lru_slot);
+    
+    // Update cache bitmask tracking
+    if (expert_cache_bitmask_.size() == num_experts_) {
+        std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
+        for (auto eid : expert_slots_indices) {
+            if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
+                expert_cache_bitmask_[eid] = 1;
+            }
+        }
+    }
+    
+    // Unlock during slow disk I/O!
+    lock.unlock();
+    
+    // Load new expert into the evicted slot
+    try {
+        load_expert_weights(lru_slot, global_expert_idx, weights_dir_);
+    } catch (...) {
+        lock.lock();
+        expert_slot_ready_[lru_slot] = true;
+        expert_slots_indices[lru_slot] = -1; // Reset it so it can be used again
+        expert_slots_cv_.notify_all();
+        throw;
+    }
+    
+    // Ensure weights are fully on device before usage
+    (void)hipDeviceSynchronize();
+    
+    // Lock, mark exactly one ready, wake any waiting thread
+    lock.lock();
+    expert_slot_ready_[lru_slot] = true;
+    expert_slots_cv_.notify_all();
+    
+    return lru_slot;
+}
+
+torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
+                                                torch::Tensor &output) {
+    bool update_stats = (x_flat.size(0) == 1);
+    for (int64_t t = 0; t < x_flat.size(0); ++t) {
+        auto token_input = x_flat.narrow(0, t, 1);
+        for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
+            int64_t global_e = topk_idx[t][k].item<int64_t>();
+            int64_t e = ensure_expert_cached(global_e, update_stats);
+            auto weight = topk_vals[t][k].to(output.dtype());
+
+            auto gate_up = gate_up_experts[e]->forward(token_input, "moe_gate_up");
+            auto gate_buf = gate_up.narrow(1, 0, intermediate_size_);
+            auto up_buf = gate_up.narrow(1, intermediate_size_, intermediate_size_);
+            torch::silu_(gate_buf);
+            gate_buf.mul_(up_buf);
+
+            auto down_out = down_experts[e]->forward(gate_buf, "moe_down");
+            down_out.mul_(weight);
+            output.narrow(0, t, 1).add_(down_out);
+        }
+    }
+    return output;
+}
+
+// Old Simple Version: Do not delete for reference
+// torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
+//                                                        const torch::Tensor &topk_idx, torch::Tensor &output) {
+//     std::vector<torch::Tensor> down_buffers;
+//     std::vector<torch::Tensor> expert_weights;
+//     down_buffers.reserve(num_experts_per_tok_);
+//     expert_weights.reserve(num_experts_per_tok_);
+
+//     // Dispatch independent expert paths first.
+//     for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
+//         int64_t e = topk_idx[0][k].item<int64_t>();
+//         expert_weights.push_back(topk_vals[0][k].to(output.dtype()));
+//         auto gate_up = gate_up_experts[e]->forward(x_flat, "moe_gate_up");
+//         auto gate_buf = gate_up.narrow(1, 0, intermediate_size_);
+//         auto up_buf = gate_up.narrow(1, intermediate_size_, intermediate_size_);
+//         torch::silu_(gate_buf);
+//         gate_buf.mul_(up_buf);
+//         down_buffers.push_back(down_experts[e]->forward(gate_buf, "moe_down"));
+//     }
+
+//     // Separate reduction pass to aggregate expert outputs.
+//     for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
+//         down_buffers[k].mul_(expert_weights[k]);
+//         output.add_(down_buffers[k]);
+//     }
+//     return output;
+// }
+
+torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
+                                                       const torch::Tensor &topk_idx, torch::Tensor &output,
+                                                       int64_t current_true_top1) {
+    in_generation_mode_ = true;
+    
+    // Speculative loading runs entirely in the background. The main thread will only wait 
+    // dynamically inside `ensure_expert_cached` if it actually needs an expert that is currently streaming.
+    auto opts = x_flat.options();
+    const int64_t active_experts = num_experts_per_tok_;
+
+    // Build expert pointer arrays once, then run both MoE projections batched in parallel.
+    std::vector<int64_t> gate_up_qw_ptrs(active_experts), gate_up_s_ptrs(active_experts), gate_up_z_ptrs(active_experts);
+    std::vector<int64_t> down_qw_ptrs(active_experts), down_s_ptrs(active_experts), down_z_ptrs(active_experts);
+    std::vector<int64_t> expert_ids(active_experts);
+
+    // Optimization: Move indices to CPU contiguously to avoid per-element synchronization
+    auto topk_cpu = topk_idx[0].to(torch::kCPU, torch::kInt64, /*non_blocking=*/false, /*copy=*/true);
+    auto topk_accessor = topk_cpu.accessor<int64_t, 1>();
+
+    for (int64_t k = 0; k < active_experts; ++k) {
+        int64_t global_e = topk_accessor[k];
+        int64_t e = ensure_expert_cached(global_e);
+        expert_ids[k] = e;
+        gate_up_qw_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_quantized_weights().data_ptr<uint8_t>());
+        gate_up_s_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_scales().data_ptr<at::BFloat16>());
+        gate_up_z_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_zeros().data_ptr<int8_t>());
+        down_qw_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_quantized_weights().data_ptr<uint8_t>());
+        down_s_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_scales().data_ptr<at::BFloat16>());
+        down_z_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_zeros().data_ptr<int8_t>());
+    }
+
+    int64_t group_size = hidden_size_;
+    if (gate_up_experts[expert_ids[0]]->get_scales().dim() == 2) {
+        int64_t n_groups = gate_up_experts[expert_ids[0]]->get_scales().size(1);
+        if (n_groups > 0)
+            group_size = hidden_size_ / n_groups;
+    }
+    int64_t down_group_size = intermediate_size_;
+    if (down_experts[expert_ids[0]]->get_scales().dim() == 2) {
+        int64_t n_groups = down_experts[expert_ids[0]]->get_scales().size(1);
+        if (n_groups > 0)
+            down_group_size = intermediate_size_ / n_groups;
+    }
+
+    auto input_batched = x_flat.expand({active_experts, hidden_size_}).contiguous();
+    auto gate_up_batched = torch::empty({active_experts, 2 * intermediate_size_}, opts);
+    auto down_batched = torch::empty({active_experts, hidden_size_}, opts);
+
+    hipkernels::w4a16_gemv_unpacked_fused_3d(gate_up_batched, input_batched, gate_up_qw_ptrs, gate_up_s_ptrs, gate_up_z_ptrs, hidden_size_,
+                                             2 * intermediate_size_, group_size, active_experts);
+
+    auto gate_buf = gate_up_batched.narrow(1, 0, intermediate_size_);
+    auto up_buf = gate_up_batched.narrow(1, intermediate_size_, intermediate_size_);
+    torch::silu_(gate_buf);
+    gate_buf.mul_(up_buf);
+
+    hipkernels::w4a16_gemv_unpacked_fused_3d(down_batched, gate_buf.contiguous(), down_qw_ptrs, down_s_ptrs, down_z_ptrs,
+                                             intermediate_size_, hidden_size_, down_group_size, active_experts);
+
+    // std::cout << "ran kernel" << std::endl;
+
+    auto weights = topk_vals[0].to(output.dtype()).view({active_experts, 1});
+    // std::cout << "weights: " << weights << std::endl;
+    down_batched.mul_(weights);
+    output.add_(down_batched.sum(0, true));
+
+    // ── Predictor hit-rate accounting ────────────────────────────────────────
+    // Compare the previous token's prediction against THIS token's unbiased top-1
+    // expert.
+    // This mirrors exactly the training metric: predict(embedding_T) == unbiased_top1(T+1).
+    if (predictor_ && pred_results_ready_.load() && last_true_top1_expert_ != -1) {
+        std::lock_guard<std::mutex> lock(pred_results_mutex_);
+        if (!last_pred_no_bias_.empty()) {
+            // Ground truth: the unbiased top-1 expert for THIS token
+            // (computed from raw router_out above, before any lambda bias)
+            int n_check = std::min((int64_t)prefetch_experts_count_,
+                                   (int64_t)last_pred_no_bias_.size());
+            int hits_no_bias = 0;
+            for (int i = 0; i < n_check; ++i) {
+                if (last_pred_no_bias_[i] == current_true_top1)  { hits_no_bias++; break; }
+            }
+            
+            if (debug_verbosity >= 2) {
+                std::cout << "[Layer " << layer_idx_ << " STAT] Pred=" << last_pred_no_bias_[0] 
+                          << " Actual=" << current_true_top1 
+                          << " " << (hits_no_bias ? "HIT" : "MISS") 
+                          << " (SeqBaseline=" << (last_true_top1_expert_ == current_true_top1 ? "HIT" : "MISS") << ")" 
+                          << std::endl;
+            }
+
+            pred_hits_no_bias_ += hits_no_bias;
+            pred_total_++;
+        }
+    }
+    // Advance: this token's unbiased top-1 becomes the reference for next token's check.
+    // current_true_top1 was computed from router_out above, before lambda bias.
+    last_true_top1_expert_ = current_true_top1;
+
+    // Sequential top1 expert tracking
+    int64_t top1_global_e = topk_accessor[0];
+    if (last_top1_expert_ != -1) {
+        sequential_top1_total_++;
+        if (last_top1_expert_ == top1_global_e) {
+            sequential_top1_hits_++;
+        }
+    }
+    last_top1_expert_ = top1_global_e;
+
+    // Trigger speculative loading for the next token based on current embedding
+    trigger_speculative_loading(x_flat);
+    
+    return output;
+}
+
+torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
+                                                    const torch::Tensor &topk_idx, torch::Tensor &output) {
+    auto opts = x_flat.options();
+    const int64_t num_tokens = x_flat.size(0);
+
+    // Build map of which tokens use which expert (expert-by-expert approach from mixtral_torch)
+    std::map<int64_t, std::vector<int64_t>> expert_to_tokens;
+    std::map<std::pair<int64_t, int64_t>, float> token_expert_weights; // (token_idx, expert_id) -> weight
+    
+    auto topk_idx_cpu = topk_idx.cpu();
+    auto acc_idx = topk_idx_cpu.accessor<int64_t, 2>();
+    
+    for (int64_t token_idx = 0; token_idx < num_tokens; ++token_idx) {
+        for (int i = 0; i < num_experts_per_tok_; ++i) {
+            int64_t eid = acc_idx[token_idx][i];
+            float weight = topk_vals[token_idx][i].item<float>();
+            
+            expert_to_tokens[eid].push_back(token_idx);
+            token_expert_weights[{token_idx, eid}] = weight;
+        }
+    }
+    
+    // Get sorted list of all experts used
+    std::vector<int64_t> experts_to_process;
+    for (const auto& [eid, tokens] : expert_to_tokens) {
+        experts_to_process.push_back(eid);
+    }
+    std::sort(experts_to_process.begin(), experts_to_process.end());
+    
+    // Process expert-by-expert (like mixtral_torch), but batch tokens for each expert
+    for (int64_t expert_id : experts_to_process) {
+        // Load expert into cache slot
+        int64_t slot = ensure_expert_cached(expert_id, false);
+        
+        // Get all tokens that need this expert
+        const auto& token_indices = expert_to_tokens[expert_id];
+        int64_t num_tokens_for_expert = token_indices.size();
+        
+        // Gather inputs for all tokens that use this expert
+        std::vector<torch::Tensor> input_list;
+        std::vector<float> weights_list;
+        input_list.reserve(num_tokens_for_expert);
+        weights_list.reserve(num_tokens_for_expert);
+        
+        for (int64_t token_idx : token_indices) {
+            input_list.push_back(x_flat[token_idx]);
+            weights_list.push_back(token_expert_weights[{token_idx, expert_id}]);
+        }
+        
+        // Stack inputs into batch: [num_tokens_for_expert, hidden_size]
+        auto input_batch = torch::stack(input_list, 0);
+        
+        // Run gate_up projection (batched GEMM for all tokens using this expert)
+        auto gate_up = gate_up_experts[slot]->forward(input_batch, "moe_gate_up");
+        
+        // SiLU activation
+        auto gate_buf = gate_up.narrow(1, 0, intermediate_size_);
+        auto up_buf = gate_up.narrow(1, intermediate_size_, intermediate_size_);
+        torch::silu_(gate_buf);
+        gate_buf.mul_(up_buf);
+        
+        // Run down projection (batched GEMM)
+        auto down_out = down_experts[slot]->forward(gate_buf, "moe_down");
+        
+        // Apply routing weights
+        auto weights_tensor = torch::tensor(weights_list, opts).unsqueeze(-1);
+        down_out.mul_(weights_tensor);
+        
+        // Accumulate weighted outputs to final output tensor
+        for (size_t i = 0; i < token_indices.size(); ++i) {
+            output[token_indices[i]].add_(down_out[i]);
+        }
+    }
+    
+    return output;
+}
+
+torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
+    auto x_flat = x.view({-1, hidden_size_});
+    auto opts = x.options();
+
+    if (x_flat.size(0) > 1) {
+        prefill_expert_counts_.zero_();
+    }
+
+    torch::Tensor router_out = router->forward(x_flat);
+
+    // Capture the unbiased top-1 expert BEFORE any lambda bias is applied.
+    // Only valid (and only needed) for single-token generation forward passes.
+    // During prefill, router_out is [num_tokens, num_experts] so .item() would fail.
+    int64_t current_true_top1 = -1;
+    if (x_flat.size(0) == 1) {
+        current_true_top1 = torch::argmax(router_out[0], /*dim=*/-1).item<int64_t>();
+    }
+    
+    // Store router logits for training data collection
+    last_router_logits_ = router_out.detach().clone();
+
+    // ============== Router Logit Modification (Lambda Parameter) ==============
+    torch::Tensor topk_vals, topk_idx;
+    
+    if (std::abs(lambda_) > 1e-9) {  // Only apply if lambda is non-zero
+        // Update delta_avg (running average of logit ranges)
+        auto max_logits = std::get<0>(torch::max(router_out, /*dim=*/-1));  // [num_tokens]
+        auto min_logits = std::get<0>(torch::min(router_out, /*dim=*/-1));  // [num_tokens]
+        auto current_ranges = max_logits - min_logits;  // [num_tokens]
+        double current_avg_range = current_ranges.mean().item<double>();
+        
+        const double momentum = 0.99;
+        if (delta_avg_ == 0.0) {
+            delta_avg_ = current_avg_range;
+        } else {
+            delta_avg_ = momentum * delta_avg_ + (1.0 - momentum) * current_avg_range;
+        }
+        
+        // Create cache mask tensor
+        auto cache_mask = torch::tensor(expert_cache_bitmask_, 
+                                       router_out.options().dtype(torch::kFloat32));
+        
+        // Ensure top expert is always included in mask
+        bool has_cached = std::any_of(expert_cache_bitmask_.begin(), 
+                                     expert_cache_bitmask_.end(), 
+                                     [](int64_t v) { return v == 1; });
+        if (has_cached) {
+            auto top1_experts = torch::argmax(router_out, /*dim=*/-1);
+            auto top_expert_mask = torch::zeros({num_experts_}, cache_mask.options());
+            top_expert_mask.index_put_({top1_experts}, 1.0);
+            cache_mask = torch::maximum(cache_mask, top_expert_mask);
+        }
+        
+        // Apply bias to router logits
+        auto bias = lambda_ * delta_avg_ * cache_mask;
+        auto z_prime = router_out + bias;
+        
+        // Get expert INDICES using biased logits
+        torch::Tensor router_scores_for_indices = z_prime;
+        if (use_softmax_before_topk_) {
+            router_scores_for_indices = torch::softmax(router_scores_for_indices.to(torch::kFloat32), -1).to(router_out.dtype());
+        }
+        auto topk_result = router_scores_for_indices.topk(num_experts_per_tok_, -1);
+        topk_idx = std::get<1>(topk_result);
+        
+        // Get expert WEIGHTS using original logits (for correct probability distribution)
+        torch::Tensor router_scores_for_weights = router_out;
+        if (use_softmax_before_topk_) {
+            router_scores_for_weights = torch::softmax(router_scores_for_weights.to(torch::kFloat32), -1).to(router_out.dtype());
+        }
+        
+        // Extract weights for the selected experts
+        topk_vals = torch::gather(router_scores_for_weights, /*dim=*/-1, topk_idx);
+        
+        // Normalize if needed
+        if (use_softmax_before_topk_) {
+            if (normalize_topk_prob_) {
+                auto denom = topk_vals.sum(-1, true).clamp_min(1e-9);
+                topk_vals = (topk_vals / denom).to(router_out.dtype());
+            } else {
+                topk_vals = topk_vals.to(router_out.dtype());
+            }
+        } else {
+            topk_vals = torch::softmax(topk_vals.to(torch::kFloat32), -1).to(router_out.dtype());
+        }
+    } else {
+        // Standard routing (no lambda bias) - original logic
+        torch::Tensor router_scores = router_out;
+        if (use_softmax_before_topk_) {
+            router_scores = torch::softmax(router_scores.to(torch::kFloat32), -1).to(router_out.dtype());
+        }
+
+        auto topk = router_scores.topk(num_experts_per_tok_, -1);
+        topk_vals = std::get<0>(topk);
+        topk_idx = std::get<1>(topk);
+        if (use_softmax_before_topk_) {
+            if (normalize_topk_prob_) {
+                auto denom = topk_vals.sum(-1, true).clamp_min(1e-9);
+                topk_vals = (topk_vals / denom).to(router_out.dtype());
+            } else {
+                topk_vals = topk_vals.to(router_out.dtype());
+            }
+        } else {
+            topk_vals = torch::softmax(topk_vals.to(torch::kFloat32), -1).to(router_out.dtype());
+        }
+    }
+    
+    // Track prefill counts
+    if (x_flat.size(0) > 1) {
+        auto topk_cpu = topk_idx.to(torch::kCPU);
+        auto acc = topk_cpu.accessor<int64_t, 2>();
+        for (int t = 0; t < topk_cpu.size(0); ++t) {
+            for (int i = 0; i < topk_cpu.size(1); ++i) {
+                prefill_expert_counts_[acc[t][i]] += 1.0f;
+            }
+        }
+    }
+
+    auto output = torch::zeros({x_flat.size(0), hidden_size_}, opts);
+
+    if (!x_flat.is_cuda()) {
+        forward_cpu(x_flat, topk_vals, topk_idx, output);
+        return output.view({x.size(0), x.size(1), hidden_size_});
+    }
+
+    if (x_flat.size(0) == 1) {
+        forward_generation(x_flat, topk_vals, topk_idx, output, current_true_top1);
+    } else {
+        forward_prefill(x_flat, topk_vals, topk_idx, output);
+    }
+
+    return output.view({x.size(0), x.size(1), hidden_size_});
 }
 
 // Prefetch removed
@@ -380,29 +1352,124 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                                          int64_t num_hidden_layers, int64_t num_attention_heads, int64_t num_key_value_heads,
                                          int64_t head_dim, float rms_norm_eps, float rope_theta, const NPUGlobalConfig &npu_config,
                                          int64_t max_seq_len, int64_t max_batch_size, int64_t groupsize, int64_t num_experts,
-                                         int64_t num_experts_per_tok, torch::Device device)
+                                         int64_t num_experts_per_tok, torch::Device device, int64_t max_cached_experts_per_layer,
+                                         const std::string& predictor_model_path, int64_t prefetch_experts_count,
+                                         const std::vector<int>& predict_layers,
+                                         const std::vector<int64_t>& per_layer_cache_sizes)
     : arch_type_(arch_type), vocab_size_(vocab_size), hidden_size_(hidden_size), intermediate_size_(intermediate_size),
       num_hidden_layers_(num_hidden_layers), num_attention_heads_(num_attention_heads), num_key_value_heads_(num_key_value_heads),
       head_dim_(head_dim), rms_norm_eps_(rms_norm_eps), rope_theta_(rope_theta), max_seq_len_(max_seq_len), max_batch_size_(max_batch_size),
-      groupsize_(groupsize), GQA_head_ratio_(num_attention_heads / num_key_value_heads), num_experts_(num_experts),
-      num_experts_per_tok_(num_experts_per_tok), npu_config_(npu_config) {
+      groupsize_(groupsize), GQA_head_ratio_(num_attention_heads / num_key_value_heads), npu_config_(npu_config) {
 
-    std::cout << "Initializing UnifiedLLMW4A16Impl_Predict" << std::endl;
-
-    // Read NPU config early to set debug verbosity
+    std::cout << "Initializing UnifiedLLMW4A16Impl_base" << std::endl;
     std::cout << "Using NPU config struct." << std::endl;
-    // Initialize NPU (reads config internally)
-    if (this->initialize_npu() != 0) {
-        throw std::runtime_error("Failed to initialize NPU context");
+    configure_npu(npu_config_);
+    warmup_ = warmup_enabled;
+
+    // Set attention mode and HIP kernel usage based on heterogeneity
+    bool is_cpu = (npu_config_.heterogeneity == "cpu");
+    attention_mode_ = is_cpu ? 1 : ATTENTION_BACKEND;
+    if (is_cpu) {
+        device = torch::kCPU;
+    }
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        num_experts_ = (num_experts > 0) ? num_experts : 8;
+        num_experts_per_tok_ = (num_experts_per_tok > 0) ? num_experts_per_tok : 2;
+    } else if (arch_type_ == ArchitectureType::QWEN) {
+        num_experts_ = (num_experts > 0) ? num_experts : 128;
+        num_experts_per_tok_ = (num_experts_per_tok > 0) ? num_experts_per_tok : 8;
+    } else {
+        throw std::runtime_error("Unsupported architecture.");
     }
 
-    // Use global warmup setting from npuSetup
-    warmup_ = warmup_enabled;
-    std::cout << "Warmup: " << (warmup_ ? "Enabled" : "Disabled") << std::endl;
+    // GPU placement configuration (GPU mode only): auto-select by free VRAM.
+    gpu_count_ = std::max(1, npu_config_.gpu_count);
+    embedding_device_ = device;
+    output_device_ = device;
+    layer_devices_.assign(num_hidden_layers_, device);
+
+    if (!is_cpu && device.is_cuda()) {
+        int available_gpus = 0;
+        if (hipGetDeviceCount(&available_gpus) != hipSuccess) {
+            available_gpus = 0;
+        }
+        if (available_gpus <= 0) {
+            throw std::runtime_error("Config requested GPU execution, but no GPU is available.");
+        }
+        if (available_gpus < gpu_count_) {
+            throw std::runtime_error("Config requested gpu-count=" + std::to_string(gpu_count_) + " but only " +
+                                     std::to_string(available_gpus) + " GPU(s) are available.");
+        }
+
+        auto selection = select_gpus_by_free_vram(gpu_count_, available_gpus);
+        if (static_cast<int>(selection.selected.size()) < gpu_count_) {
+            throw std::runtime_error("Failed to select enough GPUs for gpu-count=" + std::to_string(gpu_count_) + ".");
+        }
+
+        multi_gpu_enabled_ = (gpu_count_ > 1);
+        embedding_device_ = torch::Device(torch::kCUDA, selection.selected.front());
+        for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+            int selected_slot = static_cast<int>((i * gpu_count_) / num_hidden_layers_);
+            int gpu_idx = selection.selected[selected_slot];
+            layer_devices_[i] = torch::Device(torch::kCUDA, gpu_idx);
+        }
+        output_device_ = layer_devices_.back();
+        device = embedding_device_;
+
+        if (debug_verbosity >= 1) {
+            if (selection.used_fallback) {
+                std::cout << "[GPU SELECT] VRAM query failed, using fallback gpu ordering 0..N-1";
+                if (!selection.fallback_reason.empty()) {
+                    std::cout << " (" << selection.fallback_reason << ")";
+                }
+                std::cout << std::endl;
+            } else {
+                std::cout << "[GPU SELECT] Free VRAM ranking: ";
+                for (size_t i = 0; i < selection.ranked.size(); ++i) {
+                    if (i > 0) {
+                        std::cout << ", ";
+                    }
+                    const auto &info = selection.ranked[i];
+                    std::ostringstream vram_ss;
+                    vram_ss << std::fixed << std::setprecision(2) << bytes_to_gib(info.free_bytes) << "/" << bytes_to_gib(info.total_bytes)
+                            << " GiB";
+                    std::cout << "gpu" << info.index << "=" << vram_ss.str();
+                }
+                std::cout << std::endl;
+            }
+
+            std::cout << "[GPU SELECT] Selected GPUs for gpu-count=" << gpu_count_ << ": " << join_gpu_indices(selection.selected)
+                      << std::endl;
+
+            if (multi_gpu_enabled_) {
+                std::ostringstream layer_map_ss;
+                layer_map_ss << "[GPU MAP] Layer ranges: ";
+                bool first = true;
+                for (int slot = 0; slot < gpu_count_; ++slot) {
+                    const int64_t layer_start = (slot * num_hidden_layers_) / gpu_count_;
+                    const int64_t layer_end = (((slot + 1) * num_hidden_layers_) / gpu_count_) - 1;
+                    if (layer_start > layer_end) {
+                        continue;
+                    }
+                    if (!first) {
+                        layer_map_ss << "; ";
+                    }
+                    first = false;
+                    layer_map_ss << "gpu" << selection.selected[slot] << ": layers " << layer_start << "-" << layer_end;
+                }
+                std::cout << layer_map_ss.str() << std::endl;
+            } else {
+                std::cout << "[GPU MAP] Single-GPU placement on gpu" << static_cast<int>(embedding_device_.index()) << std::endl;
+            }
+        }
+    } else {
+        gpu_count_ = 1;
+    }
 
     // Token embedding - initialize on device
     token_embedding = register_module("token_embedding", HipEmbedding(vocab_size_, hidden_size_, max_batch_size_, max_seq_len_));
-    token_embedding->to(device);
+    token_embedding->set_use_hip(!is_cpu);
+    token_embedding->to(embedding_device_);
     token_embedding->to(torch::kBFloat16);
 
     bool use_qkv_bias = false;
@@ -420,85 +1487,180 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
         o_layers.push_back(register_module("o_" + std::to_string(i),
                                            QuantizedLinear(num_attention_heads_ * head_dim_, hidden_size_, false, max_seq_len_, "o")));
 
-        // MLP layers (quantized)
-        gate_layers.push_back(
-            register_module("gate_" + std::to_string(i), QuantizedLinear(hidden_size_, intermediate_size_, false, max_seq_len_, "gate")));
-        up_layers.push_back(
-            register_module("up_" + std::to_string(i), QuantizedLinear(hidden_size_, intermediate_size_, false, max_seq_len_, "up")));
-        down_layers.push_back(
-            register_module("down_" + std::to_string(i), QuantizedLinear(intermediate_size_, hidden_size_, false, max_seq_len_, "down")));
+        bool use_qwen_router = (arch_type_ == ArchitectureType::QWEN);
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            // Resolve predictor path for this layer (supports flat and hidden_dim subdirectory layouts).
+            std::string layer_predictor_path = find_predictor_model_path(predictor_model_path, i);
+            
+            // Check if explicitly filtered out by predict_layers array
+            if (!predict_layers.empty() && std::find(predict_layers.begin(), predict_layers.end(), static_cast<int>(i)) == predict_layers.end()) {
+                layer_predictor_path = "";
+            }
+
+            if (!predictor_model_path.empty() && layer_predictor_path.empty() && (predict_layers.empty() || std::find(predict_layers.begin(), predict_layers.end(), static_cast<int>(i)) != predict_layers.end())) {
+                std::cerr << "[Predictor] Warning: no model found for layer " << i
+                          << " under " << predictor_model_path << "/layer_" << i
+                          << " (tried flat and one-level subdirs)" << std::endl;
+            } else if (!layer_predictor_path.empty() && debug_verbosity >= 1 && (i == 0 || (!predict_layers.empty() && i == predict_layers[0]))) {
+                // Log resolved path for the first activated layer as a representative sample.
+                std::cout << "[Predictor] Layer " << i << " model path resolved to: " << layer_predictor_path << std::endl;
+            }
+
+            // Determine which device the predictor TorchScript model runs on.
+            // "hetero" / "npu" -> CPU device (Ryzen AI NPU backend runs under CPU TorchScript)
+            // "gpu"            -> same GPU as the MoE layer (default)
+            // "cpu"            -> CPU
+            // An explicit predictor_device in the config overrides the inference.
+            torch::Device pred_device = layer_devices_[i]; // default: same GPU as MoE
+            {
+                std::string pd = npu_config_.predictor_device; // explicit override
+                if (pd == "auto" || pd.empty()) {
+                    // Infer from heterogeneity
+                    const std::string &h = npu_config_.heterogeneity;
+                    if (h == "hetero" || h == "npu") {
+                        pd = "cpu";
+                    } else if (h == "cpu") {
+                        pd = "cpu";
+                    } else {
+                        pd = "gpu"; // "gpu" or anything else
+                    }
+                }
+                if (pd == "cpu") {
+                    pred_device = torch::kCPU;
+                } else if (pd == "gpu") {
+                    pred_device = layer_devices_[i];
+                }
+                // Log only for layer 0 to avoid 32 identical lines
+                if (i == 0 && debug_verbosity >= 1 && !layer_predictor_path.empty()) {
+                    std::cout << "[Predictor] Running on device: "
+                              << (pred_device.is_cpu() ? "CPU (NPU path)" : "GPU")
+                              << " (heterogeneity=\"" << npu_config_.heterogeneity
+                              << "\", predictor_device=\"" << npu_config_.predictor_device << "\")"
+                              << std::endl;
+                }
+            }
+
+            int64_t layer_cache_size = (!per_layer_cache_sizes.empty() && i < (int64_t)per_layer_cache_sizes.size())
+                                           ? per_layer_cache_sizes[i]
+                                           : max_cached_experts_per_layer;
+
+            moe_layers.push_back(register_module("moe_" + std::to_string(i),
+                                                 MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
+                                                                  layer_cache_size, i,
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, pred_device, prefetch_experts_count)));
+        }
+        if (arch_type_ == ArchitectureType::QWEN) {
+            q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
+            k_norms.push_back(register_module("k_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
+        }
 
         // Normalization layers (not quantized)
         input_norms.push_back(register_module("input_norm_" + std::to_string(i), RMSNorm(hidden_size_, rms_norm_eps_)));
         post_attn_norms.push_back(register_module("post_attn_norm_" + std::to_string(i), RMSNorm(hidden_size_, rms_norm_eps_)));
 
         // KV caches - initialize on device with bf16
-        caches_k.push_back(
-            register_buffer("cache_k_" + std::to_string(i), torch::zeros({max_batch_size_, num_key_value_heads_, max_seq_len_, head_dim_},
-                                                                         torch::TensorOptions().device(device).dtype(torch::kBFloat16))));
-        caches_v.push_back(
-            register_buffer("cache_v_" + std::to_string(i), torch::zeros({max_batch_size_, num_key_value_heads_, max_seq_len_, head_dim_},
-                                                                         torch::TensorOptions().device(device).dtype(torch::kBFloat16))));
+        caches_k.push_back(register_buffer("cache_k_" + std::to_string(i),
+                                           torch::zeros({max_batch_size_, num_key_value_heads_, max_seq_len_, head_dim_},
+                                                        torch::TensorOptions().device(layer_devices_[i]).dtype(torch::kBFloat16))));
+        caches_v.push_back(register_buffer("cache_v_" + std::to_string(i),
+                                           torch::zeros({max_batch_size_, num_key_value_heads_, max_seq_len_, head_dim_},
+                                                        torch::TensorOptions().device(layer_devices_[i]).dtype(torch::kBFloat16))));
     }
 
     // Final norm and output head
     final_norm = register_module("final_norm", RMSNorm(hidden_size_, rms_norm_eps_));
-    final_norm->to(device);
+    final_norm->to(output_device_);
     final_norm->to(torch::kBFloat16);
 
     lm_head = register_module("lm_head", LmHeadLinear(hidden_size_, vocab_size_, max_batch_size_, max_seq_len_));
+    lm_head->set_use_hip(!is_cpu);
 
     // Move all layers to device
     for (int64_t i = 0; i < num_hidden_layers_; ++i) {
-        q_layers[i]->to(device);
-        k_layers[i]->to(device);
-        v_layers[i]->to(device);
-        o_layers[i]->to(device);
-        gate_layers[i]->to(device);
-        up_layers[i]->to(device);
-        down_layers[i]->to(device);
-        input_norms[i]->to(device);
+        auto layer_device = layer_devices_[i];
+        q_layers[i]->to(layer_device);
+        k_layers[i]->to(layer_device);
+        v_layers[i]->to(layer_device);
+        o_layers[i]->to(layer_device);
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            moe_layers[i]->to(layer_device);
+            moe_layers[i]->router->to(torch::kBFloat16);
+        }
+        if (arch_type_ == ArchitectureType::QWEN) {
+            q_norms[i]->to(layer_device);
+            q_norms[i]->to(torch::kBFloat16);
+            k_norms[i]->to(layer_device);
+            k_norms[i]->to(torch::kBFloat16);
+        }
+        input_norms[i]->to(layer_device);
         input_norms[i]->to(torch::kBFloat16);
-        post_attn_norms[i]->to(device);
+        post_attn_norms[i]->to(layer_device);
         post_attn_norms[i]->to(torch::kBFloat16);
     }
-    lm_head->to(device);
+    lm_head->to(output_device_);
     lm_head->to(torch::kBFloat16);
 
     // Register scratch buffers
 
-    x_buffer = register_buffer("x_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_}, torch::kBFloat16));
-    gate_buffer = register_buffer("gate_buffer", torch::zeros({max_batch_size_, max_seq_len_, intermediate_size_}, torch::kBFloat16));
-    up_buffer = register_buffer("up_buffer", torch::zeros({max_batch_size_, max_seq_len_, intermediate_size_}, torch::kBFloat16));
-    output_buffer = register_buffer("output_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_}, torch::kBFloat16));
+    x_buffer = register_buffer("x_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_},
+                                                        torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
+    gate_buffer = register_buffer("gate_buffer", torch::zeros({max_batch_size_, max_seq_len_, intermediate_size_},
+                                                              torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
+    up_buffer = register_buffer("up_buffer", torch::zeros({max_batch_size_, max_seq_len_, intermediate_size_},
+                                                          torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
+    output_buffer =
+        register_buffer("output_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_},
+                                                      torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
 
     hidden_states_buffer =
-        register_buffer("hidden_states_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_}, torch::kBFloat16));
-    queries_buffer = register_buffer("queries_buffer",
-                                     torch::zeros({max_batch_size_, max_seq_len_, num_attention_heads_ * head_dim_}, torch::kBFloat16));
-    keys_buffer =
-        register_buffer("keys_buffer", torch::zeros({max_batch_size_, max_seq_len_, num_key_value_heads_ * head_dim_}, torch::kBFloat16));
+        register_buffer("hidden_states_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_},
+                                                             torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
+    queries_buffer =
+        register_buffer("queries_buffer", torch::zeros({max_batch_size_, max_seq_len_, num_attention_heads_ * head_dim_},
+                                                       torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
+    keys_buffer = register_buffer("keys_buffer", torch::zeros({max_batch_size_, max_seq_len_, num_key_value_heads_ * head_dim_},
+                                                              torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
     values_buffer =
-        register_buffer("values_buffer", torch::zeros({max_batch_size_, max_seq_len_, num_key_value_heads_ * head_dim_}, torch::kBFloat16));
+        register_buffer("values_buffer", torch::zeros({max_batch_size_, max_seq_len_, num_key_value_heads_ * head_dim_},
+                                                      torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
     // Decode output buffer uses q_len=1 to keep contiguous [B, H, 1, D] layout.
     attn_output_heads_buffer =
-        register_buffer("attn_output_heads_buffer", torch::zeros({max_batch_size_, num_attention_heads_, 1, head_dim_}, torch::kBFloat16));
+        register_buffer("attn_output_heads_buffer", torch::zeros({max_batch_size_, num_attention_heads_, 1, head_dim_},
+                                                                 torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
     attn_output_buffer =
-        register_buffer("attn_output_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_}, torch::kBFloat16));
+        register_buffer("attn_output_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_},
+                                                           torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
     attn_output_proj_buffer =
-        register_buffer("attn_output_proj_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_}, torch::kBFloat16));
+        register_buffer("attn_output_proj_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_},
+                                                                torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
 
-    norm_buffer = register_buffer("norm_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_}, torch::kBFloat16));
+    norm_buffer = register_buffer("norm_buffer", torch::zeros({max_batch_size_, max_seq_len_, hidden_size_},
+                                                              torch::TensorOptions().device(embedding_device_).dtype(torch::kBFloat16)));
 
-    // Move entire module (including all buffers and parameters) to device
-    this->to(device);
+    // Keep explicit per-layer placement in model-parallel mode.
+    if (!multi_gpu_enabled_) {
+        this->to(device);
+    }
+
+    // Preload MoE kernels to reduce cold-start spikes (Mixtral only)
+    preload_moe_kernels();
 
     if (debug_verbosity >= 1) {
+        if (multi_gpu_enabled_) {
+            std::cout << "Layer-split model parallel enabled across " << gpu_count_ << " GPUs." << std::endl;
+        }
         std::cout << "UnifiedLLMW4A16 initialized on device: " << device << " with w4a16 quantization" << std::endl;
     }
 }
 
 UnifiedLLMW4A16Impl &UnifiedLLMW4A16Impl::to(torch::Device device) {
+    if (multi_gpu_enabled_) {
+        if (debug_verbosity >= 1) {
+            std::cout << "Ignoring to(" << device << ") in multi-GPU layer-split mode." << std::endl;
+        }
+        return *this;
+    }
+
     torch::nn::Module::to(device);
 
     for (auto &cache : caches_k) {
@@ -521,6 +1683,18 @@ UnifiedLLMW4A16Impl &UnifiedLLMW4A16Impl::to(torch::Device device) {
     attn_output_buffer = attn_output_buffer.to(device);
     attn_output_proj_buffer = attn_output_proj_buffer.to(device);
     norm_buffer = norm_buffer.to(device);
+
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+            moe_layers[i]->to(device);
+        }
+    }
+    if (arch_type_ == ArchitectureType::QWEN) {
+        for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+            q_norms[i]->to(device);
+            k_norms[i]->to(device);
+        }
+    }
 
     if (debug_verbosity >= 1) {
         std::cout << "UnifiedLLMW4A16 moved to device: " << device << std::endl;
@@ -588,14 +1762,248 @@ torch::Tensor UnifiedLLMW4A16Impl::silu(const torch::Tensor &x) { return torch::
 torch::Tensor UnifiedLLMW4A16Impl::gelu(const torch::Tensor &x) { return torch::gelu(x); }
 torch::Tensor UnifiedLLMW4A16Impl::swiglu(const torch::Tensor &gate, const torch::Tensor &up) { return silu(gate) * up; }
 
-torch::Tensor UnifiedLLMW4A16Impl::forward(torch::Tensor x, int64_t start_pos) {
-    if (arch_type_ != ArchitectureType::LLAMA3) {
-        throw std::runtime_error("Only LLAMA3 is supported.");
+void UnifiedLLMW4A16Impl::preload_moe_kernels() {
+    if ((arch_type_ != ArchitectureType::MIXTRAL && arch_type_ != ArchitectureType::QWEN) || !preload_moe_kernels_enabled) {
+        return;
     }
-    return forward_llama3(x, start_pos);
+    if (!x_buffer.is_cuda()) {
+        return;
+    }
+
+    if (debug_verbosity >= 1) {
+        std::cout << "Preloading MoE kernels..." << std::endl;
+    }
+
+    torch::NoGradGuard no_grad;
+    auto opts = torch::TensorOptions().device(x_buffer.device()).dtype(torch::kBFloat16);
+
+    // Minimal shapes to trigger topk/softmax/one_hot/nonzero/index_add kernels.
+    auto router_out = torch::rand({1, num_experts_}, opts);
+    auto topk = router_out.topk(num_experts_per_tok_, -1);
+    auto topk_vals = std::get<0>(topk);
+    auto topk_idx = std::get<1>(topk);
+    topk_vals = torch::softmax(topk_vals.to(torch::kFloat32), -1).to(router_out.dtype());
+
+    auto expert_mask = torch::one_hot(topk_idx, num_experts_).to(torch::kBool);
+    expert_mask = expert_mask.permute({2, 1, 0}); // [experts, top_k, tokens]
+    auto expert_hit = torch::nonzero(expert_mask.sum({1, 2}) > 0).squeeze();
+
+    if (expert_hit.numel() > 0) {
+        auto token_idx = torch::zeros({1}, torch::TensorOptions().device(router_out.device()).dtype(torch::kLong));
+        auto down_slice = torch::zeros({1, hidden_size_}, opts);
+        auto topk_pos = torch::zeros({1}, torch::TensorOptions().device(router_out.device()).dtype(torch::kLong));
+        auto weights = topk_vals.index({token_idx, topk_pos}).to(down_slice.dtype());
+
+        down_slice.mul_(weights.unsqueeze(-1));
+        auto output = torch::zeros({1, hidden_size_}, opts);
+        output.index_add_(0, token_idx, down_slice);
+    }
+
+    // Warmup the MoE layer as well
+    // Cached backend: Cannot warmup MoE here as weights_dir is not set yet.
+    // if (moe_layers.size() > 0) {
+    //     auto router_input = torch::randn({1, 2, hidden_size_}, opts);
+    //     moe_layers[0]->forward(router_input);
+    // }
+
+    if (debug_verbosity >= 1) {
+        std::cout << "MoE kernels preloaded." << std::endl;
+    }
 }
 
-torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start_pos) {
+torch::Tensor UnifiedLLMW4A16Impl::forward(torch::Tensor x, int64_t start_pos) {
+    // Extract token IDs and update context for all MoE layers
+    std::vector<int64_t> token_ids;
+    if (x.is_cuda()) {
+        auto x_cpu = x.cpu();
+        token_ids = std::vector<int64_t>(x_cpu.data_ptr<int64_t>(), x_cpu.data_ptr<int64_t>() + x_cpu.numel());
+    } else {
+        token_ids = std::vector<int64_t>(x.data_ptr<int64_t>(), x.data_ptr<int64_t>() + x.numel());
+    }
+
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (auto& moe_layer : moe_layers) {
+            moe_layer->set_context_token_ids(token_ids);
+        }
+    }
+
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        if (multi_gpu_enabled_) {
+            return forward_mixtral_multi_gpu(x, start_pos);
+        }
+        return forward_mixtral(x, start_pos);
+    }
+    if (arch_type_ == ArchitectureType::QWEN) {
+        if (multi_gpu_enabled_) {
+            return forward_qwen_multi_gpu(x, start_pos);
+        }
+        return forward_qwen(x, start_pos);
+    }
+    throw std::runtime_error("Unsupported architecture.");
+}
+
+torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral_multi_gpu(torch::Tensor x, int64_t start_pos) {
+    int64_t bsz = x.size(0);
+    int64_t seq_len = x.size(1);
+
+    if (embedding_device_.is_cuda() && embedding_device_.index() >= 0) {
+        c10::hip::set_device(static_cast<c10::DeviceIndex>(embedding_device_.index()));
+    }
+    if (x.device() != embedding_device_) {
+        x = x.to(embedding_device_);
+    }
+    x = token_embedding->forward(x);
+
+    torch::Tensor mask;
+    if (seq_len > 1) {
+        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
+                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+        mask = torch::triu(mask, 1);
+        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+        mask = mask.to(x.dtype());
+    }
+
+    for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        auto layer_device = layer_devices_[i];
+        if (layer_device.is_cuda() && layer_device.index() >= 0) {
+            c10::hip::set_device(static_cast<c10::DeviceIndex>(layer_device.index()));
+        }
+        if (x.device() != layer_device) {
+            x = x.to(layer_device);
+        }
+
+        auto opts = torch::TensorOptions().device(layer_device).dtype(torch::kBFloat16);
+        auto normed = torch::empty({bsz, seq_len, hidden_size_}, opts);
+        input_norms[i]->forward_out(normed, x);
+
+        auto normed_2d = normed.view({-1, hidden_size_});
+        auto q = q_layers[i]->forward(normed_2d, "q").view({bsz, seq_len, num_attention_heads_, head_dim_});
+        auto k = k_layers[i]->forward(normed_2d, "k").view({bsz, seq_len, num_key_value_heads_, head_dim_});
+        auto v = v_layers[i]->forward(normed_2d, "v").view({bsz, seq_len, num_key_value_heads_, head_dim_});
+        if (debug_verbosity >= 2) {
+            std::cout << "[MIXTRAL-MULTIGPU] Layer " << i << ": qkv done" << std::endl;
+        }
+
+        if (!q.is_cuda() || (rope_scaling_enabled && rope_scaling_type == "llama3")) {
+            if (debug_verbosity >= 2) {
+                std::cout << "[MIXTRAL-MULTIGPU] Layer " << i << ": rope (torch) begin" << std::endl;
+            }
+            auto freqs_cis = compute_rope_freqs(seq_len, start_pos);
+            auto rope_result = apply_rotary_emb(q, k, freqs_cis);
+            q = rope_result.first;
+            k = rope_result.second;
+        } else {
+            if (debug_verbosity >= 2) {
+                std::cout << "[MIXTRAL-MULTIGPU] Layer " << i << ": rope (hip) begin" << std::endl;
+            }
+            launch_rope(q, k, start_pos, rope_theta_);
+        }
+        if (debug_verbosity >= 2) {
+            std::cout << "[MIXTRAL-MULTIGPU] Layer " << i << ": rope done" << std::endl;
+        }
+
+        auto cache_k = caches_k[i];
+        auto cache_v = caches_v[i];
+        cache_k = cache_k.narrow(2, start_pos, seq_len).copy_(k.transpose(1, 2));
+        cache_v = cache_v.narrow(2, start_pos, seq_len).copy_(v.transpose(1, 2));
+        if (debug_verbosity >= 2) {
+            std::cout << "[MIXTRAL-MULTIGPU] Layer " << i << ": cache write done" << std::endl;
+        }
+
+        k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+        v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+
+        if (attention_mode_ >= 1) {
+            if (start_pos == 0) {
+                k = repeat_kv(k, GQA_head_ratio_);
+                v = repeat_kv(v, GQA_head_ratio_);
+            }
+        } else {
+            k = repeat_kv(k, GQA_head_ratio_);
+            v = repeat_kv(v, GQA_head_ratio_);
+        }
+
+        q = q.transpose(1, 2);
+
+        torch::Tensor attn_output;
+        torch::Tensor layer_mask;
+        if (mask.defined() && mask.numel() > 0) {
+            layer_mask = (mask.device() == layer_device) ? mask : mask.to(layer_device);
+        }
+
+        if (debug_verbosity >= 2) {
+            const char *attn_backend = (attention_mode_ == 1) ? "SDPA" : (attention_mode_ == 2) ? "HIP_FA_KERNEL" : "EAGER";
+            std::cout << "[MIXTRAL-MULTIGPU] Layer " << i << ": attention backend(mode) = " << attn_backend << std::endl;
+        }
+
+        if (attention_mode_ == 1) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                c10::optional<torch::Tensor> opt_mask;
+                if (layer_mask.defined() && layer_mask.numel() > 0) {
+                    opt_mask = layer_mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                }
+                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
+            }
+
+        } else if (attention_mode_ == 2) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                int batch_size = q.size(0);
+                int n_heads_Q = q.size(1);
+                int n_heads_KV = k.size(1);
+                int head_dim = q.size(3);
+                int seq_len_kv = k.size(2);
+                float scale = 1.0f / std::sqrt(static_cast<float>(head_dim));
+                attn_output = torch::empty_like(q);
+                int element_size = q.element_size();
+
+                launch_flash_attn_decode_hip(q.data_ptr(), k.data_ptr(), v.data_ptr(),
+                                             (layer_mask.defined() && layer_mask.numel() > 0) ? layer_mask.data_ptr() : nullptr,
+                                             attn_output.data_ptr(), batch_size, n_heads_Q, n_heads_KV, head_dim, seq_len_kv, scale,
+                                             q.stride(2) * element_size, q.stride(1) * element_size, q.stride(0) * element_size,
+                                             k.stride(2) * element_size, k.stride(1) * element_size, k.stride(0) * element_size,
+                                             v.stride(2) * element_size, v.stride(1) * element_size, v.stride(0) * element_size, 0,
+                                             q.dtype() == torch::kBFloat16, c10::hip::getCurrentHIPStream().stream());
+            }
+
+        } else {
+            auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
+            if (layer_mask.defined() && layer_mask.numel() > 0) {
+                att = att + layer_mask.to(q.dtype());
+            }
+            auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
+            attn_output = torch::matmul(attn_weights, v);
+        }
+
+        attn_output = attn_output.transpose(1, 2).contiguous().view({bsz, seq_len, hidden_size_});
+        auto attn_proj_buf = o_layers[i]->forward(attn_output.view({-1, hidden_size_}), "o").view({bsz, seq_len, hidden_size_});
+        x = x + attn_proj_buf;
+
+        auto post_normed = torch::empty({bsz, seq_len, hidden_size_}, opts);
+        post_attn_norms[i]->forward_out(post_normed, x);
+        auto moe_out = moe_layers[i]->forward(post_normed);
+        x = x + moe_out;
+    }
+
+    if (x.device() != output_device_) {
+        x = x.to(output_device_);
+    }
+    x = final_norm->forward(x);
+    x = lm_head->forward(x);
+    return x;
+}
+
+torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t start_pos) {
+    if (embedding_device_.is_cuda() && embedding_device_.index() >= 0) {
+        c10::hip::set_device(static_cast<c10::DeviceIndex>(embedding_device_.index()));
+    }
+    if (x.device() != embedding_device_) {
+        x = x.to(embedding_device_);
+    }
+
     int64_t bsz = x.size(0);
     int64_t seq_len = x.size(1);
 
@@ -605,14 +2013,11 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
     // Create causal mask
     torch::Tensor mask;
     if (seq_len > 1) {
-        if (seq_len > 1) {
-            mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
-                               torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
-            mask = torch::triu(mask, 1);
-            mask =
-                torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
-            mask = mask.to(x.dtype());
-        }
+        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
+                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+        mask = torch::triu(mask, 1);
+        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+        mask = mask.to(x.dtype());
     }
 
     // Slice buffers for current batch size and sequence length
@@ -621,8 +2026,6 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
     auto v_buf = values_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
     auto attn_proj_buf = attn_output_proj_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
 
-    auto gate_buf = gate_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
-    auto up_buf = up_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
     auto out_buf = output_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
     auto normed = norm_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
 
@@ -630,28 +2033,23 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
         // Pre-attention norm
         input_norms[i]->forward_out(normed, x);
 
-        // Async calls for Q, K, V
+        // Synchronous calls for Q, K, V (since future removed)
         torch::Tensor q, k, v;
 
-        auto f_q = q_layers[i]->forward(q_buf, normed, "q");
-        auto f_k = k_layers[i]->forward(k_buf, normed, "k");
-        auto f_v = v_layers[i]->forward(v_buf, normed, "v");
-
-        if (f_q.valid())
-            f_q.wait();
-        if (f_k.valid())
-            f_k.wait();
+        q_layers[i]->forward(q_buf, normed, "q");
+        k_layers[i]->forward(k_buf, normed, "k");
+        v_layers[i]->forward(v_buf, normed, "v");
 
         // Slice padded buffers to valid dimensions before usage
         q = q_buf.slice(-1, 0, num_attention_heads_ * head_dim_);
         k = k_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
-
         // Reshape
         q = q.view({bsz, seq_len, num_attention_heads_, head_dim_});
         k = k.view({bsz, seq_len, num_key_value_heads_, head_dim_});
-
-        // Apply RoPE (Llama3 scaling if configured)
-        if (rope_scaling_enabled && rope_scaling_type == "llama3") {
+        // Apply RoPE:
+        // - CPU path uses PyTorch implementation.
+        // - CUDA path uses HIP kernel unless llama3 scaling is enabled.
+        if (!q.is_cuda() || (rope_scaling_enabled && rope_scaling_type == "llama3")) {
             auto freqs_cis = compute_rope_freqs(seq_len, start_pos);
             auto rope_result = apply_rotary_emb(q, k, freqs_cis);
             q = rope_result.first;
@@ -660,18 +2058,14 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
             launch_rope(q, k, start_pos, rope_theta_);
         }
 
-        if (f_v.valid())
-            f_v.wait();
-
         v = v_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
         v = v.view({bsz, seq_len, num_key_value_heads_, head_dim_});
 
-        // Reshape K/V to [B, H, S, D] for storage
-        auto k_transposed = k.transpose(1, 2);
-        auto v_transposed = v.transpose(1, 2);
-
-        caches_k[i].narrow(0, 0, bsz).narrow(2, start_pos, seq_len).copy_(k_transposed);
-        caches_v[i].narrow(0, 0, bsz).narrow(2, start_pos, seq_len).copy_(v_transposed);
+        // Cache K, V
+        auto cache_k = caches_k[i];
+        auto cache_v = caches_v[i];
+        cache_k = cache_k.narrow(2, start_pos, seq_len).copy_(k.transpose(1, 2));
+        cache_v = cache_v.narrow(2, start_pos, seq_len).copy_(v.transpose(1, 2));
 
         // Retrieve full cache in [B, H, S, D]
         k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
@@ -680,129 +2074,422 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_llama3(torch::Tensor x, int64_t start
         // Expand KV heads for GQA (8 KV heads -> 32 Q heads)
         // For SDPA: Skip repeat during decoding (start_pos > 0) to use native GQA.
         // For Prompt (start_pos == 0) or non-SDPA: Apply repeat (workaround for potential GQA+Causal issues).
-#if LLAMA_USE_SCALED_ATTENTION >= 1
-        if (start_pos == 0) {
+        if (attention_mode_ >= 1) {
+            if (start_pos == 0) {
+                k = repeat_kv(k, GQA_head_ratio_);
+                v = repeat_kv(v, GQA_head_ratio_);
+            }
+        } else {
             k = repeat_kv(k, GQA_head_ratio_);
             v = repeat_kv(v, GQA_head_ratio_);
         }
-#else
-        k = repeat_kv(k, GQA_head_ratio_);
-        v = repeat_kv(v, GQA_head_ratio_);
-#endif
 
         // Transpose for attention
         q = q.transpose(1, 2);
 
         torch::Tensor attn_output;
-#if LLAMA_USE_SCALED_ATTENTION == 1
-        // Mode 1: PyTorch SDPA
-        if (start_pos == 0 && seq_len > 1) {
-            // First prompt pass: use native causal optimization
-            attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
-        } else {
-            // Decoding or subsequent chunks: use explicit mask if defined
-            c10::optional<torch::Tensor> opt_mask;
-            if (mask.defined() && mask.numel() > 0) {
-                // Expand mask from [seq_len, kv_seq_len] to [1, 1, seq_len, kv_seq_len]
-                opt_mask = mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
-            }
-            attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
+        if (debug_verbosity >= 2) {
+            const char *attn_backend = (attention_mode_ == 1) ? "SDPA" : (attention_mode_ == 2) ? "HIP_FA_KERNEL" : "EAGER";
+            std::cout << "[MIXTRAL] Layer " << i << ": attention backend(mode) = " << attn_backend << std::endl;
         }
-
-#elif LLAMA_USE_SCALED_ATTENTION == 2
-        // Mode 2: Custom HIP Kernel
-        if (start_pos == 0 && seq_len > 1) {
-            // First prompt pass: use native causal optimization (SDPA fallback for prefill)
-            attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
-        } else {
-            // Decoding phase: use Custom HIP Kernel
-            int batch_size = q.size(0);
-            int n_heads_Q = q.size(1);
-            int n_heads_KV = k.size(1);
-            int head_dim = q.size(3);
-            int seq_len_kv = k.size(2);
-            float scale = 1.0f / std::sqrt(static_cast<float>(head_dim));
-
-            // Output tensor: slice from preallocated heads buffer when q_len == 1
-            if (q.size(2) == 1) {
-                attn_output = attn_output_heads_buffer.narrow(0, 0, batch_size);
+        if (attention_mode_ == 1) {
+            // Mode 1: PyTorch SDPA
+            if (start_pos == 0 && seq_len > 1) {
+                // First prompt pass: use native causal optimization
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
             } else {
-                attn_output = torch::empty_like(q);
+                // Decoding or subsequent chunks: use explicit mask if defined
+                c10::optional<torch::Tensor> opt_mask;
+                if (mask.defined() && mask.numel() > 0) {
+                    // Expand mask from [seq_len, kv_seq_len] to [1, 1, seq_len, kv_seq_len]
+                    opt_mask = mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                }
+                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
             }
 
-            int element_size = q.element_size(); // Should be 2 for BF16
+        } else if (attention_mode_ == 2) {
+            // Mode 2: Custom HIP Kernel
+            if (start_pos == 0 && seq_len > 1) {
+                // First prompt pass: use native causal optimization (SDPA fallback for prefill)
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                // Decoding phase: use Custom HIP Kernel
+                int batch_size = q.size(0);
+                int n_heads_Q = q.size(1);
+                int n_heads_KV = k.size(1);
+                int head_dim = q.size(3);
+                int seq_len_kv = k.size(2);
+                float scale = 1.0f / std::sqrt(static_cast<float>(head_dim));
 
-            launch_flash_attn_decode_hip(q.data_ptr(), k.data_ptr(), v.data_ptr(),
-                                         (mask.defined() && mask.numel() > 0) ? mask.data_ptr() : nullptr, // Basic mask support check
-                                         attn_output.data_ptr(), batch_size, n_heads_Q, n_heads_KV, head_dim, seq_len_kv, scale,
-                                         q.stride(2) * element_size, q.stride(1) * element_size, q.stride(0) * element_size,
-                                         k.stride(2) * element_size, k.stride(1) * element_size, k.stride(0) * element_size,
-                                         v.stride(2) * element_size, v.stride(1) * element_size, v.stride(0) * element_size,
-                                         0, // stride_mask_seq (not fully supported yet in this call site, assuming basic usage)
-                                         q.dtype() == torch::kBFloat16, c10::hip::getCurrentHIPStream().stream());
+                // Output tensor: slice from preallocated heads buffer when q_len == 1
+                if (q.size(2) == 1) {
+                    attn_output = attn_output_heads_buffer.narrow(0, 0, batch_size);
+                } else {
+                    attn_output = torch::empty_like(q);
+                }
+
+                int element_size = q.element_size(); // Should be 2 for BF16
+
+                launch_flash_attn_decode_hip(q.data_ptr(), k.data_ptr(), v.data_ptr(),
+                                             (mask.defined() && mask.numel() > 0) ? mask.data_ptr() : nullptr, // Basic mask support check
+                                             attn_output.data_ptr(), batch_size, n_heads_Q, n_heads_KV, head_dim, seq_len_kv, scale,
+                                             q.stride(2) * element_size, q.stride(1) * element_size, q.stride(0) * element_size,
+                                             k.stride(2) * element_size, k.stride(1) * element_size, k.stride(0) * element_size,
+                                             v.stride(2) * element_size, v.stride(1) * element_size, v.stride(0) * element_size,
+                                             0, // stride_mask_seq (not fully supported yet in this call site, assuming basic usage)
+                                             q.dtype() == torch::kBFloat16, c10::hip::getCurrentHIPStream().stream());
+            }
+
+        } else {
+            // Mode 0: Manual Matmul
+            auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
+
+            if (mask.defined() && mask.numel() > 0) {
+                att = att + mask.to(q.dtype());
+            }
+
+            auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
+            attn_output = torch::matmul(attn_weights, v);
         }
-
-#else
-        // Mode 0: Manual Matmul
-        auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
-
-        if (mask.defined() && mask.numel() > 0) {
-            att = att + mask.to(q.dtype());
-        }
-
-        auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
-        attn_output = torch::matmul(attn_weights, v);
-#endif
 
         // Reshape and output projection
         attn_output = attn_output.transpose(1, 2).contiguous().view({bsz, seq_len, hidden_size_});
 
-        // Copy to attn_output_buffer to ensure contiguous memory and registered handle
+        // Output projection
         auto attn_out_buf = attn_output_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
         attn_out_buf.slice(-1, 0, hidden_size_).copy_(attn_output);
 
         auto attn_out_buf_proj = attn_output_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+        o_layers[i]->forward(attn_proj_buf, attn_out_buf_proj.slice(-1, 0, hidden_size_), "o");
 
-        auto f_o = o_layers[i]->forward(attn_proj_buf, attn_out_buf_proj.slice(-1, 0, hidden_size_), "o");
-        if (f_o.valid())
-            f_o.wait();
+        // Residual connection
+        x = x + attn_proj_buf.slice(-1, 0, hidden_size_);
 
-        // Residual connection: x = x + attn_output
-        x.add_(attn_proj_buf.slice(-1, 0, hidden_size_));
-
-        // MLP (GeGLU)
+        // Post-attention norm
         post_attn_norms[i]->forward_out(normed.slice(-1, 0, hidden_size_), x.slice(-1, 0, hidden_size_));
 
-        auto normed_sliced = normed.slice(-1, 0, hidden_size_);
+        // MoE block
+        auto moe_out = moe_layers[i]->forward(normed.slice(-1, 0, hidden_size_));
+        
+        // Collect training data if enabled
+        if (collect_training_data_) {
+            // Store post-attention norm embeddings and router logits
+            auto embeddings = normed.slice(-1, 0, hidden_size_).detach().clone();
+            auto router_logits = moe_layers[i]->get_last_router_logits();
+            training_data_.push_back(std::make_pair(embeddings, router_logits));
+        }
 
-        // MLP projections with buffers
-        auto f_gate = gate_layers[i]->forward(gate_buf, normed_sliced, "gate");
-        auto f_up = up_layers[i]->forward(up_buf, normed_sliced, "up");
-        if (f_gate.valid())
-            f_gate.wait();
-
-        // In-place GELU and multiplication
-        torch::silu_(gate_buf); // Llama3 uses SiLU (Swish), not GELU
-
-        if (f_up.valid())
-            f_up.wait();
-
-        gate_buf.mul_(up_buf);
-
-        auto f_down = down_layers[i]->forward(out_buf, gate_buf.slice(-1, 0, intermediate_size_), "down");
-        if (f_down.valid())
-            f_down.wait();
-
-        // Residual connection: x = x + mlp_output
-        x.add_(out_buf.slice(-1, 0, hidden_size_));
+        // Residual connection
+        x = x + moe_out;
     }
 
     // Final norm and output
     x = final_norm->forward(x);
-
-    // Optimized LM Head (Ported from Llama.cpp mmvf)
     x = lm_head->forward(x);
 
+    return x;
+}
+
+torch::Tensor UnifiedLLMW4A16Impl::forward_qwen_multi_gpu(torch::Tensor x, int64_t start_pos) {
+    int64_t bsz = x.size(0);
+    int64_t seq_len = x.size(1);
+    const int64_t q_proj_size = num_attention_heads_ * head_dim_;
+
+    if (embedding_device_.is_cuda() && embedding_device_.index() >= 0) {
+        c10::hip::set_device(static_cast<c10::DeviceIndex>(embedding_device_.index()));
+    }
+    if (x.device() != embedding_device_) {
+        x = x.to(embedding_device_);
+    }
+    x = token_embedding->forward(x);
+
+    torch::Tensor mask;
+    if (seq_len > 1) {
+        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
+                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+        mask = torch::triu(mask, 1);
+        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+        mask = mask.to(x.dtype());
+    }
+
+    for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        auto layer_device = layer_devices_[i];
+        if (layer_device.is_cuda() && layer_device.index() >= 0) {
+            c10::hip::set_device(static_cast<c10::DeviceIndex>(layer_device.index()));
+        }
+        if (x.device() != layer_device) {
+            x = x.to(layer_device);
+        }
+
+        auto opts = torch::TensorOptions().device(layer_device).dtype(torch::kBFloat16);
+        auto normed = torch::empty({bsz, seq_len, hidden_size_}, opts);
+        input_norms[i]->forward_out(normed, x);
+
+        auto normed_2d = normed.view({-1, hidden_size_});
+        auto q = q_layers[i]->forward(normed_2d, "q").view({bsz, seq_len, num_attention_heads_, head_dim_});
+        auto k = k_layers[i]->forward(normed_2d, "k").view({bsz, seq_len, num_key_value_heads_, head_dim_});
+        auto v = v_layers[i]->forward(normed_2d, "v").view({bsz, seq_len, num_key_value_heads_, head_dim_});
+
+        q = q_norms[i]->forward(q);
+        k = k_norms[i]->forward(k);
+
+        if (!q.is_cuda() || (rope_scaling_enabled && rope_scaling_type == "llama3")) {
+            auto freqs_cis = compute_rope_freqs(seq_len, start_pos);
+            auto rope_result = apply_rotary_emb(q, k, freqs_cis);
+            q = rope_result.first;
+            k = rope_result.second;
+        } else {
+            launch_rope(q, k, start_pos, rope_theta_);
+        }
+
+        auto cache_k = caches_k[i];
+        auto cache_v = caches_v[i];
+        cache_k = cache_k.narrow(2, start_pos, seq_len).copy_(k.transpose(1, 2));
+        cache_v = cache_v.narrow(2, start_pos, seq_len).copy_(v.transpose(1, 2));
+
+        k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+        v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+
+        if (attention_mode_ >= 1) {
+            if (start_pos == 0) {
+                k = repeat_kv(k, GQA_head_ratio_);
+                v = repeat_kv(v, GQA_head_ratio_);
+            }
+        } else {
+            k = repeat_kv(k, GQA_head_ratio_);
+            v = repeat_kv(v, GQA_head_ratio_);
+        }
+
+        q = q.transpose(1, 2);
+
+        torch::Tensor attn_output;
+        torch::Tensor layer_mask;
+        if (mask.defined() && mask.numel() > 0) {
+            layer_mask = (mask.device() == layer_device) ? mask : mask.to(layer_device);
+        }
+
+        if (debug_verbosity >= 2) {
+            const char *attn_backend = (attention_mode_ == 1) ? "SDPA" : (attention_mode_ == 2) ? "HIP_FA_KERNEL" : "EAGER";
+            std::cout << "[QWEN-MULTIGPU] Layer " << i << ": attention backend(mode) = " << attn_backend << std::endl;
+        }
+
+        if (attention_mode_ == 1) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                c10::optional<torch::Tensor> opt_mask;
+                if (layer_mask.defined() && layer_mask.numel() > 0) {
+                    opt_mask = layer_mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                }
+                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
+            }
+        } else if (attention_mode_ == 2) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                int batch_size = q.size(0);
+                int n_heads_Q = q.size(1);
+                int n_heads_KV = k.size(1);
+                int head_dim = q.size(3);
+                int seq_len_kv = k.size(2);
+                float scale = 1.0f / std::sqrt(static_cast<float>(head_dim));
+                attn_output = torch::empty_like(q);
+                int element_size = q.element_size();
+
+                launch_flash_attn_decode_hip(q.data_ptr(), k.data_ptr(), v.data_ptr(),
+                                             (layer_mask.defined() && layer_mask.numel() > 0) ? layer_mask.data_ptr() : nullptr,
+                                             attn_output.data_ptr(), batch_size, n_heads_Q, n_heads_KV, head_dim, seq_len_kv, scale,
+                                             q.stride(2) * element_size, q.stride(1) * element_size, q.stride(0) * element_size,
+                                             k.stride(2) * element_size, k.stride(1) * element_size, k.stride(0) * element_size,
+                                             v.stride(2) * element_size, v.stride(1) * element_size, v.stride(0) * element_size, 0,
+                                             q.dtype() == torch::kBFloat16, c10::hip::getCurrentHIPStream().stream());
+            }
+        } else {
+            auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
+            if (layer_mask.defined() && layer_mask.numel() > 0) {
+                att = att + layer_mask.to(q.dtype());
+            }
+            auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
+            attn_output = torch::matmul(attn_weights, v);
+        }
+
+        attn_output = attn_output.transpose(1, 2).contiguous().view({bsz, seq_len, q_proj_size});
+        auto attn_proj_buf = o_layers[i]->forward(attn_output.view({-1, q_proj_size}), "o").view({bsz, seq_len, hidden_size_});
+
+        // Residual connection
+        x = x + attn_proj_buf;
+
+        // Post-attention norm
+        auto post_normed = torch::empty({bsz, seq_len, hidden_size_}, opts);
+
+        // Post-attention norm
+        post_attn_norms[i]->forward_out(post_normed, x);
+
+        // MoE block
+        auto moe_out = moe_layers[i]->forward(post_normed);
+
+        // Residual connection
+        x = x + moe_out;
+    }
+
+    if (x.device() != output_device_) {
+        x = x.to(output_device_);
+    }
+    x = final_norm->forward(x);
+    x = lm_head->forward(x);
+    return x;
+}
+
+torch::Tensor UnifiedLLMW4A16Impl::forward_qwen(torch::Tensor x, int64_t start_pos) {
+    if (embedding_device_.is_cuda() && embedding_device_.index() >= 0) {
+        c10::hip::set_device(static_cast<c10::DeviceIndex>(embedding_device_.index()));
+    }
+    if (x.device() != embedding_device_) {
+        x = x.to(embedding_device_);
+    }
+
+    int64_t bsz = x.size(0);
+    int64_t seq_len = x.size(1);
+    const int64_t q_proj_size = num_attention_heads_ * head_dim_;
+
+    x = token_embedding->forward(x);
+
+    torch::Tensor mask;
+    if (seq_len > 1) {
+        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
+                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+        mask = torch::triu(mask, 1);
+        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+        mask = mask.to(x.dtype());
+    }
+
+    auto q_buf = queries_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+    auto k_buf = keys_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+    auto v_buf = values_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+    auto attn_proj_buf = attn_output_proj_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+    auto normed = norm_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
+
+    for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        input_norms[i]->forward_out(normed, x);
+
+        torch::Tensor q, k, v;
+
+        q_layers[i]->forward(q_buf, normed, "q");
+        k_layers[i]->forward(k_buf, normed, "k");
+        v_layers[i]->forward(v_buf, normed, "v");
+
+        q = q_buf.slice(-1, 0, num_attention_heads_ * head_dim_);
+        k = k_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
+
+        q = q.view({bsz, seq_len, num_attention_heads_, head_dim_});
+        k = k.view({bsz, seq_len, num_key_value_heads_, head_dim_});
+
+        q = q_norms[i]->forward(q);
+        k = k_norms[i]->forward(k);
+
+        if (!q.is_cuda() || (rope_scaling_enabled && rope_scaling_type == "llama3")) {
+            auto freqs_cis = compute_rope_freqs(seq_len, start_pos);
+            auto rope_result = apply_rotary_emb(q, k, freqs_cis);
+            q = rope_result.first;
+            k = rope_result.second;
+        } else {
+            launch_rope(q, k, start_pos, rope_theta_);
+        }
+
+        v = v_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
+        v = v.view({bsz, seq_len, num_key_value_heads_, head_dim_});
+
+        auto cache_k = caches_k[i];
+        auto cache_v = caches_v[i];
+        cache_k = cache_k.narrow(2, start_pos, seq_len).copy_(k.transpose(1, 2));
+        cache_v = cache_v.narrow(2, start_pos, seq_len).copy_(v.transpose(1, 2));
+
+        k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+        v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+
+        if (attention_mode_ >= 1) {
+            if (start_pos == 0) {
+                k = repeat_kv(k, GQA_head_ratio_);
+                v = repeat_kv(v, GQA_head_ratio_);
+            }
+        } else {
+            k = repeat_kv(k, GQA_head_ratio_);
+            v = repeat_kv(v, GQA_head_ratio_);
+        }
+
+        q = q.transpose(1, 2);
+
+        torch::Tensor attn_output;
+        if (debug_verbosity >= 2) {
+            const char *attn_backend = (attention_mode_ == 1) ? "SDPA" : (attention_mode_ == 2) ? "HIP_FA_KERNEL" : "EAGER";
+            std::cout << "[QWEN] Layer " << i << ": attention backend(mode) = " << attn_backend << std::endl;
+        }
+        if (attention_mode_ == 1) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                c10::optional<torch::Tensor> opt_mask;
+                if (mask.defined() && mask.numel() > 0) {
+                    opt_mask = mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                }
+                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
+            }
+        } else if (attention_mode_ == 2) {
+            if (start_pos == 0 && seq_len > 1) {
+                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            } else {
+                int batch_size = q.size(0);
+                int n_heads_Q = q.size(1);
+                int n_heads_KV = k.size(1);
+                int head_dim = q.size(3);
+                int seq_len_kv = k.size(2);
+                float scale = 1.0f / std::sqrt(static_cast<float>(head_dim));
+
+                if (q.size(2) == 1) {
+                    attn_output = attn_output_heads_buffer.narrow(0, 0, batch_size);
+                } else {
+                    attn_output = torch::empty_like(q);
+                }
+
+                int element_size = q.element_size();
+                launch_flash_attn_decode_hip(
+                    q.data_ptr(), k.data_ptr(), v.data_ptr(), (mask.defined() && mask.numel() > 0) ? mask.data_ptr() : nullptr,
+                    attn_output.data_ptr(), batch_size, n_heads_Q, n_heads_KV, head_dim, seq_len_kv, scale, q.stride(2) * element_size,
+                    q.stride(1) * element_size, q.stride(0) * element_size, k.stride(2) * element_size, k.stride(1) * element_size,
+                    k.stride(0) * element_size, v.stride(2) * element_size, v.stride(1) * element_size, v.stride(0) * element_size, 0,
+                    q.dtype() == torch::kBFloat16, c10::hip::getCurrentHIPStream().stream());
+            }
+        } else {
+            auto att = torch::matmul(q, k.transpose(-2, -1)) / std::sqrt(static_cast<float>(head_dim_));
+            if (mask.defined() && mask.numel() > 0) {
+                att = att + mask.to(q.dtype());
+            }
+            auto attn_weights = torch::softmax(att.to(torch::kFloat32), -1).to(q.dtype());
+            attn_output = torch::matmul(attn_weights, v);
+        }
+        // Reshape and output projection
+        attn_output = attn_output.transpose(1, 2).contiguous().view({bsz, seq_len, q_proj_size});
+
+        // Output projection
+        auto attn_out_buf = q_buf;
+        attn_out_buf.slice(-1, 0, q_proj_size).copy_(attn_output);
+
+        o_layers[i]->forward(attn_proj_buf, attn_out_buf.slice(-1, 0, q_proj_size), "o");
+
+        // Residual connection
+        x.add_(attn_proj_buf.slice(-1, 0, hidden_size_));
+        // Post-attention norm
+        post_attn_norms[i]->forward_out(normed.slice(-1, 0, hidden_size_), x.slice(-1, 0, hidden_size_));
+
+        // MoE block
+        auto moe_out = moe_layers[i]->forward(normed.slice(-1, 0, hidden_size_));
+
+        // Residual connection
+        x.add_(moe_out);
+    }
+
+    x = final_norm->forward(x);
+    x = lm_head->forward(x);
     return x;
 }
 
@@ -820,6 +2507,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     // Ensure model is in eval mode (no dropout, etc.)
     this->eval();
     torch::NoGradGuard no_grad;
+    const bool should_sync_device = input_ids.is_cuda();
 
     // Warmup cycle
     if (warmup_) {
@@ -847,15 +2535,19 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     if (debug_verbosity >= 2) {
         std::cout << "Prefill phase" << std::endl;
     }
-    torch::cuda::synchronize();
+    if (should_sync_device) {
+        torch::cuda::synchronize();
+    }
     auto start_prefill = std::chrono::high_resolution_clock::now();
 
     output = forward(input_ids, start_pos);
 
-    torch::cuda::synchronize();
+    if (should_sync_device) {
+        torch::cuda::synchronize();
+    }
     auto end_prefill = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_prefill = end_prefill - start_prefill;
-    // std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
+    std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
 
     // Get next token: implementation when temperature is 0
     last_token = output.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
@@ -868,18 +2560,27 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
         next_token = torch::tensor({{next_token_id}}, torch::TensorOptions().dtype(torch::kInt64).device(input_ids.device()));
     }
 
+    // Pre-allocate output buffer for generation to avoid per-token cat
+    auto input_tensor = torch::zeros({batch_size, prompt_len + max_new_tokens}, input_ids.options());
+    input_tensor.narrow(1, 0, prompt_len).copy_(input_ids);
+    input_tensor.narrow(1, prompt_len, 1).copy_(next_token);
+
     // Check for EOS token
     int64_t next_token_id = next_token.item<int64_t>();
+    int64_t token_len = prompt_len + 1;
     if (eos_token_id >= 0 && next_token_id == eos_token_id) {
-        return input_ids;
+        return input_tensor.narrow(1, 0, token_len);
     }
 
-    torch::Tensor input_tensor = torch::cat({input_ids, next_token}, 1);
-    int64_t token_len = input_tensor.size(1);
     start_pos = token_len - 1;
 
+    // Reset cache stats before generation to ensure accurate measurements
+    reset_cache_stats();
+
     // Generate remaining tokens
-    torch::cuda::synchronize();
+    if (should_sync_device) {
+        torch::cuda::synchronize();
+    }
     auto start_gen = std::chrono::high_resolution_clock::now();
     int64_t actual_generated = 0;
 
@@ -901,61 +2602,248 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
             break;
         }
 
-        input_tensor = torch::cat({input_tensor, next_token}, 1);
+        input_tensor.narrow(1, token_len, 1).copy_(next_token);
         actual_generated++;
         token_len++;
         start_pos++;
+
+        if (actual_generated % 5 == 0) {
+            if (should_sync_device) torch::cuda::synchronize();
+            auto now = std::chrono::high_resolution_clock::now();
+            double elapsed_gen = std::chrono::duration<double>(now - start_gen).count();
+            double running_tps = actual_generated / elapsed_gen;
+            std::cout << "[gen " << actual_generated << "/" << (max_new_tokens - 1)
+                      << "] elapsed=" << std::fixed << std::setprecision(1) << elapsed_gen
+                      << "s  TPS=" << std::fixed << std::setprecision(3) << running_tps
+                      << std::flush << std::endl;
+        }
     }
 
-    torch::cuda::synchronize();
+    if (should_sync_device) {
+        torch::cuda::synchronize();
+    }
     auto end_gen = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> generation_time = end_gen - start_gen;
 
     // print to terminal
-    std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
+    std::cout << "Prefill time (summary): " << elapsed_prefill.count() << " seconds" << std::endl;
     std::cout << "Total Generation Time: " << generation_time.count() << " seconds" << std::endl;
     if (actual_generated > 0) {
         double time_per_token = generation_time.count() / actual_generated;
         std::cout << "Average Time per Token: " << time_per_token << " seconds" << std::endl;
     }
 
-    return input_tensor;
+    return input_tensor.narrow(1, 0, token_len);
 }
 
-int UnifiedLLMW4A16Impl::initialize_npu() {
-    // Read config first to set debug_verbosity (already called in constructor, but safe to call again)
-    // Configure NPU variables from struct
-    configure_npu(npu_config_);
-
-    if (debug_verbosity >= 1)
-        std::cout << "Initializing NPU..." << std::endl;
-
-    // Hardcoded driver path
-    const char *drv_path = "/dev/accel/accel0";
-
-    // Open XDNA driver (using global xdna_drv_fd defined in npuSetup.cpp)
-    if (initialize_xdna_driver(drv_path) != 0) {
-        return -1;
+double UnifiedLLMW4A16Impl::calculate_generation_perplexity(torch::Tensor input_ids) {
+    if (input_ids.size(0) != 1) {
+        throw std::runtime_error("PPL calculation requires batch size 1");
     }
-
-    if (debug_verbosity >= 1)
-        std::cout << "Verbosity: " << debug_verbosity << std::endl;
-
-    // Import all weights to XDNA using this class instance
-    if (debug_verbosity >= 1)
-        std::cout << "Loading NPU kernels..." << std::endl;
-    init_npu(); // Initialize NPU context arrays with max capacity
-
-    load_npu_kernels(xdna_drv_fd, npu_config_);
-
-    return 0;
+    
+    int64_t seq_len = input_ids.size(1);
+    if (seq_len < 2) return 0.0;
+    
+    // Ensure eval mode
+    this->eval();
+    torch::NoGradGuard no_grad;
+    
+    // Warmup could be done, but let's just proceed
+    
+    double total_nll = 0.0;
+    int64_t tokens_counted = 0;
+    
+    // We process token i to predict token i+1.
+    // However, the first token has no context.
+    // The loop iterates from 0 to N-2.
+    //   Pass token[0] -> predict token[1]
+    //   Pass token[1] -> predict token[2]
+    //   ...
+    
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
+    // Reset cache stats before calculating perplexity to ensure accurate measurements
+    reset_cache_stats();
+    
+    for (int64_t i = 0; i < seq_len - 1; ++i) {
+        // Prepare input token [1, 1]
+        auto input_token = input_ids.slice(1, i, i + 1); 
+        auto target_token = input_ids.slice(1, i + 1, i + 2).item<int64_t>();
+        
+        // Forward pass (single token -> routed through M=1 generation path)
+        // start_pos = i ensures correct KV cache slot usage
+        auto logits = forward(input_token, /*start_pos=*/i); // [1, 1, vocab]
+        
+        // Extract logits for the last token (which is the only token)
+        auto next_token_logits = logits.squeeze(0).squeeze(0); // [vocab]
+        
+        // Compute Cross Entropy Loss (NLL)
+        // standard NLL: -log(softmax(logits)[target])
+        // torch::nll_loss expects log_softmax input.
+        // torch::cross_entropy takes raw logits.
+        
+        auto nll = torch::nn::functional::cross_entropy(
+            next_token_logits.unsqueeze(0), 
+            torch::tensor({target_token}, torch::TensorOptions().dtype(torch::kLong).device(logits.device())),
+            torch::nn::functional::CrossEntropyFuncOptions().reduction(torch::kSum)
+        );
+        
+        total_nll += nll.item<double>();
+        tokens_counted++;
+        
+        if (i % 10 == 0) {
+             std::cout << "." << std::flush;
+        }
+    }
+    std::cout << std::endl;
+    
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end_time - start_time;
+    
+    if (tokens_counted > 0) {
+        double avg_nll = total_nll / tokens_counted;
+        double ppl = std::exp(avg_nll);
+        double tps = tokens_counted / elapsed.count();
+        
+        std::cout << "PPL Calculation: " << tokens_counted << " tokens." << std::endl;
+        std::cout << "Total Time: " << elapsed.count() << " s (TPS: " << tps << ")" << std::endl;
+        std::cout << "Average NLL: " << avg_nll << std::endl;
+        std::cout << "Generation Perplexity: " << ppl << std::endl;
+        
+        // For compatibility with the python regex parser in sweep script
+        std::cout << "Average Time per Token: " << (1.0/tps) << " seconds" << std::endl;
+        
+        return ppl;
+    }
+    
+    return 0.0;
 }
 
-void UnifiedLLMW4A16Impl::import_weights() {
-    if (debug_verbosity >= 1)
-        std::cout << "Importing weights to XDNA..." << std::endl;
-    // Import all weights and buffers to XDNA
-    import_all_weights_to_xdna(*this);
-    if (debug_verbosity >= 1)
-        std::cout << "Weights imported." << std::endl;
+// Lambda parameter control methods
+void UnifiedLLMW4A16Impl::set_lambda(double lambda, int64_t layer_idx) {
+    if (layer_idx >= 0) {
+        // Set for specific layer
+        if (layer_idx >= num_hidden_layers_) {
+            throw std::out_of_range("Layer index " + std::to_string(layer_idx) + 
+                                   " out of range [0, " + std::to_string(num_hidden_layers_) + ")");
+        }
+        if (arch_type_ == ArchitectureType::MIXTRAL) {
+            moe_layers[layer_idx]->set_lambda(lambda);
+        }
+    } else {
+        // Set for all layers
+        if (arch_type_ == ArchitectureType::MIXTRAL) {
+            for (auto& layer : moe_layers) {
+                layer->set_lambda(lambda);
+            }
+        }
+    }
+}
+
+double UnifiedLLMW4A16Impl::get_lambda(int64_t layer_idx) const {
+    if (layer_idx >= num_hidden_layers_) {
+        throw std::out_of_range("Layer index " + std::to_string(layer_idx) + 
+                               " out of range [0, " + std::to_string(num_hidden_layers_) + ")");
+    }
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        return moe_layers[layer_idx]->get_lambda();
+    }
+    return 0.0;
+}
+
+void MixtureOfExpertsImpl::print_cache_stats() const {
+    double hit_rate = (cache_hits_ + cache_misses_ > 0) ? 
+        static_cast<double>(cache_hits_) / (cache_hits_ + cache_misses_) : 0.0;
+    double avg_load_time = (cache_misses_ > 0) ? total_expert_load_time_ms_ / cache_misses_ : 0.0;
+    std::cout << "Layer " << layer_idx_ << ": Hits=" << cache_hits_ 
+              << ", Misses=" << cache_misses_ 
+              << ", HitRate=" << std::fixed << std::setprecision(2) << hit_rate * 100.0 << "%" 
+              << ", AvgLoadTime=" << std::fixed << std::setprecision(3) << avg_load_time << "ms" << std::endl;
+}
+
+void UnifiedLLMW4A16Impl::print_cache_stats() const {
+    std::cout << "\nExpert Cache Statistics:" << std::endl;
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        for (const auto& layer : moe_layers) {
+            layer->print_cache_stats();
+        }
+    }
+    std::cout << "============================================================" << std::endl;
+}
+
+void MixtureOfExpertsImpl::reset_cache_stats() {
+    cache_hits_ = 0;
+    cache_misses_ = 0;
+    total_expert_load_time_ms_ = 0.0;
+}
+
+void UnifiedLLMW4A16Impl::reset_cache_stats() {
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        for (auto& layer : moe_layers) {
+            layer->reset_cache_stats();
+        }
+    }
+}
+
+std::pair<int64_t, int64_t> UnifiedLLMW4A16Impl::get_cache_stats() const {
+    int64_t total_hits = 0;
+    int64_t total_misses = 0;
+    
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        for (const auto& layer : moe_layers) {
+            auto [hits, misses] = layer->get_cache_stats();
+            total_hits += hits;
+            total_misses += misses;
+        }
+    }
+    
+    return {total_hits, total_misses};
+}
+
+void UnifiedLLMW4A16Impl::reset_predictor_stats() {
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        for (auto& layer : moe_layers) {
+            layer->reset_predictor_stats();
+        }
+    }
+}
+
+std::vector<std::tuple<int64_t, int64_t>> UnifiedLLMW4A16Impl::get_predictor_stats() const {
+    std::vector<std::tuple<int64_t, int64_t>> result;
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        result.reserve(moe_layers.size());
+        for (const auto& layer : moe_layers) {
+            result.push_back(layer->get_predictor_stats());
+        }
+    }
+    return result;
+}
+
+std::vector<std::tuple<int64_t, int64_t>> UnifiedLLMW4A16Impl::get_sequential_top1_stats() const {
+    std::vector<std::tuple<int64_t, int64_t>> result;
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        result.reserve(moe_layers.size());
+        for (const auto& layer : moe_layers) {
+            result.push_back(layer->get_sequential_top1_stats());
+        }
+    }
+    return result;
+}
+
+void UnifiedLLMW4A16Impl::reset_sequential_top1_stats() {
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        for (auto& layer : moe_layers) {
+            layer->reset_sequential_top1_stats();
+        }
+    }
+}
+
+// Training data collection methods
+std::vector<std::pair<torch::Tensor, torch::Tensor>> UnifiedLLMW4A16Impl::get_training_data() {
+    // Return a copy of the training data
+    return training_data_;
+}
+
+void UnifiedLLMW4A16Impl::clear_training_data() {
+    training_data_.clear();
 }

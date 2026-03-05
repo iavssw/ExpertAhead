@@ -1,0 +1,2 @@
+/usr/bin/ar qc libnpu_matmul_func.a CMakeFiles/npu_matmul_func.dir/npu_matmul_func.cpp.o
+/usr/bin/ranlib libnpu_matmul_func.a

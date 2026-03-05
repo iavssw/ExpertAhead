@@ -6,16 +6,16 @@
 #include <torch/torch.h>
 #include <utility>
 #include <vector>
+#include <mutex>
+#include <future>
+#include <unified_llm_w4a16_predict/expert_predictor.h>
 
-// Attention mechanism selection:
+// Attention mechanism default (can be overridden at runtime by heterogeneity config):
 // 0 = Manual matmul, 1 = PyTorch SDPA, 2 = Custom HIP kernel
-#define LLAMA_USE_SCALED_ATTENTION 2
-// Use optimized HIP kernel for LM Head and Embedding
-#define USE_HIP_EMBEDDING 1
-#define USE_HIP_LM_HEAD 1
+#define ATTENTION_BACKEND 2
 
 // Architecture type enum
-enum class ArchitectureType { LLAMA3 };
+enum class ArchitectureType { MIXTRAL, QWEN };
 
 // Quantized Linear Layer for w4a16 (4-bit weights, 16-bit activations)
 // Weights are stored as 4-bit packed in uint8, with scales for dequantization
@@ -30,15 +30,15 @@ class QuantizedLinearImpl : public torch::nn::Module {
     // Forward pass: dequantize weights, then perform linear operation
     // Takes an optional output buffer for in-place operation
     // Returns a future if async execution is possible and no bias addition is needed immediately
-    std::future<int> forward(torch::Tensor output_buffer, torch::Tensor input, std::string layer_type);
+    void forward(torch::Tensor output_buffer, torch::Tensor input, std::string layer_type);
+
+    // Forward pass with internal allocation
+    torch::Tensor forward(torch::Tensor input, std::string layer_type);
 
     // Set quantized weights (for loading from state dict)
     void set_quantized_weights(torch::Tensor qweight, torch::Tensor scale, torch::Tensor zero_point, torch::Tensor g_idx = torch::Tensor());
     // Directly set preprocessed (packed int4) weights
     void set_unpacked_params(torch::Tensor qweight_packed, torch::Tensor scale, torch::Tensor zero_point);
-
-    // Explicitly import weights to XDNA (for benchmark/testing)
-    void import_weights_to_xdna();
 
     // Accessors
     int64_t in_features() const { return in_features_; }
@@ -66,10 +66,12 @@ class LmHeadLinearImpl : public torch::nn::Module {
   public:
     LmHeadLinearImpl(int64_t in_features, int64_t out_features, int64_t max_batch_size = 1, int64_t max_seq_len = 8192);
     torch::Tensor forward(torch::Tensor input);
+    void set_use_hip(bool use_hip) { use_hip_ = use_hip; }
     torch::Tensor weight;
 
   private:
     torch::Tensor logits_buffer;
+    bool use_hip_ = true;
 };
 TORCH_MODULE(LmHeadLinear);
 
@@ -97,12 +99,166 @@ class HipEmbeddingImpl : public torch::nn::Module {
   public:
     HipEmbeddingImpl(int64_t num_embeddings, int64_t embedding_dim, int64_t max_batch_size = 1, int64_t max_seq_len = 8192);
     torch::Tensor forward(torch::Tensor input);
+    void set_use_hip(bool use_hip) { use_hip_ = use_hip; }
     torch::Tensor weight;
 
   private:
     torch::Tensor output_buffer;
+    bool use_hip_ = true;
 };
 TORCH_MODULE(HipEmbedding);
+
+// Linear Matmul Layer (replacement for torch::nn::Linear for MoE router)
+class LinearMatmulImpl : public torch::nn::Module {
+  public:
+    LinearMatmulImpl(int64_t in_features, int64_t out_features, bool bias = true);
+    torch::Tensor forward(torch::Tensor input);
+    torch::Tensor weight;
+    torch::Tensor bias;
+};
+TORCH_MODULE(LinearMatmul);
+
+// Mixtral MoE layer (router + experts)
+class MixtureOfExpertsImpl : public torch::nn::Module {
+  public:
+
+    MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
+                         int64_t max_cached_experts, int64_t layer_idx, 
+                         int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false,
+                         double lambda = 0.0, const std::string& predictor_model_path = "", torch::Device predictor_device = torch::kCPU,
+                         int64_t prefetch_experts_count = 1);
+
+    torch::Tensor forward(const torch::Tensor &x);
+    void set_weights_dir(const std::string& dir) { weights_dir_ = dir; }
+    void prefill_cache_for_testing();
+    void prewarm_experts(int64_t num_to_warm);
+    
+    // Lambda parameter control (router logit biasing)
+    void set_lambda(double lambda) { 
+        if (lambda < 0.0 || lambda > 1.0) {
+            throw std::invalid_argument("Lambda must be in range [0, 1], got: " + std::to_string(lambda));
+        }
+        lambda_ = lambda; 
+    }
+    double get_lambda() const { return lambda_; }
+    
+    // Correlation-based expert tracking
+    // We still keep correlation constant API around if something calls it but ignore it, or remove it. Let's remove it.
+    torch::Tensor get_last_router_logits() const { return last_router_logits_; }
+    
+    // Cache stats
+    void print_cache_stats() const;
+    std::pair<int64_t, int64_t> get_cache_stats() const { return {cache_hits_, cache_misses_}; }
+    void reset_cache_stats();
+
+    // Predictor hit-rate stats (generation only)
+    std::tuple<int64_t, int64_t> get_predictor_stats() const {
+        return {pred_hits_no_bias_, pred_total_};
+    }
+    void reset_predictor_stats() {
+        pred_hits_no_bias_ = 0;
+        pred_total_ = 0;
+        last_true_top1_expert_ = -1;  // Reset so first token doesn't count
+    }
+
+    // Sequential top1 caching stats (generation only)
+    std::tuple<int64_t, int64_t> get_sequential_top1_stats() const {
+        return {sequential_top1_hits_, sequential_top1_total_};
+    }
+    void reset_sequential_top1_stats() {
+        sequential_top1_hits_ = 0;
+        sequential_top1_total_ = 0;
+        last_top1_expert_ = -1;
+    }
+
+    // Prediction & Speculative Loading
+    void set_context_token_ids(const std::vector<int64_t>& token_ids);
+    void trigger_speculative_loading(const torch::Tensor& embedding);
+    void load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids);
+
+    // Exposed for weight loading
+    LinearMatmul router{nullptr};
+    
+    // Changed: These now represent the *slots* in the cache, not the logical experts.
+    // Size will be max_cached_experts.
+    std::vector<QuantizedLinear> gate_up_experts;
+    std::vector<QuantizedLinear> down_experts;
+
+  private:
+    // Pinned memory buffers for fast expert weight loading (one per slot)
+    std::vector<torch::Tensor> gate_up_q_pinned_;
+    std::vector<torch::Tensor> gate_up_s_pinned_;
+    std::vector<torch::Tensor> gate_up_z_pinned_;
+    std::vector<torch::Tensor> down_q_pinned_;
+    std::vector<torch::Tensor> down_s_pinned_;
+    std::vector<torch::Tensor> down_z_pinned_;
+
+    int64_t hidden_size_;
+    int64_t intermediate_size_;
+    int64_t num_experts_;
+    int64_t num_experts_per_tok_;
+    int64_t max_cached_experts_;
+    int64_t layer_idx_;
+    int64_t prefetch_experts_count_;
+    bool use_softmax_before_topk_;
+    bool normalize_topk_prob_;
+
+    std::string weights_dir_;
+
+    // Router logit biasing (lambda parameter)
+    double lambda_ = 0.0;                        // Bias parameter [0, 1]
+    double delta_avg_ = 0.0;                     // Running average of logit ranges
+    std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
+
+    // Prefill distribution tracking
+    torch::Tensor prefill_expert_counts_;
+
+    // Cache State
+    std::vector<int64_t> expert_slots_indices; // Maps Slot ID [0..max_cached] -> Global Expert ID. -1 if empty.
+    std::vector<size_t> expert_lru_order_;       // List of Slot IDs, ordered by usage (LRU at front, MRU at back).
+    
+    int64_t cache_hits_ = 0;
+    int64_t cache_misses_ = 0;
+    double total_expert_load_time_ms_ = 0.0;
+
+    // Predictor hit-rate counters (generation only)
+    int64_t pred_hits_no_bias_   = 0;  // tokens where predictor's prefetched expert(s) matched unbiased top-1
+    int64_t pred_total_          = 0;  // total evaluated generation tokens
+    int64_t last_true_top1_expert_ = -1; // unbiased top-1 from previous token (ground truth for predictor stat)
+    
+    // Sequential top1 tracking
+    int64_t sequential_top1_hits_ = 0;
+    int64_t sequential_top1_total_ = 0;
+    int64_t last_top1_expert_ = -1;
+    
+    // Ranked predictions from the previous token (set in async lambda, read next token)
+    std::vector<int64_t> last_pred_no_bias_;
+    std::mutex pred_results_mutex_;
+    std::atomic<bool> pred_results_ready_{false};
+    
+    // Training data collection
+    mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
+    
+    // Prediction & Speculative Loading
+    std::unique_ptr<IExpertPredictor> predictor_;
+    std::vector<int64_t> recent_token_ids_;
+    std::future<void> speculative_load_future_;
+    bool in_generation_mode_ = false;
+    std::mutex expert_slots_mutex_;  // For thread safety during loading
+    std::vector<bool> expert_slot_ready_; // For condition variable, size max_cached_experts_
+    std::condition_variable expert_slots_cv_; // To wait for background loading
+    
+    void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
+    int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
+
+    torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
+                              torch::Tensor &output);
+    torch::Tensor forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
+                                     torch::Tensor &output, int64_t current_true_top1);
+    torch::Tensor forward_prefill(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
+                                  torch::Tensor &output);
+};
+TORCH_MODULE(MixtureOfExperts);
 
 #include "unified_llm_w4a16_predict/npuSetup.hpp"
 
@@ -112,7 +268,10 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                         int64_t num_hidden_layers, int64_t num_attention_heads, int64_t num_key_value_heads, int64_t head_dim,
                         float rms_norm_eps, float rope_theta, const NPUGlobalConfig &npu_config, int64_t max_seq_len = 8192,
                         int64_t max_batch_size = 1, int64_t groupsize = 128, int64_t num_experts = 0, int64_t num_experts_per_tok = 0,
-                        torch::Device device = torch::kCPU);
+                        torch::Device device = torch::kCPU, int64_t max_cached_experts_per_layer = 0,
+                        const std::string& predictor_model_path = "", int64_t prefetch_experts_count = 1,
+                        const std::vector<int>& predict_layers = {},
+                        const std::vector<int64_t>& per_layer_cache_sizes = {});
 
     // Forward pass: takes token IDs and returns logits
     torch::Tensor forward(torch::Tensor input_ids, int64_t start_pos = 0);
@@ -121,6 +280,9 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     torch::Tensor generate(torch::Tensor input_ids, int64_t max_new_tokens, float temperature = 1.0f, float top_p = 0.9f,
                            int64_t top_k = 50, int64_t eos_token_id = -1);
 
+    // Calculate generation perplexity (NLL) by simulating sequential token generation (step-by-step)
+    double calculate_generation_perplexity(torch::Tensor input_ids);
+
     // Load quantized weights from safetensors file
     void load_quantized_weights_from_safetensors(const std::string &filename);
     // Load non-quantized weights only (embeddings, norms, lm_head) from safetensors
@@ -128,18 +290,37 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Load quantized weights from preprocessed bin directory
     void load_quantized_weights_from_bins(const std::string &weights_dir);
 
+    // Pre-warm expert cache
+    void prewarm_experts(int64_t num_to_warm, bool verbose = true);
+    
+    // Lambda parameter control for router logit biasing
+    void set_lambda(double lambda, int64_t layer_idx = -1);
+    double get_lambda(int64_t layer_idx = 0) const;
+
     // Move model to device
     // Move model to device
     UnifiedLLMW4A16Impl &to(torch::Device device);
 
-    // Initialize NPU configuration and resources
-    int initialize_npu();
-
-    // Import weights to NPU (must be called after loading weights)
-    void import_weights();
-
     // Initialize all weights with dummy values (random) for testing without loading files
     void initialize_dummy_weights(int seed = 42);
+
+    void print_cache_stats() const;
+    void reset_cache_stats();
+    std::pair<int64_t, int64_t> get_cache_stats() const;  // Returns (total_hits, total_misses)
+
+    // Predictor hit-rate stats across all MoE layers
+    // Each element: (hits, total) for that layer
+    std::vector<std::tuple<int64_t, int64_t>> get_predictor_stats() const;
+    void reset_predictor_stats();
+
+    std::vector<std::tuple<int64_t, int64_t>> get_sequential_top1_stats() const;
+    void reset_sequential_top1_stats();
+    
+    // Training data collection
+    void enable_training_data_collection() { collect_training_data_ = true; }
+    void disable_training_data_collection() { collect_training_data_ = false; }
+    std::vector<std::pair<torch::Tensor, torch::Tensor>> get_training_data(); // Returns [(embeddings, router_logits), ...]
+    void clear_training_data();
 
     // NPU Helper functions
     // We declare them as friends or static/global if they are not members
@@ -165,6 +346,16 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     int64_t num_experts_per_tok_;
     NPUGlobalConfig npu_config_;
     bool warmup_;
+    
+    // Training data collection
+    bool collect_training_data_ = false;
+    std::vector<std::pair<torch::Tensor, torch::Tensor>> training_data_;  // [(post_attn_norm_embeddings, router_logits), ...]
+    int attention_mode_; // 0=manual matmul, 1=PyTorch SDPA, 2=Custom HIP kernel
+    bool multi_gpu_enabled_ = false;
+    int gpu_count_ = 1;
+    torch::Device embedding_device_ = torch::kCPU;
+    torch::Device output_device_ = torch::kCPU;
+    std::vector<torch::Device> layer_devices_;
 
     // Common components
     HipEmbedding token_embedding{nullptr};
@@ -172,16 +363,15 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     std::vector<QuantizedLinear> k_layers;
     std::vector<QuantizedLinear> v_layers;
     std::vector<QuantizedLinear> o_layers;
+    std::vector<RMSNorm> q_norms;
+    std::vector<RMSNorm> k_norms;
 
     // MLP layers
-    std::vector<QuantizedLinear> gate_layers;
-    std::vector<QuantizedLinear> up_layers;
-    std::vector<QuantizedLinear> down_layers;
 
-    // LLaMA3 specific MLP layers (unified approach might not need separate vectors if logic handles it,
-    // but UnifiedLLM.cpp used separate vectors for LLaMA3.
-    // However, looking at UnifiedLLM.cpp, LLaMA3 uses gate/up/down just like others.
-    // I can reuse gate_layers/up_layers/down_layers for all architectures if I map them correctly during init and
+    // Mixtral MoE layers
+    std::vector<MixtureOfExperts> moe_layers;
+
+    // Note: gate_layers/up_layers/down_layers have been removed. Mixtral uses MoE layers instead.
     // weight loading.) Let's reuse the existing vectors to keep it simple, but we need to know which is which.
 
     // Normalization layers
@@ -215,20 +405,21 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     std::pair<torch::Tensor, torch::Tensor> apply_rotary_emb(const torch::Tensor &xq, const torch::Tensor &xk,
                                                              const torch::Tensor &freqs_cis);
 
+    // Preload MoE kernels to avoid cold-start spikes
+    void preload_moe_kernels();
+
     // Architecture-specific forward methods
-    torch::Tensor forward_llama3(torch::Tensor x, int64_t start_pos);
+
+    torch::Tensor forward_mixtral_multi_gpu(torch::Tensor x, int64_t start_pos);
+    torch::Tensor forward_mixtral(torch::Tensor x, int64_t start_pos);
+    torch::Tensor forward_qwen_multi_gpu(torch::Tensor x, int64_t start_pos);
+    torch::Tensor forward_qwen(torch::Tensor x, int64_t start_pos);
 
     // Activation functions
     torch::Tensor silu(const torch::Tensor &x);
     torch::Tensor gelu(const torch::Tensor &x);
     torch::Tensor swiglu(const torch::Tensor &gate, const torch::Tensor &up);
 };
-
-// Global NPU functions
-uint32_t import_dma_buf_to_xdna(void *hip_managed_ptr, size_t size, int dataTypeinBytes);
-std::pair<int, int> get_npu_context(int M, int K, int N);
-int npuMatmul_zero(int hwctx_numb, int instctx_numb, void *output_pointer, void *input_pointer, void *weight_pointer,
-                   uint32_t output_xdna_handle, uint32_t input_xdna_handle, uint32_t weight_xdna_handle, void *hip_event);
 
 // Reference Implementation Functions
 torch::Tensor reference_dequantize_weights(torch::Tensor quantized_weight, torch::Tensor scale, torch::Tensor zero_point,

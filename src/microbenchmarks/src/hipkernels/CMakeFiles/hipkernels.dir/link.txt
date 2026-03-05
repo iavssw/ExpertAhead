@@ -1,0 +1,2 @@
+/usr/bin/ar qc libhipkernels.a CMakeFiles/hipkernels.dir/w4a16_gemm_unpacked.cu.o CMakeFiles/hipkernels.dir/w4a16_gemv_unpacked.cu.o CMakeFiles/hipkernels.dir/embedding.cu.o CMakeFiles/hipkernels.dir/lm_head.cu.o CMakeFiles/hipkernels.dir/rope.cu.o CMakeFiles/hipkernels.dir/rmsnorm.cu.o CMakeFiles/hipkernels.dir/flash_attn_decode.cu.o
+/usr/bin/ranlib libhipkernels.a

@@ -184,19 +184,38 @@ class Mixtral8x7BW4A16Model:
         num_experts_per_tok: int = 2,
         device: str = "cuda",
         backend: str = "base",
-        config_path: Optional[str] = None
+        config_path: Optional[str] = None,
+        max_cached_experts_per_layer: int = 8,
+        use_cached_moe: bool = False,
+        predictor_models_dir: str = "",
+        weights_dir: str = "",
+        predictor_device: str = "gpu",
+        prefetch_experts_count: int = 1,
+        predict_layers: Optional[List[int]] = None,
+        per_layer_cache_sizes: Optional[List[int]] = None,
     ):
         """
         Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
+
+        predictor_device: where to run the TorchScript expert predictor.
+            "gpu"  -> same GPU as the MoE layer (default — use this to benchmark/validate
+                      speculative-loading speedup without NPU hardware)
+            "cpu"  -> CPU, which routes through the Ryzen AI NPU backend on Strix
+            "auto" -> inferred from heterogeneity in config (gpu->GPU, hetero/npu->CPU/NPU)
         """
 
-        if backend != "base":
-            raise ValueError("Mixtral is only supported in the base backend for now.")
+        if backend not in ["base", "predict", "cached"]:
+            raise ValueError(f"Invalid backend: {backend}. Choose from: base, predict, cached")
 
         try:
-            import unified_llm_w4a16_base_libtorch as backend_module
+            if backend == "base":
+                import unified_llm_w4a16_base_libtorch as backend_module
+            elif backend == "predict":
+                import unified_llm_w4a16_predict_libtorch as backend_module
+            elif backend == "cached":
+                import unified_llm_w4a16_cached_libtorch as backend_module
         except ImportError as e:
-            raise ImportError(f"Could not import base backend: {e}")
+            raise ImportError(f"Could not import {backend} backend: {e}")
 
         global ArchitectureType
         ArchitectureType = backend_module.ArchitectureType
@@ -231,14 +250,52 @@ class Mixtral8x7BW4A16Model:
             groupsize,
             num_experts,
             num_experts_per_tok,
-            device,
         ]
+
+        if backend == "cached":
+             # Cached backend specific args: max_cached, device, config
+             constructor_args.append(max_cached_experts_per_layer)
+             constructor_args.append(device)
+        else:
+             # Base/Predict backend args (assuming predict uses extra args)
+             constructor_args.append(device)
+             # predict backend usage would need to be checked, for now keeping compatibility with previous style if backend=predict?
+             if backend == "predict":
+                 constructor_args.append(max_cached_experts_per_layer) # Predict might use this too?
+                 constructor_args.append(predictor_models_dir)
 
         if config_path is None:
             config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5"))
-        constructor_args.append(config_path)
 
+        # If predictor_device override is requested, write a temp config with the field injected.
+        # The C++ constructor reads predictor_device from the JSON on construction.
+        _temp_config_path = None
+        if predictor_device != "auto" and backend == "predict":
+            import tempfile, json
+            base_cfg = load_config_with_comments(config_path) if config_path else {}
+            base_cfg["predictor_device"] = predictor_device
+            tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+            json.dump(base_cfg, tmp)
+            tmp.close()
+            _temp_config_path = tmp.name
+            print(f"[predictor_device={predictor_device}] Using temp config: {_temp_config_path}")
+            constructor_args.append(_temp_config_path)
+        else:
+            constructor_args.append(config_path)
+        if backend == "predict":
+            constructor_args.append(prefetch_experts_count)
+            constructor_args.append(predict_layers if predict_layers is not None else [])
+            constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
+            
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
+
+        # Clean up temp config after C++ has read it
+        if _temp_config_path:
+            import os as _os
+            try:
+                _os.unlink(_temp_config_path)
+            except OSError:
+                pass
 
         self.config = {}
         self.use_pre_saved_weights = False
@@ -263,6 +320,11 @@ class Mixtral8x7BW4A16Model:
             self.model.initialize_dummy_weights()
         elif model_path:
             self._load_quantized_weights(model_path, weights_folder="model_weights")
+
+        if backend in ["cached", "predict"]:
+            num_to_warm = max(per_layer_cache_sizes) if per_layer_cache_sizes else max_cached_experts_per_layer
+            print(f"Pre-warming expert cache with {num_to_warm} experts...")
+            self.model.prewarm_experts(num_to_warm)
 
         tokenizer_path = tokenizer_path or model_path
         if tokenizer_path:
@@ -483,6 +545,8 @@ class Mixtral8x7BW4A16Model:
         if self.tokenizer is not None and self.tokenizer.eos_token_id is not None:
             eos_token_id = self.tokenizer.eos_token_id
 
+        print(" ========================== Starting generation ==========================")
+
         return self.model.generate(
             input_ids,
             max_new_tokens,
@@ -498,6 +562,96 @@ class Mixtral8x7BW4A16Model:
             input_ids = self.tokenize(input_ids)
         return self.model.forward(input_ids, start_pos)
 
+    def set_lambda(self, lambda_value: float, layer_idx: int = -1):
+        """
+        Set the router logit bias parameter (lambda).
+        
+        Args:
+            lambda_value: Bias strength in range [0, 1].
+                         0.0: no bias (standard routing)
+                         0.0 < λ ≤ 1.0: bias toward cached experts
+                         Higher values = stronger bias toward cache
+            layer_idx: Layer index to modify, or -1 for all layers
+        
+        Raises:
+            ValueError: If lambda_value is not in [0, 1]
+        """
+        if lambda_value < 0.0 or lambda_value > 2.0:
+            raise ValueError(f"Lambda must be in range [0, 2], got: {lambda_value}")
+        self.model.set_lambda(lambda_value, layer_idx)
+
+    def get_lambda(self, layer_idx: int = 0) -> float:
+        """Get lambda parameter for specified layer."""
+        return self.model.get_lambda(layer_idx)
+
+    def set_layer_correlation_constants(self, constants: List[float]):
+        """Set the correlation constant for each layer."""
+        if hasattr(self.model, "set_layer_correlation_constants"):
+            self.model.set_layer_correlation_constants(constants)
+
+    def calculate_generation_perplexity(self, text: str) -> float:
+        """
+        Calculate generation-time perplexity using the optimized C++ backend loop.
+        This provides a fair evaluation of cache performance during generation.
+        """
+        if isinstance(text, str):
+            input_ids = self.tokenize(text)
+            # Ensure input_ids on correct device is handled by tokenize/backend
+        elif isinstance(text, torch.Tensor):
+            input_ids = text
+        else:
+            raise ValueError("Text must be string or tensor")
+            
+        # Call C++ backend method directly
+        if hasattr(self.model, "calculate_generation_perplexity"):
+             return self.model.calculate_generation_perplexity(input_ids)
+        else:
+             print("Error: Backend does not support calculate_generation_perplexity")
+             return 0.0
+
+    def print_cache_stats(self):
+        """Print cache hits and misses."""
+        if hasattr(self.model, "print_cache_stats"):
+            self.model.print_cache_stats()
+
+    def reset_cache_stats(self):
+        """Reset cache hits and misses."""
+        if hasattr(self.model, "reset_cache_stats"):
+            self.model.reset_cache_stats()
+    
+    def get_cache_stats(self):
+        """Get cache statistics as (total_hits, total_misses) tuple."""
+        if hasattr(self.model, "get_cache_stats"):
+            return self.model.get_cache_stats()
+        return (0, 0)
+
+    def get_predictor_stats(self):
+        """
+        Get per-layer predictor hit-rate stats.
+
+        Returns a list of (hits, total) tuples,
+        one per MoE layer. 'total' is the number of generation tokens for
+        which a prior prediction existed and was evaluated.
+        """
+        if hasattr(self.model, "get_predictor_stats"):
+            return self.model.get_predictor_stats()
+        return []
+
+    def reset_predictor_stats(self):
+        """Reset predictor hit-rate counters across all layers."""
+        if hasattr(self.model, "reset_predictor_stats"):
+            self.model.reset_predictor_stats()
+
+    def get_sequential_top1_stats(self):
+        """Get sequential top1 expert hit stats across all layers."""
+        if hasattr(self.model, "get_sequential_top1_stats"):
+            return self.model.get_sequential_top1_stats()
+        return []
+
+    def reset_sequential_top1_stats(self):
+        """Reset sequential top1 expert hit counters."""
+        if hasattr(self.model, "reset_sequential_top1_stats"):
+            self.model.reset_sequential_top1_stats()
     def perplexity(self, input_ids: Union[str, torch.Tensor]) -> dict:
         """
         Compute causal-LM perplexity for the provided sequence(s).
@@ -1013,14 +1167,26 @@ def main():
         "--backend",
         type=str,
         default="base",
-        choices=["base", "predict"],
-        help="Backend to use (default: base)"
+        choices=["base", "predict", "cached"],
+        help="Backend to use: base (all experts), predict (heterogeneous), cached (selective loading)"
+    )
+    parser.add_argument(
+        "--expert-cache",
+        type=int,
+        default=2,
+        help="Maximum number of cached experts per layer (for cached backend)"
     )
     parser.add_argument(
         "--config-path",
         type=str,
         default=os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5")),
         help="Path to NPU config JSON"
+    )
+    parser.add_argument(
+        "--predictor-model",
+        type=str,
+        default="/home/michael/heteroPredict/trainingData/mixtral_8x7b/sweep_3_5",
+        help="Path to predictor model directory (containing layer_X subdirs) for 'predict' backend"
     )
     parser.add_argument(
         "--generate",
@@ -1038,7 +1204,7 @@ def main():
     parser.add_argument(
         "--max-new-tokens",
         type=int,
-        default=16,
+        default=40,
         help="Maximum number of tokens to generate (if --generate is used, default: 16)"
     )
     parser.add_argument(
@@ -1066,6 +1232,22 @@ def main():
         help="Run prompt test case with specified token count."
     )
     parser.add_argument(
+        "--lambda-val",
+        type=float,
+        default=0.0,
+        help="Lambda value for router logit biasing (range [0, 1])"
+    )
+    parser.add_argument(
+        "--expert-correlation-csv",
+        type=str,
+        default=None,
+        help="Path to CSV containing layer correlation multipliers."
+    )
+    parser.add_argument(
+        "--perplexity",
+        action="store_true",
+        default=False,
+        help="Calculate perplexity instead of generating text"
         "--perplexity",
         action="store_true",
         help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
@@ -1095,6 +1277,56 @@ def main():
         help="Stride for sliding-window WikiText-2 perplexity."
     )
 
+    parser.add_argument(
+        "--generation-perplexity",
+        action="store_true",
+        default=False,
+        help="Calculate generation-time perplexity (slower, token-by-token)"
+    )
+
+
+    parser.add_argument(
+        "--benchmark-prompts",
+        type=str,
+        default=None,
+        help="Path to a file containing prompts for benchmarking. If set, runs benchmark mode."
+    )
+    
+    parser.add_argument(
+        "--predictor-device",
+        type=str,
+        default="gpu",
+        choices=["gpu", "cpu", "auto"],
+        help=(
+            "Device for expert predictor TorchScript inference (predict backend only). "
+            "'gpu' = same GPU as MoE (default — validates GPU-based speculative-loading speedup), "
+            "'cpu' = CPU, routes through Ryzen AI NPU on Strix, "
+            "'auto' = inferred from heterogeneity config."
+        )
+    )
+    
+    parser.add_argument(
+        "--predict-layers",
+        type=int,
+        nargs="+",
+        default=None,
+        help="List of layer indices (e.g., 0 1 2) to enable the predictor. If not specified, runs on all layers."
+    )
+    
+    parser.add_argument(
+        "--prefetch-experts-count",
+        type=int,
+        default=1,
+        help="Number of top experts for the predictor engine to proactively prefetch."
+    )
+    
+    parser.add_argument(
+        "--sweep-prompts-file",
+        type=str,
+        default=None,
+        help="Path to a JSON file containing a list of prompts. Runs all prompts sequentially without reloading."
+    )
+    
     args = parser.parse_args()
 
     if args.wikitext2_perplexity:
@@ -1135,7 +1367,12 @@ def main():
             tokenizer_path=args.tokenizer_path,
             device=args.device,
             backend=args.backend,
-            config_path=args.config_path
+            config_path=args.config_path,
+            max_cached_experts_per_layer=args.expert_cache,
+            predictor_models_dir=args.predictor_model,
+            predictor_device=args.predictor_device,
+            prefetch_experts_count=args.prefetch_experts_count,
+            predict_layers=args.predict_layers,
         )
 
         print("Model initialized successfully!")
@@ -1149,6 +1386,208 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
+    # Set lambda if specified
+    if args.lambda_val != 0.0:
+        print(f"Setting lambda to {args.lambda_val}")
+        model.set_lambda(args.lambda_val)
+
+    if args.expert_correlation_csv:
+        print(f"Loading correlations from {args.expert_correlation_csv}")
+        import pandas as pd
+        df = pd.read_csv(args.expert_correlation_csv)
+        df = df.sort_values(by="layer")
+        correlations = df['correlation'].tolist()
+        model.set_layer_correlation_constants(correlations)
+
+    # Benchmark Mode
+    if args.benchmark_prompts:
+        print(f"\nRunning benchmark using prompts from: {args.benchmark_prompts}")
+        if not os.path.exists(args.benchmark_prompts):
+            print(f"Error: Prompts file {args.benchmark_prompts} not found.")
+            return 1
+            
+        with open(args.benchmark_prompts, 'r') as f:
+            content = f.read()
+            
+        # Parse prompts (simple splitting by newline or custom separator if needed)
+        # Using the logic from previous script attempt:
+        lines = [l.strip() for l in content.split('\n') if l.strip()]
+        prompts = []
+        current_prompt = ""
+        for line in lines:
+            if line.startswith("<|begin_of_text|>"):
+                 if current_prompt: prompts.append(current_prompt)
+                 current_prompt = line.replace("<|begin_of_text|>", "")
+            else:
+                 current_prompt += " " + line
+                 
+            if len(current_prompt) > 200: 
+                 prompts.append(current_prompt)
+                 current_prompt = ""
+        if current_prompt: prompts.append(current_prompt)
+        
+        # Limit to 20 prompts for reasonable runtime
+        prompts = [p for p in prompts if len(p) > 20][:20]
+        print(f"Loaded {len(prompts)} prompts for benchmarking.")
+        
+        tps_values = []
+        
+        for i, prompt in enumerate(prompts):
+            print(f"\nProcessing Prompt {i+1}/{len(prompts)}...")
+            try:
+                # Reset stats
+                model.reset_cache_stats()
+                
+                # Tokenize
+                input_ids = model.tokenize(prompt)
+                
+                # Warmup / Forward pass measure
+                start_time = time.time()
+                
+                # Generate
+                generated = model.generate(
+                    input_ids,
+                    max_new_tokens=args.max_new_tokens,
+                    temperature=args.temperature,
+                    top_p=args.top_p,
+                    top_k=args.top_k
+                )
+                
+                end_time = time.time()
+                elapsed = end_time - start_time
+                
+                # Calculate TPS (generation only, usually)
+                # But here elapsed includes prefill. 
+                # Ideally we want generation TPS.
+                # The generate() function returns, we assume prefill dominates short prompts?
+                # Actually for long prompts prefill dominates.
+                # User asked for "tokens per second".
+                
+                # Let's count generated tokens
+                num_generated = generated.size(1) - input_ids.size(1)
+                
+                # We should subtract prefill time? exact prefill time is harder to get from wrappers 
+                # unless we instrument generate().
+                # But simple Total Time / Generated Tokens is "End-to-End TPS"
+                
+                # However, usually benchmarks exclude prefill.
+                # For now, let's use Total Time / Tokens and note it. 
+                # Or better: check if model has internal TPS tracking.
+                # The C++ backend prints "Average Time per Token" which is generation only.
+                # We can capture that from stdout if we were capturing it, but here we are IN python.
+                
+                # Let's rely on wall clock for now as a rough metric, or look for C++ output.
+                # But wait, we want to return the metric to the user.
+                
+                if num_generated > 0 and elapsed > 0:
+                    tps = num_generated / elapsed
+                    tps_values.append(tps)
+                    print(f"  Generated {num_generated} tokens in {elapsed:.4f}s")
+                    print(f"  End-to-End TPS: {tps:.2f}")
+                
+            except Exception as e:
+                print(f"  Error on prompt {i+1}: {e}")
+                
+        if tps_values:
+            avg_tps = sum(tps_values) / len(tps_values)
+            import statistics
+            std_tps = statistics.stdev(tps_values) if len(tps_values) > 1 else 0
+            print(f"\nBenchmark Complete.")
+            print(f"Average TPS: {avg_tps:.2f} +/- {std_tps:.2f}")
+            # Identify special output for parsing
+            print(f"BENCHMARK_RESULT_TPS: {avg_tps:.4f}")
+            print(f"BENCHMARK_RESULT_STD: {std_tps:.4f}")
+        else:
+            print("No valid benchmark results.")
+            
+        return 0
+
+    if args.sweep_prompts_file:
+        print(f"\nRunning sweep using prompts from JSON: {args.sweep_prompts_file}")
+        if not os.path.exists(args.sweep_prompts_file):
+            print(f"Error: Prompts file {args.sweep_prompts_file} not found.")
+            return 1
+            
+        with open(args.sweep_prompts_file, 'r') as f:
+            prompts = json.load(f)
+            
+        print(f"Loaded {len(prompts)} prompts for sweeping.")
+        
+        total_ppl = 0.0
+        valid_ppl_count = 0
+        total_time = 0.0
+        total_generated_tokens = 0
+        
+        # Reset stats globally before starting sweep
+        model.reset_cache_stats()
+
+        for i, prompt in enumerate(prompts):
+            print(f"\nProcessing Prompt {i+1}/{len(prompts)}...")
+            try:
+                if args.generation_perplexity:
+                    gppl = model.calculate_generation_perplexity(prompt)
+                    total_ppl += gppl
+                    valid_ppl_count += 1
+                
+                if args.generate:
+                    input_ids = model.tokenize(prompt)
+                    start_time = time.time()
+                    generated = model.generate(
+                        input_ids,
+                        max_new_tokens=args.max_new_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        top_k=args.top_k
+                    )
+                    end_time = time.time()
+                    elapsed = end_time - start_time
+                    num_generated = generated.size(1) - input_ids.size(1)
+                    
+                    if num_generated > 0:
+                        total_time += elapsed
+                        total_generated_tokens += num_generated
+
+            except Exception as e:
+                print(f"  Error on prompt {i+1}: {e}")
+                import traceback
+                traceback.print_exc()
+
+        print(f"\n{'=' * 60}")
+        print("Sweep Complete.")
+        
+        if args.generation_perplexity and valid_ppl_count > 0:
+            avg_ppl = total_ppl / valid_ppl_count
+            print(f"Generation Perplexity: {avg_ppl:.4f}")
+            
+        if args.generate and total_generated_tokens > 0:
+            avg_tps = total_generated_tokens / total_time
+            print(f"Average Time per Token: {1.0 / avg_tps:.6f}") # Output inverse since parser expects time per token
+            print(f"End-to-End TPS: {avg_tps:.4f}")
+
+        # Get and print cache stats for entire sweep
+        hits, misses = model.get_cache_stats()
+        total = hits + misses
+        hit_rate = (hits / total * 100.0) if total > 0 else 0.0
+        print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
+        
+        pred_stats = model.get_predictor_stats()
+        if pred_stats:
+            pred_hits = sum(s[0] for s in pred_stats)
+            pred_total = sum(s[1] for s in pred_stats)
+            pred_rate = (pred_hits / pred_total * 100.0) if pred_total > 0 else 0.0
+            print(f"Predictor Stats: Hits={pred_hits}, Total={pred_total}, HitRate={pred_rate:.2f}%")
+
+        seq_stats = model.get_sequential_top1_stats()
+        if seq_stats:
+            seq_hits = sum(s[0] for s in seq_stats)
+            seq_total = sum(s[1] for s in seq_stats)
+            seq_rate = (seq_hits / seq_total * 100.0) if seq_total > 0 else 0.0
+            print(f"Sequential Top1 Stats: Hits={seq_hits}, Total={seq_total}, HitRate={seq_rate:.2f}%")
+
+        model.print_cache_stats()
+        return 0
+
+    # Normal execution path (Single Text)
     print(f"Processing text: '{args.text}'")
 
     if args.perplexity:
@@ -1169,6 +1608,8 @@ def main():
             return 1
     elif args.generate:
         print(f"Generating {args.max_new_tokens} tokens...\n")
+        # Reset stats before generation so we only capture generation stats
+        model.reset_cache_stats()
         try:
             input_ids = model.tokenize(args.text)
 
@@ -1187,6 +1628,8 @@ def main():
                 generated_tokens = generated[0, prompt_len:].tolist()
                 decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
 
+                num_generated_tokens = len(generated_tokens)
+
                 print(f"\n{'='*60}")
                 print("Full output (prompt + generated):")
                 print(f"{'='*60}")
@@ -1196,6 +1639,29 @@ def main():
                 print(f"{'='*60}")
                 print(decoded_generated)
                 print(f"{'='*60}")
+
+
+                # Get and print cache stats
+                hits, misses = model.get_cache_stats()
+                total = hits + misses
+                hit_rate = (hits / total * 100.0) if total > 0 else 0.0
+                print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
+                
+                pred_stats = model.get_predictor_stats()
+                if pred_stats:
+                    pred_hits = sum(s[0] for s in pred_stats)
+                    pred_total = sum(s[1] for s in pred_stats)
+                    pred_rate = (pred_hits / pred_total * 100.0) if pred_total > 0 else 0.0
+                    print(f"Predictor Stats: Hits={pred_hits}, Total={pred_total}, HitRate={pred_rate:.2f}%")
+                
+                seq_stats = model.get_sequential_top1_stats()
+                if seq_stats:
+                    seq_hits = sum(s[0] for s in seq_stats)
+                    seq_total = sum(s[1] for s in seq_stats)
+                    seq_rate = (seq_hits / seq_total * 100.0) if seq_total > 0 else 0.0
+                    print(f"Sequential Top1 Stats: Hits={seq_hits}, Total={seq_total}, HitRate={seq_rate:.2f}%")
+                
+                model.print_cache_stats()
             else:
                 print(f"\nGenerated token IDs: {generated}")
         except Exception as e:
