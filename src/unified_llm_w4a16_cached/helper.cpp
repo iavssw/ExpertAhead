@@ -985,10 +985,19 @@ static torch::Tensor read_bin_tensor(const std::string &path, torch::ScalarType 
 }
 
 static void read_bin_tensor_pread(const std::string &path, void* dest_ptr, size_t copy_size) {
-    int fd = open(path.c_str(), O_RDONLY);
+    // Open with O_DIRECT to bypass the OS page cache — expert weights must come
+    // from SSD, not from a silent RAM buffer that would give unrealistically fast
+    // load times on machines with plenty of free RAM.
+    int flags = O_RDONLY | O_DIRECT;
+    int fd = open(path.c_str(), flags);
+    if (fd == -1 && errno == EINVAL) {
+        // O_DIRECT not supported by this filesystem (e.g. tmpfs) — fall back.
+        fd = open(path.c_str(), O_RDONLY);
+    }
     if (fd == -1) {
         throw std::runtime_error("Could not open file: " + path + " (" + strerror(errno) + ")");
     }
+
     struct stat sb;
     if (fstat(fd, &sb) == -1) {
         close(fd);
@@ -1001,8 +1010,18 @@ static void read_bin_tensor_pread(const std::string &path, void* dest_ptr, size_
                                  ", got " + std::to_string(file_size) + ")");
     }
 
-    size_t bytes_read = 0;
+    bool is_direct = (fcntl(fd, F_GETFL) & O_DIRECT) != 0;
     char* ptr = static_cast<char*>(dest_ptr);
+
+    // O_DIRECT requires 512-byte alignment for both the destination pointer and
+    // the transfer size. Pinned memory is usually aligned, but check and fall
+    // back gracefully if not.
+    if (is_direct && (((uintptr_t)ptr % 512 != 0) || (copy_size % 512 != 0))) {
+        int current_flags = fcntl(fd, F_GETFL);
+        fcntl(fd, F_SETFL, current_flags & ~O_DIRECT);
+    }
+
+    size_t bytes_read = 0;
     while (bytes_read < copy_size) {
         ssize_t ret = pread(fd, ptr + bytes_read, copy_size - bytes_read, bytes_read);
         if (ret <= 0) break;
@@ -1217,6 +1236,7 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
 }
 
 void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
+    auto start_time = std::chrono::high_resolution_clock::now();
     if (weights_dir.empty()) {
         throw std::runtime_error("Weights directory not set for MoE layer " + std::to_string(layer_idx_));
     }
@@ -1325,4 +1345,8 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
 
         down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
     }
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
+    total_expert_load_time_ms_ += ms;
 }

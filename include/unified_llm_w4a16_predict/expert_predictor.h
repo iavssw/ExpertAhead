@@ -58,7 +58,7 @@ class IExpertPredictor {
 public:
     virtual ~IExpertPredictor() = default;
     
-    virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> expert_bias = c10::nullopt) = 0;
+    virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) = 0;
     virtual bool is_ready() = 0;
     virtual std::vector<int64_t> get_prediction() = 0;
     virtual std::vector<int64_t> try_get_prediction() = 0;
@@ -111,7 +111,7 @@ public:
         shm_unlink(shm_name_.c_str());
     }
     
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> expert_bias = c10::nullopt) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
         response_->reset();
         
         request_->token_id = 0; // Deprecated
@@ -170,7 +170,8 @@ class ThreadedTorchScriptPredictor : public IExpertPredictor {
 public:
     struct PredictionJob {
         torch::Tensor embedding;
-        c10::optional<torch::Tensor> expert_bias;
+        c10::optional<torch::Tensor> prefill_dist;
+        c10::optional<torch::Tensor> prev_expert_onehot;
         int64_t job_id;
     };
     
@@ -191,6 +192,15 @@ public:
             model_ = torch::jit::load(model_path, device_);
             model_.eval();
             model_loaded_ = true;
+
+            // As of the new PredictorJITWrapper, all models take exactly 3 inputs + self.
+            // We bypass the flaky TorchScript schema reflection which can throw on traced modules.
+            model_accepts_prefill_dist_ = true;
+            model_accepts_prev_expert_ = true;
+            std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_
+                      << "] Assuming prefill_dist and prev_expert_onehot support (v2 API)." << std::endl;
+            std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_
+                      << "] prefill_dist support: " << (model_accepts_prefill_dist_ ? "yes" : "no") << ", prev_expert_onehot support: " << (model_accepts_prev_expert_ ? "yes" : "no") << std::endl;
             std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
                       << "] Loaded model: " << model_path << std::endl;
         } catch (const c10::Error& e) {
@@ -224,10 +234,11 @@ public:
                   << "] Shutdown complete" << std::endl;
     }
     
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> expert_bias = c10::nullopt) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
         PredictionJob job;
         job.embedding = embedding;
-        job.expert_bias = expert_bias;
+        job.prefill_dist = prefill_dist;
+        job.prev_expert_onehot = prev_expert_onehot;
         job.job_id = next_job_id_++;
         
         {
@@ -316,6 +327,24 @@ private:
             
             std::vector<torch::jit::IValue> inputs;
             inputs.push_back(input);
+            if (model_accepts_prefill_dist_) {
+                if (job.prefill_dist.has_value()) {
+                    torch::Tensor pdist = job.prefill_dist.value().to(torch::kFloat32).to(device_);
+                    if (pdist.dim() == 1) {
+                        pdist = pdist.unsqueeze(0);
+                    }
+                    inputs.push_back(pdist);
+                }
+            }
+            if (model_accepts_prev_expert_) {
+                if (job.prev_expert_onehot.has_value()) {
+                    torch::Tensor prev_exp = job.prev_expert_onehot.value().to(torch::kFloat32).to(device_);
+                    if (prev_exp.dim() == 1) {
+                        prev_exp = prev_exp.unsqueeze(0);
+                    }
+                    inputs.push_back(prev_exp);
+                }
+            }
             
             torch::NoGradGuard no_grad;
             auto output = model_.forward(inputs).toTensor();
@@ -328,12 +357,6 @@ private:
                 delta_avg_ = current_range;
             } else {
                 delta_avg_ = 0.9 * delta_avg_ + 0.1 * current_range;
-            }
-            
-            if (job.expert_bias.has_value()) {
-                auto bias = job.expert_bias.value().to(torch::kFloat32).to(device_);
-                bias = bias * delta_avg_;
-                output = output + bias;
             }
             
             // Extract prediction (get fully ranked list of experts)
@@ -378,6 +401,8 @@ private:
     torch::Device device_;
     torch::jit::script::Module model_;
     bool model_loaded_;
+    bool model_accepts_prefill_dist_ = false;  // Detected from the model's forward schema at load time
+    bool model_accepts_prev_expert_ = false;   // Detected from the model's forward schema at load time
     
     std::atomic<bool> running_;
     std::thread worker_thread_;
@@ -403,7 +428,7 @@ public:
         : num_experts_(num_experts),
           gen_(std::random_device{}()) {}
 
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> expert_bias = c10::nullopt) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
         // Generate a random ranking of all experts
         std::vector<int64_t> experts(num_experts_);
         std::iota(experts.begin(), experts.end(), 0);

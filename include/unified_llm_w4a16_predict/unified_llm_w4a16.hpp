@@ -142,11 +142,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     }
     double get_lambda() const { return lambda_; }
     
-    // Correlation-based expert bias
-    void set_correlation_constant(double constant) { correlation_constant_ = constant; }
-    double get_correlation_constant() const { return correlation_constant_; }
-    
-    // Training data collection
+    // Correlation-based expert tracking
+    // We still keep correlation constant API around if something calls it but ignore it, or remove it. Let's remove it.
     torch::Tensor get_last_router_logits() const { return last_router_logits_; }
     
     // Cache stats
@@ -154,14 +151,24 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::pair<int64_t, int64_t> get_cache_stats() const { return {cache_hits_, cache_misses_}; }
     void reset_cache_stats();
 
-    // Predictor hit-rate stats (no-bias vs with-bias, generation only)
-    std::tuple<int64_t, int64_t, int64_t> get_predictor_stats() const {
-        return {pred_hits_no_bias_, pred_hits_with_bias_, pred_total_};
+    // Predictor hit-rate stats (generation only)
+    std::tuple<int64_t, int64_t> get_predictor_stats() const {
+        return {pred_hits_no_bias_, pred_total_};
     }
     void reset_predictor_stats() {
         pred_hits_no_bias_ = 0;
-        pred_hits_with_bias_ = 0;
         pred_total_ = 0;
+        last_true_top1_expert_ = -1;  // Reset so first token doesn't count
+    }
+
+    // Sequential top1 caching stats (generation only)
+    std::tuple<int64_t, int64_t> get_sequential_top1_stats() const {
+        return {sequential_top1_hits_, sequential_top1_total_};
+    }
+    void reset_sequential_top1_stats() {
+        sequential_top1_hits_ = 0;
+        sequential_top1_total_ = 0;
+        last_top1_expert_ = -1;
     }
 
     // Prediction & Speculative Loading
@@ -203,8 +210,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double delta_avg_ = 0.0;                     // Running average of logit ranges
     std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
 
-    // Correlation-based expert bias
-    double correlation_constant_ = 0.0;
+    // Prefill distribution tracking
     torch::Tensor prefill_expert_counts_;
 
     // Cache State
@@ -216,12 +222,17 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double total_expert_load_time_ms_ = 0.0;
 
     // Predictor hit-rate counters (generation only)
-    int64_t pred_hits_no_bias_   = 0;  // tokens where no-bias top-k had ≥1 correct expert
-    int64_t pred_hits_with_bias_ = 0;  // tokens where with-bias top-k had ≥1 correct expert
+    int64_t pred_hits_no_bias_   = 0;  // tokens where predictor's prefetched expert(s) matched unbiased top-1
     int64_t pred_total_          = 0;  // total evaluated generation tokens
+    int64_t last_true_top1_expert_ = -1; // unbiased top-1 from previous token (ground truth for predictor stat)
+    
+    // Sequential top1 tracking
+    int64_t sequential_top1_hits_ = 0;
+    int64_t sequential_top1_total_ = 0;
+    int64_t last_top1_expert_ = -1;
+    
     // Ranked predictions from the previous token (set in async lambda, read next token)
     std::vector<int64_t> last_pred_no_bias_;
-    std::vector<int64_t> last_pred_with_bias_;
     std::mutex pred_results_mutex_;
     std::atomic<bool> pred_results_ready_{false};
     
@@ -243,7 +254,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);
     torch::Tensor forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
-                                     torch::Tensor &output);
+                                     torch::Tensor &output, int64_t current_true_top1);
     torch::Tensor forward_prefill(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                                   torch::Tensor &output);
 };
@@ -259,7 +270,8 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                         int64_t max_batch_size = 1, int64_t groupsize = 128, int64_t num_experts = 0, int64_t num_experts_per_tok = 0,
                         torch::Device device = torch::kCPU, int64_t max_cached_experts_per_layer = 0,
                         const std::string& predictor_model_path = "", int64_t prefetch_experts_count = 1,
-                        const std::vector<int>& predict_layers = {});
+                        const std::vector<int>& predict_layers = {},
+                        const std::vector<int64_t>& per_layer_cache_sizes = {});
 
     // Forward pass: takes token IDs and returns logits
     torch::Tensor forward(torch::Tensor input_ids, int64_t start_pos = 0);
@@ -285,9 +297,6 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void set_lambda(double lambda, int64_t layer_idx = -1);
     double get_lambda(int64_t layer_idx = 0) const;
 
-    // Correlation-based expert bias
-    void set_layer_correlation_constants(const std::vector<double>& constants);
-
     // Move model to device
     // Move model to device
     UnifiedLLMW4A16Impl &to(torch::Device device);
@@ -300,9 +309,12 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     std::pair<int64_t, int64_t> get_cache_stats() const;  // Returns (total_hits, total_misses)
 
     // Predictor hit-rate stats across all MoE layers
-    // Each element: (no_bias_hits, with_bias_hits, total) for that layer
-    std::vector<std::tuple<int64_t, int64_t, int64_t>> get_predictor_stats() const;
+    // Each element: (hits, total) for that layer
+    std::vector<std::tuple<int64_t, int64_t>> get_predictor_stats() const;
     void reset_predictor_stats();
+
+    std::vector<std::tuple<int64_t, int64_t>> get_sequential_top1_stats() const;
+    void reset_sequential_top1_stats();
     
     // Training data collection
     void enable_training_data_collection() { collect_training_data_ = true; }

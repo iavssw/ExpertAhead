@@ -3,19 +3,13 @@
 sweep_bias_hitrate.py
 =====================
 Sweeps the expert bias `correlation_constant` (alpha) and measures how it
-affects the MLP predictor's top-k hit rate at generation time.
+affects the expert cache hit rate at generation time.
 
 The model is loaded ONCE; we change `set_layer_correlation_constants` between
-runs, so no subprocess overhead.
+runs so no subprocess overhead.
 
-For each alpha value we collect per-layer:
-  - hit_rate_no_bias  : fraction of tokens where the pure-MLP top-k prediction
-                        overlaps with the actual experts (no bias applied)
-  - hit_rate_with_bias: same metric with bias applied at the given alpha
-  - total             : number of generation tokens evaluated
-
-At alpha=0 both rates will be identical (no bias); non-zero alphas reveal the
-marginal benefit/cost of the frequency prior.
+For each alpha value we run generation and record the cache hit rate.
+We also always run alpha=0.0 as the baseline and compare.
 
 Usage
 -----
@@ -36,15 +30,10 @@ from pathlib import Path
 
 import torch
 
-# ── allow running from the script's directory ──────────────────────────────
 _script_dir = Path(__file__).parent.resolve()
 sys.path.insert(0, str(_script_dir))
 from mixtral_8x7B_w4a16_model import Mixtral8x7BW4A16Model
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-# helpers
-# ──────────────────────────────────────────────────────────────────────────────
 
 def parse_args():
     p = argparse.ArgumentParser(description="Sweep expert-bias alpha and measure predictor hit rate.")
@@ -59,7 +48,7 @@ def parse_args():
     p.add_argument("--expert-cache", type=int, default=2,
                    help="Max cached experts per layer")
     p.add_argument("--prefetch-count", type=int, default=2,
-                   help="Number of predicted experts checked for hit-rate")
+                   help="Number of predicted experts to prefetch")
     p.add_argument("--num-layers", type=int, default=32,
                    help="Number of MoE layers in the model")
     p.add_argument("--alpha-values", type=float, nargs="+",
@@ -78,27 +67,9 @@ def parse_args():
     return p.parse_args()
 
 
-def compute_summary(stats):
-    """
-    Aggregate per-layer tuple list into summary dict.
-    stats: list of (no_bias_hits, with_bias_hits, total) per layer
-    """
-    layer_rows = []
-    for layer_idx, (nb, wb, tot) in enumerate(stats):
-        layer_rows.append({
-            "layer": layer_idx,
-            "hits_no_bias":   nb,
-            "hits_with_bias": wb,
-            "total":          tot,
-            "hit_rate_no_bias":   nb / tot if tot > 0 else 0.0,
-            "hit_rate_with_bias": wb / tot if tot > 0 else 0.0,
-        })
-    return layer_rows
-
-
 def run_sweep(args):
     print("=" * 70)
-    print("Expert Bias Hit-Rate Sweep")
+    print("Expert Bias Hit-Rate Sweep (Separate Runs)")
     print(f"  alpha values   : {args.alpha_values}")
     print(f"  prefetch_count : {args.prefetch_count}")
     print(f"  tokens/run     : {args.num_tokens}")
@@ -119,16 +90,14 @@ def run_sweep(args):
     )
     print("Model loaded.\n")
 
-    all_rows = []  # accumulated CSV rows
+    all_rows = []
 
     for alpha in args.alpha_values:
         print(f"\n{'─'*60}")
         print(f"  alpha = {alpha:.4f}")
         print(f"{'─'*60}")
 
-        # Set correlation constant for every layer
         model.set_layer_correlation_constants([alpha] * args.num_layers)
-        model.reset_predictor_stats()
         model.reset_cache_stats()
 
         tokens_generated = 0
@@ -139,61 +108,45 @@ def run_sweep(args):
             input_ids = model.tokenize(prompt_text)
             per_prompt = max(1, args.num_tokens // len(args.prompts))
             try:
-                model.generate(input_ids, max_new_tokens=per_prompt,
-                               temperature=0.0)
+                model.generate(input_ids, max_new_tokens=per_prompt, temperature=0.0)
                 tokens_generated += per_prompt
             except Exception as e:
                 print(f"  [Error] generation failed: {e}")
 
-        stats = model.get_predictor_stats()
-        if not stats:
-            print("  WARNING: no predictor stats returned "
-                  "(is predictor available for these layers?)")
-            continue
-
-        summary = compute_summary(stats)
-        total_nb  = sum(r["hits_no_bias"]   for r in summary)
-        total_wb  = sum(r["hits_with_bias"]  for r in summary)
-        total_tok = sum(r["total"]           for r in summary)
-
-        overall_nb  = total_nb  / total_tok if total_tok > 0 else 0.0
-        overall_wb  = total_wb  / total_tok if total_tok > 0 else 0.0
+        # Collect overall cache stats
+        total_hits, total_misses = model.get_cache_stats()
+        total = total_hits + total_misses
+        hit_rate = total_hits / total if total > 0 else 0.0
 
         print(f"  tokens generated : {tokens_generated}")
-        print(f"  total predictions: {total_tok}")
-        print(f"  hit_rate (no bias) : {overall_nb:.4f}  ({overall_nb*100:.2f}%)")
-        print(f"  hit_rate (w/ bias) : {overall_wb:.4f}  ({overall_wb*100:.2f}%)")
-        print(f"  delta              : {overall_wb - overall_nb:+.4f}")
+        print(f"  cache hits       : {total_hits} / {total}")
+        print(f"  hit_rate         : {hit_rate:.4f}  ({hit_rate*100:.2f}%)")
 
-        for row in summary:
-            row["alpha"] = alpha
-            all_rows.append(row)
+        all_rows.append({
+            "alpha": alpha,
+            "hits": total_hits,
+            "misses": total_misses,
+            "total": total,
+            "hit_rate": hit_rate,
+        })
 
-    # ── save CSV ──────────────────────────────────────────────────────────────
+    # Save CSV
     if all_rows:
-        fieldnames = ["alpha", "layer", "hits_no_bias", "hits_with_bias",
-                      "total", "hit_rate_no_bias", "hit_rate_with_bias"]
-        out_path = args.output
-        with open(out_path, "w", newline="") as f:
+        fieldnames = ["alpha", "hits", "misses", "total", "hit_rate"]
+        with open(args.output, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(all_rows)
-        print(f"\nResults saved → {out_path}")
-        generate_plots(out_path, args)
+        print(f"\nResults saved → {args.output}")
+        generate_plots(args.output, args)
     else:
         print("\nNo results collected.")
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-# plotting
-# ──────────────────────────────────────────────────────────────────────────────
 
 def generate_plots(csv_path, args=None):
     try:
         import pandas as pd
         import matplotlib.pyplot as plt
-        import matplotlib.cm as cm
-        import numpy as np
     except ImportError as e:
         print(f"Plotting skipped (missing library: {e})")
         return
@@ -206,77 +159,24 @@ def generate_plots(csv_path, args=None):
     ts = time.strftime("%Y%m%d_%H%M%S")
     out_dir = Path(csv_path).parent
 
-    alphas = sorted(df["alpha"].unique())
-    layers = sorted(df["layer"].unique())
-
-    # ── Plot 1: overall hit rate vs alpha ────────────────────────────────────
-    agg = df.groupby("alpha")[["hits_no_bias", "hits_with_bias", "total"]].sum()
-    agg["hr_no_bias"]   = agg["hits_no_bias"]   / agg["total"].clip(lower=1)
-    agg["hr_with_bias"] = agg["hits_with_bias"]  / agg["total"].clip(lower=1)
-    agg = agg.reset_index()
+    baseline = df[df["alpha"] == 0.0]["hit_rate"].values
+    baseline_hr = baseline[0] if len(baseline) > 0 else None
 
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(agg["alpha"], agg["hr_no_bias"]   * 100, "o--", label="No bias (MLP only)", color="steelblue")
-    ax.plot(agg["alpha"], agg["hr_with_bias"] * 100, "s-",  label="With bias", color="darkorange")
+    ax.plot(df["alpha"], df["hit_rate"] * 100, "o-", color="darkorange", label="Hit rate")
+    if baseline_hr is not None:
+        ax.axhline(y=baseline_hr * 100, color="steelblue", linestyle="--", label=f"Baseline (α=0): {baseline_hr*100:.1f}%")
     ax.set_xlabel("Correlation constant α")
-    ax.set_ylabel("Hit rate (%)")
-    ax.set_title("Expert predictor hit rate vs. bias alpha (all layers)")
+    ax.set_ylabel("Cache hit rate (%)")
+    ax.set_title("Expert cache hit rate vs. prefill bias alpha")
     ax.legend()
     ax.grid(True, alpha=0.4)
     fig.tight_layout()
-    fname = str(out_dir / f"bias_hitrate_overall_{ts}.png")
+    fname = str(out_dir / f"bias_hitrate_{ts}.png")
     fig.savefig(fname, dpi=150)
     print(f"Saved {fname}")
     plt.close(fig)
 
-    # ── Plot 2: delta (with_bias - no_bias) vs alpha per layer (heatmap) ────
-    pivot_delta = df.copy()
-    pivot_delta["delta"] = (pivot_delta["hits_with_bias"] - pivot_delta["hits_no_bias"]) / pivot_delta["total"].clip(lower=1)
-    heat = pivot_delta.pivot_table(index="layer", columns="alpha", values="delta", aggfunc="mean")
-
-    fig, ax = plt.subplots(figsize=(max(6, len(alphas) * 1.2), max(6, len(layers) * 0.35)))
-    vmax = max(abs(heat.values.max()), abs(heat.values.min()), 0.01)
-    im = ax.imshow(heat.values, aspect="auto", cmap="RdYlGn",
-                   vmin=-vmax, vmax=vmax, interpolation="nearest")
-    ax.set_xticks(range(len(heat.columns)))
-    ax.set_xticklabels([f"{v:.2f}" for v in heat.columns], fontsize=8)
-    ax.set_yticks(range(len(heat.index)))
-    ax.set_yticklabels([f"L{l}" for l in heat.index], fontsize=7)
-    ax.set_xlabel("Alpha")
-    ax.set_ylabel("Layer")
-    ax.set_title("Δ Hit rate (with_bias − no_bias) per layer × alpha")
-    plt.colorbar(im, ax=ax, label="Δ hit rate")
-    fig.tight_layout()
-    fname = str(out_dir / f"bias_hitrate_delta_heatmap_{ts}.png")
-    fig.savefig(fname, dpi=150)
-    print(f"Saved {fname}")
-    plt.close(fig)
-
-    # ── Plot 3: per-layer hit rate curves at best alpha vs baseline ──────────
-    # Find the alpha with highest overall with_bias hit rate
-    best_alpha = agg.loc[agg["hr_with_bias"].idxmax(), "alpha"]
-    df_best   = df[df["alpha"] == best_alpha].copy()
-    df_best["hr_no_bias"]   = df_best["hits_no_bias"]   / df_best["total"].clip(lower=1)
-    df_best["hr_with_bias"] = df_best["hits_with_bias"] / df_best["total"].clip(lower=1)
-
-    fig, ax = plt.subplots(figsize=(12, 5))
-    ax.bar(df_best["layer"] - 0.2, df_best["hr_no_bias"]   * 100, 0.4, label="No bias", color="steelblue", alpha=0.8)
-    ax.bar(df_best["layer"] + 0.2, df_best["hr_with_bias"] * 100, 0.4, label=f"With bias (α={best_alpha:.2f})", color="darkorange", alpha=0.8)
-    ax.set_xlabel("Layer")
-    ax.set_ylabel("Hit rate (%)")
-    ax.set_title(f"Per-layer hit rate at best alpha (α={best_alpha:.2f})")
-    ax.legend()
-    ax.grid(True, axis="y", alpha=0.4)
-    fig.tight_layout()
-    fname = str(out_dir / f"bias_hitrate_per_layer_{ts}.png")
-    fig.savefig(fname, dpi=150)
-    print(f"Saved {fname}")
-    plt.close(fig)
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# entry
-# ──────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     args = parse_args()

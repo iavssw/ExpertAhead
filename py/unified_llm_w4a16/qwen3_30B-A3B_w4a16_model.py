@@ -182,7 +182,12 @@ class Qwen3_30BA3BW4A16Model:
         device: str = "cuda",
         backend: str = "base",
         max_cached_experts_per_layer: int = 0,
-        config_path: Optional[str] = None
+        config_path: Optional[str] = None,
+        predictor_models_dir: str = "",
+        predictor_device: str = "gpu",
+        prefetch_experts_count: int = 1,
+        predict_layers: Optional[List[int]] = None,
+        per_layer_cache_sizes: Optional[List[int]] = None,
     ):
         """
         Initialize Qwen3 30B-A3B AWQ w4a16 quantized model.
@@ -238,13 +243,44 @@ class Qwen3_30BA3BW4A16Model:
         if backend == "cached":
             constructor_args.append(max_cached_experts_per_layer)
 
-        constructor_args.append(device)
+        if backend in ["cached", "predict"]:
+            constructor_args.append(device)
+        else:
+            constructor_args.append(device)
 
         if config_path is None:
             config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_qwen3_30B_A3B.json5"))
-        constructor_args.append(config_path)
+
+        if backend == "predict":
+            # predict backend arg order: device, max_cached, predictor_path, config, prefetch, predict_layers, per_layer_cache_sizes
+            import tempfile, json as _json
+            _temp_config_path = None
+            if predictor_device != "auto" and predictor_models_dir:
+                base_cfg = load_config_with_comments(config_path) if config_path else {}
+                base_cfg["predictor_device"] = predictor_device
+                tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+                _json.dump(base_cfg, tmp)
+                tmp.close()
+                _temp_config_path = tmp.name
+                constructor_args.append(_temp_config_path)
+            else:
+                constructor_args.append(config_path)
+            constructor_args.append(max_cached_experts_per_layer)
+            constructor_args.append(predictor_models_dir)
+            constructor_args.append(prefetch_experts_count)
+            constructor_args.append(predict_layers if predict_layers is not None else [])
+            constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
+        else:
+            constructor_args.append(config_path)
 
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
+
+        # Clean up temp config
+        if backend == "predict" and 'tmp' in dir() and hasattr(tmp, 'name'):
+            try:
+                os.unlink(tmp.name)
+            except OSError:
+                pass
 
         self.config = {}
         self.use_pre_saved_weights = False
@@ -269,6 +305,12 @@ class Qwen3_30BA3BW4A16Model:
             self.model.initialize_dummy_weights()
         elif model_path:
             self._load_quantized_weights(model_path, weights_folder="model_weights")
+
+        if backend in ["cached", "predict"]:
+            num_to_warm = max(per_layer_cache_sizes) if per_layer_cache_sizes else max_cached_experts_per_layer
+            if num_to_warm > 0:
+                print(f"Pre-warming expert cache with {num_to_warm} experts...")
+                self.model.prewarm_experts(num_to_warm)
 
         tokenizer_path = tokenizer_path or model_path
         if tokenizer_path:
@@ -510,6 +552,35 @@ class Qwen3_30BA3BW4A16Model:
             input_ids = self.tokenize(input_ids)
         return self.model.forward(input_ids, start_pos)
 
+    def set_layer_correlation_constants(self, constants: List[float]):
+        """Set the correlation constant (prefill bias alpha) for each layer."""
+        if hasattr(self.model, "set_layer_correlation_constants"):
+            self.model.set_layer_correlation_constants(constants)
+
+    def reset_cache_stats(self):
+        """Reset cache hit/miss counters."""
+        if hasattr(self.model, "reset_cache_stats"):
+            self.model.reset_cache_stats()
+
+    def get_cache_stats(self):
+        """Return (total_hits, total_misses) across all MoE layers."""
+        if hasattr(self.model, "get_cache_stats"):
+            return self.model.get_cache_stats()
+        return (0, 0)
+
+    def print_cache_stats(self):
+        if hasattr(self.model, "print_cache_stats"):
+            self.model.print_cache_stats()
+
+    def get_predictor_stats(self):
+        """Return per-layer (no_bias_hits, with_bias_hits, total) tuples."""
+        if hasattr(self.model, "get_predictor_stats"):
+            return self.model.get_predictor_stats()
+        return []
+
+    def reset_predictor_stats(self):
+        if hasattr(self.model, "reset_predictor_stats"):
+            self.model.reset_predictor_stats()
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
                     max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50, generate=True, config_path=None):
@@ -763,6 +834,18 @@ def main():
         default=None,
         help="Run prompt test case with specified token count."
     )
+    parser.add_argument(
+        "--max-cached-experts",
+        type=int,
+        default=8,
+        help="Maximum number of experts to cache per layer (cached/predict backends only, default: 8)"
+    )
+    parser.add_argument(
+        "--prefetch-experts-count",
+        type=int,
+        default=1,
+        help="Number of experts to speculatively prefetch (predict backend only, default: 1)"
+    )
 
     args = parser.parse_args()
 
@@ -791,7 +874,9 @@ def main():
             tokenizer_path=args.tokenizer_path,
             device=args.device,
             backend=args.backend,
-            config_path=args.config_path
+            config_path=args.config_path,
+            max_cached_experts_per_layer=args.max_cached_experts,
+            prefetch_experts_count=args.prefetch_experts_count,
         )
 
         print("Model initialized successfully!")
@@ -805,66 +890,64 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
-    print(f"Processing text: '{args.text}'")
-
-    if args.generate:
-        print(f"Generating {args.max_new_tokens} tokens...\n")
-        try:
-            input_ids = model.tokenize(args.text)
-
-            generated = model.generate(
-                input_ids,
-                max_new_tokens=args.max_new_tokens,
-                temperature=args.temperature,
-                top_p=args.top_p,
-                top_k=args.top_k
-            )
-
-            if model.tokenizer is not None:
-                decoded_full = model.tokenizer.decode(generated[0].tolist(), skip_special_tokens=False)
-
-                prompt_len = input_ids.size(1)
-                generated_tokens = generated[0, prompt_len:].tolist()
-                decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
-
-                print(f"\n{'='*60}")
-                print("Full output (prompt + generated):")
-                print(f"{'='*60}")
-                print(decoded_full)
-                print(f"{'='*60}")
-                print("Generated text only:")
-                print(f"{'='*60}")
-                print(decoded_generated)
-                print(f"{'='*60}")
-            else:
-                print(f"\nGenerated token IDs: {generated}")
-        except Exception as e:
-            print(f"Error during generation: {e}")
-            import traceback
-            traceback.print_exc()
-            return 1
+    # Read all prompts from prompts.txt
+    script_dir = Path(__file__).parent
+    prompts_file = script_dir / "prompts.txt"
+    if prompts_file.exists():
+        with open(prompts_file, "r", encoding="utf-8") as f:
+            raw_prompts = [line.strip() for line in f.readlines()]
+        prompts = [p for p in raw_prompts if p]  # drop blank lines
     else:
-        print("\nRunning forward pass (getting logits)...")
-        try:
-            start_time = time.time()
-            logits = model(args.text)
-            end_time = time.time()
-            print(f"Prefill time: {end_time - start_time:.4f} seconds")
+        print(f"Warning: {prompts_file} not found, falling back to --text argument.")
+        prompts = [args.text]
 
-            print(f"Logits shape: {logits.shape}")
-            print(f"Logits dtype: {logits.dtype}")
-            print(f"Logits device: {logits.device}")
+    print(f"Running {len(prompts)} prompt(s) from {prompts_file if prompts_file.exists() else '--text'}...\n")
 
-            print("\nLogits statistics:")
-            print(f"  Min: {logits.min().item():.4f}")
-            print(f"  Max: {logits.max().item():.4f}")
-            print(f"  Mean: {logits.mean().item():.4f}")
-            print(f"  Std: {logits.std().item():.4f}")
-        except Exception as e:
-            print(f"Error during forward pass: {e}")
-            import traceback
-            traceback.print_exc()
-            return 1
+    for prompt_idx, prompt_text in enumerate(prompts):
+        print(f"\n{'='*60}")
+        print(f"PROMPT {prompt_idx + 1}/{len(prompts)}: {prompt_text[:80]}{'...' if len(prompt_text) > 80 else ''}")
+        print(f"{'='*60}")
+
+        if args.generate:
+            try:
+                input_ids = model.tokenize(prompt_text)
+
+                generated = model.generate(
+                    input_ids,
+                    max_new_tokens=args.max_new_tokens,
+                    temperature=args.temperature,
+                    top_p=args.top_p,
+                    top_k=args.top_k
+                )
+
+                if model.tokenizer is not None:
+                    prompt_len = input_ids.size(1)
+                    generated_tokens = generated[0, prompt_len:].tolist()
+                    decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
+
+                    print("Generated text:")
+                    print(f"{'='*60}")
+                    print(decoded_generated)
+                    print(f"{'='*60}")
+                else:
+                    print(f"Generated token IDs: {generated}")
+            except Exception as e:
+                print(f"Error during generation for prompt {prompt_idx + 1}: {e}")
+                import traceback
+                traceback.print_exc()
+        else:
+            try:
+                start_time = time.time()
+                logits = model(prompt_text)
+                end_time = time.time()
+                print(f"Prefill time: {end_time - start_time:.4f} seconds")
+                print(f"Logits shape: {logits.shape}, dtype: {logits.dtype}")
+                print(f"Logits stats — min: {logits.min().item():.4f}, max: {logits.max().item():.4f}, "
+                      f"mean: {logits.mean().item():.4f}")
+            except Exception as e:
+                print(f"Error during forward pass for prompt {prompt_idx + 1}: {e}")
+                import traceback
+                traceback.print_exc()
 
     print(f"\n{'=' * 60}")
     if hasattr(model, "load_time"):

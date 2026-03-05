@@ -640,6 +640,11 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
     if (update_stats) {
         cache_misses_++;
     }
+    if (expert_lru_order_.empty()) {
+        throw std::runtime_error(
+            "MixtureOfExperts: cache miss on layer " + std::to_string(layer_idx_) +
+            " but max_cached_experts_per_layer=0. Please pass a non-zero --max-cached-experts value.");
+    }
     size_t lru_slot = expert_lru_order_[0];
     expert_lru_order_.erase(expert_lru_order_.begin());
     
@@ -2110,7 +2115,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     }
     auto end_prefill = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_prefill = end_prefill - start_prefill;
-    // std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
+    std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
 
     // Get next token: implementation when temperature is 0
     last_token = output.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
@@ -2169,6 +2174,17 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
         actual_generated++;
         token_len++;
         start_pos++;
+
+        if (actual_generated % 5 == 0) {
+            if (should_sync_device) torch::cuda::synchronize();
+            auto now = std::chrono::high_resolution_clock::now();
+            double elapsed_gen = std::chrono::duration<double>(now - start_gen).count();
+            double running_tps = actual_generated / elapsed_gen;
+            std::cout << "[gen " << actual_generated << "/" << (max_new_tokens - 1)
+                      << "] elapsed=" << std::fixed << std::setprecision(1) << elapsed_gen
+                      << "s  TPS=" << std::fixed << std::setprecision(3) << running_tps
+                      << std::flush << std::endl;
+        }
     }
 
     if (should_sync_device) {
@@ -2178,7 +2194,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     std::chrono::duration<double> generation_time = end_gen - start_gen;
 
     // print to terminal
-    std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
+    std::cout << "Prefill time (summary): " << elapsed_prefill.count() << " seconds" << std::endl;
     std::cout << "Total Generation Time: " << generation_time.count() << " seconds" << std::endl;
     if (actual_generated > 0) {
         double time_per_token = generation_time.count() / actual_generated;

@@ -184,7 +184,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     
     int64_t cache_hits_ = 0;
     int64_t cache_misses_ = 0;
-    
+    double total_expert_load_time_ms_ = 0.0;  // cumulative time spent in load_expert_weights()
+
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
     

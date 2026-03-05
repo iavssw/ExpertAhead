@@ -190,6 +190,7 @@ class Mixtral8x7BW4A16Model:
         predictor_device: str = "gpu",
         prefetch_experts_count: int = 1,
         predict_layers: Optional[List[int]] = None,
+        per_layer_cache_sizes: Optional[List[int]] = None,
     ):
         """
         Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
@@ -281,6 +282,7 @@ class Mixtral8x7BW4A16Model:
         if backend == "predict":
             constructor_args.append(prefetch_experts_count)
             constructor_args.append(predict_layers if predict_layers is not None else [])
+            constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
             
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
 
@@ -317,8 +319,9 @@ class Mixtral8x7BW4A16Model:
             self._load_quantized_weights(model_path, weights_folder="model_weights")
 
         if backend in ["cached", "predict"]:
-            print(f"Pre-warming expert cache with {max_cached_experts_per_layer} experts...")
-            self.model.prewarm_experts(max_cached_experts_per_layer)
+            num_to_warm = max(per_layer_cache_sizes) if per_layer_cache_sizes else max_cached_experts_per_layer
+            print(f"Pre-warming expert cache with {num_to_warm} experts...")
+            self.model.prewarm_experts(num_to_warm)
 
         tokenizer_path = tokenizer_path or model_path
         if tokenizer_path:
@@ -570,8 +573,8 @@ class Mixtral8x7BW4A16Model:
         Raises:
             ValueError: If lambda_value is not in [0, 1]
         """
-        if lambda_value < 0.0 or lambda_value > 1.0:
-            raise ValueError(f"Lambda must be in range [0, 1], got: {lambda_value}")
+        if lambda_value < 0.0 or lambda_value > 2.0:
+            raise ValueError(f"Lambda must be in range [0, 2], got: {lambda_value}")
         self.model.set_lambda(lambda_value, layer_idx)
 
     def get_lambda(self, layer_idx: int = 0) -> float:
@@ -623,7 +626,7 @@ class Mixtral8x7BW4A16Model:
         """
         Get per-layer predictor hit-rate stats.
 
-        Returns a list of (no_bias_hits, with_bias_hits, total) tuples,
+        Returns a list of (hits, total) tuples,
         one per MoE layer. 'total' is the number of generation tokens for
         which a prior prediction existed and was evaluated.
         """
@@ -635,6 +638,17 @@ class Mixtral8x7BW4A16Model:
         """Reset predictor hit-rate counters across all layers."""
         if hasattr(self.model, "reset_predictor_stats"):
             self.model.reset_predictor_stats()
+
+    def get_sequential_top1_stats(self):
+        """Get sequential top1 expert hit stats across all layers."""
+        if hasattr(self.model, "get_sequential_top1_stats"):
+            return self.model.get_sequential_top1_stats()
+        return []
+
+    def reset_sequential_top1_stats(self):
+        """Reset sequential top1 expert hit counters."""
+        if hasattr(self.model, "reset_sequential_top1_stats"):
+            self.model.reset_sequential_top1_stats()
 
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
@@ -855,7 +869,7 @@ def main():
     parser.add_argument(
         "--predictor-model",
         type=str,
-        default="/home/michael/mixtral_project/expert_prediction_full/embedding_only_predictors",
+        default="/home/michael/heteroPredict/trainingData/mixtral_8x7b/best/eh1_h32",
         help="Path to predictor model directory (containing layer_X subdirs) for 'predict' backend"
     )
     parser.add_argument(
@@ -1200,6 +1214,20 @@ def main():
         hit_rate = (hits / total * 100.0) if total > 0 else 0.0
         print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
         
+        pred_stats = model.get_predictor_stats()
+        if pred_stats:
+            pred_hits = sum(s[0] for s in pred_stats)
+            pred_total = sum(s[1] for s in pred_stats)
+            pred_rate = (pred_hits / pred_total * 100.0) if pred_total > 0 else 0.0
+            print(f"Predictor Stats: Hits={pred_hits}, Total={pred_total}, HitRate={pred_rate:.2f}%")
+
+        seq_stats = model.get_sequential_top1_stats()
+        if seq_stats:
+            seq_hits = sum(s[0] for s in seq_stats)
+            seq_total = sum(s[1] for s in seq_stats)
+            seq_rate = (seq_hits / seq_total * 100.0) if seq_total > 0 else 0.0
+            print(f"Sequential Top1 Stats: Hits={seq_hits}, Total={seq_total}, HitRate={seq_rate:.2f}%")
+
         model.print_cache_stats()
         return 0
 
@@ -1263,6 +1291,20 @@ def main():
                 total = hits + misses
                 hit_rate = (hits / total * 100.0) if total > 0 else 0.0
                 print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
+                
+                pred_stats = model.get_predictor_stats()
+                if pred_stats:
+                    pred_hits = sum(s[0] for s in pred_stats)
+                    pred_total = sum(s[1] for s in pred_stats)
+                    pred_rate = (pred_hits / pred_total * 100.0) if pred_total > 0 else 0.0
+                    print(f"Predictor Stats: Hits={pred_hits}, Total={pred_total}, HitRate={pred_rate:.2f}%")
+                
+                seq_stats = model.get_sequential_top1_stats()
+                if seq_stats:
+                    seq_hits = sum(s[0] for s in seq_stats)
+                    seq_total = sum(s[1] for s in seq_stats)
+                    seq_rate = (seq_hits / seq_total * 100.0) if seq_total > 0 else 0.0
+                    print(f"Sequential Top1 Stats: Hits={seq_hits}, Total={seq_total}, HitRate={seq_rate:.2f}%")
                 
                 model.print_cache_stats()
             else:

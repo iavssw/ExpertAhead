@@ -22,7 +22,7 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
                         int64_t num_hidden_layers, int64_t num_attention_heads, int64_t num_key_value_heads, int64_t head_dim,
                         float rms_norm_eps, float rope_theta, int64_t max_seq_len, int64_t max_batch_size, int64_t groupsize,
                         int64_t num_experts, int64_t num_experts_per_tok, const std::string &device_str,
-                        int64_t max_cached_experts_per_layer, const std::string predictor_model_path, const std::string &config_path, int64_t prefetch_experts_count, std::vector<int> predict_layers) {
+                        int64_t max_cached_experts_per_layer, const std::string predictor_model_path, const std::string &config_path, int64_t prefetch_experts_count, std::vector<int> predict_layers, std::vector<int64_t> per_layer_cache_sizes) {
                 torch::Device device = (device_str == "cuda") ? torch::kCUDA : torch::kCPU;
 
                 NPUGlobalConfig config;
@@ -120,14 +120,15 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
                 return std::make_shared<UnifiedLLMW4A16Impl>(arch_type, vocab_size, hidden_size, intermediate_size, num_hidden_layers,
                                                              num_attention_heads, num_key_value_heads, head_dim, rms_norm_eps, rope_theta,
                                                              config, max_seq_len, max_batch_size, groupsize, num_experts,
-                                                             num_experts_per_tok, device, max_cached_experts_per_layer, predictor_model_path, prefetch_experts_count, predict_layers);
+                                                             num_experts_per_tok, device, max_cached_experts_per_layer, predictor_model_path, prefetch_experts_count, predict_layers, per_layer_cache_sizes);
             }),
             py::arg("arch_type"), py::arg("vocab_size"), py::arg("hidden_size"), py::arg("intermediate_size"), py::arg("num_hidden_layers"),
             py::arg("num_attention_heads"), py::arg("num_key_value_heads"), py::arg("head_dim"), py::arg("rms_norm_eps"),
             py::arg("rope_theta"), py::arg("max_seq_len") = 8192, py::arg("max_batch_size") = 1, py::arg("groupsize") = 128,
             py::arg("num_experts") = 0, py::arg("num_experts_per_tok") = 0, py::arg("device") = "cpu",
             py::arg("max_cached_experts_per_layer") = 0, py::arg("predictor_model_path") = "", py::arg("config_path") = "",
-            py::arg("prefetch_experts_count") = 1, py::arg("predict_layers") = std::vector<int>())
+            py::arg("prefetch_experts_count") = 1, py::arg("predict_layers") = std::vector<int>(),
+            py::arg("per_layer_cache_sizes") = std::vector<int64_t>())
         .def(
             "forward",
             [](UnifiedLLMW4A16Impl &self, torch::Tensor input_ids, int64_t start_pos) -> torch::Tensor {
@@ -155,13 +156,14 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
         .def("load_quantized_weights_from_bins", &UnifiedLLMW4A16Impl::load_quantized_weights_from_bins, py::arg("weights_dir"))
         .def("set_lambda", &UnifiedLLMW4A16Impl::set_lambda, py::arg("lambda"), py::arg("layer_idx") = -1)
         .def("get_lambda", &UnifiedLLMW4A16Impl::get_lambda, py::arg("layer_idx") = 0)
-        .def("set_layer_correlation_constants", &UnifiedLLMW4A16Impl::set_layer_correlation_constants, py::arg("constants"))
         .def("calculate_generation_perplexity", &UnifiedLLMW4A16Impl::calculate_generation_perplexity, py::arg("input_ids"))
         .def("print_cache_stats", &UnifiedLLMW4A16Impl::print_cache_stats)
         .def("reset_cache_stats", &UnifiedLLMW4A16Impl::reset_cache_stats)
         .def("get_cache_stats", &UnifiedLLMW4A16Impl::get_cache_stats)
         .def("get_predictor_stats", &UnifiedLLMW4A16Impl::get_predictor_stats)
         .def("reset_predictor_stats", &UnifiedLLMW4A16Impl::reset_predictor_stats)
+        .def("get_sequential_top1_stats", &UnifiedLLMW4A16Impl::get_sequential_top1_stats)
+        .def("reset_sequential_top1_stats", &UnifiedLLMW4A16Impl::reset_sequential_top1_stats)
         .def("prewarm_experts", &UnifiedLLMW4A16Impl::prewarm_experts, py::arg("num_to_warm"), py::arg("verbose") = true)
 
         .def("initialize_dummy_weights", &UnifiedLLMW4A16Impl::initialize_dummy_weights, py::arg("seed") = 42,

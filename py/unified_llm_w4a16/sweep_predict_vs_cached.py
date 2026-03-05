@@ -12,6 +12,7 @@ import json
 import threading
 import psutil
 
+
 def run_subprocess(cmd, timeout=300):
     """Run a command and return its output string, printing in real-time. Includes timeout."""
     try:
@@ -31,7 +32,9 @@ def run_subprocess(cmd, timeout=300):
         
         output_lines = []
         timeout_reached = False
-        
+        last_output_time = [time.time()]  # list for mutability in closures
+        start_time = time.time()
+
         def kill_process():
             nonlocal timeout_reached
             timeout_reached = True
@@ -40,10 +43,10 @@ def run_subprocess(cmd, timeout=300):
                 os.killpg(os.getpgid(process.pid), signal.SIGKILL)
             except Exception as e:
                 pass
-                
+
         timer = threading.Timer(timeout, kill_process)
         timer.start()
-        
+
         try:
             while True:
                 line = process.stdout.readline()
@@ -53,6 +56,7 @@ def run_subprocess(cmd, timeout=300):
                     print(line, end="")
                     sys.stdout.flush()
                     output_lines.append(line)
+                    last_output_time[0] = time.time()
         finally:
             timer.cancel()
             
@@ -73,17 +77,25 @@ def run_subprocess(cmd, timeout=300):
         return None
 
 def parse_cache_stats(output):
-    """Parse cache hits, misses, and hit rate from output."""
+    """Parse cache hits, misses, and hit rate from output. Also looks for Predictor Stats."""
+    cache_hits, cache_misses, cache_rate = None, None, None
+    pred_hits, pred_total, pred_rate = None, None, None
+    
     match = re.search(r"Cache Stats: Hits=(\d+), Misses=(\d+), HitRate=([\d\.]+)%", output)
     if match:
-        return int(match.group(1)), int(match.group(2)), float(match.group(3))
-    return None, None, None
+        cache_hits, cache_misses, cache_rate = int(match.group(1)), int(match.group(2)), float(match.group(3))
+        
+    pred_match = re.search(r"Predictor Stats: Hits=(\d+), Total=(\d+), HitRate=([\d\.]+)%", output)
+    if pred_match:
+        pred_hits, pred_total, pred_rate = int(pred_match.group(1)), int(pred_match.group(2)), float(pred_match.group(3))
+        
+    return cache_hits, cache_misses, cache_rate, pred_hits, pred_total, pred_rate
 
 def run_sweep():
     parser = argparse.ArgumentParser(description="Sweep 'cached' vs 'predict' backends with different lambda values.")
     parser.add_argument("--lambdas", type=float, nargs="+", default=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0], help="List of lambda values to test")
     parser.add_argument("--cache-size", type=int, nargs="+", default=[2], help="Cache sizes (key per layer) to use for both backends")
-    parser.add_argument("--predictor-path", type=str, default="/home/michael/mixtral_project/expert_prediction_full/embedding_only_predictors", help="Path to predictor models base directory")
+    parser.add_argument("--predictor-path", type=str, default="/home/michael/heteroPredict/trainingData/mixtral_8x7b/best/eh1_h64", help="Path to predictor models base directory")
     parser.add_argument("--dataset", type=str, choices=["default", "fineweb", "orca", "wikitext", "txt"], default="default", help="Dataset to use")
     parser.add_argument("--predictor-device", type=str, default="gpu", choices=["gpu", "cpu", "auto"],
                         help="Device for predictor inference: 'gpu' (default), 'cpu' (NPU path on Strix), 'auto'")
@@ -103,8 +115,18 @@ def run_sweep():
         default=None,
         help="List of layer indices to enable the predictor (e.g. 0 1 2 3). If omitted, predicts all layers."
     )
+    parser.add_argument(
+        "--subprocess-timeout",
+        type=int,
+        default=None,
+        help="Timeout in seconds for each subprocess call. Defaults to max(300, max_new_tokens * 20 + 180)."
+    )
     
     args = parser.parse_args()
+
+    # Compute timeout: default scales with max_new_tokens to avoid spurious timeouts
+    if args.subprocess_timeout is None:
+        args.subprocess_timeout = max(300, args.max_new_tokens * 20 + 180)
 
     if args.plot_only:
         csv_file = "sweep_predict_vs_cached_results.csv"
@@ -164,6 +186,7 @@ def run_sweep():
     print(f"Lambdas: {args.lambdas}")
     print(f"Prefetch Counts: {args.prefetch_count}")
     print(f"Predictor Path: {args.predictor_path}")
+    print(f"Subprocess Timeout: {args.subprocess_timeout}s")
 
     results = []
     script_path = os.path.join(os.path.dirname(__file__), "mixtral_8x7B_w4a16_model.py")
@@ -180,14 +203,14 @@ def run_sweep():
         json.dump(prompts, f)
 
     # Header
-    print("-" * 120)
+    print("-" * 135)
     if args.mode == "perplexity":
-        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Gen PPL':<10} | {'Hit Rate':<10}")
+        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Gen PPL':<10} | {'Hit Rate':<10} | {'Pred Rate':<10}")
     elif args.mode == "generation":
-        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'TPS':<10} | {'Hit Rate':<10}")
+        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'TPS':<10} | {'Hit Rate':<10} | {'Pred Rate':<10}")
     else:
-        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Gen PPL':<10} | {'TPS':<10} | {'Hit Rate':<10}")
-    print("-" * 120)
+        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Gen PPL':<10} | {'TPS':<10} | {'Hit Rate':<10} | {'Pred Rate':<10}")
+    print("-" * 135)
 
     for cache_size in args.cache_size:
         for prefetch_count in args.prefetch_count:
@@ -211,6 +234,8 @@ def run_sweep():
                     valid_tps_count = 0
                     total_hits = 0
                     total_misses = 0
+                    total_pred_hits = 0
+                    total_pred_total = 0
         
                     # --- PHASE 1: PERPLEXITY ---
                     if args.mode in ["perplexity", "both"]:
@@ -239,17 +264,20 @@ def run_sweep():
                         if args.expert_correlation_csv:
                             cmd.extend(["--expert-correlation-csv", args.expert_correlation_csv])
                         
-                        output = run_subprocess(cmd)
+                        output = run_subprocess(cmd, timeout=args.subprocess_timeout)
     
                         if output:
                             ppl_match = re.search(r"Generation Perplexity:\s+([\d\.]+)", output)
                             if ppl_match:
                                 total_ppl = float(ppl_match.group(1))
                                 valid_ppl_count = 1
-                            hits, misses, _ = parse_cache_stats(output)
+                            hits, misses, _, phits, ptotal, _ = parse_cache_stats(output)
                             if hits is not None:
                                 total_hits += hits
                                 total_misses += misses
+                            if phits is not None:
+                                total_pred_hits += phits
+                                total_pred_total += ptotal
 
                     # --- PHASE 2: GENERATION (TPS) ---
                     if args.mode in ["generation", "both"]:
@@ -278,23 +306,27 @@ def run_sweep():
                         if args.expert_correlation_csv:
                             cmd.extend(["--expert-correlation-csv", args.expert_correlation_csv])
 
-                        output = run_subprocess(cmd)
+                        output = run_subprocess(cmd, timeout=args.subprocess_timeout)
     
                         if output:
                             tps_match = re.search(r"End-to-End TPS:\s+([\d\.]+)", output)
                             if tps_match:
                                 total_tps = float(tps_match.group(1))
                                 valid_tps_count = 1
-                            hits, misses, _ = parse_cache_stats(output)
+                            hits, misses, _, phits, ptotal, _ = parse_cache_stats(output)
                             if hits is not None:
                                 total_hits += hits
                                 total_misses += misses
+                            if phits is not None:
+                                total_pred_hits += phits
+                                total_pred_total += ptotal
 
                     # Average results
                     avg_ppl = total_ppl / valid_ppl_count if valid_ppl_count > 0 else None
                     avg_tps = total_tps / valid_tps_count if valid_tps_count > 0 else None
                     total_reqs = total_hits + total_misses
                     hit_rate = (total_hits / total_reqs * 100.0) if total_reqs > 0 else None
+                    pred_rate = (total_pred_hits / total_pred_total * 100.0) if total_pred_total > 0 else None
 
                     result = {
                         "cache_size": cache_size,
@@ -303,7 +335,8 @@ def run_sweep():
                         "backend": display_name,
                         "gen_perplexity": avg_ppl,
                         "hit_rate": hit_rate,
-                        "tokens_per_second": avg_tps
+                        "tokens_per_second": avg_tps,
+                        "pred_rate": pred_rate
                     }
                     results.append(result)
 
@@ -311,17 +344,19 @@ def run_sweep():
                     ppl_str = f"{avg_ppl:.4f}" if avg_ppl is not None else "N/A"
                     tps_str = f"{avg_tps:.4f}" if avg_tps is not None else "N/A"
                     rate_str = f"{hit_rate:.2f}%" if hit_rate is not None else "N/A"
-                    print("-" * 120)
+                    prate_str = f"{pred_rate:.2f}%" if pred_rate is not None else "N/A"
+                    
+                    print("-" * 135)
                     if args.mode == "perplexity":
-                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {ppl_str:<10} | {rate_str:<10}")
+                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {ppl_str:<10} | {rate_str:<10} | {prate_str:<10}")
                     elif args.mode == "generation":
-                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {tps_str:<10} | {rate_str:<10}")
+                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {tps_str:<10} | {rate_str:<10} | {prate_str:<10}")
                     else:
-                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {ppl_str:<10} | {tps_str:<10} | {rate_str:<10}")
+                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {ppl_str:<10} | {tps_str:<10} | {rate_str:<10} | {prate_str:<10}")
 
                     sys.stdout.flush()
 
-    print("-" * 120)
+    print("-" * 135)
 
     try:
         os.remove(temp_prompts_path)

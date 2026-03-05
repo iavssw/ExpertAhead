@@ -131,22 +131,25 @@ static std::string find_predictor_model_path(const std::string& base_dir, int64_
     if (base_dir.empty()) return "";
 
     fs::path layer_dir = fs::path(base_dir) / ("layer_" + std::to_string(layer_idx));
-    const std::string kModelFile = "embedding_predictor_best.pt";
+    
+    std::vector<std::string> model_files = {"embedding_predictor_best.pt", "embedding_predictor_best.pth"};
 
-    // 1. Flat: base/layer_X/embedding_predictor_best.pt
-    fs::path direct = layer_dir / kModelFile;
-    if (fs::exists(direct)) {
-        return direct.string();
-    }
+    for (const auto& kModelFile : model_files) {
+        // 1. Flat: base/layer_X/embedding_predictor_best.pt(h)
+        fs::path direct = layer_dir / kModelFile;
+        if (fs::exists(direct)) {
+            return direct.string();
+        }
 
-    // 2. One level of subdirectories: base/layer_X/<subdir>/embedding_predictor_best.pt
-    std::error_code ec;
-    if (fs::is_directory(layer_dir, ec)) {
-        for (const auto& entry : fs::directory_iterator(layer_dir, ec)) {
-            if (entry.is_directory()) {
-                fs::path candidate = entry.path() / kModelFile;
-                if (fs::exists(candidate)) {
-                    return candidate.string();
+        // 2. One level of subdirectories: base/layer_X/<subdir>/embedding_predictor_best.pt(h)
+        std::error_code ec;
+        if (fs::is_directory(layer_dir, ec)) {
+            for (const auto& entry : fs::directory_iterator(layer_dir, ec)) {
+                if (entry.is_directory()) {
+                    fs::path candidate = entry.path() / kModelFile;
+                    if (fs::exists(candidate)) {
+                        return candidate.string();
+                    }
                 }
             }
         }
@@ -717,42 +720,43 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
     // Capture necessary data by deep copy to avoid lifetime issues across async barrier
     torch::Tensor embedding_copy = embedding.detach().clone();
     
-    c10::optional<torch::Tensor> expert_bias = c10::nullopt;
-    if (correlation_constant_ > 0.0) {
-        float sum = prefill_expert_counts_.sum().item<float>();
-        if (sum > 0.0f) {
-            auto distribution = prefill_expert_counts_ / sum;
-            expert_bias = (correlation_constant_ * distribution).unsqueeze(0);
-        }
+    float sum_counts = prefill_expert_counts_.sum().item<float>();
+    torch::Tensor prefill_dist = (sum_counts > 0.0f) 
+                                 ? (prefill_expert_counts_ / sum_counts) 
+                                 : (torch::full({num_experts_}, 1.0f / num_experts_, torch::kFloat32));
+    c10::optional<torch::Tensor> pdist_opt = prefill_dist.unsqueeze(0);
+
+    c10::optional<torch::Tensor> prev_expert_opt;
+    if (last_true_top1_expert_ >= 0 && last_true_top1_expert_ < num_experts_) {
+        torch::Tensor prev_onehot = torch::zeros({num_experts_}, torch::kFloat32);
+        prev_onehot[last_true_top1_expert_] = 1.0f;
+        prev_expert_opt = prev_onehot.unsqueeze(0);
+    } else {
+        prev_expert_opt = torch::zeros({1, num_experts_}, torch::kFloat32);
     }
 
     // Reset ready flag before launching new async work
     pred_results_ready_.store(false);
     
     speculative_load_future_ = std::async(std::launch::async, 
-        [this, embedding_copy, expert_bias]() {
-            // ── Run 1: NO bias (pure MLP) ────────────────────────────────────
-            predictor_->predict_async(embedding_copy, c10::nullopt);
-            std::vector<int64_t> no_bias_result = predictor_->get_prediction();
+        [this, embedding_copy, pdist_opt, prev_expert_opt]() {
+            // ── Run 1: Predict experts ────────────────────────────────────
+            predictor_->predict_async(embedding_copy, pdist_opt, prev_expert_opt);
+            std::vector<int64_t> pred_result = predictor_->get_prediction();
 
-            // ── Run 2: WITH bias ─────────────────────────────────────────────
-            predictor_->predict_async(embedding_copy, expert_bias);
-            std::vector<int64_t> with_bias_result = predictor_->get_prediction();
-
-            // Store both rankings safely for forward_generation to compare
+            // Store rankings safely for forward_generation to compare
             {
                 std::lock_guard<std::mutex> lock(pred_results_mutex_);
-                last_pred_no_bias_   = no_bias_result;
-                last_pred_with_bias_ = with_bias_result;
+                last_pred_no_bias_   = pred_result;
             }
             pred_results_ready_.store(true);
             
-            if (!with_bias_result.empty()) {
-                int limit = std::min((int)with_bias_result.size(), (int)prefetch_experts_count_);
-                std::vector<int64_t> top_experts(with_bias_result.begin(), with_bias_result.begin() + limit);
+            if (!pred_result.empty()) {
+                int limit = std::min((int)pred_result.size(), (int)prefetch_experts_count_);
+                std::vector<int64_t> top_experts(pred_result.begin(), pred_result.begin() + limit);
                 
                 if (debug_verbosity >= 2) {
-                    std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted experts (with bias): ";
+                    std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted experts: ";
                     for (auto e : top_experts) std::cout << e << " ";
                     std::cout << std::endl;
                 }
@@ -1015,7 +1019,8 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
 // }
 
 torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
-                                                       const torch::Tensor &topk_idx, torch::Tensor &output) {
+                                                       const torch::Tensor &topk_idx, torch::Tensor &output,
+                                                       int64_t current_true_top1) {
     in_generation_mode_ = true;
     
     // Speculative loading runs entirely in the background. The main thread will only wait 
@@ -1080,28 +1085,37 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     output.add_(down_batched.sum(0, true));
 
     // ── Predictor hit-rate accounting ────────────────────────────────────────
-    // Compare the previous token's predictions against this token's ground-truth
-    // top-k experts. We only do this if the async thread finished writing results.
-    if (predictor_ && pred_results_ready_.load()) {
+    // Compare the previous token's prediction against THIS token's unbiased top-1
+    // expert.
+    // This mirrors exactly the training metric: predict(embedding_T) == unbiased_top1(T+1).
+    if (predictor_ && pred_results_ready_.load() && last_true_top1_expert_ != -1) {
         std::lock_guard<std::mutex> lock(pred_results_mutex_);
         if (!last_pred_no_bias_.empty()) {
-            // Build actual expert set from topk_accessor (already on CPU)
-            std::unordered_set<int64_t> actual_set;
-            for (int64_t k = 0; k < num_experts_per_tok_; ++k)
-                actual_set.insert(topk_accessor[k]);
-
+            // Ground truth: the unbiased top-1 expert for THIS token
+            // (computed from raw router_out above, before any lambda bias)
             int n_check = std::min((int64_t)prefetch_experts_count_,
-                                   (int64_t)std::min(last_pred_no_bias_.size(), last_pred_with_bias_.size()));
-            int hits_no_bias = 0, hits_with_bias = 0;
+                                   (int64_t)last_pred_no_bias_.size());
+            int hits_no_bias = 0;
             for (int i = 0; i < n_check; ++i) {
-                if (actual_set.count(last_pred_no_bias_[i]))   hits_no_bias++;
-                if (actual_set.count(last_pred_with_bias_[i])) hits_with_bias++;
+                if (last_pred_no_bias_[i] == current_true_top1)  { hits_no_bias++; break; }
             }
-            pred_hits_no_bias_   += hits_no_bias;
-            pred_hits_with_bias_ += hits_with_bias;
+            pred_hits_no_bias_ += hits_no_bias;
             pred_total_++;
         }
     }
+    // Advance: this token's unbiased top-1 becomes the reference for next token's check.
+    // current_true_top1 was computed from router_out above, before lambda bias.
+    last_true_top1_expert_ = current_true_top1;
+
+    // Sequential top1 expert tracking
+    int64_t top1_global_e = topk_accessor[0];
+    if (last_top1_expert_ != -1) {
+        sequential_top1_total_++;
+        if (last_top1_expert_ == top1_global_e) {
+            sequential_top1_hits_++;
+        }
+    }
+    last_top1_expert_ = top1_global_e;
 
     // Trigger speculative loading for the next token based on current embedding
     trigger_speculative_loading(x_flat);
@@ -1195,6 +1209,14 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
     }
 
     torch::Tensor router_out = router->forward(x_flat);
+
+    // Capture the unbiased top-1 expert BEFORE any lambda bias is applied.
+    // Only valid (and only needed) for single-token generation forward passes.
+    // During prefill, router_out is [num_tokens, num_experts] so .item() would fail.
+    int64_t current_true_top1 = -1;
+    if (x_flat.size(0) == 1) {
+        current_true_top1 = torch::argmax(router_out[0], /*dim=*/-1).item<int64_t>();
+    }
     
     // Store router logits for training data collection
     last_router_logits_ = router_out.detach().clone();
@@ -1304,7 +1326,7 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
     }
 
     if (x_flat.size(0) == 1) {
-        forward_generation(x_flat, topk_vals, topk_idx, output);
+        forward_generation(x_flat, topk_vals, topk_idx, output, current_true_top1);
     } else {
         forward_prefill(x_flat, topk_vals, topk_idx, output);
     }
@@ -1320,7 +1342,8 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                                          int64_t max_seq_len, int64_t max_batch_size, int64_t groupsize, int64_t num_experts,
                                          int64_t num_experts_per_tok, torch::Device device, int64_t max_cached_experts_per_layer,
                                          const std::string& predictor_model_path, int64_t prefetch_experts_count,
-                                         const std::vector<int>& predict_layers)
+                                         const std::vector<int>& predict_layers,
+                                         const std::vector<int64_t>& per_layer_cache_sizes)
     : arch_type_(arch_type), vocab_size_(vocab_size), hidden_size_(hidden_size), intermediate_size_(intermediate_size),
       num_hidden_layers_(num_hidden_layers), num_attention_heads_(num_attention_heads), num_key_value_heads_(num_key_value_heads),
       head_dim_(head_dim), rms_norm_eps_(rms_norm_eps), rope_theta_(rope_theta), max_seq_len_(max_seq_len), max_batch_size_(max_batch_size),
@@ -1505,9 +1528,13 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                 }
             }
 
+            int64_t layer_cache_size = (!per_layer_cache_sizes.empty() && i < (int64_t)per_layer_cache_sizes.size())
+                                           ? per_layer_cache_sizes[i]
+                                           : max_cached_experts_per_layer;
+
             moe_layers.push_back(register_module("moe_" + std::to_string(i),
                                                  MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
-                                                                  max_cached_experts_per_layer, i,
+                                                                  layer_cache_size, i,
                                                                   max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, pred_device, prefetch_experts_count)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
@@ -1769,14 +1796,6 @@ void UnifiedLLMW4A16Impl::preload_moe_kernels() {
 
     if (debug_verbosity >= 1) {
         std::cout << "MoE kernels preloaded." << std::endl;
-    }
-}
-
-void UnifiedLLMW4A16Impl::set_layer_correlation_constants(const std::vector<double>& constants) {
-    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-        for (size_t i = 0; i < std::min(moe_layers.size(), constants.size()); ++i) {
-            moe_layers[i]->set_correlation_constant(constants[i]);
-        }
     }
 }
 
@@ -2516,7 +2535,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     }
     auto end_prefill = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_prefill = end_prefill - start_prefill;
-    // std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
+    std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
 
     // Get next token: implementation when temperature is 0
     last_token = output.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
@@ -2575,6 +2594,17 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
         actual_generated++;
         token_len++;
         start_pos++;
+
+        if (actual_generated % 5 == 0) {
+            if (should_sync_device) torch::cuda::synchronize();
+            auto now = std::chrono::high_resolution_clock::now();
+            double elapsed_gen = std::chrono::duration<double>(now - start_gen).count();
+            double running_tps = actual_generated / elapsed_gen;
+            std::cout << "[gen " << actual_generated << "/" << (max_new_tokens - 1)
+                      << "] elapsed=" << std::fixed << std::setprecision(1) << elapsed_gen
+                      << "s  TPS=" << std::fixed << std::setprecision(3) << running_tps
+                      << std::flush << std::endl;
+        }
     }
 
     if (should_sync_device) {
@@ -2584,7 +2614,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     std::chrono::duration<double> generation_time = end_gen - start_gen;
 
     // print to terminal
-    std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
+    std::cout << "Prefill time (summary): " << elapsed_prefill.count() << " seconds" << std::endl;
     std::cout << "Total Generation Time: " << generation_time.count() << " seconds" << std::endl;
     if (actual_generated > 0) {
         double time_per_token = generation_time.count() / actual_generated;
@@ -2766,8 +2796,8 @@ void UnifiedLLMW4A16Impl::reset_predictor_stats() {
     }
 }
 
-std::vector<std::tuple<int64_t, int64_t, int64_t>> UnifiedLLMW4A16Impl::get_predictor_stats() const {
-    std::vector<std::tuple<int64_t, int64_t, int64_t>> result;
+std::vector<std::tuple<int64_t, int64_t>> UnifiedLLMW4A16Impl::get_predictor_stats() const {
+    std::vector<std::tuple<int64_t, int64_t>> result;
     if (arch_type_ == ArchitectureType::MIXTRAL) {
         result.reserve(moe_layers.size());
         for (const auto& layer : moe_layers) {
@@ -2775,6 +2805,25 @@ std::vector<std::tuple<int64_t, int64_t, int64_t>> UnifiedLLMW4A16Impl::get_pred
         }
     }
     return result;
+}
+
+std::vector<std::tuple<int64_t, int64_t>> UnifiedLLMW4A16Impl::get_sequential_top1_stats() const {
+    std::vector<std::tuple<int64_t, int64_t>> result;
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        result.reserve(moe_layers.size());
+        for (const auto& layer : moe_layers) {
+            result.push_back(layer->get_sequential_top1_stats());
+        }
+    }
+    return result;
+}
+
+void UnifiedLLMW4A16Impl::reset_sequential_top1_stats() {
+    if (arch_type_ == ArchitectureType::MIXTRAL) {
+        for (auto& layer : moe_layers) {
+            layer->reset_sequential_top1_stats();
+        }
+    }
 }
 
 // Training data collection methods
