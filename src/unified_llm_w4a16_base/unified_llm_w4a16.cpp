@@ -769,7 +769,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
                     candidate = candidate_experts[static_cast<size_t>(rand_idx)];
                 }
                 topk_idx_acc[t][k] = candidate;
-                if (debug_verbosity >= 3) {
+                if (random_replace_rank_start_idx_ >= 0 && debug_verbosity >= 2) {
                     std::cout << "[MoE Replace] token=" << t << " rank=" << k << " old_expert=" << old_expert
                               << " new_expert=" << candidate << std::endl;
                 }
@@ -1139,10 +1139,10 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
             random_replace_rank_start_idx = (arch_type_ == ArchitectureType::MIXTRAL) ? 1 : -1;
         }
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-            moe_layers.push_back(register_module("moe_" + std::to_string(i),
-                                                 MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router,
-                                                                  random_replace_rank_start_idx)));
+            moe_layers.push_back(
+                register_module("moe_" + std::to_string(i),
+                                MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_, max_seq_len_,
+                                                 use_qwen_router, use_qwen_router, random_replace_rank_start_idx)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
