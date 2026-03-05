@@ -3,11 +3,11 @@
     "heterogeneity": "gpu",
     // number of GPUs to use when heterogeneity is set to gpu
     // if the system has more GPUs than this count, runtime auto-selects GPUs by highest free VRAM
-    "gpu-count": 1,
+    "gpu-count": 2,
     "warmup": true,
     "preload_moe_kernels": true,
     "dummy_weights": false,
-    "debug_verbosity": 3,
+    "debug_verbosity": 1,
     "usePreSavedWeights": true,
     "minimal_pdi": true,
     "kernels_gemm": []

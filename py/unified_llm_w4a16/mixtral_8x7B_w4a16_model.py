@@ -515,7 +515,7 @@ class Mixtral8x7BW4A16Model:
             logits = self.model.forward(input_ids, 0)
 
         shift_logits = logits[:, :-1, :].float().contiguous()
-        shift_labels = input_ids[:, 1:].contiguous()
+        shift_labels = input_ids[:, 1:].to(shift_logits.device).contiguous()
         vocab_size = shift_logits.size(-1)
 
         pad_token_id = self.tokenizer.pad_token_id if self.tokenizer is not None else None
@@ -907,7 +907,7 @@ def run_wikitext2_perplexity(
                     if target_begin >= target_end:
                         continue
 
-                    labels = input_ids_window_dev[:, target_begin:target_end].contiguous()
+                    labels = input_ids_window_dev[:, target_begin:target_end].to(chunk_logits.device).contiguous()
                     chunk_token_count = labels.size(1)
                     logits_for_loss = chunk_logits[:, :chunk_token_count, :].float().contiguous()
                     vocab_size = logits_for_loss.size(-1)
@@ -1236,3 +1236,6 @@ def main():
 
 if __name__ == "__main__":
     exit(main())
+
+    # Perplexity test for wikitext2
+    python3 mixtral_8x7B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
