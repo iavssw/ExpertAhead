@@ -3,7 +3,8 @@
 Unified training data collection script for MoE expert prediction.
 
 Collects per-layer embeddings (post-attention-norm, pre-router) and router logits
-for each sample, saving one .pt file per sample. Supported models:
+during the **generation (decode) phase** of inference. Also captures the prefill
+expert distribution as a summary feature per layer. Supported models:
   - mixtral_8x7b  : Mixtral 8x7B   (TheBloke/mixtral-8x7b-v0.1-AWQ)
   - mixtral_8x22b : Mixtral 8x22B  (TheBloke/Mixtral-8x22B-v0.1-AWQ)
   - qwen3_30b     : Qwen3 30B-A3B  (QuixiAI/Qwen3-30B-A3B-AWQ)
@@ -11,17 +12,31 @@ for each sample, saving one .pt file per sample. Supported models:
 
 To add a new model, add one entry to MODEL_REGISTRY below — no other changes needed.
 
+Data collection procedure per sample:
+  1. Prefill phase  — run one forward pass on the full prompt with collection
+                      enabled; extract prefill_expert_dist per layer; flush buffers.
+  2. Decode phase   — autoregressively call forward() for up to max_gen_tokens
+                      steps with collection enabled; each step appends one row of
+                      (embedding, router_logits) per layer to the C++ buffer.
+  3. After the loop — call get_training_data() to retrieve [gen_len, *] tensors.
+
+The predictor is then trained on consecutive decode steps:
+  input:  embedding[t]  +  prefill_expert_dist
+  label:  top-k experts from router_logits[t+1]
+
 Each output .pt file contains:
   {
     'sample_idx':    int,
-    'dataset':       str,     # 'fineweb' or 'orca'
-    'token_count':   int,
-    'model':         str,     # e.g. 'mixtral_8x7b'
+    'dataset':       str,
+    'token_count':   int,     # number of generation tokens collected
+    'model':         str,
     'layers': [
         {
-            'layer_idx':     int,
-            'embeddings':    Tensor[seq_len, hidden_size],   # fp32 on CPU
-            'router_logits': Tensor[seq_len, num_experts],   # fp32 on CPU
+            'layer_idx':            int,
+            'embeddings':           Tensor[gen_len, hidden_size],   # fp32 CPU
+            'router_logits':        Tensor[gen_len, num_experts],   # fp32 CPU
+            'prev_expert_ids':      Tensor[gen_len, top_k],         # int64 CPU — experts chosen at step t
+            'prefill_expert_count': Tensor[num_experts],            # int counts
         },
         ...
     ]
@@ -32,7 +47,8 @@ Usage:
       --model <model_tag> \\
       --output-dir <path> \\
       --num-wikitext 100 \\
-      --max-tokens 512
+      --max-tokens 512 \\
+      --max-gen-tokens 128
 """
 
 import argparse
@@ -167,10 +183,18 @@ def collect_from_dataset(
     min_tokens: int,
     max_tokens: int,
     start_sample_idx: int = 0,
+    max_gen_tokens: int = 128,
 ):
     """
     Run inference on `num_samples` texts from `dataset_name`, collecting
-    per-layer embeddings and router logits. Saves one .pt file per sample.
+    per-layer embeddings and router logits from the **generation (decode) phase**.
+    Saves one .pt file per sample.
+
+    Procedure per sample:
+      1. Prefill (collection enabled)  → capture prefill_expert_count per layer
+      2. Clear buffers
+      3. Decode loop (up to max_gen_tokens)  → accumulate one row per step
+      4. get_training_data() → [gen_len, hidden] embeddings + [gen_len, E] logits
 
     Returns the number of successfully collected samples.
     """
@@ -181,87 +205,138 @@ def collect_from_dataset(
 
     print("=" * 60)
     print(f"Collecting from: {dataset_name}  ({num_samples} samples)")
-    print(f"Token range: {min_tokens}–{max_tokens}")
+    print(f"Prompt token range: {min_tokens}–{max_tokens}  |  max_gen_tokens={max_gen_tokens}")
     print(f"Output: {output_dir}")
     print("=" * 60)
+
+    eos_id = -1
+    if tokenizer.eos_token_id is not None:
+        eos_id = tokenizer.eos_token_id
+
+    top_k_experts = getattr(model, "num_experts_per_tok", 2)
 
     collected = 0
     skipped   = 0
 
-    # Enable C++ backend collection
+    # Enable C++ backend collection for the entire session
     model.model.enable_training_data_collection()
 
     try:
         for text, input_ids in _stream_texts(dataset_name, min_tokens, max_tokens, tokenizer):
-            global_idx = start_sample_idx + collected
-            token_count = input_ids.shape[1]
+            global_idx  = start_sample_idx + collected
+            prefill_len = input_ids.shape[1]
 
-            print(f"  [{collected + 1}/{num_samples}] tokens={token_count}", end="", flush=True)
+            print(f"  [{collected + 1}/{num_samples}] prefill={prefill_len} tokens", end="", flush=True)
 
-            # Move input_ids to the model device
             input_ids_dev = input_ids.to(model.device)
 
-            # Clear previous layer data
+            # ── Phase 1: Prefill ──────────────────────────────────────────────
+            # Run with collection on so we can compute prefill_expert_count.
             model.model.clear_training_data()
-
-            # Forward pass (prefill only – no generation)
             t0 = time.perf_counter()
             try:
                 with torch.no_grad():
-                    _ = model(input_ids_dev, start_pos=0)
+                    prefill_logits = model.model.forward(input_ids_dev, 0)
             except Exception as e:
-                print(f"  ← ERROR: {e}")
+                print(f"  ← PREFILL ERROR: {e}")
                 skipped += 1
                 continue
+
+            prefill_data = model.model.get_training_data()   # [(emb, rlogits), ...] per layer
+            model.model.clear_training_data()                # reset before decode
+
+            if not prefill_data:
+                print("  ← WARNING: no prefill data, skipping")
+                skipped += 1
+                continue 
+
+            # Compute per-layer prefill expert count from the collected prefill data
+            prefill_expert_counts = {}   # layer_idx -> count tensor
+            for l_idx, (emb_p, rlogits_p) in enumerate(prefill_data):
+                rlogits_cpu = rlogits_p.float().cpu()        # [prefill_len, num_experts]
+                top_k_idx   = rlogits_cpu.topk(top_k_experts, dim=-1).indices
+                prefill_count = torch.bincount(top_k_idx.flatten(), minlength=rlogits_cpu.shape[-1])
+                prefill_expert_counts[l_idx] = prefill_count
+                del emb_p, rlogits_p, rlogits_cpu
+            del prefill_data
+
+            # ── Phase 2: Decode loop ─────────────────────────────────────────
+            # Greedily sample the first new token from prefill logits.
+            next_token = prefill_logits[:, -1, :].argmax(dim=-1, keepdim=True)  # [1, 1]
+            del prefill_logits
+
+            gen_steps = 0
+            gen_data_per_layer = {}  # layer_idx -> {"embeddings": [], "router_logits": []}
+            t_decode_start = time.perf_counter()
+            try:
+                with torch.no_grad():
+                    for step in range(max_gen_tokens):
+                        decode_logits = model.model.forward(next_token, prefill_len + step)
+                        step_data = model.model.get_training_data()
+                        model.model.clear_training_data()
+                        
+                        for l_idx, (emb_p, rlogits_p) in enumerate(step_data):
+                            if l_idx not in gen_data_per_layer:
+                                gen_data_per_layer[l_idx] = {"embeddings": [], "router_logits": [], "prev_expert_ids": []}
+                            rlogits_cpu = rlogits_p.float().cpu()
+                            # top-k expert indices for this step (the "current" choice, used as feature for t+1)
+                            step_topk_idx = rlogits_cpu.topk(top_k_experts, dim=-1).indices  # [1, top_k] or [top_k]
+                            gen_data_per_layer[l_idx]["embeddings"].append(emb_p.squeeze(0).cpu())
+                            gen_data_per_layer[l_idx]["router_logits"].append(rlogits_cpu)
+                            gen_data_per_layer[l_idx]["prev_expert_ids"].append(step_topk_idx.squeeze(0).cpu())
+
+                        next_token = decode_logits[:, -1, :].argmax(dim=-1, keepdim=True)
+                        gen_steps += 1
+                        if eos_id >= 0 and next_token.item() == eos_id:
+                            break
+            except Exception as e:
+                print(f"  ← DECODE ERROR after {gen_steps} steps: {e}")
+                if gen_steps < 2:
+                    skipped += 1
+                    model.model.clear_training_data()
+                    continue
+                # otherwise keep the partial data
+
             elapsed = time.perf_counter() - t0
 
-            # Retrieve collected data: list of (embeddings, router_logits) per layer
-            training_data = model.model.get_training_data()
-            # Clear C++ buffer immediately to free GPU memory before we process
-            model.model.clear_training_data()
-
-            if not training_data:
-                print("  ← WARNING: no data collected, skipping")
+            if not gen_data_per_layer:
+                print(f"  ← WARNING: no generation data after {gen_steps} steps, skipping")
                 skipped += 1
                 continue
 
-            # Build per-sample record — move each tensor to CPU immediately and
-            # delete the GPU reference so the allocator can reclaim the memory.
             layers = []
-            for layer_idx, (embeddings, router_logits) in enumerate(training_data):
-                # embeddings:    [batch, seq_len, hidden_size]  → squeeze batch dim → [seq_len, hidden_size]
-                # router_logits: [batch*seq_len, num_experts]   → [seq_len, num_experts]
-                emb     = embeddings.squeeze(0).float().cpu()   # [seq_len, hidden_size]
-                rlogits = router_logits.float().cpu()           # [seq_len, num_experts]
-                del embeddings, router_logits                   # release GPU tensors now
+            for l_idx, data_dict in gen_data_per_layer.items():
+                if not data_dict["embeddings"]: continue
+                emb          = torch.cat(data_dict["embeddings"], dim=0).float()      # [gen_steps, hidden_size]
+                rlogits      = torch.cat(data_dict["router_logits"], dim=0).float()   # [gen_steps, num_experts]
+                prev_exp_ids = torch.stack(data_dict["prev_expert_ids"], dim=0).long() # [gen_steps, top_k]
 
-                # Prefill expert count: count of token assignments to each expert for this layer
-                top_k = getattr(model, "num_experts_per_tok", 2)
-                top_k_indices = rlogits.topk(top_k, dim=-1).indices
-                prefill_count = torch.bincount(top_k_indices.flatten(), minlength=rlogits.shape[-1])
+                # If gen_data has more layers than prefill_data, default to uniform
+                prefill_ct = prefill_expert_counts.get(l_idx)
+                if prefill_ct is None:
+                    prefill_ct = torch.ones(rlogits.shape[-1], dtype=torch.float)
 
                 layers.append({
-                    "layer_idx":          layer_idx,
-                    "embeddings":         emb,
-                    "router_logits":      rlogits,
-                    "prefill_expert_count": prefill_count,
+                    "layer_idx":            l_idx,
+                    "embeddings":           emb,
+                    "router_logits":        rlogits,
+                    "prev_expert_ids":      prev_exp_ids,
+                    "prefill_expert_count": prefill_ct,
                 })
-            del training_data                                   # release the list
-            torch.cuda.empty_cache()                            # return freed pages to allocator
+            torch.cuda.empty_cache()
 
             sample_record = {
                 "sample_idx":  global_idx,
                 "dataset":     dataset_name,
-                "token_count": token_count,
+                "token_count": gen_steps,   # number of generation tokens collected
                 "model":       model_tag,
                 "layers":      layers,
             }
 
-            # Save as individual file: <dataset>_<sample_idx:05d>.pt
             fname = output_dir / f"{dataset_name}_{global_idx:05d}.pt"
             torch.save(sample_record, fname)
 
-            print(f"  ← {len(layers)} layers, {elapsed:.2f}s  → {fname.name}")
+            print(f"  ← {len(layers)} layers, {gen_steps} gen tokens, {elapsed:.2f}s  → {fname.name}")
 
             collected += 1
             if collected >= num_samples:
@@ -279,29 +354,34 @@ def collect_from_dataset(
 # ─────────────────────────────────────────────────────────────────────────────
 
 def write_metadata(output_dir: Path, model_tag: str, num_fineweb: int, num_orca: int,
-                   num_wikitext: int, min_tokens: int, max_tokens: int, model_path: str):
+                   num_wikitext: int, min_tokens: int, max_tokens: int, max_gen_tokens: int,
+                   model_path: str):
     meta = {
-        "model":          model_tag,
-        "model_path":     model_path,
-        "num_fineweb":    num_fineweb,
-        "num_orca":       num_orca,
-        "num_wikitext":   num_wikitext,
-        "min_tokens":     min_tokens,
-        "max_tokens":     max_tokens,
-        "file_format":    "per_sample_pt",
-        "description":    (
-            "Each .pt file is a dict with keys: sample_idx, dataset, token_count, model, layers. "
-            "'layers' is a list of dicts keyed by layer_idx, embeddings [seq_len, hidden_size], "
-            "router_logits [seq_len, num_experts], prefill_expert_count [num_experts]. "
-            "Embeddings are post-attention-norm (pre-router). "
-            "prefill_expert_count is the raw count of how many times each expert was selected "
-            "over all prefill tokens for this layer."
+        "model":           model_tag,
+        "model_path":      model_path,
+        "num_fineweb":     num_fineweb,
+        "num_orca":        num_orca,
+        "num_wikitext":    num_wikitext,
+        "min_tokens":      min_tokens,
+        "max_tokens":      max_tokens,
+        "max_gen_tokens":  max_gen_tokens,
+        "collection_phase": "generation",
+        "file_format":     "per_sample_pt",
+        "description":     (
+            "Each .pt file contains embeddings and router_logits from the GENERATION phase. "
+            "'token_count' is the number of generation tokens collected. "
+            "'layers' is a list of dicts with: layer_idx, embeddings [gen_len, hidden_size], "
+            "router_logits [gen_len, num_experts] (generation steps only), "
+            "prev_expert_ids [gen_len, top_k] (expert IDs selected at each step, int64), "
+            "prefill_expert_count [num_experts] (expert usage counts over full prefill). "
+            "Training pairs: embedding[t] + prev_expert_ids[t] + prefill_expert_count -> top-k experts from router_logits[t+1]."
         ),
     }
     meta_path = output_dir / "metadata.json"
     with open(meta_path, "w") as f:
         json.dump(meta, f, indent=2)
     print(f"Metadata written to {meta_path}")
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -355,6 +435,10 @@ def main():
         help="Path to the backend JSON5 config file. Uses model-specific defaults."
     )
     parser.add_argument(
+        "--max-gen-tokens", type=int, default=128,
+        help="Maximum number of generation (decode) tokens to collect per sample (default: 128)."
+    )
+    parser.add_argument(
         "--skip-fineweb", action="store_true",
         help="Skip FineWeb collection (useful for resuming Orca-only)."
     )
@@ -400,6 +484,7 @@ def main():
             min_tokens=args.min_tokens,
             max_tokens=args.max_tokens,
             start_sample_idx=0,
+            max_gen_tokens=args.max_gen_tokens,
         )
 
     # ── collect Orca ──────────────────────────────────────────────────────────
@@ -415,6 +500,7 @@ def main():
             min_tokens=args.min_tokens,
             max_tokens=args.max_tokens,
             start_sample_idx=args.num_fineweb,
+            max_gen_tokens=args.max_gen_tokens,
         )
 
     # ── collect Wikitext ──────────────────────────────────────────────────────
@@ -430,6 +516,7 @@ def main():
             min_tokens=args.min_tokens,
             max_tokens=args.max_tokens,
             start_sample_idx=args.num_fineweb + args.num_orca,
+            max_gen_tokens=args.max_gen_tokens,
         )
 
     # ── write metadata ────────────────────────────────────────────────────────
@@ -441,6 +528,7 @@ def main():
         num_wikitext=wikitext_collected,
         min_tokens=args.min_tokens,
         max_tokens=args.max_tokens,
+        max_gen_tokens=args.max_gen_tokens,
         model_path=model_path,
     )
 
