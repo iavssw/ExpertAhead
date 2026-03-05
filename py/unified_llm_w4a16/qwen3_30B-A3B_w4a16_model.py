@@ -1133,6 +1133,8 @@ def main():
         type=int,
         default=1,
         help="Number of experts to speculatively prefetch (predict backend only, default: 1)"
+    )
+    parser.add_argument(
         "--perplexity",
         action="store_true",
         help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
@@ -1225,6 +1227,9 @@ def main():
         with open(prompts_file, "r", encoding="utf-8") as f:
             raw_prompts = [line.strip() for line in f.readlines()]
         prompts = [p for p in raw_prompts if p]  # drop blank lines
+    else:
+        print(f"Warning: {prompts_file} not found, falling back to --text argument.")
+        prompts = [args.text]
     print(f"Processing text: '{args.text}'")
 
     if args.perplexity:
@@ -1279,10 +1284,6 @@ def main():
             import traceback
             traceback.print_exc()
             return 1
-    else:
-        print(f"Warning: {prompts_file} not found, falling back to --text argument.")
-        prompts = [args.text]
-
     print(f"Running {len(prompts)} prompt(s) from {prompts_file if prompts_file.exists() else '--text'}...\n")
 
     for prompt_idx, prompt_text in enumerate(prompts):

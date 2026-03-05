@@ -1247,9 +1247,6 @@ def main():
         "--perplexity",
         action="store_true",
         default=False,
-        help="Calculate perplexity instead of generating text"
-        "--perplexity",
-        action="store_true",
         help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
     )
     parser.add_argument(
@@ -1276,22 +1273,18 @@ def main():
         default=2048,
         help="Stride for sliding-window WikiText-2 perplexity."
     )
-
     parser.add_argument(
         "--generation-perplexity",
         action="store_true",
         default=False,
         help="Calculate generation-time perplexity (slower, token-by-token)"
     )
-
-
     parser.add_argument(
         "--benchmark-prompts",
         type=str,
         default=None,
         help="Path to a file containing prompts for benchmarking. If set, runs benchmark mode."
     )
-    
     parser.add_argument(
         "--predictor-device",
         type=str,
@@ -1304,7 +1297,6 @@ def main():
             "'auto' = inferred from heterogeneity config."
         )
     )
-    
     parser.add_argument(
         "--predict-layers",
         type=int,
@@ -1312,14 +1304,12 @@ def main():
         default=None,
         help="List of layer indices (e.g., 0 1 2) to enable the predictor. If not specified, runs on all layers."
     )
-    
     parser.add_argument(
         "--prefetch-experts-count",
         type=int,
         default=1,
         help="Number of top experts for the predictor engine to proactively prefetch."
     )
-    
     parser.add_argument(
         "--sweep-prompts-file",
         type=str,
