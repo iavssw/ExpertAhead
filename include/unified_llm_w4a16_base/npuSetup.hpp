@@ -69,6 +69,8 @@ struct NPUGlobalConfig {
     bool warmup = true;
     bool preload_moe_kernels = false;
     bool minimal_pdi = false;
+    // -2: use model default, -1: disable replacement, >=0: replace ranks >= this index
+    int random_replace_rank_start_idx = -2;
 
     NPURopeScalingConfig rope_scaling;
     std::vector<NPUKernelConfig> kernels;

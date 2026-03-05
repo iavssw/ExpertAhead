@@ -18,15 +18,19 @@ void hip_synchronize() { HIP_CHECK(hipDeviceSynchronize()); }
 
 int main() {
     constexpr int64_t kNumExperts = 8;
-    constexpr int64_t kM = 128;
+    constexpr int64_t kExpertsPerToken = 2;
+    constexpr int64_t kPrefillPromptLen = 16384;
+    constexpr int64_t kM = (kPrefillPromptLen * kExpertsPerToken) / kNumExperts; // ~tokens routed to each expert during prefill
     constexpr int64_t kK = 4096;
     constexpr int64_t kN = 14336;
+    constexpr int64_t kNumExpertsGemv = kExpertsPerToken; // generation activates top-2 experts/token
     constexpr int64_t kGroupSize = 128;
     constexpr int64_t kWarmup = 8;
     constexpr int64_t kIters = 20;
 
     std::cout << "test_layout_hip_3d (hardcoded)\n";
-    std::cout << "Experts=" << kNumExperts << " M=" << kM << " K=" << kK << " N=" << kN << " group_size=" << kGroupSize << std::endl;
+    std::cout << "Experts=" << kNumExperts << " ExpertsPerToken=" << kExpertsPerToken << " PromptTokens=" << kPrefillPromptLen
+              << " M(per-expert)=" << kM << " K=" << kK << " N=" << kN << " group_size=" << kGroupSize << std::endl;
 
     if (!torch::cuda::is_available()) {
         std::cerr << "HIP available check failed" << std::endl;
@@ -41,8 +45,8 @@ int main() {
     auto input_gemm_3d = torch::rand({kNumExperts, kM, kK}, torch::kBFloat16).to(device) * 0.1f;
     auto output_gemm_3d = torch::zeros({kNumExperts, kM, kN}, torch::kBFloat16).to(device);
 
-    auto input_gemv_3d = torch::rand({kNumExperts, kK}, torch::kBFloat16).to(device) * 0.1f;
-    auto output_gemv_3d = torch::zeros({kNumExperts, kN}, torch::kBFloat16).to(device);
+    auto input_gemv_3d = torch::rand({kNumExpertsGemv, kK}, torch::kBFloat16).to(device) * 0.1f;
+    auto output_gemv_3d = torch::zeros({kNumExpertsGemv, kN}, torch::kBFloat16).to(device);
 
     std::vector<torch::Tensor> qweights_all;
     std::vector<torch::Tensor> scales_all;
@@ -167,8 +171,6 @@ int main() {
 
     std::cout << "GEMM 3D Avg Time: " << (avg_time * 1000.0) << " ms\n";
     std::cout << "GEMM 3D Performance: " << tops << " TOPS" << std::endl;
-
-    constexpr int64_t kNumExpertsGemv = 2;
 
     std::cout << "================ GEMV =================" << std::endl;
 

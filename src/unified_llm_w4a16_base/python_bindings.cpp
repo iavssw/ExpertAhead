@@ -54,6 +54,8 @@ PYBIND11_MODULE(unified_llm_w4a16_base_libtorch, m) {
                             config.preload_moe_kernels = data["preload_moe_kernels"].cast<bool>();
                         if (data.contains("minimal_pdi"))
                             config.minimal_pdi = data["minimal_pdi"].cast<bool>();
+                        if (data.contains("random_replace_rank_start_idx"))
+                            config.random_replace_rank_start_idx = data["random_replace_rank_start_idx"].cast<int>();
 
                         if (data.contains("rope_scaling")) {
                             py::dict rs = data["rope_scaling"].cast<py::dict>();
@@ -146,6 +148,8 @@ PYBIND11_MODULE(unified_llm_w4a16_base_libtorch, m) {
             py::arg("input_ids"), py::arg("max_new_tokens"), py::arg("temperature") = 1.0f, py::arg("top_p") = 0.9f, py::arg("top_k") = 50,
             py::arg("eos_token_id") = -1)
         .def("to", &UnifiedLLMW4A16Impl::to, py::arg("device"))
+        .def("get_prefill_chunk_size", &UnifiedLLMW4A16Impl::get_prefill_chunk_size)
+        .def("get_sliding_window_size", &UnifiedLLMW4A16Impl::get_sliding_window_size)
         .def("load_quantized_weights_from_safetensors", &UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors, py::arg("filename"))
         .def("load_non_quantized_weights_from_safetensors", &UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors,
              py::arg("filename"))
