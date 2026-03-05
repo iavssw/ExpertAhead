@@ -7,7 +7,7 @@
     "warmup": true,
     "preload_moe_kernels": true,
     "dummy_weights": false,
-    "debug_verbosity": 1,
+    "debug_verbosity": 2,
     "usePreSavedWeights": true,
     "minimal_pdi": true,
     // Where to run the expert predictor TorchScript model:

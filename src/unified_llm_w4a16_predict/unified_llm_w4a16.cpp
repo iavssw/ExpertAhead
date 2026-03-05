@@ -132,16 +132,16 @@ static std::string find_predictor_model_path(const std::string& base_dir, int64_
 
     fs::path layer_dir = fs::path(base_dir) / ("layer_" + std::to_string(layer_idx));
     
-    std::vector<std::string> model_files = {"embedding_predictor_best.pt", "embedding_predictor_best.pth"};
+    std::vector<std::string> model_files = {"best_jit.pt", "best_jit.pth"};
 
     for (const auto& kModelFile : model_files) {
-        // 1. Flat: base/layer_X/embedding_predictor_best.pt(h)
+        // 1. Flat: base/layer_X/best_jit.pt(h)
         fs::path direct = layer_dir / kModelFile;
         if (fs::exists(direct)) {
             return direct.string();
         }
 
-        // 2. One level of subdirectories: base/layer_X/<subdir>/embedding_predictor_best.pt(h)
+        // 2. One level of subdirectories: base/layer_X/<subdir>/best_jit.pt(h)
         std::error_code ec;
         if (fs::is_directory(layer_dir, ec)) {
             for (const auto& entry : fs::directory_iterator(layer_dir, ec)) {
@@ -713,6 +713,8 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
         if (debug_verbosity >= 2) {
             std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Skipping prefetch, previous still running." << std::endl;
         }
+        // Ensure ready flag is cleared if we skip, so we don't use STALE results on the next token
+        pred_results_ready_.store(false); 
         return;
     }
     
@@ -741,8 +743,9 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
     speculative_load_future_ = std::async(std::launch::async, 
         [this, embedding_copy, pdist_opt, prev_expert_opt]() {
             // ── Run 1: Predict experts ────────────────────────────────────
-            predictor_->predict_async(embedding_copy, pdist_opt, prev_expert_opt);
-            std::vector<int64_t> pred_result = predictor_->get_prediction();
+            // Fix: Use sync call HERE inside the background thread to ensure we get 
+            // the result for the CURRENT embedding before proceeding.
+            std::vector<int64_t> pred_result = predictor_->predict_sync(embedding_copy, pdist_opt, prev_expert_opt);
 
             // Store rankings safely for forward_generation to compare
             {
@@ -1099,6 +1102,15 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
             for (int i = 0; i < n_check; ++i) {
                 if (last_pred_no_bias_[i] == current_true_top1)  { hits_no_bias++; break; }
             }
+            
+            if (debug_verbosity >= 2) {
+                std::cout << "[Layer " << layer_idx_ << " STAT] Pred=" << last_pred_no_bias_[0] 
+                          << " Actual=" << current_true_top1 
+                          << " " << (hits_no_bias ? "HIT" : "MISS") 
+                          << " (SeqBaseline=" << (last_true_top1_expert_ == current_true_top1 ? "HIT" : "MISS") << ")" 
+                          << std::endl;
+            }
+
             pred_hits_no_bias_ += hits_no_bias;
             pred_total_++;
         }

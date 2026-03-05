@@ -185,7 +185,7 @@ class Mixtral8x7BW4A16Model:
         config_path: Optional[str] = None,
         max_cached_experts_per_layer: int = 8,
         use_cached_moe: bool = False,
-        predictor_models_dir: str = "/home/michael/mixtral_project/expert_prediction_full/embedding_only_predictors",
+        predictor_models_dir: str = "",
         weights_dir: str = "",
         predictor_device: str = "gpu",
         prefetch_experts_count: int = 1,
@@ -869,7 +869,7 @@ def main():
     parser.add_argument(
         "--predictor-model",
         type=str,
-        default="/home/michael/heteroPredict/trainingData/mixtral_8x7b/best/eh1_h32",
+        default="/home/michael/heteroPredict/trainingData/mixtral_8x7b/sweep_3_5",
         help="Path to predictor model directory (containing layer_X subdirs) for 'predict' backend"
     )
     parser.add_argument(

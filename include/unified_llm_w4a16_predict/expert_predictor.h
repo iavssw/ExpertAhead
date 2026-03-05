@@ -59,6 +59,7 @@ public:
     virtual ~IExpertPredictor() = default;
     
     virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) = 0;
+    virtual std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) = 0;
     virtual bool is_ready() = 0;
     virtual std::vector<int64_t> get_prediction() = 0;
     virtual std::vector<int64_t> try_get_prediction() = 0;
@@ -121,6 +122,11 @@ public:
         request_->ready.store(true);
     }
     
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
+        predict_async(embedding, prefill_dist, prev_expert_onehot);
+        return get_prediction();
+    }
+
     bool is_ready() override {
         return response_->ready.load();
     }
@@ -247,6 +253,10 @@ public:
         }
         queue_cv_.notify_one();
     }
+
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
+        return internal_predict(embedding, prefill_dist, prev_expert_onehot);
+    }
     
     bool is_ready() override {
         return prediction_ready_.load();
@@ -304,44 +314,42 @@ private:
     }
     
     void process_prediction(const PredictionJob& job) {
+        auto result = internal_predict(job.embedding, job.prefill_dist, job.prev_expert_onehot);
+        {
+            std::lock_guard<std::mutex> lock(result_mutex_);
+            predicted_experts_ = result;
+        }
+        prediction_ready_.store(true);
+        result_cv_.notify_all();
+    }
+
+    std::vector<int64_t> internal_predict(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist, c10::optional<torch::Tensor> prev_expert_onehot) {
         auto start = std::chrono::high_resolution_clock::now();
         
-        prediction_ready_.store(false);
-        
         if (!model_loaded_) {
-            std::lock_guard<std::mutex> lock(result_mutex_);
-            predicted_experts_.clear();
-            prediction_ready_.store(true);
-            result_cv_.notify_all();
-            return;
+            return {};
         }
         
         try {
             // Prepare input
-            // The embedding needs to be passed to the TorchScript model.
-            // Predictor models accept [1, hidden_dim] tensors, likely in float32.
-            torch::Tensor input = job.embedding.to(torch::kFloat32).to(device_);
+            torch::Tensor input = embedding.to(torch::kFloat32).to(device_);
             if (input.dim() == 1) {
-                input = input.unsqueeze(0); // Ensure [1, hidden_dim]
+                input = input.unsqueeze(0); 
             }
             
             std::vector<torch::jit::IValue> inputs;
             inputs.push_back(input);
             if (model_accepts_prefill_dist_) {
-                if (job.prefill_dist.has_value()) {
-                    torch::Tensor pdist = job.prefill_dist.value().to(torch::kFloat32).to(device_);
-                    if (pdist.dim() == 1) {
-                        pdist = pdist.unsqueeze(0);
-                    }
+                if (prefill_dist.has_value()) {
+                    torch::Tensor pdist = prefill_dist.value().to(torch::kFloat32).to(device_);
+                    if (pdist.dim() == 1) pdist = pdist.unsqueeze(0);
                     inputs.push_back(pdist);
                 }
             }
             if (model_accepts_prev_expert_) {
-                if (job.prev_expert_onehot.has_value()) {
-                    torch::Tensor prev_exp = job.prev_expert_onehot.value().to(torch::kFloat32).to(device_);
-                    if (prev_exp.dim() == 1) {
-                        prev_exp = prev_exp.unsqueeze(0);
-                    }
+                if (prev_expert_onehot.has_value()) {
+                    torch::Tensor prev_exp = prev_expert_onehot.value().to(torch::kFloat32).to(device_);
+                    if (prev_exp.dim() == 1) prev_exp = prev_exp.unsqueeze(0);
                     inputs.push_back(prev_exp);
                 }
             }
@@ -349,23 +357,11 @@ private:
             torch::NoGradGuard no_grad;
             auto output = model_.forward(inputs).toTensor();
             
-            auto max_logits = std::get<0>(torch::max(output, /*dim=*/-1));
-            auto min_logits = std::get<0>(torch::min(output, /*dim=*/-1));
-            double current_range = (max_logits - min_logits).mean().item<double>();
-            
-            if (delta_avg_ == 0.0) {
-                delta_avg_ = current_range;
-            } else {
-                delta_avg_ = 0.9 * delta_avg_ + 0.1 * current_range;
-            }
-            
-            // Extract prediction (get fully ranked list of experts)
-            // Perform argsort on the dedicated stream/device before safely copying to CPU
+            // Extract prediction
             auto indices = output.argsort(-1, true).to(torch::kCPU, torch::kInt64);
             
             std::vector<int64_t> predicted_experts;
             if (indices.dim() == 2) {
-                // Batch dimension exists
                 auto acc = indices.accessor<int64_t, 2>();
                 for (int i = 0; i < indices.size(1); ++i) {
                     predicted_experts.push_back(acc[0][i]);
@@ -377,24 +373,17 @@ private:
                 }
             }
             
-            {
-                std::lock_guard<std::mutex> lock(result_mutex_);
-                predicted_experts_ = predicted_experts;
-            }
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> duration = end - start;
+            prediction_time_ms_ = duration.count();
+            
+            return predicted_experts;
             
         } catch (const std::exception& e) {
-            std::cerr << "[Worker Layer " << layer_idx_ << "] Prediction error: " 
+            std::cerr << "[Predictor Layer " << layer_idx_ << "] Sync prediction error: " 
                       << e.what() << std::endl;
-            std::lock_guard<std::mutex> lock(result_mutex_);
-            predicted_experts_.clear();
+            return {};
         }
-        
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::milli> duration = end - start;
-        prediction_time_ms_ = duration.count();
-        
-        prediction_ready_.store(true);
-        result_cv_.notify_all();
     }
     
     int layer_idx_;
@@ -439,6 +428,13 @@ public:
         ready_ = true;
     }
 
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
+        std::vector<int64_t> experts(num_experts_);
+        std::iota(experts.begin(), experts.end(), 0);
+        std::shuffle(experts.begin(), experts.end(), gen_);
+        return experts;
+    }
+    
     bool is_ready() override {
         return ready_.load();
     }
