@@ -1,23 +1,40 @@
 #!/usr/bin/env python3
 """
-expert_predictor.py — Expert Predictor Training and Sweeping
-============================================================
-A unified script containing model definitions, data loaders, training loops,
-and sweeping capabilities.
+expert_predictor.py — Expert Predictor: Models, Training, and Sweeping
+=======================================================================
+A single unified script containing model definitions, data loaders, training
+loops, and sweep/ablation orchestration.
+
+Goal: predict which SINGLE expert (the top-1 router expert) will be selected
+      at token t+1, given the post-attention-norm embedding at token t and the
+      prefill expert-usage distribution.
 
 Usage Examples
 --------------
 Train all layers for Mixtral 8x7B:
-  python expert_predictor.py train --data_dir ../../trainingData/mixtral_8x7b \\
-                                   --output_dir ../../trainingData/mixtral_8x7b/predictor_models \\
-                                   --model mixtral_8x7b
+  python expert_predictor.py train \\
+      --data_dir ../../trainingData/mixtral_8x7b \\
+      --output_dir ../../trainingData/mixtral_8x7b/predictor_models \\
+      --model mixtral_8x7b
 
-Comprehensive Sweep:
-  python expert_predictor.py sweep --data_dir ../../trainingData/mixtral_8x7b \\
-                                   --output_dir ../../trainingData/mixtral_8x7b/sweep_results \\
-                                   --model mixtral_8x7b \\
-                                   --hidden_dims 256 512 1024 \\
-                                   --max_size_mb 50
+Train a single layer:
+  python expert_predictor.py train ... --layer_idx 15
+
+Comprehensive sweep (hidden_dim × embedding_history × layers):
+  python expert_predictor.py sweep \\
+      --data_dir ../../trainingData/mixtral_8x7b \\
+      --output_dir ../../trainingData/mixtral_8x7b/sweep_results \\
+      --model mixtral_8x7b \\
+      --hidden_dims 32 64 128 256 \\
+      --histories 1 2 \\
+      --max_size_mb 70
+
+Ablation study (which feature branches matter):
+  python expert_predictor.py ablation \\
+      --data_dir ../../trainingData/mixtral_8x7b \\
+      --output_dir ../../trainingData/mixtral_8x7b/ablation \\
+      --model mixtral_8x7b \\
+      --layers 0 15 31
 """
 
 import argparse
@@ -37,12 +54,28 @@ from tqdm import tqdm
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# 1. Model Definition
+# 1. Model Defaults
+# ──────────────────────────────────────────────────────────────────────────────
+
+# emb_dim, num_experts, active_k (router top-k), num_layers, default_prefetch_k
+MODEL_DEFAULTS = {
+    "mixtral_8x7b":  (4096, 8,   2, 32, 1),
+    "mixtral_8x22b": (4096, 8,   2, 56, 1),
+    "qwen3_30b":     (2048, 128, 8, 48, 4),
+    "qwen3_480b":    (7168, 128, 8, 94, 4),
+}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 2. Model Definitions
 # ──────────────────────────────────────────────────────────────────────────────
 
 class DualMLPPredictor(nn.Module):
     """
     Dual-branch expert predictor for MoE models.
+
+    Predicts the SINGLE top-1 expert that will be selected at token t+1.
+    Training uses CrossEntropyLoss against the true top-1 expert index.
 
     Branch 1 — EmbeddingBranch:
         Input:  post-attention-norm embedding for token t  [batch, hidden_size]
@@ -56,7 +89,7 @@ class DualMLPPredictor(nn.Module):
 
     Both branches are projected to feature vectors, concatenated, then
     passed through a classifier head that outputs logits over all experts.
-    The predicted top-1 (or top-k) expert is used for preload decisions.
+    The argmax gives the single predicted top-1 expert to prefetch.
     """
 
     def __init__(
@@ -76,7 +109,6 @@ class DualMLPPredictor(nn.Module):
         self.hidden_size   = hidden_size
         self.num_experts   = num_experts
         self.branch_dim    = branch_dim
-        self.top_k         = prefetch_k   # kept as .top_k for train loop compat
         self.prefetch_k    = prefetch_k
         self.use_embedding = use_embedding
         self.use_prefill   = use_prefill
@@ -102,7 +134,7 @@ class DualMLPPredictor(nn.Module):
             )
             fused_dim += prefill_dim
 
-        # Fused classifier
+        # Fused classifier → logits over all experts
         self.classifier = nn.Sequential(
             nn.Linear(fused_dim, fused_dim // 2),
             nn.GELU(),
@@ -121,10 +153,10 @@ class DualMLPPredictor(nn.Module):
             prefill_dist: [batch, num_experts]  expert usage distribution over the
                           full prefill. If None, uniform distribution is used.
         Returns:
-            logits: [batch, num_experts]
+            logits: [batch, num_experts]  — argmax gives predicted top-1 expert
         """
         features = []
-        
+
         if self.use_embedding:
             features.append(self.embedding_branch(embedding))
 
@@ -141,15 +173,14 @@ class DualMLPPredictor(nn.Module):
         fused = torch.cat(features, dim=-1)
         return self.classifier(fused)
 
-    def predict_top_k(
+    def predict_top1(
         self,
         embedding: torch.Tensor,
         prefill_dist: Optional[torch.Tensor] = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> torch.Tensor:
+        """Returns the single predicted top-1 expert index. Shape: [batch]."""
         logits = self.forward(embedding, prefill_dist)
-        probs  = F.softmax(logits, dim=-1)
-        top_k_probs, top_k_indices = torch.topk(probs, self.top_k, dim=-1)
-        return top_k_indices, top_k_probs
+        return logits.argmax(dim=-1)
 
     def get_config(self) -> Dict:
         return {
@@ -158,9 +189,8 @@ class DualMLPPredictor(nn.Module):
             'branch_dim':    self.branch_dim,
             'prefetch_k':    self.prefetch_k,
             'use_embedding': self.use_embedding,
-            'use_prefill':   self.use_prefill
+            'use_prefill':   self.use_prefill,
         }
-
 
     def save(self, path: str):
         path = Path(path)
@@ -186,9 +216,11 @@ class HistoryAwareDualMLPPredictor(nn.Module):
     """
     Three-branch expert predictor.
 
+    Predicts the SINGLE top-1 expert at token t+1.
+
     Branch 1 — EmbeddingBranch:   post-attn-norm embedding at token t   [batch, hidden_size]
-    Branch 2 — PrevExpertBranch:  one-hot expert selection at token t    [batch, num_experts]
-                                  (scatter of the top-k IDs chosen at step t)
+    Branch 2 — PrevExpertBranch:  one-hot of expert selected at token t  [batch, num_experts]
+                                  (scatter of the top-1 ID chosen at step t)
     Branch 3 — PrefillBranch:     expert usage counts over prefill        [batch, num_experts]
 
     For ablation, each branch can be independently enabled/disabled.
@@ -212,14 +244,13 @@ class HistoryAwareDualMLPPredictor(nn.Module):
         self.hidden_size      = hidden_size
         self.num_experts      = num_experts
         self.branch_dim       = branch_dim
-        self.top_k            = prefetch_k   # kept as .top_k for train loop compat
         self.prefetch_k       = prefetch_k
         self.use_embedding    = use_embedding
         self.use_prev_experts = use_prev_experts
         self.use_prefill      = use_prefill
 
-        prefill_dim    = max(branch_dim // 4, num_experts)
-        prev_exp_dim   = max(branch_dim // 4, num_experts)
+        prefill_dim  = max(branch_dim // 4, num_experts)
+        prev_exp_dim = max(branch_dim // 4, num_experts)
         fused_dim = 0
 
         if self.use_embedding:
@@ -232,7 +263,7 @@ class HistoryAwareDualMLPPredictor(nn.Module):
             fused_dim += branch_dim
 
         if self.use_prev_experts:
-            # Input: one-hot/count vector over num_experts indicating which were active last step
+            # One-hot indicating which expert was top-1 at token t
             self.prev_expert_branch = nn.Sequential(
                 nn.Linear(num_experts, prev_exp_dim),
                 nn.GELU(),
@@ -246,6 +277,7 @@ class HistoryAwareDualMLPPredictor(nn.Module):
             )
             fused_dim += prefill_dim
 
+        # Classifier → logits over all experts; argmax = predicted top-1 expert
         self.classifier = nn.Sequential(
             nn.Linear(fused_dim, fused_dim // 2),
             nn.GELU(),
@@ -261,8 +293,10 @@ class HistoryAwareDualMLPPredictor(nn.Module):
     ) -> torch.Tensor:
         """
         embedding:          [batch, hidden_size]
-        prev_expert_onehot: [batch, num_experts]  — one-hot/count of experts at step t
+        prev_expert_onehot: [batch, num_experts]  — one-hot of top-1 expert at step t
         prefill_dist:       [batch, num_experts]
+        Returns:
+            logits: [batch, num_experts]
         """
         features = []
         ref = next(x for x in [embedding, prev_expert_onehot, prefill_dist] if x is not None)
@@ -288,10 +322,9 @@ class HistoryAwareDualMLPPredictor(nn.Module):
         fused = torch.cat(features, dim=-1)
         return self.classifier(fused)
 
-    def predict_top_k(self, embedding, prev_expert_onehot=None, prefill_dist=None):
-        logits = self.forward(embedding, prev_expert_onehot, prefill_dist)
-        probs  = F.softmax(logits, dim=-1)
-        return torch.topk(probs, self.top_k, dim=-1)
+    def predict_top1(self, embedding=None, prev_expert_onehot=None, prefill_dist=None) -> torch.Tensor:
+        """Returns the single predicted top-1 expert index. Shape: [batch]."""
+        return self.forward(embedding, prev_expert_onehot, prefill_dist).argmax(dim=-1)
 
     def get_config(self) -> Dict:
         return {
@@ -323,33 +356,18 @@ class HistoryAwareDualMLPPredictor(nn.Module):
         return model
 
 
-class ExpertPredictor(nn.Module):
-    # Dummy fallback in case ExpertPredictor is needed (was referenced in train.py but not defined there)
-    pass
-
 class PredictorJITWrapper(torch.nn.Module):
-    """
-    Thin JIT-traceable wrapper that presents a single fixed signature:
-        forward(embedding, prefill_dist, prev_expert_onehot) -> logits
-    Branches that are disabled in the underlying model receive a zero tensor
-    and are short-circuited internally, so the traced graph is always correct.
-    """
     def __init__(self, predictor):
         super().__init__()
         self.predictor = predictor
-        self.uses_prefill      = getattr(predictor, 'use_prefill',      False)
-        self.uses_prev_experts = getattr(predictor, 'use_prev_experts', False)
-        self.is_history_aware  = isinstance(predictor, HistoryAwareDualMLPPredictor)
+        self.is_history_aware = isinstance(predictor, HistoryAwareDualMLPPredictor)
 
     def forward(
         self,
-        embedding:          torch.Tensor,          # [B, hidden]
-        prefill_dist:       torch.Tensor,          # [B, num_experts]  (zeros if unused)
-        prev_expert_onehot: torch.Tensor,          # [B, num_experts]  (zeros if unused)
+        embedding:          torch.Tensor,
+        prefill_dist:       torch.Tensor,
+        prev_expert_onehot: torch.Tensor,
     ) -> torch.Tensor:
-        # Always pass tensors (never None) so torch.jit.trace can follow the graph.
-        # The model's branches are gated by use_prefill / use_prev_experts flags,
-        # so passing zeros for unused inputs has no effect on output.
         if self.is_history_aware:
             return self.predictor(
                 embedding=embedding,
@@ -361,45 +379,39 @@ class PredictorJITWrapper(torch.nn.Module):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# 2. Loss & Datasets
+# 3. Dataset
 # ──────────────────────────────────────────────────────────────────────────────
 
-class FocalLoss(nn.Module):
-    """Focal Loss for addressing class imbalance in expert selection."""
-    def __init__(self, gamma: float = 2.0, alpha=None, reduction: str = 'mean'):
-        super().__init__()
-        self.gamma = gamma
-        self.alpha = alpha
-        self.reduction = reduction
+class ExpertPredictorDataset(Dataset):
+    """
+    Dataset for top-1 expert prediction.
 
-    def forward(self, inputs, targets):
-        bce = F.binary_cross_entropy_with_logits(inputs, targets, reduction='none')
-        pt = torch.exp(-bce)
-        loss = (1 - pt) ** self.gamma * bce
-        if self.alpha is not None:
-            if self.alpha.device != inputs.device:
-                self.alpha = self.alpha.to(inputs.device)
-            loss = loss * targets * self.alpha + loss * (1 - targets)
-        if self.reduction == 'mean': return loss.mean()
-        elif self.reduction == 'sum': return loss.sum()
-        return loss
+    Each sample is:
+      - post_attn_embedding:  [hidden_size * embedding_history_size]  (float32)
+      - top1_expert:          scalar int64  — the TRUE top-1 router expert at t+1
+                              This is the training target for CrossEntropyLoss.
+      - prefill_expert_dist:  [num_experts]  (float32)
+      - prev_expert_onehot:   [num_experts]  (float32)  — one-hot of top-1 at t
 
+    Handles two .pt schemas:
+      NEW  (collect_training_data_unified.py):
+           payload['layers'] = [{'layer_idx', 'embeddings' [seq,H],
+                                 'router_logits' [seq,E], optionally
+                                 'prev_expert_ids' [seq, active_k],
+                                 'prefill_expert_dist' [E] or
+                                 'prefill_expert_count' [E]}, ...]
+      LEGACY: payload['data'] = {layer_idx: {token_pos: {'post_attn_post_norm_embedding', ...}}}
+    """
 
-class EmbeddingHistoryDataset(Dataset):
     def __init__(
         self,
         data_source: Union[str, Path, List[Path]],
         layer_idx: Optional[int] = None,
         num_experts: int = 8,
-        active_k: int = 2,     # how many experts the router picks (defines the label)
-        prefetch_k: int = 1,   # how many we predict/prefetch (used for metrics only)
         embedding_history_size: int = 1,
     ):
         self.layer_idx = layer_idx
         self.num_experts = num_experts
-        self.active_k = active_k
-        self.prefetch_k = prefetch_k
-        self.top_k = prefetch_k       # kept for train loop compat
         self.embedding_history_size = embedding_history_size
         self.samples = []
 
@@ -424,63 +436,81 @@ class EmbeddingHistoryDataset(Dataset):
     def _load_pt_file(self, pt_file: Path):
         try:
             payload = torch.load(pt_file, map_location='cpu', weights_only=False)
+
+            # ── New unified schema ─────────────────────────────────────────────
             if 'layers' in payload:
                 for layer_dict in payload['layers']:
                     l_idx = layer_dict['layer_idx']
-                    if self.layer_idx is not None and l_idx != self.layer_idx: continue
+                    if self.layer_idx is not None and l_idx != self.layer_idx:
+                        continue
 
-                    embeddings    = layer_dict['embeddings']
-                    router_logits = layer_dict['router_logits']
-                    prev_expert_ids = layer_dict.get('prev_expert_ids')  # [gen_len, top_k] or None
+                    embeddings      = layer_dict['embeddings']      # [seq_len, hidden_size]
+                    router_logits   = layer_dict['router_logits']   # [seq_len, num_experts]
+                    prev_expert_ids = layer_dict.get('prev_expert_ids')  # [seq_len, active_k] or None
                     seq_len, hidden_size = embeddings.shape
 
+                    # Prefill distribution (prompt-level feature)
+                    prefill_expert_dist = layer_dict.get('prefill_expert_dist')
+                    if prefill_expert_dist is None and 'prefill_expert_count' in layer_dict:
+                        c = layer_dict['prefill_expert_count'].float()
+                        prefill_expert_dist = c / c.sum().clamp(min=1)
+                    if prefill_expert_dist is None:
+                        # Fallback: use softmax mean of all available router logits
+                        prefill_expert_dist = torch.softmax(router_logits.float(), dim=-1).mean(dim=0)
+
                     for t in range(seq_len - 1):
+                        # Build embedding history window
                         emb_parts = []
                         for h in range(self.embedding_history_size):
                             src = t - (self.embedding_history_size - 1 - h)
                             emb_parts.append(embeddings[src] if src >= 0 else torch.zeros(hidden_size))
 
-                        prefill_expert_dist = layer_dict.get('prefill_expert_dist')
-                        if prefill_expert_dist is None and 'prefill_expert_count' in layer_dict:
-                            c = layer_dict['prefill_expert_count'].float()
-                            prefill_expert_dist = c / c.sum().clamp(min=1)
-                        if prefill_expert_dist is None:
-                            prefill_expert_dist = torch.softmax(router_logits[:t+1].float(), dim=-1).mean(dim=0)
+                        # Top-1 expert at t+1 (the training target)
+                        top1_next = int(torch.argmax(router_logits[t + 1]).item())
 
-                        # Build one-hot for the experts chosen AT step t (feature for predicting t+1)
+                        # One-hot of the top-1 expert USED at step t (feature for predicting t+1)
                         if prev_expert_ids is not None:
-                            ids_t = prev_expert_ids[t]  # [top_k]
-                            prev_onehot = torch.zeros(self.num_experts)
-                            prev_onehot.scatter_(0, ids_t.long(), 1.0)
+                            # prev_expert_ids[t, 0] is the top-1 expert at step t
+                            top1_t = int(prev_expert_ids[t, 0].item())
                         else:
-                            prev_onehot = None  # will be filled with zeros in __getitem__
+                            top1_t = int(torch.argmax(router_logits[t]).item())
+                        prev_onehot = torch.zeros(self.num_experts)
+                        prev_onehot[top1_t] = 1.0
 
-                        sample = {
-                            'embedding_features':      torch.cat(emb_parts, dim=0),
-                            'next_token_router_logits': router_logits[t + 1],
-                            'prefill_expert_dist':      prefill_expert_dist,
-                            'prev_expert_onehot':       prev_onehot,
-                        }
-                        self.samples.append(sample)
+                        self.samples.append({
+                            'embedding_features': torch.cat(emb_parts, dim=0),
+                            'top1_expert':        top1_next,
+                            'prefill_expert_dist': prefill_expert_dist,
+                            'prev_expert_onehot':  prev_onehot,
+                        })
                 return
 
-            if 'data' not in payload: return
+            # ── Legacy schema ──────────────────────────────────────────────────
+            if 'data' not in payload:
+                return
             data_by_layer = payload['data']
             target_layers = [self.layer_idx] if self.layer_idx is not None else list(data_by_layer.keys())
             for l_idx in target_layers:
-                if l_idx not in data_by_layer: continue
+                if l_idx not in data_by_layer:
+                    continue
                 layer_data = data_by_layer[l_idx]
                 sorted_tokens = sorted(layer_data.keys())
                 for i in range(len(sorted_tokens) - 1):
                     t_curr, t_next = sorted_tokens[i], sorted_tokens[i + 1]
-                    if t_next != t_curr + 1: continue
+                    if t_next != t_curr + 1:
+                        continue
                     emb_list = []
                     for h in range(self.embedding_history_size):
                         t_h = t_curr - (self.embedding_history_size - 1 - h)
-                        emb_list.extend(layer_data[t_h]['post_attn_post_norm_embedding'] if t_h in layer_data else [0.0] * 4096)
+                        emb_list.extend(
+                            layer_data[t_h]['post_attn_post_norm_embedding']
+                            if t_h in layer_data else [0.0] * 4096
+                        )
+                    next_logits = torch.tensor(layer_data[t_next]['current_router_logits'])
+                    top1_next = int(torch.argmax(next_logits).item())
                     self.samples.append({
                         'embedding_features': emb_list,
-                        'next_token_router_logits': layer_data[t_next]['current_router_logits'],
+                        'top1_expert':        top1_next,
                     })
         except Exception as e:
             print(f"Error loading {pt_file}: {e}")
@@ -491,270 +521,163 @@ class EmbeddingHistoryDataset(Dataset):
             for line in f:
                 d = json.loads(line)
                 if d.get('is_output_token', False):
-                    if self.layer_idx is not None and d.get('layer_idx') != self.layer_idx: continue
+                    if self.layer_idx is not None and d.get('layer_idx') != self.layer_idx:
+                        continue
                     records[d['token_position']] = d
         sorted_tokens = sorted(records.keys())
         for i in range(len(sorted_tokens) - 1):
             t_curr, t_next = sorted_tokens[i], sorted_tokens[i + 1]
-            if t_next != t_curr + 1: continue
+            if t_next != t_curr + 1:
+                continue
             emb_list = []
             for h in range(self.embedding_history_size):
                 t_h = t_curr - (self.embedding_history_size - 1 - h)
                 rec = records.get(t_h)
                 emb_list.extend(rec['post_attn_post_norm_embedding'] if rec else [0.0] * 4096)
-            s = {'embedding_features': emb_list}
             nxt = records[t_next]
-            if 'selected_experts' in nxt: s['next_token_selected_experts'] = nxt['selected_experts']
-            else: s['next_token_router_logits'] = nxt['current_router_logits']
-            self.samples.append(s)
+            if 'selected_experts' in nxt:
+                top1_next = nxt['selected_experts'][0]
+            else:
+                logits = torch.tensor(nxt['current_router_logits'])
+                top1_next = int(torch.argmax(logits).item())
+            self.samples.append({'embedding_features': emb_list, 'top1_expert': top1_next})
 
-    def __len__(self): return len(self.samples)
+    def __len__(self):
+        return len(self.samples)
 
     def __getitem__(self, idx):
         s = self.samples[idx]
         emb = s['embedding_features']
-        if not isinstance(emb, torch.Tensor): emb = torch.tensor(emb, dtype=torch.float32)
+        if not isinstance(emb, torch.Tensor):
+            emb = torch.tensor(emb, dtype=torch.float32)
 
-        if 'next_token_selected_experts' in s:
-            active_idx = torch.tensor(s['next_token_selected_experts'], dtype=torch.long)
-        else:
-            probs = s['next_token_router_logits']
-            if not isinstance(probs, torch.Tensor): probs = torch.tensor(probs)
-            # Label: the active_k experts that actually fire at t+1
-            _, active_idx = torch.topk(torch.softmax(probs.float(), dim=0), self.active_k)
-
-        # Multi-hot label over all num_experts: 1 for each of the active_k experts
-        label = torch.zeros(self.num_experts)
-        label[active_idx] = 1.0
         prev_onehot = s.get('prev_expert_onehot')
         if prev_onehot is None:
             prev_onehot = torch.zeros(self.num_experts)
+
         return {
-            'post_attn_embedding':  emb.float(),
-            'label':                label,
-            'active_indices':       active_idx,   # [active_k] ground-truth experts that fire
-            'prefill_expert_dist':  s.get('prefill_expert_dist', torch.full((self.num_experts,), 1.0 / self.num_experts)),
-            'prev_expert_onehot':   prev_onehot.float(),
+            'post_attn_embedding': emb.float(),
+            'top1_expert':         torch.tensor(s['top1_expert'], dtype=torch.long),
+            'prefill_expert_dist': s.get('prefill_expert_dist',
+                                         torch.full((self.num_experts,), 1.0 / self.num_experts)),
+            'prev_expert_onehot':  prev_onehot.float(),
         }
 
-    def calculate_class_weights(self):
-        expert_counts = torch.zeros(self.num_experts)
-        for s in self.samples:
-            if 'next_token_selected_experts' in s:
-                idx = s['next_token_selected_experts']
-            else:
-                probs = s['next_token_router_logits']
-                if not isinstance(probs, torch.Tensor): probs = torch.tensor(probs)
-                _, idx = torch.topk(torch.softmax(probs.float(), dim=0), self.active_k)
-            expert_counts[idx] += 1
-        expert_counts = expert_counts.clamp(min=1)
-        return (len(self.samples) - expert_counts) / expert_counts
-
 
 # ──────────────────────────────────────────────────────────────────────────────
-# 3. Metrics
+# 4. Metrics
 # ──────────────────────────────────────────────────────────────────────────────
 
-def compute_metrics(pred_logits: torch.Tensor, true_label: torch.Tensor,
-                    prefetch_k: int, active_k: Optional[int] = None) -> dict:
+def compute_metrics(pred_logits: torch.Tensor, true_top1: torch.Tensor) -> dict:
     """
-    pred_logits:  [B, num_experts]  raw logits from model
-    true_label:   [B, num_experts]  multi-hot: 1.0 at each of the active_k experts that fired
-    prefetch_k:   how many experts we predict/prefetch (our budget)
-    active_k:     how many experts actually fire (inferred from true_label if None)
+    Compute accuracy metrics for top-1 expert prediction.
 
-    Positive class = expert is in the active set (true_label==1).
-    Predicted positive = expert is in our top-prefetch_k predictions.
+    pred_logits: [B, num_experts]  raw logits from model
+    true_top1:   [B]               ground-truth top-1 expert index (int64)
 
-    top1_exact: our single top-1 prediction is in the active set.
-    any_correct: at least 1 of our prefetch_k predictions is in the active set.
-    mean_overlap: average |intersection| between our prefetch_k picks and active set.
+    Returns a dict of *sums* (caller divides by N):
+      top1_exact  — our argmax matches the true top-1 expert exactly
+      any_top2    — our argmax is within the true top-2 experts (softer metric)
     """
     B = pred_logits.size(0)
     num_experts = pred_logits.size(1)
-    if active_k is None:
-        active_k = int(true_label[0].sum().item())
 
-    # Our prediction: top-prefetch_k experts
-    pred_ranked  = torch.argsort(pred_logits, dim=1, descending=True)[:, :prefetch_k]
-    pred_mask    = torch.zeros(B, num_experts, dtype=torch.bool, device=pred_logits.device)
-    pred_mask.scatter_(1, pred_ranked, True)
+    pred_top1 = pred_logits.argmax(dim=-1)   # [B]  our prediction
 
-    # Ground truth: the multi-hot active set
-    true_mask = true_label.bool().to(pred_logits.device)
+    exact = (pred_top1 == true_top1).sum().item()
 
-    # Per-expert TP/FP/FN/TN -> [num_experts]
-    tp_per = (pred_mask &  true_mask).sum(0).cpu().float()
-    fp_per = (pred_mask & ~true_mask).sum(0).cpu().float()
-    fn_per = (~pred_mask &  true_mask).sum(0).cpu().float()
-    tn_per = (~pred_mask & ~true_mask).sum(0).cpu().float()
+    # Soft bonus: are we within top-2?   (true_top1 is rank-1; rank-2 is next best)
+    pred_top2_mask = torch.zeros(B, num_experts, dtype=torch.bool, device=pred_logits.device)
+    pred_top2_mask.scatter_(1, pred_logits.topk(2, dim=-1).indices, True)
+    true_top1_in_pred2 = pred_top2_mask[torch.arange(B), true_top1].sum().item()
 
-    sums = {
-        'top1_exact': 0, 'any_correct': 0, 'overlap_count': 0,
-        'tp_per': tp_per, 'fp_per': fp_per, 'fn_per': fn_per, 'tn_per': tn_per,
-    }
-
-    pred_list = pred_ranked.tolist()
-    for i, pred_row in enumerate(pred_list):
-        active_set = true_mask[i].nonzero(as_tuple=True)[0].tolist()
-        active_set_s = set(active_set)
-        # top1_exact: is our top-1 in the active set?
-        if pred_row[0] in active_set_s:
-            sums['top1_exact'] += 1
-        n_overlap = len(set(pred_row) & active_set_s)
-        sums['overlap_count'] += n_overlap
-        if n_overlap >= 1:
-            sums['any_correct'] += 1
-
-    return sums, B
+    return {'top1_exact': exact, 'any_top2': true_top1_in_pred2}, B
 
 
-def _merge_metrics(acc, new_sums, new_n):
-    acc['n'] = acc.get('n', 0) + new_n
-    acc['total_loss']    = acc.get('total_loss', 0.0) + new_sums.get('total_loss', 0.0)
-    acc['top1_exact']    = acc.get('top1_exact', 0)   + new_sums['top1_exact']
-    acc['overlap_count'] = acc.get('overlap_count', 0.0) + new_sums['overlap_count']
-    acc['any_correct']   = acc.get('any_correct', 0)  + new_sums['any_correct']
-    for key in ('tp_per', 'fp_per', 'fn_per', 'tn_per'):
-        if key in new_sums:
-            acc[key] = acc.get(key, torch.zeros_like(new_sums[key])) + new_sums[key]
+def _merge_metrics(acc: dict, new_sums: dict, new_n: int) -> dict:
+    acc['n']          = acc.get('n', 0)   + new_n
+    acc['total_loss'] = acc.get('total_loss', 0.0) + new_sums.get('total_loss', 0.0)
+    acc['top1_exact'] = acc.get('top1_exact', 0)   + new_sums['top1_exact']
+    acc['any_top2']   = acc.get('any_top2',   0)   + new_sums['any_top2']
     return acc
 
-def _finalise_metrics(acc, num_batches, prefetch_k, active_k):
+
+def _finalise_metrics(acc: dict, num_batches: int) -> dict:
     n = acc['n']
-    result = {
-        'loss':         acc['total_loss'] / max(num_batches, 1),
-        'top1_exact':   acc['top1_exact'] / n,
-        'mean_overlap': acc['overlap_count'] / n,
-        'any_correct':  acc['any_correct'] / n,
-        # convenience alias
-        'acc':          acc['top1_exact'] / n,
+    return {
+        'loss':       acc['total_loss'] / max(num_batches, 1),
+        'top1_exact': acc['top1_exact'] / n,   # PRIMARY metric: exact top-1 hit rate
+        'any_top2':   acc['any_top2']   / n,   # softer: prediction is within true top-2
+        'acc':        acc['top1_exact'] / n,   # alias for backward compat
     }
-    # F1 / TP/FP etc
-    if 'tp_per' in acc:
-        tp, fp, fn, tn = acc['tp_per'], acc['fp_per'], acc['fn_per'], acc['tn_per']
-        micro_tp = tp.sum().item()
-        micro_fp = fp.sum().item()
-        micro_fn = fn.sum().item()
-        micro_prec = micro_tp / max(micro_tp + micro_fp, 1e-9)
-        micro_rec  = micro_tp / max(micro_tp + micro_fn, 1e-9)
-        micro_f1   = 2 * micro_prec * micro_rec / max(micro_prec + micro_rec, 1e-9)
-        per_prec = tp / (tp + fp).clamp(min=1e-9)
-        per_rec  = tp / (tp + fn).clamp(min=1e-9)
-        per_f1   = 2 * per_prec * per_rec / (per_prec + per_rec).clamp(min=1e-9)
-        total    = (tp + fp + fn + tn).clamp(min=1)
-        result.update({
-            'micro_precision': micro_prec,
-            'micro_recall':    micro_rec,
-            'micro_f1':        micro_f1,
-            'macro_f1':        per_f1.mean().item(),
-            'per_expert_f1':   per_f1.tolist(),
-            'per_expert_acc':  ((tp + tn) / total).tolist(),
-            'per_expert_tp':   tp.long().tolist(),
-            'per_expert_fp':   fp.long().tolist(),
-            'per_expert_fn':   fn.long().tolist(),
-            'per_expert_tn':   tn.long().tolist(),
-        })
-    return result
 
-def _print_metrics(phase: str, m: dict, prefetch_k: int):
+
+def _print_metrics(phase: str, m: dict):
+    random_baseline = 1.0 / 8   # placeholder; will be 1/num_experts at runtime
     print(f"  {phase}:")
-    top1 = m['top1_exact']
     print(f"    loss={m['loss']:.4f}")
-    print(f"    ─── Prefetch accuracy (primary system metric) ─────────────")
-    print(f"    top1_exact (prefetch hit rate) = {top1:.4f}  [random=0.125]")
-    # With Mixtral top-2 routing + LRU cache: we load 1 expert speculatively.
-    # If we're right, only 1 load needed instead of 2.
-    # Expected loads/token = 2 - top1_exact  (save top1_exact loads on average).
-    if prefetch_k >= 2:
-        exp_loads = 2.0 - top1
-        reduction_pct = (2.0 - exp_loads) / 2.0 * 100
-        print(f"    expected loads/token ≈ {exp_loads:.3f}  "
-              f"({reduction_pct:.1f}% load reduction vs no predictor)")
-    print(f"    any_correct={m['any_correct']:.4f}  "
-          f"mean_overlap={m['mean_overlap']:.3f}")
-    if 'micro_f1' in m:
-        print(f"    ─── ML metrics (multi-label, top-{prefetch_k} as positive class) ──")
-        print(f"    micro_F1={m['micro_f1']:.4f}  macro_F1={m['macro_f1']:.4f}  "
-              f"prec={m['micro_precision']:.4f}  rec={m['micro_recall']:.4f}")
-        if 'per_expert_f1' in m and len(m['per_expert_f1']) <= 16:
-            pef = '  '.join(f"E{i}:{v:.3f}" for i, v in enumerate(m['per_expert_f1']))
-            pea = '  '.join(f"E{i}:{v:.3f}" for i, v in enumerate(m.get('per_expert_acc', [])))
-            print(f"    per-expert F1:  {pef}")
-            print(f"    per-expert acc: {pea}")
+    print(f"    top1_exact={m['top1_exact']:.4f}  any_top2={m['any_top2']:.4f}")
+    exp_loads = 2.0 - m['top1_exact']   # expected loads/token (Mixtral has active_k=2)
+    reduction = m['top1_exact'] * 100
+    print(f"    expected_loads/tok≈{exp_loads:.3f}  ({reduction:.1f}% load reduction vs no predictor)")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# 4. Training Engine
+# 5. Training Engine
 # ──────────────────────────────────────────────────────────────────────────────
 
-def _model_forward(model, batch_on_device):
+def _model_forward(model, batch_on_device: dict) -> torch.Tensor:
     """Unified forward dispatch for all predictor model types."""
-    emb   = batch_on_device.get('post_attn_embedding')
-    pdist = batch_on_device.get('prefill_expert_dist')
-    prev  = batch_on_device.get('prev_expert_onehot')
+    emb   = batch_on_device['post_attn_embedding']
+    pdist = batch_on_device['prefill_expert_dist']
+    prev  = batch_on_device['prev_expert_onehot']
     if isinstance(model, HistoryAwareDualMLPPredictor):
         return model(embedding=emb, prev_expert_onehot=prev, prefill_dist=pdist)
-    elif isinstance(model, DualMLPPredictor):
-        return model(embedding=emb, prefill_dist=pdist)
     else:
-        return model(post_attn_embedding=emb)
+        return model(embedding=emb, prefill_dist=pdist)
 
 
-def train_epoch(model, loader, optimizer, criterion, device):
+def train_epoch(model, loader, optimizer, criterion, device) -> dict:
     model.train()
-    prefetch_k = model.prefetch_k
     acc = {}
     num_batches = 0
-    for batch in tqdm(loader, desc="Training", leave=False):
+    for batch in tqdm(loader, desc="Training", leave=True):
         batch_dev = {k: v.to(device) for k, v in batch.items()}
-        lbl    = batch_dev['label']             # multi-hot [B, num_experts]
-        active = batch_dev['active_indices']    # [B, active_k] ground truth experts
+        target = batch_dev['top1_expert']   # [B]  true top-1 expert index
 
         optimizer.zero_grad()
-        logits = _model_forward(model, batch_dev)
-
-        if isinstance(criterion, nn.CrossEntropyLoss):
-            loss = criterion(logits, active[:, 0])  # supervise on top-1 active expert
-        else:
-            loss = criterion(logits, lbl)
-
+        logits = _model_forward(model, batch_dev)   # [B, num_experts]
+        loss = criterion(logits, target)             # CrossEntropyLoss
         loss.backward()
         optimizer.step()
 
-        active_k = active.size(1)
-        sums, n = compute_metrics(logits.detach(), lbl, prefetch_k, active_k)
+        sums, n = compute_metrics(logits.detach(), target)
         sums['total_loss'] = loss.item()
         _merge_metrics(acc, sums, n)
         num_batches += 1
 
-    return _finalise_metrics(acc, num_batches, prefetch_k, active_k)
+    return _finalise_metrics(acc, num_batches)
 
-def evaluate(model, loader, criterion, device):
+
+def evaluate(model, loader, criterion, device) -> dict:
     model.eval()
-    prefetch_k = model.prefetch_k
     acc = {}
     num_batches = 0
     with torch.no_grad():
-        for batch in tqdm(loader, desc="Evaluating", leave=False):
+        for batch in tqdm(loader, desc="Evaluating", leave=True):
             batch_dev = {k: v.to(device) for k, v in batch.items()}
-            lbl    = batch_dev['label']
-            active = batch_dev['active_indices']
+            target = batch_dev['top1_expert']
 
             logits = _model_forward(model, batch_dev)
+            loss = criterion(logits, target)
 
-            if isinstance(criterion, nn.CrossEntropyLoss):
-                loss = criterion(logits, active[:, 0])
-            else:
-                loss = criterion(logits, lbl)
-
-            active_k = active.size(1)
-            sums, n = compute_metrics(logits, lbl, prefetch_k, active_k)
+            sums, n = compute_metrics(logits, target)
             sums['total_loss'] = loss.item()
             _merge_metrics(acc, sums, n)
             num_batches += 1
 
-    return _finalise_metrics(acc, num_batches, prefetch_k, active_k)
+    return _finalise_metrics(acc, num_batches)
+
 
 def train_embedding_predictor(
     data_dir: str,
@@ -767,16 +690,17 @@ def train_embedding_predictor(
     device: str = 'cuda',
     base_embedding_dim: int = 4096,
     num_experts: int = 8,
-    active_k: int = 2,       # how many experts the router selects (label size)
-    prefetch_k: int = 1,     # how many experts we predict and prefetch
+    active_k: int = 2,       # how many experts the router selects (for reference / future use)
+    prefetch_k: int = 1,     # currently always 1; we predict a single top-1 expert
     hidden_dim: Optional[int] = None,
-    loss_type: str = 'ce',
+    loss_type: str = 'ce',   # only 'ce' is meaningful for single-class prediction
     best_by: str = 'top1_exact',
     model_type: str = 'dual_mlp',
     use_embedding: bool = True,
     use_prefill: bool = True,
     use_prev_experts: bool = False,
-):
+) -> dict:
+    """Train one per-layer expert predictor MLP to predict the top-1 router expert."""
     _base_out = Path(output_dir) / f"layer_{layer_idx}"
 
     all_files = sorted(list(Path(data_dir).glob("*.pt")) + list(Path(data_dir).glob("*.jsonl")))
@@ -788,27 +712,29 @@ def train_embedding_predictor(
     print(f"Train files: {len(train_files)}, Val files: {len(val_files)}")
 
     ds_kwargs = dict(
-        layer_idx=layer_idx, num_experts=num_experts,
-        active_k=active_k, prefetch_k=prefetch_k,
+        layer_idx=layer_idx,
+        num_experts=num_experts,
         embedding_history_size=embedding_history_size,
     )
-    train_ds = EmbeddingHistoryDataset(train_files, **ds_kwargs)
-    val_ds   = EmbeddingHistoryDataset(val_files,   **ds_kwargs)
-    pos_weights = train_ds.calculate_class_weights().to(device)
+    train_ds = ExpertPredictorDataset(train_files, **ds_kwargs)
+    val_ds   = ExpertPredictorDataset(val_files,   **ds_kwargs)
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
-    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  num_workers=2, pin_memory=True)
+    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True)
 
     input_dim   = base_embedding_dim * embedding_history_size
     _hidden_dim = hidden_dim if hidden_dim else min(2048, max(256, input_dim // 4))
     output_dir  = _base_out / f"hidden_{_hidden_dim}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Layer {layer_idx} — input_dim={input_dim}, hidden_dim={_hidden_dim}, "
-          f"num_experts={num_experts}, active_k={active_k}, prefetch_k={prefetch_k}, "
-          f"model_type={model_type}, use_embedding={use_embedding}, "
-          f"use_prefill={use_prefill}, use_prev_experts={use_prev_experts}")
+    print(
+        f"Layer {layer_idx} — input_dim={input_dim}, hidden_dim={_hidden_dim}, "
+        f"num_experts={num_experts}, active_k={active_k}, prefetch_k={prefetch_k}, "
+        f"model_type={model_type}, use_embedding={use_embedding}, "
+        f"use_prefill={use_prefill}, use_prev_experts={use_prev_experts}"
+    )
 
+    # Build model
     if use_prev_experts:
         model = HistoryAwareDualMLPPredictor(
             hidden_size=input_dim, num_experts=num_experts,
@@ -825,16 +751,14 @@ def train_embedding_predictor(
     else:
         raise ValueError(f"Unknown model_type: {model_type}")
 
+    # CrossEntropyLoss is the only correct loss for single-class top-1 prediction
+    criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2)
-    
-    if loss_type == 'ce': criterion = nn.CrossEntropyLoss()
-    elif loss_type == 'bce': criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weights)
-    else: criterion = FocalLoss(alpha=pos_weights)
 
-    best_acc = 0.0
+    best_acc     = 0.0
     best_metrics = {}
-    metrics  = []
+    epoch_log    = []
     metrics_path = output_dir / "training_metrics.json"
 
     run_config = {
@@ -845,201 +769,203 @@ def train_embedding_predictor(
         "use_embedding": use_embedding,
         "use_prefill": use_prefill,
         "use_prev_experts": use_prev_experts,
+        "target": "top1_expert_exact",
     }
 
     for epoch in range(num_epochs):
         print(f"Epoch {epoch+1}/{num_epochs}")
         train_m = train_epoch(model, train_loader, optimizer, criterion, device)
-        val_m   = evaluate(model, val_loader, criterion, device)
-        
-        scheduler.step(val_m.get(best_by, val_m['acc']))
+        val_m   = evaluate(model,   val_loader,   criterion, device)
 
-        _print_metrics("Train", train_m, prefetch_k)
-        _print_metrics("Val",   val_m,   prefetch_k)
+        scheduler.step(val_m.get(best_by, val_m['top1_exact']))
 
-        epoch_record = {
+        _print_metrics("Train", train_m)
+        _print_metrics("Val",   val_m)
+
+        epoch_log.append({
             "epoch": epoch + 1, "train": train_m, "val": val_m,
-            "train_loss": train_m['loss'], "train_acc": train_m['acc'],
-            "val_loss": val_m['loss'], "val_acc": val_m['acc'],
-        }
-        metrics.append(epoch_record)
+            "train_loss": train_m['loss'], "train_acc": train_m['top1_exact'],
+            "val_loss":   val_m['loss'],   "val_acc":   val_m['top1_exact'],
+        })
 
-        current_score = val_m.get(best_by, val_m['acc'])
+        current_score = val_m.get(best_by, val_m['top1_exact'])
         if current_score > best_acc:
-            best_acc = current_score
+            best_acc     = current_score
             best_metrics = val_m
-            save_path = output_dir / "embedding_predictor_best.pt"
+            save_path    = output_dir / "embedding_predictor_best.pt"
             model.save(save_path)
-            
+
+            # Also save as TorchScript JIT for inference
             try:
                 model.eval()
                 wrapper = PredictorJITWrapper(model)
                 wrapper.eval()
-                # Always provide all three inputs so trace captures full graph.
-                # Disabled branches will receive zeros and ignore them internally.
-                num_exp = model.num_experts
-                example_emb    = torch.randn(1, input_dim).to(device)
-                example_pfill  = torch.zeros(1, num_exp).to(device)
-                example_prev   = torch.zeros(1, num_exp).to(device)
+                # Always provide 3 tensors for the trace to ensure fixed C++ signature.
+                ex_emb   = torch.randn(1, input_dim).to(device)
+                ex_pfill = torch.zeros(1, num_experts).to(device)
+                ex_prev  = torch.zeros(1, num_experts).to(device)
                 with torch.no_grad():
-                    traced_model = torch.jit.trace(
-                        wrapper, (example_emb, example_pfill, example_prev)
-                    )
-                traced_model.save(str(save_path))
+                    traced = torch.jit.trace(wrapper, (ex_emb, ex_pfill, ex_prev))
+                traced.save(str(save_path))
                 model.train()
             except Exception as e:
-                print(f"  [warn] Failed to auto-save JIT model: {e}")
+                print(f"  [warn] JIT trace failed: {e}")
 
-            print(f"  ↑ New best {best_by}={best_acc:.4f} — saved to {save_path} (and JIT)")
-        
+            print(f"  ↑ New best {best_by}={best_acc:.4f} — saved to {save_path}")
+
         with open(metrics_path, 'w') as f:
-            json.dump({**run_config, "best_val_acc": best_acc, "best_by": best_by, "epochs": metrics}, f, indent=2)
+            json.dump({**run_config, "best_val_acc": best_acc, "best_by": best_by,
+                       "epochs": epoch_log}, f, indent=2)
 
     return best_metrics
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# 5. CLI Definition
+# 6. Sweep Helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
-# emb_dim, num_experts, active_k (router top-k), num_layers, default_prefetch_k
-MODEL_DEFAULTS = {
-    "mixtral_8x7b":  (4096, 8,   2, 32, 1),
-    "mixtral_8x22b": (4096, 8,   2, 56, 1),
-    "qwen3_30b":     (2048, 128, 8, 48, 4),
-    "qwen3_480b":    (7168, 128, 8, 94, 4),
-}
-
-def calculate_model_size_mb(input_dim, hidden_dim, output_dim):
-    params = (input_dim * hidden_dim) + hidden_dim
+def calculate_model_size_mb(input_dim: int, hidden_dim: int, output_dim: int) -> float:
+    """Estimate the size of a DualMLPPredictor in megabytes."""
+    # Branch 1: Linear(input_dim, hidden_dim) + LayerNorm
+    params  = (input_dim * hidden_dim) + hidden_dim   # weights + bias
+    params += hidden_dim * 2                          # LayerNorm weight + bias
+    # Classifier: Linear(hidden_dim, hidden_dim//2) + Linear(hidden_dim//2, output_dim)
     params += (hidden_dim * (hidden_dim // 2)) + (hidden_dim // 2)
-    params += ((hidden_dim // 2) * output_dim) + output_dim
-    params += (hidden_dim * 2) + ((hidden_dim // 2) * 2)
-    return (params * 4) / (1024 * 1024)
+    params += ((hidden_dim // 2) * output_dim)   + output_dim
+    return (params * 4) / (1024 * 1024)   # float32 bytes → MB
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 7. CLI Commands
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _resolve_model_args(args):
+    """Return (emb_dim, n_experts, active_k, n_layers, prefetch_k) from CLI args."""
+    if args.model:
+        emb_dim, n_exp, default_active_k, n_layers, default_prefetch_k = MODEL_DEFAULTS[args.model]
+    else:
+        emb_dim, n_exp, default_active_k, n_layers, default_prefetch_k = (
+            args.embedding_dim, args.num_experts, 2, args.num_layers, 1
+        )
+    active_k   = args.active_k   if getattr(args, 'active_k',   None) is not None else default_active_k
+    prefetch_k = args.prefetch_k if getattr(args, 'prefetch_k', None) is not None else default_prefetch_k
+    return emb_dim, n_exp, active_k, n_layers, prefetch_k
+
 
 def run_train(args):
-    if args.model:
-        emb_dim, n_exp, default_active_k, n_layers, default_prefetch_k = MODEL_DEFAULTS[args.model]
-    else:
-        emb_dim, n_exp, default_active_k, n_layers, default_prefetch_k = args.embedding_dim, args.num_experts, 2, args.num_layers, 1
-    active_k   = args.active_k   if args.active_k   is not None else default_active_k
-    prefetch_k = args.prefetch_k if args.prefetch_k is not None else default_prefetch_k
+    emb_dim, n_exp, active_k, n_layers, prefetch_k = _resolve_model_args(args)
     shared = dict(
-        embedding_history_size=args.history, num_epochs=args.epochs, batch_size=args.batch_size,
-        lr=args.lr, device=args.device, base_embedding_dim=emb_dim, num_experts=n_exp,
-        active_k=active_k, prefetch_k=prefetch_k, hidden_dim=args.hidden_dim, loss_type=args.loss_type,
-        model_type=args.model_type, best_by=args.best_by
+        embedding_history_size=args.history, num_epochs=args.epochs,
+        batch_size=args.batch_size, lr=args.lr, device=args.device,
+        base_embedding_dim=emb_dim, num_experts=n_exp,
+        active_k=active_k, prefetch_k=prefetch_k,
+        hidden_dim=args.hidden_dim, loss_type=args.loss_type,
+        model_type=args.model_type, best_by=args.best_by,
     )
     layers = [args.layer_idx] if args.layer_idx is not None else list(range(n_layers))
-    layer_accs = {}
+    layer_results = {}
     for i in layers:
         print(f"\n{'='*60}\nTraining Layer {i}/{n_layers-1}\n{'='*60}")
-        acc = train_embedding_predictor(args.data_dir, args.output_dir, i, **shared)
-        layer_accs[i] = acc
-    print("\n" + "="*60 + "\nLayer-wise best validation accuracy:\n" + "-"*30)
-    for i, acc in sorted(layer_accs.items()): print(f"  Layer {i:3d}: {acc:.4f}")
+        layer_results[i] = train_embedding_predictor(args.data_dir, args.output_dir, i, **shared)
+    print("\n" + "="*60 + "\nLayer-wise best val top1_exact:\n" + "-"*30)
+    for i, m in sorted(layer_results.items()):
+        print(f"  Layer {i:3d}: top1_exact={m.get('top1_exact', 0):.4f}")
     print("="*60)
 
+
 def run_sweep(args):
-    if args.model:
-        emb_dim, n_exp, default_active_k, n_layers, default_prefetch_k = MODEL_DEFAULTS[args.model]
-    else:
-        emb_dim, n_exp, default_active_k, n_layers, default_prefetch_k = args.embedding_dim, args.num_experts, 2, args.num_layers, 1
-    active_k   = args.active_k   if args.active_k   is not None else default_active_k
-    prefetch_k = args.prefetch_k if args.prefetch_k is not None else default_prefetch_k
+    emb_dim, n_exp, active_k, n_layers, prefetch_k = _resolve_model_args(args)
     layers = args.layers if args.layers is not None else list(range(n_layers))
     output_path = Path(args.output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
+    OVERHEAD = 1.25   # 25% buffer for metadata in .pt file
     valid_configs = []
-    OVERHEAD = 1.25
     for history in args.histories:
         for h_dim in args.hidden_dims:
             est = calculate_model_size_mb(emb_dim * history, h_dim, n_exp) * OVERHEAD
             if est <= args.max_size_mb:
                 valid_configs.append((history, h_dim, est))
-                print(f"Valid: emb_hist={history}, hidden={h_dim} (Est Per-Layer: {est:.1f}MB)")
+                print(f"Valid:    emb_hist={history}, hidden={h_dim}  (est {est:.1f} MB/layer)")
             else:
-                print(f"Skipping: hist={history}, hidden={h_dim} ({est:.1f}MB > {args.max_size_mb}MB)")
+                print(f"Skipping: emb_hist={history}, hidden={h_dim}  ({est:.1f} MB > {args.max_size_mb} MB)")
 
     total, done = len(layers) * len(valid_configs), 0
+    print(f"\nSweep Summary:\n  Layers: {layers}\n  Valid archs: {len(valid_configs)}\n  Total runs: {total}")
+
     results = []
     for history, hidden_dim, size_mb in valid_configs:
         for layer_idx in layers:
             done += 1
-            print(f"\n{'='*60}\n Run {done}/{total}: Layer {layer_idx}, EmbHist {history}, Hidden {hidden_dim} ({size_mb:.1f}MB)\n{'='*60}")
+            print(f"\n{'='*60}\n Run {done}/{total}: Layer {layer_idx}, "
+                  f"EmbHist {history}, Hidden {hidden_dim} ({size_mb:.1f} MB)\n{'='*60}")
             out_dir = output_path / f"eh{history}_h{hidden_dim}"
             try:
                 metrics = train_embedding_predictor(
                     data_dir=args.data_dir, output_dir=str(out_dir), layer_idx=layer_idx,
-                    embedding_history_size=history, hidden_dim=hidden_dim, num_epochs=args.epochs,
-                    batch_size=args.batch_size, lr=args.lr, device=args.device, base_embedding_dim=emb_dim,
+                    embedding_history_size=history, hidden_dim=hidden_dim,
+                    num_epochs=args.epochs, batch_size=args.batch_size,
+                    lr=args.lr, device=args.device, base_embedding_dim=emb_dim,
                     num_experts=n_exp, active_k=active_k, prefetch_k=prefetch_k,
-                    loss_type=args.loss_type, best_by=args.best_by, model_type=args.model_type
+                    loss_type=args.loss_type, best_by=args.best_by,
+                    model_type=args.model_type,
                 )
                 results.append({
                     "layer": layer_idx, "history": history, "hidden_dim": hidden_dim,
-                    "size_mb": size_mb, **{f"val_{key}": v for key, v in metrics.items()}
+                    "size_mb": size_mb,
+                    **{f"val_{k}": v for k, v in metrics.items()},
                 })
-                with open(output_path / "sweep_summary.json", "w") as f: json.dump(results, f, indent=2)
+                with open(output_path / "sweep_summary.json", "w") as f:
+                    json.dump(results, f, indent=2)
             except Exception as e:
                 print(f"[ERROR] Run failed: {e}", file=sys.stderr)
 
     print(f"\nSweep complete. Best architectures per layer (by {args.best_by}):")
     for layer in layers:
         layer_res = [r for r in results if r['layer'] == layer]
-        if not layer_res: continue
-        best = max(layer_res, key=lambda x: x[f'val_{args.best_by}'])
-        print(f"  Layer {layer:2d}: Best is EmbHist={best['history']}, Hidden={best['hidden_dim']} "
-              f"(Top-1 Exact: {best['val_top1_exact']:.4f}, Mean Overlap: {best.get('val_mean_overlap', 0):.4f})")
+        if not layer_res:
+            continue
+        best = max(layer_res, key=lambda x: x.get(f'val_{args.best_by}', 0))
+        print(f"  Layer {layer:2d}: EmbHist={best['history']}, Hidden={best['hidden_dim']}  "
+              f"top1_exact={best.get('val_top1_exact', 0):.4f}  "
+              f"any_top2={best.get('val_any_top2', 0):.4f}")
+
 
 def run_ablation(args):
-    if args.model:
-        emb_dim, n_exp, default_active_k, n_layers, default_prefetch_k = MODEL_DEFAULTS[args.model]
-    else:
-        emb_dim, n_exp, default_active_k, n_layers, default_prefetch_k = args.embedding_dim, args.num_experts, 2, args.num_layers, 1
-    active_k   = args.active_k   if args.active_k   is not None else default_active_k
-    prefetch_k = args.prefetch_k if args.prefetch_k is not None else default_prefetch_k
-    layers = args.layers if args.layers is not None else [15]  # default middle layer
+    emb_dim, n_exp, active_k, n_layers, prefetch_k = _resolve_model_args(args)
+    layers = args.layers if args.layers is not None else [15]
     output_path = Path(args.output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    # Each variant specifies which feature branches to enable.
-    # use_prev_experts=True  -> HistoryAwareDualMLPPredictor
-    # use_prev_experts=False -> DualMLPPredictor (original)
     variants = [
-        # ── Baselines (no prev-expert branch) ────────────────────────────
-        {"name": "emb_only",             "use_embedding": True,  "use_prev_experts": False, "use_prefill": False},
-        {"name": "prefill_only",         "use_embedding": False, "use_prev_experts": False, "use_prefill": True},
-        {"name": "prev_only",            "use_embedding": False, "use_prev_experts": True,  "use_prefill": False},
-        # ── Two-branch combos ─────────────────────────────────────────────
-        {"name": "emb_prefill",          "use_embedding": True,  "use_prev_experts": False, "use_prefill": True},
-        {"name": "emb_prev",             "use_embedding": True,  "use_prev_experts": True,  "use_prefill": False},
-        {"name": "prev_prefill",         "use_embedding": False, "use_prev_experts": True,  "use_prefill": True},
-        # ── Full three-branch model ────────────────────────────────────────
-        {"name": "emb_prev_prefill",     "use_embedding": True,  "use_prev_experts": True,  "use_prefill": True},
+        # ── Single-branch baselines ────────────────────────────────────────────
+        {"name": "emb_only",         "use_embedding": True,  "use_prev_experts": False, "use_prefill": False},
+        {"name": "prefill_only",     "use_embedding": False, "use_prev_experts": False, "use_prefill": True},
+        {"name": "prev_only",        "use_embedding": False, "use_prev_experts": True,  "use_prefill": False},
+        # ── Two-branch combos ─────────────────────────────────────────────────
+        {"name": "emb_prefill",      "use_embedding": True,  "use_prev_experts": False, "use_prefill": True},
+        {"name": "emb_prev",         "use_embedding": True,  "use_prev_experts": True,  "use_prefill": False},
+        {"name": "prev_prefill",     "use_embedding": False, "use_prev_experts": True,  "use_prefill": True},
+        # ── Full three-branch ─────────────────────────────────────────────────
+        {"name": "emb_prev_prefill", "use_embedding": True,  "use_prev_experts": True,  "use_prefill": True},
     ]
 
-    total = len(layers) * len(variants)
-    done = 0
+    total, done = len(layers) * len(variants), 0
     results = []
-
-    print(f"\n=== Starting Ablation Study ===")
-    print(f"  Layers:   {layers}")
+    print(f"\n=== Ablation Study ===\n  Layers:   {layers}")
     print(f"  Variants: {[v['name'] for v in variants]}\n")
 
     for layer_idx in layers:
         for var in variants:
             done += 1
-            var_name = var["name"]
-            print(f"\n{'='*60}\n Run {done}/{total}: Layer {layer_idx}, Variant {var_name}\n{'='*60}")
-            out_dir = output_path / f"ablation_layer_{layer_idx}_{var_name}"
-
+            print(f"\n{'='*60}\n Run {done}/{total}: Layer {layer_idx}, Variant {var['name']}\n{'='*60}")
+            out_dir = output_path / f"ablation_layer_{layer_idx}_{var['name']}"
             try:
                 metrics = train_embedding_predictor(
                     data_dir=args.data_dir, output_dir=str(out_dir), layer_idx=layer_idx,
-                    embedding_history_size=args.history, hidden_dim=args.hidden_dim, num_epochs=args.epochs,
-                    batch_size=args.batch_size, lr=args.lr, device=args.device, base_embedding_dim=emb_dim,
+                    embedding_history_size=args.history, hidden_dim=args.hidden_dim,
+                    num_epochs=args.epochs, batch_size=args.batch_size,
+                    lr=args.lr, device=args.device, base_embedding_dim=emb_dim,
                     num_experts=n_exp, active_k=active_k, prefetch_k=prefetch_k,
                     loss_type=args.loss_type, best_by=args.best_by,
                     model_type="dual_mlp",
@@ -1048,11 +974,9 @@ def run_ablation(args):
                     use_prev_experts=var["use_prev_experts"],
                 )
                 results.append({
-                    "layer": layer_idx, "variant": var_name,
-                    "use_embedding": var["use_embedding"],
-                    "use_prev_experts": var["use_prev_experts"],
-                    "use_prefill": var["use_prefill"],
-                    **{f"val_{key}": v for key, v in metrics.items()}
+                    "layer": layer_idx, "variant": var["name"],
+                    **var,
+                    **{f"val_{k}": v for k, v in metrics.items()},
                 })
                 with open(output_path / "ablation_summary.json", "w") as f:
                     json.dump(results, f, indent=2)
@@ -1061,75 +985,89 @@ def run_ablation(args):
                 print(f"[ERROR] Run failed: {e}", file=sys.stderr)
                 traceback.print_exc()
 
-    print(f"\n=== Ablation Study Complete ===")
+    print("\n=== Ablation Complete ===")
     for layer in layers:
         print(f"\nLayer {layer}:")
-        layer_res = [r for r in results if r['layer'] == layer]
-        layer_res = sorted(layer_res, key=lambda x: x[f'val_{args.best_by}'], reverse=True)
-        if prefetch_k == 1:
-            # top_k=1: accuracy is the single meaningful metric
-            header = f"  {'Variant':<22} {'accuracy':>10}  {'macro_F1':>10}  {'loads/tok':>10}  {'reduction':>10}"
-            print(header)
-            print("  " + "-" * (len(header) - 2))
-            for r in layer_res:
-                acc = r.get(f'val_{args.best_by}', 0)
-                mf1 = r.get('val_macro_f1', 0)
-                exp_loads = 2.0 - acc
-                reduc = (2.0 - exp_loads) / 2.0 * 100
-                print(f"  {r['variant']:<22} {acc:>10.4f}  {mf1:>10.4f}  "
-                      f"{exp_loads:>10.3f}  {reduc:>9.1f}%")
-        else:
-            header = f"  {'Variant':<22} {args.best_by:>12}  {'any_correct':>12}  {'mean_overlap':>12}"
-            print(header)
-            print("  " + "-" * (len(header) - 2))
-            for r in layer_res:
-                print(f"  {r['variant']:<22} {r[f'val_{args.best_by}']:>12.4f}  "
-                      f"{r.get('val_any_correct', 0):>12.4f}  {r.get('val_mean_overlap', 0):>12.4f}")
+        layer_res = sorted(
+            [r for r in results if r['layer'] == layer],
+            key=lambda x: x.get(f'val_{args.best_by}', 0), reverse=True
+        )
+        header = f"  {'Variant':<22} {'top1_exact':>12}  {'any_top2':>10}  {'loads/tok':>10}  {'reduction':>10}"
+        print(header)
+        print("  " + "-" * (len(header) - 2))
+        for r in layer_res:
+            acc = r.get(f'val_{args.best_by}', 0)
+            at2 = r.get('val_any_top2', 0)
+            exp_loads = 2.0 - acc
+            reduc     = acc * 100
+            print(f"  {r['variant']:<22} {acc:>12.4f}  {at2:>10.4f}  "
+                  f"{exp_loads:>10.3f}  {reduc:>9.1f}%")
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 8. Entry Point
+# ──────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Expert Predictor Training and Sweeping")
+    parser = argparse.ArgumentParser(
+        description="Expert Predictor: predict the top-1 router expert at token t+1."
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    # Base arguments shared between both commands
-    parent_parser = argparse.ArgumentParser(add_help=False)
-    parent_parser.add_argument('--data_dir', required=True)
-    parent_parser.add_argument('--output_dir', required=True)
-    parent_parser.add_argument('--model', choices=list(MODEL_DEFAULTS.keys()), default=None)
-    parent_parser.add_argument('--num_layers', type=int, default=32)
-    parent_parser.add_argument('--embedding_dim', type=int, default=4096)
-    parent_parser.add_argument('--num_experts', type=int, default=8)
-    parent_parser.add_argument('--active_k',   type=int, default=None,
-                               help='Experts the router picks per token (defines the label). Overrides model default.')
-    parent_parser.add_argument('--prefetch_k', type=int, default=None,
-                               help='Experts to predict and prefetch. Overrides model default (1 for Mixtral, 4 for Qwen3).')
-    parent_parser.add_argument('--device', type=str, default='cuda')
-    parent_parser.add_argument('--epochs', type=int, default=10)
-    parent_parser.add_argument('--batch_size', type=int, default=32)
-    parent_parser.add_argument('--lr', type=float, default=1e-3)
-    parent_parser.add_argument('--loss_type', choices=['ce', 'bce', 'focal'], default='ce')
-    parent_parser.add_argument('--best_by', type=str, default="top1_exact")
-    parent_parser.add_argument('--model_type', type=str, default="dual_mlp", choices=["dual_mlp"])
+    # ── Shared parent parser ───────────────────────────────────────────────────
+    parent = argparse.ArgumentParser(add_help=False)
+    parent.add_argument('--data_dir',      required=True,  help="Directory with .pt training files")
+    parent.add_argument('--output_dir',    required=True,  help="Where to save models/metrics")
+    parent.add_argument('--model',         choices=list(MODEL_DEFAULTS.keys()), default=None,
+                        help="Use preset emb_dim/num_experts/active_k/num_layers for a known model")
+    parent.add_argument('--num_layers',    type=int, default=32)
+    parent.add_argument('--embedding_dim', type=int, default=4096)
+    parent.add_argument('--num_experts',   type=int, default=8)
+    parent.add_argument('--active_k',      type=int, default=None,
+                        help="Experts the router picks per token (overrides model default)")
+    parent.add_argument('--prefetch_k',    type=int, default=None,
+                        help="Experts to prefetch — currently must be 1 (overrides model default)")
+    parent.add_argument('--epochs',        type=int,   default=10)
+    parent.add_argument('--batch_size',    type=int,   default=128)
+    parent.add_argument('--lr',            type=float, default=1e-3)
+    parent.add_argument('--device',        type=str,   default='cuda')
+    parent.add_argument('--loss_type',     choices=['ce'], default='ce',
+                        help="Loss function (only 'ce' is valid for top-1 prediction)")
+    parent.add_argument('--best_by',       type=str,   default='top1_exact')
+    parent.add_argument('--model_type',    type=str,   default='dual_mlp', choices=['dual_mlp'])
 
-    # train command
-    parser_train = subparsers.add_parser('train', parents=[parent_parser])
-    parser_train.add_argument('--layer_idx', type=int, default=None)
-    parser_train.add_argument('--history', type=int, default=1)
-    parser_train.add_argument('--hidden_dim', type=int, default=None)
+    # ── train ─────────────────────────────────────────────────────────────────
+    p_train = subparsers.add_parser('train', parents=[parent],
+                                    help="Train a predictor for one or all layers")
+    p_train.add_argument('--layer_idx',  type=int, default=None,
+                         help="Single layer to train (default: all layers)")
+    p_train.add_argument('--history',    type=int, default=1,
+                         help="Embedding history window size")
+    p_train.add_argument('--hidden_dim', type=int, default=None,
+                         help="Branch projection dimension (default: auto)")
 
-    # sweep command
-    parser_sweep = subparsers.add_parser('sweep', parents=[parent_parser])
-    parser_sweep.add_argument("--hidden_dims", nargs="+", type=int, default=[64, 128, 256])
-    parser_sweep.add_argument("--histories", nargs="+", type=int, default=[1, 2])
-    parser_sweep.add_argument("--layers", nargs="+", type=int, default=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31])
-    parser_sweep.add_argument("--max_size_mb", type=float, default=70.0)
+    # ── sweep ─────────────────────────────────────────────────────────────────
+    p_sweep = subparsers.add_parser('sweep', parents=[parent],
+                                    help="Grid search over hidden_dim × history × layers")
+    p_sweep.add_argument('--hidden_dims', nargs='+', type=int, default=[64, 128, 256],
+                         help="Hidden (branch) dims to sweep")
+    p_sweep.add_argument('--histories',   nargs='+', type=int, default=[1, 2],
+                         help="Embedding history sizes to sweep")
+    p_sweep.add_argument('--layers',      nargs='+', type=int,
+                         default=list(range(32)),
+                         help="Layer indices to sweep")
+    p_sweep.add_argument('--max_size_mb', type=float, default=70.0,
+                         help="Max estimated model size per layer in MB")
 
-    # ablation command
-    parser_ablation = subparsers.add_parser('ablation', parents=[parent_parser])
-    parser_ablation.add_argument('--layers', nargs="+", type=int, default=[15], help="Layers specifically to run ablation on")
-    parser_ablation.add_argument('--history', type=int, default=1)
-    parser_ablation.add_argument('--hidden_dim', type=int, default=256)
+    # ── ablation ──────────────────────────────────────────────────────────────
+    p_abl = subparsers.add_parser('ablation', parents=[parent],
+                                  help="Ablation study over feature branches")
+    p_abl.add_argument('--layers',      nargs='+', type=int, default=[15],
+                       help="Layers to run ablation on")
+    p_abl.add_argument('--history',     type=int, default=1)
+    p_abl.add_argument('--hidden_dim',  type=int, default=256)
 
     args = parser.parse_args()
-    if args.command == 'train': run_train(args)
-    elif args.command == 'sweep': run_sweep(args)
+    if   args.command == 'train':    run_train(args)
+    elif args.command == 'sweep':    run_sweep(args)
     elif args.command == 'ablation': run_ablation(args)
