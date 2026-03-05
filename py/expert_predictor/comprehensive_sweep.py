@@ -44,7 +44,6 @@ def parse_args():
     p.add_argument("--model",       choices=list(MODEL_DEFAULTS.keys()), default=None)
     p.add_argument("--hidden_dims", nargs="+", type=int, default=[64, 128, 256])
     p.add_argument("--histories",   nargs="+", type=int, default=[1, 2])
-    p.add_argument("--router_histories", nargs="+", type=int, default=[2,3])
     p.add_argument("--layers",      nargs="+", type=int, default=[0, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
                    help="Layer indices to sweep (representative layers)")
     p.add_argument("--max_size_mb", type=float, default=70.0, help="Max size PER LAYER model in MB")
@@ -80,18 +79,17 @@ def main():
     OVERHEAD = 1.25 # 25% buffer for metadata/config strings in .pt file
     
     for history in args.histories:
-        for r_history in args.router_histories:
-            for h_dim in args.hidden_dims:
-                input_dim = emb_dim * history
-                per_layer_mb = calculate_model_size_mb(input_dim, h_dim, n_exp)
-                
-                est_per_layer = per_layer_mb * OVERHEAD
-                
-                if est_per_layer <= args.max_size_mb:
-                    valid_configs.append((history, r_history, h_dim, est_per_layer))
-                    print(f"Valid: emb_hist={history}, router_hist={r_history}, hidden={h_dim} (Est Per-Layer: {est_per_layer:.1f}MB)")
-                else:
-                    print(f"Skipping: emb_hist={history}, router_hist={r_history}, hidden={h_dim} (Est Per-Layer {est_per_layer:.1f}MB > {args.max_size_mb}MB)")
+        for h_dim in args.hidden_dims:
+            input_dim = emb_dim * history
+            per_layer_mb = calculate_model_size_mb(input_dim, h_dim, n_exp)
+            
+            est_per_layer = per_layer_mb * OVERHEAD
+            
+            if est_per_layer <= args.max_size_mb:
+                valid_configs.append((history, h_dim, est_per_layer))
+                print(f"Valid: emb_hist={history}, hidden={h_dim} (Est Per-Layer: {est_per_layer:.1f}MB)")
+            else:
+                print(f"Skipping: emb_hist={history}, hidden={h_dim} (Est Per-Layer {est_per_layer:.1f}MB > {args.max_size_mb}MB)")
 
     total = len(layers) * len(valid_configs)
     done = 0
@@ -103,15 +101,15 @@ def main():
 
     results = []
     
-    for history, r_history, hidden_dim, size_mb in valid_configs:
+    for history, hidden_dim, size_mb in valid_configs:
         for layer_idx in layers:
             done += 1
             print(f"\n{'='*60}")
-            print(f" Run {done}/{total}: Layer {layer_idx}, EmbHist {history}, RouterHist {r_history}, Hidden {hidden_dim} ({size_mb:.1f}MB)")
+            print(f" Run {done}/{total}: Layer {layer_idx}, EmbHist {history}, Hidden {hidden_dim} ({size_mb:.1f}MB)")
             print(f"{'='*60}")
             
             # Adjust output dir to include architecture details
-            arch_specific_out = output_path / f"eh{history}_rh{r_history}_h{hidden_dim}"
+            arch_specific_out = output_path / f"eh{history}_h{hidden_dim}"
             
             try:
                 metrics = train_embedding_predictor(
@@ -119,7 +117,6 @@ def main():
                     output_dir=str(arch_specific_out),
                     layer_idx=layer_idx,
                     embedding_history_size=history,
-                    router_history_size=r_history,
                     hidden_dim=hidden_dim,
                     num_epochs=args.epochs,
                     batch_size=args.batch_size,
@@ -136,7 +133,6 @@ def main():
                 results.append({
                     "layer": layer_idx,
                     "history": history,
-                    "router_history": r_history,
                     "hidden_dim": hidden_dim,
                     "size_mb": size_mb,
                     **{f"val_{k}": v for k, v in metrics.items()}
@@ -158,7 +154,7 @@ def main():
         layer_results = [r for r in results if r['layer'] == layer]
         if not layer_results: continue
         best = max(layer_results, key=lambda x: x[f'val_{args.best_by}'])
-        print(f"  Layer {layer:2d}: Best is EmbHist={best['history']}, RouterHist={best['router_history']}, Hidden={best['hidden_dim']} "
+        print(f"  Layer {layer:2d}: Best is EmbHist={best['history']}, Hidden={best['hidden_dim']} "
               f"(Top-1 Exact: {best['val_top1_exact']:.4f}, Full Match: {best['val_acc']:.4f}, Mean Overlap: {best['val_mean_overlap']:.4f})")
 
 if __name__ == "__main__":

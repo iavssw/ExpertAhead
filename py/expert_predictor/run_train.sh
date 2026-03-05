@@ -24,12 +24,24 @@ case "$MODEL" in
   sweep)
     TARGET="${EXTRA:-mixtral_8x7b}"
     echo "=== Sweep: $TARGET ==="
-    python "${SCRIPT_DIR}/sweep.py" \
+    python "${SCRIPT_DIR}/expert_predictor.py" sweep \
         --data_dir   "${DATA_ROOT}/${TARGET}" \
         --output_dir "${DATA_ROOT}/${TARGET}/sweep_results" \
         --model      "${TARGET}" \
         --hidden_dims 256 512 1024 2048 \
         --epochs 15
+    ;;
+
+  ablation)
+    TARGET="${EXTRA:-mixtral_8x7b}"
+    echo "=== Ablation: $TARGET ==="
+    python "${SCRIPT_DIR}/expert_predictor.py" ablation \
+        --data_dir   "${DATA_ROOT}/${TARGET}" \
+        --output_dir "${DATA_ROOT}/${TARGET}/ablation_results" \
+        --model      "${TARGET}" \
+        --layers 15 \
+        --epochs 10 \
+        --hidden_dim 512
     ;;
 
   plot)
@@ -50,14 +62,14 @@ case "$MODEL" in
     OUT_DIR="${DATA_ROOT}/${MODEL}/predictor_models"
     if [[ -n "$EXTRA" && "$EXTRA" =~ ^[0-9]+$ ]]; then
         echo "=== Training layer $EXTRA of $MODEL ==="
-        python "${SCRIPT_DIR}/train.py" \
+        python "${SCRIPT_DIR}/expert_predictor.py" train \
             --data_dir   "${DATA_ROOT}/${MODEL}" \
             --output_dir "${OUT_DIR}" \
             --model      "${MODEL}" \
             --layer_idx  "${EXTRA}"
     else
         echo "=== Training all layers of $MODEL ==="
-        python "${SCRIPT_DIR}/train.py" \
+        python "${SCRIPT_DIR}/expert_predictor.py" train \
             --data_dir   "${DATA_ROOT}/${MODEL}" \
             --output_dir "${OUT_DIR}" \
             --model      "${MODEL}"

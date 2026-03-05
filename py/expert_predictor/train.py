@@ -35,7 +35,7 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
-from mlp_predictor import ExpertPredictor, DualMLPPredictor
+from expert_predictor import DualMLPPredictor
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -87,13 +87,11 @@ class EmbeddingHistoryDataset(Dataset):
         num_experts: int = 8,
         top_k: int = 2,
         embedding_history_size: int = 1,
-        router_history_size: int = 0,
     ):
         self.layer_idx = layer_idx
         self.num_experts = num_experts
         self.top_k = top_k
         self.embedding_history_size = embedding_history_size
-        self.router_history_size = router_history_size
         self.samples = []
 
         if isinstance(data_source, (str, Path)):
@@ -132,17 +130,10 @@ class EmbeddingHistoryDataset(Dataset):
 
                     for t in range(seq_len - 1):
                         emb_parts = []
-                        router_parts = []
                         for h in range(self.embedding_history_size):
                             src = t - (self.embedding_history_size - 1 - h)
                             emb_parts.append(
                                 embeddings[src] if src >= 0 else torch.zeros(hidden_size)
-                            )
-                        
-                        for h in range(self.router_history_size):
-                            src = t - (self.router_history_size - 1 - h)
-                            router_parts.append(
-                                router_logits[src] if src >= 0 else torch.zeros(self.num_experts)
                             )
                         
                         prefill_expert_dist = layer_dict.get('prefill_expert_dist')
@@ -157,9 +148,6 @@ class EmbeddingHistoryDataset(Dataset):
                             'next_token_router_logits': router_logits[t + 1],
                             'prefill_expert_dist': prefill_expert_dist,
                         }
-                        if self.router_history_size > 0:
-                            sample['router_history'] = torch.cat(router_parts, dim=0)
-                            
                         self.samples.append(sample)
                 return
 
@@ -247,7 +235,6 @@ class EmbeddingHistoryDataset(Dataset):
             'post_attn_embedding': emb.float(),
             'label': label,
             'top_k_indices': top_k_idx,
-            'router_logits_history': s.get('router_history', torch.zeros(1)),
             'prefill_expert_dist': s.get('prefill_expert_dist',
                                          torch.full((self.num_experts,), 1.0 / self.num_experts)),
         }
@@ -404,14 +391,13 @@ def train_epoch(model, loader, optimizer, criterion, device):
         emb   = batch['post_attn_embedding'].to(device)
         lbl   = batch['label'].to(device)
         true  = batch['top_k_indices'].to(device)
-        hist  = batch['router_logits_history'].to(device)
         pdist = batch['prefill_expert_dist'].to(device)
 
         optimizer.zero_grad()
         if is_dual:
             logits = model(embedding=emb, prefill_dist=pdist)
         else:
-            logits = model(post_attn_embedding=emb, router_logits_history=hist)
+            logits = model(post_attn_embedding=emb)
         
         if isinstance(criterion, (nn.CrossEntropyLoss, nn.BCEWithLogitsLoss)):
             if isinstance(criterion, nn.CrossEntropyLoss):
@@ -445,13 +431,12 @@ def evaluate(model, loader, criterion, device):
         for batch in tqdm(loader, desc="Evaluating", leave=False):
             emb   = batch['post_attn_embedding'].to(device)
             lbl   = batch['label'].to(device)
-            hist  = batch['router_logits_history'].to(device)
             pdist = batch['prefill_expert_dist'].to(device)
 
             if is_dual:
                 logits = model(embedding=emb, prefill_dist=pdist)
             else:
-                logits = model(post_attn_embedding=emb, router_logits_history=hist)
+                logits = model(post_attn_embedding=emb)
             
             true = batch['top_k_indices'].to(device)
             if isinstance(criterion, (nn.CrossEntropyLoss, nn.BCEWithLogitsLoss)):
@@ -482,7 +467,6 @@ def train_embedding_predictor(
     output_dir: str,
     layer_idx: int,
     embedding_history_size: int = 1,
-    router_history_size: int = 0,
     num_epochs: int = 10,
     batch_size: int = 32,
     lr: float = 1e-3,
@@ -513,7 +497,6 @@ def train_embedding_predictor(
         num_experts=num_experts,
         top_k=top_k,
         embedding_history_size=embedding_history_size,
-        router_history_size=router_history_size,
     )
     train_ds = EmbeddingHistoryDataset(train_files, **ds_kwargs)
     val_ds   = EmbeddingHistoryDataset(val_files,   **ds_kwargs)
@@ -546,7 +529,6 @@ def train_embedding_predictor(
             vocab_size=32000,
             base_embedding_dim=base_embedding_dim,
             embedding_history_size=embedding_history_size,
-            router_history_size=router_history_size,
             num_experts=num_experts,
             top_k=top_k,
             hidden_dim=_hidden_dim,
@@ -573,7 +555,6 @@ def train_embedding_predictor(
         "layer_idx": layer_idx,
         "hidden_dim": _hidden_dim,
         "embedding_history_size": embedding_history_size,
-        "router_history_size": router_history_size,
         "base_embedding_dim": base_embedding_dim,
         "num_experts": num_experts,
         "top_k": top_k,
@@ -662,7 +643,6 @@ if __name__ == "__main__":
 
     shared = dict(
         embedding_history_size=args.history,
-        router_history_size=args.history, # Default to same as embedding history
         num_epochs=args.epochs,
         batch_size=args.batch_size,
         lr=args.lr,
