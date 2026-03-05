@@ -1238,4 +1238,4 @@ if __name__ == "__main__":
     exit(main())
 
     # Perplexity test for wikitext2
-    python3 mixtral_8x7B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
+    # python3 mixtral_8x7B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
