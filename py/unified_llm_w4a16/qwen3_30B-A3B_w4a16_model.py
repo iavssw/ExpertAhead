@@ -556,7 +556,6 @@ class Qwen3_30BA3BW4A16Model:
             input_ids = self.tokenize(input_ids)
         return self.model.forward(input_ids, start_pos)
 
-<<<<<<< HEAD
     def set_layer_correlation_constants(self, constants: List[float]):
         """Set the correlation constant (prefill bias alpha) for each layer."""
         if hasattr(self.model, "set_layer_correlation_constants"):
@@ -586,7 +585,6 @@ class Qwen3_30BA3BW4A16Model:
     def reset_predictor_stats(self):
         if hasattr(self.model, "reset_predictor_stats"):
             self.model.reset_predictor_stats()
-=======
     def perplexity(self, input_ids: Union[str, torch.Tensor]) -> dict:
         """
         Compute causal-LM perplexity for the provided sequence(s).
@@ -635,7 +633,6 @@ class Qwen3_30BA3BW4A16Model:
             "num_tokens": num_tokens,
         }
 
->>>>>>> main
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
                     max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50,
@@ -1126,7 +1123,6 @@ def main():
         help="Run prompt test case with specified token count."
     )
     parser.add_argument(
-<<<<<<< HEAD
         "--max-cached-experts",
         type=int,
         default=8,
@@ -1137,7 +1133,6 @@ def main():
         type=int,
         default=1,
         help="Number of experts to speculatively prefetch (predict backend only, default: 1)"
-=======
         "--perplexity",
         action="store_true",
         help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
@@ -1165,7 +1160,6 @@ def main():
         type=int,
         default=2048,
         help="Stride for sliding-window WikiText-2 perplexity."
->>>>>>> main
     )
 
     args = parser.parse_args()
@@ -1224,7 +1218,6 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
-<<<<<<< HEAD
     # Read all prompts from prompts.txt
     script_dir = Path(__file__).parent
     prompts_file = script_dir / "prompts.txt"
@@ -1232,7 +1225,6 @@ def main():
         with open(prompts_file, "r", encoding="utf-8") as f:
             raw_prompts = [line.strip() for line in f.readlines()]
         prompts = [p for p in raw_prompts if p]  # drop blank lines
-=======
     print(f"Processing text: '{args.text}'")
 
     if args.perplexity:
@@ -1287,7 +1279,6 @@ def main():
             import traceback
             traceback.print_exc()
             return 1
->>>>>>> main
     else:
         print(f"Warning: {prompts_file} not found, falling back to --text argument.")
         prompts = [args.text]

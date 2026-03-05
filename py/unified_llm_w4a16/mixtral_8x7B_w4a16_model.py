@@ -562,7 +562,6 @@ class Mixtral8x7BW4A16Model:
             input_ids = self.tokenize(input_ids)
         return self.model.forward(input_ids, start_pos)
 
-<<<<<<< HEAD
     def set_lambda(self, lambda_value: float, layer_idx: int = -1):
         """
         Set the router logit bias parameter (lambda).
@@ -653,7 +652,6 @@ class Mixtral8x7BW4A16Model:
         """Reset sequential top1 expert hit counters."""
         if hasattr(self.model, "reset_sequential_top1_stats"):
             self.model.reset_sequential_top1_stats()
-=======
     def perplexity(self, input_ids: Union[str, torch.Tensor]) -> dict:
         """
         Compute causal-LM perplexity for the provided sequence(s).
@@ -701,7 +699,6 @@ class Mixtral8x7BW4A16Model:
             "perplexity": float(ppl.item()),
             "num_tokens": num_tokens,
         }
->>>>>>> main
 
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
@@ -1235,7 +1232,6 @@ def main():
         help="Run prompt test case with specified token count."
     )
     parser.add_argument(
-<<<<<<< HEAD
         "--lambda-val",
         type=float,
         default=0.0,
@@ -1252,7 +1248,6 @@ def main():
         action="store_true",
         default=False,
         help="Calculate perplexity instead of generating text"
-=======
         "--perplexity",
         action="store_true",
         help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
@@ -1280,7 +1275,6 @@ def main():
         type=int,
         default=2048,
         help="Stride for sliding-window WikiText-2 perplexity."
->>>>>>> main
     )
 
     parser.add_argument(
@@ -1596,26 +1590,6 @@ def main():
     # Normal execution path (Single Text)
     print(f"Processing text: '{args.text}'")
 
-<<<<<<< HEAD
-    if args.generation_perplexity:
-        print("Calculating generation-time perplexity (using C++ backend loop)...")
-        # Reset stats before PPL so we capture only PPL phases
-        model.reset_cache_stats()
-        
-        gppl = model.calculate_generation_perplexity(args.text)
-             
-        print(f"Generation Perplexity: {gppl:.4f}")
-        
-        # Get and print cache stats
-        hits, misses = model.get_cache_stats()
-        total = hits + misses
-        hit_rate = (hits / total * 100.0) if total > 0 else 0.0
-        print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
-        
-        model.print_cache_stats()
-
-    if args.generate:
-=======
     if args.perplexity:
         print("\nRunning perplexity evaluation...")
         try:
@@ -1633,7 +1607,6 @@ def main():
             traceback.print_exc()
             return 1
     elif args.generate:
->>>>>>> main
         print(f"Generating {args.max_new_tokens} tokens...\n")
         # Reset stats before generation so we only capture generation stats
         model.reset_cache_stats()
@@ -1728,19 +1701,7 @@ def main():
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    exit_code = main()
-    try:
-        import torch
-        if torch.cuda.is_available():
-            torch.cuda.synchronize()
-            torch.cuda.empty_cache()
-    except Exception:
-        pass
-    exit(exit_code)
-=======
     exit(main())
 
     # Perplexity test for wikitext2
     # python3 mixtral_8x7B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
->>>>>>> main

@@ -7,13 +7,9 @@
     "warmup": true,
     "preload_moe_kernels": true,
     "dummy_weights": false,
-<<<<<<< HEAD
-    "debug_verbosity": 2,
-=======
     "debug_verbosity": 1,
     // -2 uses model default, -1 disables replacement, >=0 replaces expert ranks >= this index
     "random_replace_rank_start_idx": -1,
->>>>>>> main
     "usePreSavedWeights": true,
     "minimal_pdi": true,
     // Where to run the expert predictor TorchScript model:
