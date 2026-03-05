@@ -7,6 +7,7 @@
 #include <hip/hip_fp16.h>
 
 #include "hipkernels/w4a16_gemm_unpacked.hpp"
+#include <c10/hip/HIPStream.h>
 #include <hip/hip_bfloat16.h>
 #include <hip/hip_runtime.h>
 #include <rocwmma/rocwmma.hpp>
@@ -17,6 +18,7 @@ using namespace rocwmma;
 using bfloat16_t = hip_bfloat16;
 
 #include <cstdlib>
+#include <cstdint>
 #include <hipblas/hipblas.h>
 #include <iostream>
 #include <mutex>
@@ -45,9 +47,6 @@ struct DevicePtrCache {
     uint64_t *d_scales = nullptr;
     uint64_t *d_zeros = nullptr;
     int64_t size = 0;
-    const int64_t *host_q = nullptr;
-    const int64_t *host_s = nullptr;
-    const int64_t *host_z = nullptr;
 };
 
 void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweights, const std::vector<int64_t> &scales,
@@ -55,7 +54,6 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
     TORCH_CHECK(qweights.size() == scales.size() && qweights.size() == zeros.size(), "Pointer array size mismatch");
     int64_t n = static_cast<int64_t>(qweights.size());
     bool need_alloc = (!cache.d_qweights || cache.size != n);
-    bool need_copy = (need_alloc || cache.host_q != qweights.data() || cache.host_s != scales.data() || cache.host_z != zeros.data());
 
     if (need_alloc) {
         if (cache.d_qweights)
@@ -71,21 +69,23 @@ void ensure_device_ptrs(DevicePtrCache &cache, const std::vector<int64_t> &qweig
         cache.size = n;
     }
 
-    if (need_copy) {
-        HIP_CHECK(hipMemcpy(cache.d_qweights, qweights.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        HIP_CHECK(hipMemcpy(cache.d_scales, scales.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        HIP_CHECK(hipMemcpy(cache.d_zeros, zeros.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
-        cache.host_q = qweights.data();
-        cache.host_s = scales.data();
-        cache.host_z = zeros.data();
-    }
+    // Pointer vectors are often temporary and may reuse host addresses across calls
+    // with different contents. Always refresh the device-side pointer arrays.
+    HIP_CHECK(hipMemcpy(cache.d_qweights, qweights.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(cache.d_scales, scales.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(cache.d_zeros, zeros.data(), n * sizeof(uint64_t), hipMemcpyHostToDevice));
 }
 
-DevicePtrCache &gemm_ptr_cache_for_device(int device) {
-    static std::unordered_map<int, DevicePtrCache> caches;
+uint64_t make_cache_key(int device, hipStream_t stream) {
+    return (static_cast<uint64_t>(static_cast<uint32_t>(device)) << 32) ^
+           static_cast<uint64_t>(reinterpret_cast<uintptr_t>(stream));
+}
+
+DevicePtrCache &gemm_ptr_cache_for_device_stream(int device, hipStream_t stream) {
+    static std::unordered_map<uint64_t, DevicePtrCache> caches;
     static std::mutex cache_mutex;
     std::lock_guard<std::mutex> lock(cache_mutex);
-    return caches[device];
+    return caches[make_cache_key(device, stream)];
 }
 } // namespace
 
@@ -103,6 +103,7 @@ constexpr int WAVE_SIZE = 64;
 constexpr int GEMM_BLOCK_SIZE = 256;
 constexpr int WAVE_SIZE = 32;
 #endif
+constexpr bool NEED_W_ROW_GUARD = (GEMM_BLOCK_SIZE > 256);
 
 // Kernel assumes Block M=128, N=128, K_step=128
 // Grid dimensions: (N / 128), (M / 128)
@@ -135,32 +136,25 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
 
     const int groups = K / group_size;
 
+    // Invariants for this thread across all K-tiles.
+    const int w_row = tid >> 1; // 0..127 (N-index)
+    const int w_blk = tid & 1;  // 0..1 (64 K-values each)
+    const int k_base = w_blk * 64;
+    const int gn = global_n_start + w_row;
+    const bool active_n = (w_row < 128) && (gn < N);
+    const int q_row_base = active_n ? (gn * (K / 2) + w_blk * 32) : 0;
+    const int s_row_base = active_n ? (gn * groups) : 0;
+
     for (int k_outer = 0; k_outer < K; k_outer += 128) {
         int group_idx = k_outer / group_size;
 
-        // Load weights: 2 threads per N-row, each loads 64 K-values
-        int w_row = tid >> 1; // 0..127 (N-index)
-        int w_blk = tid & 1;  // 0..1 (64 K-values each)
+        if (!NEED_W_ROW_GUARD || w_row < 128) {
+            if (active_n) {
+                int idx = s_row_base + group_idx;
+                float scale = bf16_to_float(scales[idx]);
+                int zero = (int8_t)zeros[idx];
 
-        if (w_row < 128) {
-            int gn = global_n_start + w_row;
-            int k_base = w_blk * 64;
-            if (gn < N) {
-                float scale = 0.0f;
-                int zero = 0;
-                if (w_blk == 0) {
-                    int idx = gn * groups + group_idx;
-                    scale = bf16_to_float(scales[idx]);
-                    zero = (int8_t)zeros[idx];
-                }
-                float scale_peer = __shfl_xor(scale, 1);
-                int zero_peer = __shfl_xor(zero, 1);
-                if (w_blk == 1) {
-                    scale = scale_peer;
-                    zero = zero_peer;
-                }
-
-                const uint8_t *w_src_base = &qweights[gn * (K / 2) + (k_outer / 2) + w_blk * 32];
+                const uint8_t *w_src_base = &qweights[q_row_base + (k_outer / 2)];
                 const uint4 *src_u4 = reinterpret_cast<const uint4 *>(w_src_base);
                 uint4 v0 = src_u4[0];
                 uint4 v1 = src_u4[1];
@@ -262,6 +256,7 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
 
         int tid_offset = tid * 8;
         if (tid_offset < 2048) {
+#pragma unroll
             for (int k = 0; k < 8; ++k) {
                 int idx = tid_offset + k;
                 int r = idx / 64; // 0..31
@@ -318,7 +313,8 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
     // Pre-calculate invariant offsets
     int q_base_offset = 0;
     int s_base_offset = 0;
-    bool active_n = (gn < N);
+    const bool valid_w_row = (!NEED_W_ROW_GUARD || w_row < 128);
+    bool active_n = valid_w_row && (gn < N);
     const uint8_t *__restrict__ w_ptr = nullptr;
 
     if (active_n) {
@@ -335,19 +331,9 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
             int k_base = w_blk * 64;
 
             if (active_n) {
-                float scale = 0.0f;
-                int zero = 0;
-                if (w_blk == 0) {
-                    int idx = s_base_offset + group_idx;
-                    scale = bf16_to_float(scales[idx]);
-                    zero = (int8_t)zeros[idx];
-                }
-                float scale_peer = __shfl_xor(scale, 1);
-                int zero_peer = __shfl_xor(zero, 1);
-                if (w_blk == 1) {
-                    scale = scale_peer;
-                    zero = zero_peer;
-                }
+                int idx = s_base_offset + group_idx;
+                float scale = bf16_to_float(scales[idx]);
+                int zero = (int8_t)zeros[idx];
 
                 const uint4 *src_u4 = reinterpret_cast<const uint4 *>(w_ptr);
                 w_ptr += 64;
@@ -431,19 +417,9 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
             int k_base = w_blk * 64;
 
             if (active_n) {
-                float scale = 0.0f;
-                int zero = 0;
-                if (w_blk == 0) {
-                    int idx = s_base_offset + group_idx;
-                    scale = bf16_to_float(scales[idx]);
-                    zero = (int8_t)zeros[idx];
-                }
-                float scale_peer = __shfl_xor(scale, 1);
-                int zero_peer = __shfl_xor(zero, 1);
-                if (w_blk == 1) {
-                    scale = scale_peer;
-                    zero = zero_peer;
-                }
+                int idx = s_base_offset + group_idx;
+                float scale = bf16_to_float(scales[idx]);
+                int zero = (int8_t)zeros[idx];
 
                 const uint4 *src_u4 = reinterpret_cast<const uint4 *>(w_ptr);
                 w_ptr += 64;
@@ -543,6 +519,7 @@ __global__ void __launch_bounds__(GEMM_BLOCK_SIZE, 1)
 
         int tid_offset = tid * 8;
         if (tid_offset < 2048) {
+#pragma unroll
             for (int k = 0; k < 8; ++k) {
                 int idx = tid_offset + k;
                 int r = idx / 64;
@@ -572,6 +549,7 @@ void w4a16_gemm_unpacked_fused(torch::Tensor &output, const torch::Tensor &input
     // Ensure grid covers M, N with 128x128 blocks (grid.x = N, grid.y = M)
     dim3 block(GEMM_BLOCK_SIZE);
     dim3 grid((N + 127) / 128, (M + 127) / 128);
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
     static bool cache_configured = false;
     if (!cache_configured) {
@@ -582,7 +560,7 @@ void w4a16_gemm_unpacked_fused(torch::Tensor &output, const torch::Tensor &input
         cache_configured = true;
     }
 
-    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked, grid, block, 0, 0, (bfloat16_t *)output.data_ptr(),
+    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked, grid, block, 0, stream, (bfloat16_t *)output.data_ptr(),
                        (const bfloat16_t *)input.data_ptr(), qweights.data_ptr<uint8_t>(), (const bfloat16_t *)scales.data_ptr(),
                        (const uint8_t *)zeros.data_ptr(), M, K, N, group_size);
 
@@ -605,6 +583,7 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
     const int M = static_cast<int>(input.size(1));
     const int K = static_cast<int>(in_features);
     const int N = static_cast<int>(out_features);
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
     dim3 block(GEMM_BLOCK_SIZE);
     dim3 grid((N + 127) / 128, (M + 127) / 128, static_cast<uint32_t>(num_experts));
@@ -618,7 +597,7 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
         cache_configured_3d = true;
     }
 
-    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked_3d, grid, block, 0, 0, (bfloat16_t *)output.data_ptr(),
+    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked_3d, grid, block, 0, stream, (bfloat16_t *)output.data_ptr(),
                        (const bfloat16_t *)input.data_ptr(), (const uint64_t *)qweights_ptrs.data_ptr<int64_t>(),
                        (const uint64_t *)scales_ptrs.data_ptr<int64_t>(), (const uint64_t *)zeros_ptrs.data_ptr<int64_t>(), M, K, N,
                        group_size);
@@ -633,14 +612,30 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
                                   const std::vector<int64_t> &scales_ptrs, const std::vector<int64_t> &zeros_ptrs, int64_t in_features,
                                   int64_t out_features, int64_t group_size, int64_t num_experts) {
     TORCH_CHECK(input.is_cuda(), "input must be on CUDA");
+    TORCH_CHECK(input.dim() == 3, "input must be 3D [E, M, K]");
+    TORCH_CHECK(output.dim() == 3, "output must be 3D [E, M, N]");
+    TORCH_CHECK(input.size(0) == num_experts, "input E dimension mismatch: input.size(0)=", input.size(0), " num_experts=", num_experts);
+    TORCH_CHECK(output.size(0) == num_experts, "output E dimension mismatch: output.size(0)=", output.size(0), " num_experts=", num_experts);
+    TORCH_CHECK(input.size(2) == in_features, "input K dimension mismatch: input.size(2)=", input.size(2), " in_features=", in_features);
+    TORCH_CHECK(output.size(1) == input.size(1), "output M dimension mismatch: output.size(1)=", output.size(1),
+                " input.size(1)=", input.size(1));
+    TORCH_CHECK(output.size(2) == out_features, "output N dimension mismatch: output.size(2)=", output.size(2),
+                " out_features=", out_features);
+    TORCH_CHECK(static_cast<int64_t>(qweights_ptrs.size()) == num_experts, "qweights pointer count mismatch: ", qweights_ptrs.size(),
+                " vs num_experts=", num_experts);
+    TORCH_CHECK(static_cast<int64_t>(scales_ptrs.size()) == num_experts, "scales pointer count mismatch: ", scales_ptrs.size(),
+                " vs num_experts=", num_experts);
+    TORCH_CHECK(static_cast<int64_t>(zeros_ptrs.size()) == num_experts, "zeros pointer count mismatch: ", zeros_ptrs.size(),
+                " vs num_experts=", num_experts);
     const int target_device = input.get_device();
     int current_device = 0;
     HIP_CHECK(hipGetDevice(&current_device));
     if (current_device != target_device) {
         HIP_CHECK(hipSetDevice(target_device));
     }
+    hipStream_t stream = c10::hip::getCurrentHIPStream().stream();
 
-    auto &cache = gemm_ptr_cache_for_device(target_device);
+    auto &cache = gemm_ptr_cache_for_device_stream(target_device, stream);
     ensure_device_ptrs(cache, qweights_ptrs, scales_ptrs, zeros_ptrs);
 
     const int M = static_cast<int>(input.size(1));
@@ -659,12 +654,14 @@ void w4a16_gemm_unpacked_fused_3d(torch::Tensor &output, const torch::Tensor &in
         cache_configured_3d = true;
     }
 
-    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked_3d, grid, block, 0, 0, (bfloat16_t *)output.data_ptr(),
+    hipLaunchKernelGGL(w4a16_gemm_rocwmma_unpacked_3d, grid, block, 0, stream, (bfloat16_t *)output.data_ptr(),
                        (const bfloat16_t *)input.data_ptr(), cache.d_qweights, cache.d_scales, cache.d_zeros, M, K, N, group_size);
 
     hipError_t err = hipGetLastError();
     if (err != hipSuccess) {
-        throw std::runtime_error(std::string("HIP kernel 3D error: ") + hipGetErrorString(err));
+        throw std::runtime_error(std::string("HIP kernel 3D error: ") + hipGetErrorString(err) + " [M=" + std::to_string(M) +
+                                 ", K=" + std::to_string(K) + ", N=" + std::to_string(N) + ", E=" + std::to_string(num_experts) +
+                                 ", group_size=" + std::to_string(group_size) + "]");
     }
 }
 

@@ -8,9 +8,11 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_base/helper.hpp"
 #include "unified_llm_w4a16_base/npuSetup.hpp"
+#include <algorithm>
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
 #include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <hip/hip_runtime.h>
 #include <iomanip>
@@ -19,7 +21,6 @@
 #include <torch/torch.h>
 #include <unistd.h>
 #include <vector>
-#include <algorithm>
 
 namespace {
 
@@ -145,6 +146,50 @@ torch::Tensor repeat_kv(const torch::Tensor &x, int64_t n_rep) {
     // We want to repeat the heads (dim 1)
     auto expanded = x.unsqueeze(2).expand({batch, num_kv_heads, n_rep, seq_len, head_dim});
     return expanded.reshape({batch, num_kv_heads * n_rep, seq_len, head_dim});
+}
+
+int64_t positive_mod(int64_t value, int64_t mod) {
+    if (mod <= 0) {
+        return 0;
+    }
+    int64_t r = value % mod;
+    return (r < 0) ? (r + mod) : r;
+}
+
+void write_kv_ring(torch::Tensor cache_slice, const torch::Tensor &kv, int64_t start_pos, int64_t window_size) {
+    if (window_size <= 0 || kv.numel() == 0) {
+        return;
+    }
+
+    int64_t seq_len = kv.size(2);
+    int64_t tokens_to_write = std::min<int64_t>(seq_len, window_size);
+    int64_t src_start = seq_len - tokens_to_write;
+    int64_t write_head = positive_mod(start_pos + src_start, window_size);
+
+    auto ring_cache = cache_slice.narrow(2, 0, window_size);
+    int64_t first_chunk = std::min<int64_t>(tokens_to_write, window_size - write_head);
+    ring_cache.narrow(2, write_head, first_chunk).copy_(kv.narrow(2, src_start, first_chunk));
+
+    int64_t remaining = tokens_to_write - first_chunk;
+    if (remaining > 0) {
+        ring_cache.narrow(2, 0, remaining).copy_(kv.narrow(2, src_start + first_chunk, remaining));
+    }
+}
+
+torch::Tensor read_kv_window(const torch::Tensor &cache_slice, int64_t kv_len, int64_t oldest_pos, int64_t window_size) {
+    auto ring_cache = cache_slice.narrow(2, 0, window_size);
+    if (kv_len <= 0) {
+        return ring_cache.narrow(2, 0, 0);
+    }
+
+    int64_t oldest_idx = positive_mod(oldest_pos, window_size);
+    if (oldest_idx + kv_len <= window_size) {
+        return ring_cache.narrow(2, oldest_idx, kv_len);
+    }
+
+    int64_t first_chunk = window_size - oldest_idx;
+    int64_t second_chunk = kv_len - first_chunk;
+    return torch::cat({ring_cache.narrow(2, oldest_idx, first_chunk), ring_cache.narrow(2, 0, second_chunk)}, 2);
 }
 
 // Tile sizes
@@ -350,7 +395,7 @@ QuantizedLinearImpl::QuantizedLinearImpl(int64_t in_features, int64_t out_featur
 
 void QuantizedLinearImpl::forward(torch::Tensor output_buffer, torch::Tensor input, std::string layer_type) {
     // we don't care about the future for now
-    if (debug_verbosity >= 2) {
+    if (debug_verbosity >= 3) {
         std::cout << "Forward " << layer_type << " (Target: " << hw_target << ")" << std::endl;
         std::cout << "  input.device=" << input.device() << " output.device=" << output_buffer.device()
                   << " qweight.device=" << quantized_weight_.device() << " scale.device=" << scale_.device()
@@ -387,13 +432,13 @@ void QuantizedLinearImpl::forward(torch::Tensor output_buffer, torch::Tensor inp
     // Compute the GEMV or GEMM on Fused Hip Kernels
     // This does not check input padding correctly for 128 tiles sizes
     if (M == 1) {
-        if (debug_verbosity >= 2) {
+        if (debug_verbosity >= 3) {
             std::cout << "GPU Unpacked GEMV" << std::endl;
         }
         hipkernels::w4a16_gemv_unpacked_fused(output_2d, input_2d, quantized_weight_, scale_, zero_point_, in_features_, out_features_,
                                               group_size);
     } else {
-        if (debug_verbosity >= 2) {
+        if (debug_verbosity >= 3) {
             std::cout << "GPU Unpacked GEMM" << std::endl;
         }
         hipkernels::w4a16_gemm_unpacked_fused(output_2d, input_2d, quantized_weight_, scale_, zero_point_, in_features_, out_features_,
@@ -417,7 +462,7 @@ torch::Tensor QuantizedLinearImpl::forward(torch::Tensor input, std::string laye
             group_size = in_features_ / n_groups;
     }
 
-    if (debug_verbosity >= 2) {
+    if (debug_verbosity >= 3) {
         std::cout << "Forward (Allocating) " << layer_type << " (Target: " << hw_target << ")" << std::endl;
         std::cout << "  input.device=" << input.device() << " qweight.device=" << quantized_weight_.device()
                   << " scale.device=" << scale_.device() << " zeros.device=" << zero_point_.device() << std::endl;
@@ -441,14 +486,14 @@ torch::Tensor QuantizedLinearImpl::forward(torch::Tensor input, std::string laye
     auto input_2d = input.contiguous().view({-1, in_features_});
     torch::Tensor output;
     if (M == 1) {
-        if (debug_verbosity >= 2) {
+        if (debug_verbosity >= 3) {
             std::cout << "GPU Unpacked GEMV (Alloc)" << std::endl;
         }
         output = torch::empty({1, out_features_}, torch::TensorOptions().dtype(torch::kBFloat16).device(input.device()));
         hipkernels::w4a16_gemv_unpacked_fused(output, input_2d, quantized_weight_, scale_, zero_point_, in_features_, out_features_,
                                               group_size);
     } else {
-        if (debug_verbosity >= 2) {
+        if (debug_verbosity >= 3) {
             std::cout << "GPU Unpacked GEMM (Alloc)" << std::endl;
         }
 
@@ -563,10 +608,11 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 
 // MixtureOfExpertsImpl Implementation
 MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
-                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob)
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob,
+                                           int64_t random_replace_rank_start_idx)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), use_softmax_before_topk_(use_softmax_before_topk),
-      normalize_topk_prob_(normalize_topk_prob) {
+      normalize_topk_prob_(normalize_topk_prob), random_replace_rank_start_idx_(random_replace_rank_start_idx) {
     router = register_module("router", LinearMatmul(hidden_size_, num_experts_, false));
 
     gate_up_experts.reserve(num_experts_);
@@ -687,9 +733,56 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
 
 torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
                                                     const torch::Tensor &topk_idx, torch::Tensor &output) {
+    // Use original routing by default; may be replaced below.
+    torch::Tensor topk_idx_effective = topk_idx;
+    if (random_replace_rank_start_idx_ >= 0 && random_replace_rank_start_idx_ < num_experts_per_tok_) {
+        // Do index edits on CPU to avoid per-element GPU sync from repeated item()/writes.
+        auto topk_idx_cpu = topk_idx.to(torch::kCPU).contiguous();
+        auto topk_idx_acc = topk_idx_cpu.accessor<int64_t, 2>();
+        const int64_t num_tokens = topk_idx_cpu.size(0);
+        // Reuse buffers across tokens to avoid reallocating in the inner loop.
+        std::vector<uint8_t> preserved_mask(static_cast<size_t>(num_experts_), 0);
+        std::vector<int64_t> candidate_experts;
+        candidate_experts.reserve(static_cast<size_t>(num_experts_));
+
+        for (int64_t t = 0; t < num_tokens; ++t) {
+            std::fill(preserved_mask.begin(), preserved_mask.end(), 0);
+            for (int64_t p = 0; p < random_replace_rank_start_idx_; ++p) {
+                const int64_t preserved = topk_idx_acc[t][p];
+                if (preserved >= 0 && preserved < num_experts_) {
+                    preserved_mask[static_cast<size_t>(preserved)] = 1;
+                }
+            }
+
+            candidate_experts.clear();
+            for (int64_t e = 0; e < num_experts_; ++e) {
+                if (!preserved_mask[static_cast<size_t>(e)]) {
+                    candidate_experts.push_back(e);
+                }
+            }
+
+            for (int64_t k = random_replace_rank_start_idx_; k < num_experts_per_tok_; ++k) {
+                const int64_t old_expert = topk_idx_acc[t][k];
+                int64_t candidate = old_expert;
+                if (!candidate_experts.empty()) {
+                    const int64_t rand_idx = std::rand() % static_cast<int64_t>(candidate_experts.size());
+                    candidate = candidate_experts[static_cast<size_t>(rand_idx)];
+                }
+                topk_idx_acc[t][k] = candidate;
+                if (random_replace_rank_start_idx_ >= 0 && debug_verbosity >= 2) {
+                    std::cout << "[MoE Replace] token=" << t << " rank=" << k << " old_expert=" << old_expert
+                              << " new_expert=" << candidate << std::endl;
+                }
+            }
+        }
+
+        // Copy updated routing indices back to the original device.
+        topk_idx_effective = topk_idx_cpu.to(topk_idx.device(), topk_idx.scalar_type());
+    }
+
     auto opts = x_flat.options();
 
-    torch::Tensor expert_mask = torch::one_hot(topk_idx, num_experts_).to(torch::kBool);
+    torch::Tensor expert_mask = torch::one_hot(topk_idx_effective, num_experts_).to(torch::kBool);
     expert_mask = expert_mask.permute({2, 1, 0}); // [experts, top_k, tokens]
     torch::Tensor expert_hit = torch::nonzero(expert_mask.sum({1, 2}) > 0).squeeze();
 
@@ -730,6 +823,28 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
 
     int64_t actual_num_experts = expert_ids.size();
 
+    // Stable path for long prefill: avoid very large 3D MoE GEMM launches.
+    const int64_t stable_prefill_row_limit = 0;
+    if (max_rows > stable_prefill_row_limit) {
+        for (size_t i = 0; i < actual_num_experts; ++i) {
+            int64_t e = expert_ids[i];
+            auto tok_idx = token_indices[i];
+            auto expert_in = x_flat.index_select(0, tok_idx).contiguous();
+            auto weights = topk_vals.index({tok_idx, top_k_positions[i]}).to(opts.dtype());
+
+            auto gate_up = gate_up_experts[e]->forward(expert_in, "moe_gate_up");
+            auto gate_buf = gate_up.narrow(1, 0, intermediate_size_);
+            auto up_buf = gate_up.narrow(1, intermediate_size_, intermediate_size_);
+            torch::silu_(gate_buf);
+            gate_buf.mul_(up_buf);
+
+            auto down_out = down_experts[e]->forward(gate_buf.contiguous(), "moe_down");
+            down_out.mul_(weights.unsqueeze(-1));
+            output.index_add_(0, tok_idx, down_out);
+        }
+        return output;
+    }
+
     int64_t padded_M = ((max_rows + tile - 1) / tile) * tile;
 
     // Get group sizes once
@@ -746,17 +861,16 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
             down_group_size = intermediate_size_ / n_groups;
     }
 
-    // Allocate batched tensors
+    // Allocate batched input once. GEMM temporaries are chunked by rows to avoid
+    // very large single launches in long-prefill scenarios.
     auto input_batched = torch::zeros({actual_num_experts, padded_M, hidden_size_}, opts);
-    auto gate_up_batched = torch::empty({actual_num_experts, padded_M, intermediate_size_ * 2}, opts);
-    auto down_batched = torch::zeros({actual_num_experts, padded_M, hidden_size_}, opts);
 
     // Build pointer arrays and gather inputs in single loop
     std::vector<int64_t> gate_up_qw_ptrs(actual_num_experts), gate_up_s_ptrs(actual_num_experts), gate_up_z_ptrs(actual_num_experts);
     std::vector<int64_t> down_qw_ptrs(actual_num_experts), down_s_ptrs(actual_num_experts), down_z_ptrs(actual_num_experts);
 
     // For vectorized scatter: collect all token indices and weights
-    std::vector<torch::Tensor> all_token_idx, all_weights, all_down_slices;
+    std::vector<torch::Tensor> all_token_idx, all_weights;
     all_token_idx.reserve(actual_num_experts);
     all_weights.reserve(actual_num_experts);
 
@@ -777,32 +891,54 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
         all_weights.push_back(topk_vals.index({token_indices[i], top_k_positions[i]}).to(opts.dtype()));
     }
 
-    // Gate-up GEMM
-    hipkernels::w4a16_gemm_unpacked_fused_3d(gate_up_batched, input_batched, gate_up_qw_ptrs, gate_up_s_ptrs, gate_up_z_ptrs, hidden_size_,
-                                             intermediate_size_ * 2, group_size, actual_num_experts);
+    // Chunk rows to keep each 3D GEMM launch in a stable region for long prompts.
+    const int64_t gemm_row_chunk = 4096; // must be a multiple of tile (128)
+    for (int64_t row_start = 0; row_start < padded_M; row_start += gemm_row_chunk) {
+        int64_t rows_this = std::min(gemm_row_chunk, padded_M - row_start);
 
-    // Fused SiLU + mul
-    auto gate_buf = gate_up_batched.narrow(2, 0, intermediate_size_);
-    auto up_buf = gate_up_batched.narrow(2, intermediate_size_, intermediate_size_);
-    torch::silu_(gate_buf);
-    gate_buf.mul_(up_buf);
+        auto input_chunk = input_batched.narrow(1, row_start, rows_this).contiguous();
+        auto gate_up_chunk = torch::empty({actual_num_experts, rows_this, intermediate_size_ * 2}, opts);
+        auto down_chunk = torch::zeros({actual_num_experts, rows_this, hidden_size_}, opts);
 
-    // Down GEMM
-    hipkernels::w4a16_gemm_unpacked_fused_3d(down_batched, gate_buf.contiguous(), down_qw_ptrs, down_s_ptrs, down_z_ptrs,
-                                             intermediate_size_, hidden_size_, down_group_size, actual_num_experts);
+        // Gate-up GEMM
+        hipkernels::w4a16_gemm_unpacked_fused_3d(gate_up_chunk, input_chunk, gate_up_qw_ptrs, gate_up_s_ptrs, gate_up_z_ptrs, hidden_size_,
+                                                 intermediate_size_ * 2, group_size, actual_num_experts);
 
-    // Vectorized weight application and scatter
-    for (size_t i = 0; i < actual_num_experts; ++i) {
-        int64_t rows = row_counts[i];
-        auto down_slice = down_batched[i].narrow(0, 0, rows);
-        down_slice.mul_(all_weights[i].unsqueeze(-1));
-        output.index_add_(0, all_token_idx[i], down_slice);
+        // Fused SiLU + mul
+        auto gate_buf = gate_up_chunk.narrow(2, 0, intermediate_size_);
+        auto up_buf = gate_up_chunk.narrow(2, intermediate_size_, intermediate_size_);
+        torch::silu_(gate_buf);
+        gate_buf.mul_(up_buf);
+
+        // Down GEMM
+        hipkernels::w4a16_gemm_unpacked_fused_3d(down_chunk, gate_buf.contiguous(), down_qw_ptrs, down_s_ptrs, down_z_ptrs,
+                                                 intermediate_size_, hidden_size_, down_group_size, actual_num_experts);
+
+        // Apply top-k weights + scatter only for real (unpadded) rows.
+        for (size_t i = 0; i < actual_num_experts; ++i) {
+            int64_t rows = row_counts[i];
+            if (row_start >= rows) {
+                continue;
+            }
+            int64_t local_rows = std::min(rows_this, rows - row_start);
+            auto down_slice = down_chunk[i].narrow(0, 0, local_rows);
+            auto local_weights = all_weights[i].narrow(0, row_start, local_rows);
+            auto local_tokens = all_token_idx[i].narrow(0, row_start, local_rows);
+            down_slice.mul_(local_weights.unsqueeze(-1));
+            output.index_add_(0, local_tokens, down_slice);
+        }
     }
 
     return output;
 }
 
 torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
+
+    if (debug_verbosity >= 2) {
+        std::cout << "Forward MixtureOfExperts" << std::endl;
+        std::cout << "  x shape=" << x.sizes() << std::endl;
+    }
+
     auto x_flat = x.view({-1, hidden_size_});
     auto opts = x.options();
 
@@ -874,6 +1010,21 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
         num_experts_per_tok_ = (num_experts_per_tok > 0) ? num_experts_per_tok : 8;
     } else {
         throw std::runtime_error("Unsupported architecture.");
+    }
+
+    sliding_window_enabled_ = (arch_type_ == ArchitectureType::MIXTRAL);
+    sliding_window_size_ = std::min<int64_t>(4096, max_seq_len_);
+    cache_filled_ = 0;
+    if (sliding_window_size_ <= 0) {
+        sliding_window_size_ = max_seq_len_;
+    }
+    prefill_chunk_size_ = sliding_window_enabled_ ? sliding_window_size_ : max_seq_len_;
+    if (prefill_chunk_size_ <= 0) {
+        prefill_chunk_size_ = 1;
+    }
+    if (debug_verbosity >= 1 && sliding_window_enabled_) {
+        std::cout << "Sliding window enabled (size=" << sliding_window_size_ << ", prefill_chunk_size=" << prefill_chunk_size_ << ")"
+                  << std::endl;
     }
 
     // GPU placement configuration (GPU mode only): auto-select by free VRAM.
@@ -982,10 +1133,16 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                                            QuantizedLinear(num_attention_heads_ * head_dim_, hidden_size_, false, max_seq_len_, "o")));
 
         bool use_qwen_router = (arch_type_ == ArchitectureType::QWEN);
+        // -2 uses architecture default (Mixtral=1, Qwen/others=-1). Any other value overrides it from config.
+        int64_t random_replace_rank_start_idx = npu_config_.random_replace_rank_start_idx;
+        if (random_replace_rank_start_idx == -2) {
+            random_replace_rank_start_idx = (arch_type_ == ArchitectureType::MIXTRAL) ? 1 : -1;
+        }
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-            moe_layers.push_back(register_module("moe_" + std::to_string(i),
-                                                 MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router)));
+            moe_layers.push_back(
+                register_module("moe_" + std::to_string(i),
+                                MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_, max_seq_len_,
+                                                 use_qwen_router, use_qwen_router, random_replace_rank_start_idx)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
@@ -1237,11 +1394,8 @@ void UnifiedLLMW4A16Impl::preload_moe_kernels() {
         output.index_add_(0, token_idx, down_slice);
     }
 
-    // Warmup the MoE layer as well
-    if (moe_layers.size() > 0) {
-        auto router_input = torch::randn({1, 2, hidden_size_}, opts);
-        moe_layers[0]->forward(router_input);
-    }
+    // Avoid invoking full MoE forward during preload. On some runtimes this can
+    // trip a stale/async HIP error state before first real inference call.
 
     if (debug_verbosity >= 1) {
         std::cout << "MoE kernels preloaded." << std::endl;
@@ -1428,17 +1582,29 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
 
     int64_t bsz = x.size(0);
     int64_t seq_len = x.size(1);
+    int64_t active_window_size = sliding_window_enabled_ ? std::min<int64_t>(sliding_window_size_, max_seq_len_) : max_seq_len_;
+    if (active_window_size <= 0) {
+        active_window_size = max_seq_len_;
+    }
+    int64_t abs_end_pos = start_pos + seq_len;
+    int64_t kv_seq_len = std::min<int64_t>(active_window_size, abs_end_pos);
+    int64_t oldest_pos = abs_end_pos - kv_seq_len;
+    if (start_pos == 0) {
+        cache_filled_ = 0;
+    }
+    cache_filled_ = kv_seq_len;
 
     // Embedding
     x = token_embedding->forward(x);
 
-    // Create causal mask
+    // Create causal mask aligned with retained KV window [oldest_pos, abs_end_pos).
     torch::Tensor mask;
-    if (seq_len > 1) {
-        mask = torch::full({seq_len, seq_len}, -std::numeric_limits<float>::infinity(),
-                           torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
-        mask = torch::triu(mask, 1);
-        mask = torch::hstack({torch::zeros({seq_len, start_pos}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device())), mask});
+    if (seq_len > 1 && kv_seq_len > 0) {
+        auto pos_opts = torch::TensorOptions().dtype(torch::kInt64).device(x.device());
+        auto q_pos = torch::arange(start_pos, start_pos + seq_len, pos_opts).unsqueeze(1);
+        auto k_pos = torch::arange(oldest_pos, oldest_pos + kv_seq_len, pos_opts).unsqueeze(0);
+        mask = torch::zeros({seq_len, kv_seq_len}, torch::TensorOptions().dtype(torch::kFloat32).device(x.device()));
+        mask.masked_fill_(k_pos > q_pos, -std::numeric_limits<float>::infinity());
         mask = mask.to(x.dtype());
     }
 
@@ -1448,7 +1614,6 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
     auto v_buf = values_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
     auto attn_proj_buf = attn_output_proj_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
 
-    auto out_buf = output_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
     auto normed = norm_buffer.narrow(0, 0, bsz).narrow(1, 0, seq_len);
 
     for (int64_t i = 0; i < num_hidden_layers_; ++i) {
@@ -1483,15 +1648,16 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
         v = v_buf.slice(-1, 0, num_key_value_heads_ * head_dim_);
         v = v.view({bsz, seq_len, num_key_value_heads_, head_dim_});
 
-        // Cache K, V
-        auto cache_k = caches_k[i];
-        auto cache_v = caches_v[i];
-        cache_k = cache_k.narrow(2, start_pos, seq_len).copy_(k.transpose(1, 2));
-        cache_v = cache_v.narrow(2, start_pos, seq_len).copy_(v.transpose(1, 2));
+        // Cache K/V in ring-buffer layout and read back in chronological order.
+        auto k_for_cache = k.transpose(1, 2).contiguous();
+        auto v_for_cache = v.transpose(1, 2).contiguous();
+        auto cache_k = caches_k[i].narrow(0, 0, bsz);
+        auto cache_v = caches_v[i].narrow(0, 0, bsz);
+        write_kv_ring(cache_k, k_for_cache, start_pos, active_window_size);
+        write_kv_ring(cache_v, v_for_cache, start_pos, active_window_size);
 
-        // Retrieve full cache in [B, H, S, D]
-        k = caches_k[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
-        v = caches_v[i].narrow(0, 0, bsz).narrow(2, 0, start_pos + seq_len);
+        k = read_kv_window(cache_k, kv_seq_len, oldest_pos, active_window_size);
+        v = read_kv_window(cache_v, kv_seq_len, oldest_pos, active_window_size);
 
         // Expand KV heads for GQA (8 KV heads -> 32 Q heads)
         // For SDPA: Skip repeat during decoding (start_pos > 0) to use native GQA.
@@ -1516,7 +1682,7 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
         }
         if (attention_mode_ == 1) {
             // Mode 1: PyTorch SDPA
-            if (start_pos == 0 && seq_len > 1) {
+            if (start_pos == 0 && seq_len > 1 && kv_seq_len == seq_len) {
                 // First prompt pass: use native causal optimization
                 attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
             } else {
@@ -1531,9 +1697,13 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_mixtral(torch::Tensor x, int64_t star
 
         } else if (attention_mode_ == 2) {
             // Mode 2: Custom HIP Kernel
-            if (start_pos == 0 && seq_len > 1) {
-                // First prompt pass: use native causal optimization (SDPA fallback for prefill)
-                attn_output = torch::scaled_dot_product_attention(q, k, v, c10::nullopt, 0.0, true, std::nullopt, false);
+            if (seq_len > 1) {
+                // Prefill chunks use SDPA; HIP decode kernel path remains for single-token decoding.
+                c10::optional<torch::Tensor> opt_mask;
+                if (mask.defined() && mask.numel() > 0) {
+                    opt_mask = mask.unsqueeze(0).unsqueeze(0).to(q.dtype());
+                }
+                attn_output = torch::scaled_dot_product_attention(q, k, v, opt_mask, 0.0, false, std::nullopt, true);
             } else {
                 // Decoding phase: use Custom HIP Kernel
                 int batch_size = q.size(0);
@@ -1922,6 +2092,17 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     this->eval();
     torch::NoGradGuard no_grad;
     const bool should_sync_device = input_ids.is_cuda();
+    const int64_t prefill_chunk_size = std::max<int64_t>(1, prefill_chunk_size_);
+
+    auto run_prefill_chunks = [&](const torch::Tensor &prompt_tokens) {
+        torch::Tensor local_output;
+        int64_t total_len = prompt_tokens.size(1);
+        for (int64_t chunk_start = 0; chunk_start < total_len; chunk_start += prefill_chunk_size) {
+            int64_t chunk_len = std::min<int64_t>(prefill_chunk_size, total_len - chunk_start);
+            local_output = forward(prompt_tokens.narrow(1, chunk_start, chunk_len), chunk_start);
+        }
+        return local_output;
+    };
 
     // Warmup cycle
     if (warmup_) {
@@ -1929,7 +2110,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
         int warm_up = 1;
         // Prefill warmup
         for (int i = 0; i < warm_up; i++) {
-            forward(input_ids, start_pos);
+            run_prefill_chunks(input_ids);
         }
 
         // M=1 Warmup (Single token generation after prefill)
@@ -1953,8 +2134,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
         torch::cuda::synchronize();
     }
     auto start_prefill = std::chrono::high_resolution_clock::now();
-
-    output = forward(input_ids, start_pos);
+    output = run_prefill_chunks(input_ids);
 
     if (should_sync_device) {
         torch::cuda::synchronize();
