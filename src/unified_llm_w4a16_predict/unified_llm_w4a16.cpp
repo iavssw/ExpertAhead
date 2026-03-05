@@ -120,8 +120,6 @@ GpuSelectionInfo select_gpus_by_free_vram(int requested_gpu_count, int available
 //
 // Strategy:
 //  1. <base>/layer_<i>/embedding_predictor_best.pt  (flat layout)
-//  2. <base>/layer_<i>/<any subdir>/embedding_predictor_best.pt
-//     e.g. <base>/layer_<i>/hidden_1024/embedding_predictor_best.pt
 //
 // Returns the first path that exists, or empty string if none found.
 // ---------------------------------------------------------------------------
@@ -141,18 +139,6 @@ static std::string find_predictor_model_path(const std::string& base_dir, int64_
             return direct.string();
         }
 
-        // 2. One level of subdirectories: base/layer_X/<subdir>/best_jit.pt(h)
-        std::error_code ec;
-        if (fs::is_directory(layer_dir, ec)) {
-            for (const auto& entry : fs::directory_iterator(layer_dir, ec)) {
-                if (entry.is_directory()) {
-                    fs::path candidate = entry.path() / kModelFile;
-                    if (fs::exists(candidate)) {
-                        return candidate.string();
-                    }
-                }
-            }
-        }
     }
 
     return "";  // Not found
@@ -628,12 +614,7 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
 
     if (!predictor_model_path.empty()) {
         try {
-            if (predictor_model_path == "random") {
-                predictor_ = std::make_unique<RandomExpertPredictor>(num_experts_);
-                std::cout << "Initialized RandomExpertPredictor" << std::endl;
-            } else {
-                predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
-            }
+            predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
         } catch (const std::exception& e) {
             std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
         }
