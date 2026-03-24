@@ -156,6 +156,8 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
         .def("load_quantized_weights_from_bins", &UnifiedLLMW4A16Impl::load_quantized_weights_from_bins, py::arg("weights_dir"))
         .def("set_lambda", &UnifiedLLMW4A16Impl::set_lambda, py::arg("lambda"), py::arg("layer_idx") = -1)
         .def("get_lambda", &UnifiedLLMW4A16Impl::get_lambda, py::arg("layer_idx") = 0)
+        .def("set_forced_top_n", &UnifiedLLMW4A16Impl::set_forced_top_n, py::arg("n"))
+        .def("set_random_fill_mode", &UnifiedLLMW4A16Impl::set_random_fill_mode, py::arg("on"))
         .def("calculate_generation_perplexity", &UnifiedLLMW4A16Impl::calculate_generation_perplexity, py::arg("input_ids"))
         .def("print_cache_stats", &UnifiedLLMW4A16Impl::print_cache_stats)
         .def("reset_cache_stats", &UnifiedLLMW4A16Impl::reset_cache_stats)

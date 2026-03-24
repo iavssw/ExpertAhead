@@ -77,9 +77,10 @@ def run_subprocess(cmd, timeout=300):
         return None
 
 def parse_cache_stats(output):
-    """Parse cache hits, misses, and hit rate from output. Also looks for Predictor Stats."""
+    """Parse cache hits, misses, and hit rate from output. Also looks for Predictor Stats and Bandwidth."""
     cache_hits, cache_misses, cache_rate = None, None, None
     pred_hits, pred_total, pred_rate = None, None, None
+    stall_loads, prefetch_loads, avg_load_ms = None, None, None
     
     match = re.search(r"Cache Stats: Hits=(\d+), Misses=(\d+), HitRate=([\d\.]+)%", output)
     if match:
@@ -88,18 +89,22 @@ def parse_cache_stats(output):
     pred_match = re.search(r"Predictor Stats: Hits=(\d+), Total=(\d+), HitRate=([\d\.]+)%", output)
     if pred_match:
         pred_hits, pred_total, pred_rate = int(pred_match.group(1)), int(pred_match.group(2)), float(pred_match.group(3))
+
+    bw_match = re.search(r"Bandwidth: StallLoads=(\d+),\s*PrefetchLoads=(\d+),\s*AvgLoadTime=([\d\.]+)ms", output)
+    if bw_match:
+        stall_loads, prefetch_loads, avg_load_ms = int(bw_match.group(1)), int(bw_match.group(2)), float(bw_match.group(3))
         
-    return cache_hits, cache_misses, cache_rate, pred_hits, pred_total, pred_rate
+    return cache_hits, cache_misses, cache_rate, pred_hits, pred_total, pred_rate, stall_loads, prefetch_loads, avg_load_ms
 
 def run_sweep():
     parser = argparse.ArgumentParser(description="Sweep 'cached' vs 'predict' backends with different lambda values.")
     parser.add_argument("--lambdas", type=float, nargs="+", default=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0], help="List of lambda values to test")
     parser.add_argument("--cache-size", type=int, nargs="+", default=[2], help="Cache sizes (key per layer) to use for both backends")
-    parser.add_argument("--predictor-path", type=str, default="/home/michael/heteroPredict/trainingData/mixtral_8x7b/best/eh1_h64", help="Path to predictor models base directory")
+    parser.add_argument("--predictor-path", type=str, default="/home/michael/heteroPredict/trainingData/mixtral_8x7b/sweep_3_5", help="Path to predictor models base directory")
     parser.add_argument("--dataset", type=str, choices=["default", "fineweb", "orca", "wikitext", "txt"], default="default", help="Dataset to use")
     parser.add_argument("--predictor-device", type=str, default="gpu", choices=["gpu", "cpu", "auto"],
                         help="Device for predictor inference: 'gpu' (default), 'cpu' (NPU path on Strix), 'auto'")
-    parser.add_argument("--num-prompts", type=int, default=1, help="Number of prompts to evaluate")
+    parser.add_argument("--num-prompts", type=int, default=5, help="Number of prompts to evaluate")
     parser.add_argument("--max-new-tokens", type=int, default=30, help="Max new tokens for generation mode")
     parser.add_argument("--text", type=str, default=None, help="Text for single prompt mode")
     parser.add_argument("--mode", type=str, choices=["perplexity", "generation", "both"], default="generation",
@@ -107,13 +112,25 @@ def run_sweep():
     parser.add_argument("--prefetch-count", type=int, nargs="+", default=[1], help="Number of predicted experts to prefetched.")
     parser.add_argument("--expert-correlation-csv", type=str, default=None, help="Path to CSV containing layer correlation multipliers.")
     parser.add_argument("--plot-only", action="store_true", help="Just plot the results from sweep_predict_vs_cached_results.csv")
+    parser.add_argument(
+        "--backends", type=str, nargs="+", default=["cached", "predict"], choices=["cached", "predict"],
+        help="Which backends to sweep (default: both)."
+    )
+    parser.add_argument(
+        "--model", type=str, default="mixtral", choices=["mixtral", "qwen"],
+        help="Model to sweep: 'mixtral' (default) or 'qwen'."
+    )
+    parser.add_argument(
+        "--forced-top-n", type=int, default=0,
+        help="(cached backend) Force the top-N unbiased experts into the cache mask every step. 0 = disabled."
+    )
 
     parser.add_argument(
-        "--predict-layers",
-        type=int,
+        "--predict-layer-subsets",
+        type=str,
         nargs="+",
-        default=None,
-        help="List of layer indices to enable the predictor (e.g. 0 1 2 3). If omitted, predicts all layers."
+        default=["all"],
+        help="List of layer subsets to sweep over. Use 'all' for all layers, or comma commands like '0,1,2' '0,2,4,6'. Default is ['all']."
     )
     parser.add_argument(
         "--subprocess-timeout",
@@ -181,21 +198,27 @@ def run_sweep():
 
     print(f"Sweeping {len(prompts)} prompt(s).")
     print(f"Mode: {args.mode}")
-    print(f"Backends: ['cached', 'predict']")
+    print(f"Backends: {args.backends}")
     print(f"Cache Sizes: {args.cache_size}")
     print(f"Lambdas: {args.lambdas}")
     print(f"Prefetch Counts: {args.prefetch_count}")
     print(f"Predictor Path: {args.predictor_path}")
     print(f"Subprocess Timeout: {args.subprocess_timeout}s")
+    print(f"Layer Subsets: {args.predict_layer_subsets}")
 
     results = []
-    script_path = os.path.join(os.path.dirname(__file__), "mixtral_8x7B_w4a16_model.py")
+    script_path = os.path.join(
+        os.path.dirname(__file__),
+        "../unified_llm_w4a16/"
+        + ("qwen3_30B-A3B_w4a16_model.py" if args.model == "qwen" else "mixtral_8x7B_w4a16_model.py")
+    )
 
     # Define configurations
-    configs = [
-        {"name": "Cached (LRU)", "backend": "cached", "predictor": ""},
-        {"name": "Predict (Spec)", "backend": "predict", "predictor": args.predictor_path}
-    ]
+    configs = []
+    if "cached" in args.backends:
+        configs.append({"name": "Cached (LRU)", "backend": "cached", "predictor": ""})
+    if "predict" in args.backends:
+        configs.append({"name": "Predict (Spec)", "backend": "predict", "predictor": args.predictor_path})
 
     import tempfile
     temp_prompts_fd, temp_prompts_path = tempfile.mkstemp(suffix=".json")
@@ -203,29 +226,39 @@ def run_sweep():
         json.dump(prompts, f)
 
     # Header
-    print("-" * 135)
+    print("-" * 165)
     if args.mode == "perplexity":
-        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Gen PPL':<10} | {'Hit Rate':<10} | {'Pred Rate':<10}")
+        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Layers':<15} | {'Gen PPL':<10} | {'Hit Rate':<10} | {'Pred Rate':<10} | {'Stalls':<8} | {'AvgLoad':<10}")
     elif args.mode == "generation":
-        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'TPS':<10} | {'Hit Rate':<10} | {'Pred Rate':<10}")
+        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Layers':<15} | {'TPS':<10} | {'Hit Rate':<10} | {'Pred Rate':<10} | {'Stalls':<8} | {'AvgLoad':<10}")
     else:
-        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Gen PPL':<10} | {'TPS':<10} | {'Hit Rate':<10} | {'Pred Rate':<10}")
-    print("-" * 135)
+        print(f"{'Cache':<6} | {'Prefetch':<8} | {'Lambda':<8} | {'Backend':<16} | {'Layers':<15} | {'Gen PPL':<10} | {'TPS':<10} | {'Hit Rate':<10} | {'Pred Rate':<10} | {'Stalls':<8} | {'AvgLoad':<10}")
+    print("-" * 165)
 
     for cache_size in args.cache_size:
         for prefetch_count in args.prefetch_count:
             for lambda_val in args.lambdas:
-                for config in configs:
-                    backend_name = config["backend"]
-                    if backend_name == "cached" and prefetch_count != args.prefetch_count[0]:
-                        continue
-                    if backend_name == "predict" and prefetch_count > cache_size:
-                        continue
-                    
-                    predictor = config["predictor"]
-                    display_name = config["name"]
-        
-                    print(f"\n{'='*30} Run: Cache={cache_size}, Prefetch={prefetch_count}, Lambda={lambda_val}, Backend={display_name} {'='*30}")
+                for layer_subset_str in args.predict_layer_subsets:
+                    for config in configs:
+                        backend_name = config["backend"]
+                        if backend_name == "cached" and prefetch_count != args.prefetch_count[0]:
+                            continue
+                        if backend_name == "cached" and layer_subset_str != args.predict_layer_subsets[0]:
+                            # Cached backend doesn't care about predict layers, so don't re-run it
+                            continue
+                        if backend_name == "predict" and prefetch_count > cache_size:
+                            continue
+                        
+                        predictor = config["predictor"]
+                        display_name = config["name"]
+                        
+                        layer_subset_name = layer_subset_str
+                        parsed_predict_layers = None
+                        if layer_subset_str.lower() != "all":
+                            parsed_predict_layers = [int(x.strip()) for x in layer_subset_str.split(",") if x.strip()]
+                            layer_subset_name = layer_subset_str
+            
+                        print(f"\n{'='*25} Run: Cache={cache_size}, Prefetch={prefetch_count}, Lambda={lambda_val}, Layers={layer_subset_name}, Backend={display_name} {'='*25}")
         
                     # Aggregate stats across prompts
                     total_ppl = 0.0
@@ -236,6 +269,10 @@ def run_sweep():
                     total_misses = 0
                     total_pred_hits = 0
                     total_pred_total = 0
+                    total_stall_loads = 0
+                    total_prefetch_loads = 0
+                    sum_avg_load_ms = 0.0
+                    valid_load_stats_count = 0
         
                     # --- PHASE 1: PERPLEXITY ---
                     if args.mode in ["perplexity", "both"]:
@@ -244,22 +281,21 @@ def run_sweep():
                             sys.executable, script_path,
                             "--backend", backend_name,
                             "--device", "cuda",
-                            "--expert-cache", str(cache_size),
                             "--lambda-val", str(lambda_val),
                             "--sweep-prompts-file", temp_prompts_path,
                             "--generation-perplexity",
                             "--no-generate"
                         ]
+                        
+                        cmd.extend(["--max-cached-experts" if args.model == "qwen" else "--expert-cache", str(cache_size)])
+                        cmd.extend(["--prefetch-experts-count", str(prefetch_count)])
                         if predictor:
                             cmd.extend(["--predictor-model", predictor])
-                        if backend_name == "predict":
-                            cmd.extend([
-                                "--predictor-device", args.predictor_device,
-                                "--prefetch-experts-count", str(prefetch_count)
-                            ])
-                            if args.predict_layers is not None:
+                            if parsed_predict_layers is not None:
                                 cmd.append("--predict-layers")
-                                cmd.extend(map(str, args.predict_layers))
+                                cmd.extend(map(str, parsed_predict_layers))
+                        if args.forced_top_n > 0:
+                            cmd.extend(["--forced-top-n", str(args.forced_top_n)])
                         
                         if args.expert_correlation_csv:
                             cmd.extend(["--expert-correlation-csv", args.expert_correlation_csv])
@@ -271,13 +307,18 @@ def run_sweep():
                             if ppl_match:
                                 total_ppl = float(ppl_match.group(1))
                                 valid_ppl_count = 1
-                            hits, misses, _, phits, ptotal, _ = parse_cache_stats(output)
+                            hits, misses, _, phits, ptotal, _, stall, prefetch, avg_ms = parse_cache_stats(output)
                             if hits is not None:
                                 total_hits += hits
                                 total_misses += misses
                             if phits is not None:
                                 total_pred_hits += phits
                                 total_pred_total += ptotal
+                            if stall is not None:
+                                total_stall_loads += stall
+                                total_prefetch_loads += prefetch
+                                sum_avg_load_ms += avg_ms
+                                valid_load_stats_count += 1
 
                     # --- PHASE 2: GENERATION (TPS) ---
                     if args.mode in ["generation", "both"]:
@@ -286,22 +327,21 @@ def run_sweep():
                             sys.executable, script_path,
                             "--backend", backend_name,
                             "--device", "cuda",
-                            "--expert-cache", str(cache_size),
                             "--lambda-val", str(lambda_val),
                             "--sweep-prompts-file", temp_prompts_path,
                             "--generate",
                             "--max-new-tokens", str(args.max_new_tokens)
                         ]
+                        
+                        cmd.extend(["--max-cached-experts" if args.model == "qwen" else "--expert-cache", str(cache_size)])
+                        cmd.extend(["--prefetch-experts-count", str(prefetch_count)])
                         if predictor:
                             cmd.extend(["--predictor-model", predictor])
-                        if backend_name == "predict":
-                            cmd.extend([
-                                "--predictor-device", args.predictor_device,
-                                "--prefetch-experts-count", str(prefetch_count)
-                            ])
-                            if args.predict_layers is not None:
+                            if parsed_predict_layers is not None:
                                 cmd.append("--predict-layers")
-                                cmd.extend(map(str, args.predict_layers))
+                                cmd.extend(map(str, parsed_predict_layers))
+                        if args.forced_top_n > 0:
+                            cmd.extend(["--forced-top-n", str(args.forced_top_n)])
                         
                         if args.expert_correlation_csv:
                             cmd.extend(["--expert-correlation-csv", args.expert_correlation_csv])
@@ -313,13 +353,18 @@ def run_sweep():
                             if tps_match:
                                 total_tps = float(tps_match.group(1))
                                 valid_tps_count = 1
-                            hits, misses, _, phits, ptotal, _ = parse_cache_stats(output)
+                            hits, misses, _, phits, ptotal, _, stall, prefetch, avg_ms = parse_cache_stats(output)
                             if hits is not None:
                                 total_hits += hits
                                 total_misses += misses
                             if phits is not None:
                                 total_pred_hits += phits
                                 total_pred_total += ptotal
+                            if stall is not None:
+                                total_stall_loads += stall
+                                total_prefetch_loads += prefetch
+                                sum_avg_load_ms += avg_ms
+                                valid_load_stats_count += 1
 
                     # Average results
                     avg_ppl = total_ppl / valid_ppl_count if valid_ppl_count > 0 else None
@@ -328,15 +373,21 @@ def run_sweep():
                     hit_rate = (total_hits / total_reqs * 100.0) if total_reqs > 0 else None
                     pred_rate = (total_pred_hits / total_pred_total * 100.0) if total_pred_total > 0 else None
 
+                    avg_load_ms = sum_avg_load_ms / valid_load_stats_count if valid_load_stats_count > 0 else None
+
                     result = {
                         "cache_size": cache_size,
                         "prefetch_count": prefetch_count if backend_name == "predict" else None,
+                        "layers": layer_subset_name if backend_name == "predict" else "all",
                         "lambda": lambda_val,
                         "backend": display_name,
                         "gen_perplexity": avg_ppl,
                         "hit_rate": hit_rate,
                         "tokens_per_second": avg_tps,
-                        "pred_rate": pred_rate
+                        "pred_rate": pred_rate,
+                        "stall_loads": total_stall_loads,
+                        "prefetch_loads": total_prefetch_loads,
+                        "avg_load_ms": avg_load_ms
                     }
                     results.append(result)
 
@@ -345,18 +396,20 @@ def run_sweep():
                     tps_str = f"{avg_tps:.4f}" if avg_tps is not None else "N/A"
                     rate_str = f"{hit_rate:.2f}%" if hit_rate is not None else "N/A"
                     prate_str = f"{pred_rate:.2f}%" if pred_rate is not None else "N/A"
+                    stall_str = str(total_stall_loads) if total_stall_loads is not None else "N/A"
+                    avg_ld_str = f"{avg_load_ms:.2f}ms" if avg_load_ms is not None else "0.00ms"
                     
-                    print("-" * 135)
+                    print("-" * 165)
                     if args.mode == "perplexity":
-                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {ppl_str:<10} | {rate_str:<10} | {prate_str:<10}")
+                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {layer_subset_name:<15} | {ppl_str:<10} | {rate_str:<10} | {prate_str:<10} | {stall_str:<8} | {avg_ld_str:<10}")
                     elif args.mode == "generation":
-                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {tps_str:<10} | {rate_str:<10} | {prate_str:<10}")
+                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {layer_subset_name:<15} | {tps_str:<10} | {rate_str:<10} | {prate_str:<10} | {stall_str:<8} | {avg_ld_str:<10}")
                     else:
-                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {ppl_str:<10} | {tps_str:<10} | {rate_str:<10} | {prate_str:<10}")
+                        print(f"{cache_size:<6} | {prefetch_count:<8} | {lambda_val:<8} | {display_name:<16} | {layer_subset_name:<15} | {ppl_str:<10} | {tps_str:<10} | {rate_str:<10} | {prate_str:<10} | {stall_str:<8} | {avg_ld_str:<10}")
 
                     sys.stdout.flush()
 
-    print("-" * 135)
+    print("-" * 165)
 
     try:
         os.remove(temp_prompts_path)
@@ -397,7 +450,8 @@ def generate_plots(df, mode):
         lbl = str(row['backend'])
         if "Predict" in lbl:
             p_val = "N/A" if pd.isna(row.get('prefetch_count')) else int(row['prefetch_count'])
-            lbl += f" (C={int(row['cache_size'])}, P={p_val})"
+            l_val = row.get('layers', 'all')
+            lbl += f" (C={int(row['cache_size'])}, P={p_val}, L={l_val})"
         else:
             lbl += f" (C={int(row['cache_size'])})"
         return lbl

@@ -163,6 +163,14 @@ PYBIND11_MODULE(unified_llm_w4a16_cached_libtorch, m) {
              "layer_idx=-1 sets for all layers, otherwise sets for specific layer.")
         .def("get_lambda", &UnifiedLLMW4A16Impl::get_lambda, py::arg("layer_idx") = 0,
              "Get lambda parameter for specified layer")
+        .def("set_forced_top_n", &UnifiedLLMW4A16Impl::set_forced_top_n, py::arg("n"),
+             "Set how many unbiased top-K experts are forced into the cache bias mask (default 1)")
+        .def("set_prefill_top_n", &UnifiedLLMW4A16Impl::set_prefill_top_n, py::arg("n"),
+             "Lock the top n most used experts from prefill into the cache under PREFILL policy.")
+        .def("set_random_fill_mode", &UnifiedLLMW4A16Impl::set_random_fill_mode, py::arg("on"),
+             "Experiment mode: keep top forced_top_n correct experts; fill remaining slots with random experts")
+        .def("set_cache_policy", &UnifiedLLMW4A16Impl::set_cache_policy, py::arg("policy_name"), py::arg("layer_idx") = -1,
+             "Set the eviction policy for the expert cache (e.g., 'LRU', 'LFU', 'CLOCK', etc.)")
         .def("print_cache_stats", &UnifiedLLMW4A16Impl::print_cache_stats,
              "Print cache hits and misses statistics for all layers")
         .def("reset_cache_stats", &UnifiedLLMW4A16Impl::reset_cache_stats,

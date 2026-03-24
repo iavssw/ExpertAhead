@@ -1,0 +1,5 @@
+cache_hit_rate,cache_size,gen_ppl,lambda,policy,tps
+27.42,2,13.2951,0.0,LRU,0.6181
+53.83,4,13.2951,0.0,LRU,0.9415
+26.29,2,13.2951,0.0,PREFILL,0.7308
+53.39,4,13.2951,0.0,PREFILL,0.9807

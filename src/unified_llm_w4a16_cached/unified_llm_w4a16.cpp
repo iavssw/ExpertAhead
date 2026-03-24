@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <vector>
 #include <algorithm>
+#include <random>
 
 namespace {
 
@@ -585,9 +586,10 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     // Initialize cache bitmask
     expert_cache_bitmask_.assign(num_experts_, 0);
     
-    // Initialize LRU order (initially 0, 1, 2, ..., max-1)
+    // Initialize cache slots metadata
+    slot_meta_.resize(max_cached_experts_);
     for (size_t i = 0; i < max_cached_experts_; ++i) {
-        expert_lru_order_.push_back(i);
+        slot_meta_[i].expert_id = -1;
     }
 
     gate_up_experts.reserve(max_cached_experts_);
@@ -612,62 +614,139 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
 }
 
 int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
+    ++access_clock_;
+
     // Check if we should force a cache miss
     static const char* force_miss_env = std::getenv("FORCE_EXPERT_MISS");
     static bool force_miss = force_miss_env && std::string(force_miss_env) == "1";
 
     if (!force_miss) {
         // Linear scan of slots to find if expert is already loaded
-        for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
-            if (expert_slots_indices[s] == global_expert_idx) {
-                if (update_stats) {
-                    cache_hits_++;
-                }
-                // Hit: Move slot 's' to the back of the LRU vector (Mark as MRU)
-                // We search for 's' in the LRU order list
-                for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
-                    if (*it == s) {
-                        expert_lru_order_.erase(it);
-                        expert_lru_order_.push_back(s);
-                        break;
-                    }
-                }
+        for (size_t s = 0; s < slot_meta_.size(); ++s) {
+            if (slot_meta_[s].expert_id == global_expert_idx) {
+                if (update_stats) cache_hits_++;
+                slot_meta_[s].access_count++;
+                slot_meta_[s].last_access = access_clock_;
+                slot_meta_[s].clock_bit = 1;  // used recently (CLOCK)
                 return s;
             }
         }
     }
     
-    if (update_stats) {
-        cache_misses_++;
-    }
-    if (expert_lru_order_.empty()) {
+    if (update_stats) cache_misses_++;
+    
+    if (slot_meta_.empty()) {
         throw std::runtime_error(
             "MixtureOfExperts: cache miss on layer " + std::to_string(layer_idx_) +
             " but max_cached_experts_per_layer=0. Please pass a non-zero --max-cached-experts value.");
     }
-    size_t lru_slot = expert_lru_order_[0];
-    expert_lru_order_.erase(expert_lru_order_.begin());
+
+    size_t victim = pick_victim();
     
     // Load new expert into the evicted slot
-    load_expert_weights(lru_slot, global_expert_idx, weights_dir_);
+    load_expert_weights(victim, global_expert_idx, weights_dir_);
     // Ensure weights are fully on device before usage (critical for cache=2 and generation perplexity)
     (void)hipDeviceSynchronize();
     
-    // Update slot mapping and mark as MRU
-    expert_slots_indices[lru_slot] = global_expert_idx;
-    expert_lru_order_.push_back(lru_slot);
+    // Update slot metadata
+    slot_meta_[victim].expert_id = global_expert_idx;
+    slot_meta_[victim].access_count = 1;
+    slot_meta_[victim].last_access = access_clock_;
+    slot_meta_[victim].clock_bit = 1;
+    expert_slots_indices[victim] = global_expert_idx; // keep array in sync for legacy users
     
     // Update cache bitmask to reflect currently loaded experts
     if (expert_cache_bitmask_.size() == num_experts_) {
         std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
-        for (auto eid : expert_slots_indices) {
+        for (size_t i = 0; i < slot_meta_.size(); ++i) {
+            int64_t eid = slot_meta_[i].expert_id;
             if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
                 expert_cache_bitmask_[eid] = 1;
             }
         }
     }
     
-    return lru_slot;
+    return victim;
+}
+
+size_t MixtureOfExpertsImpl::pick_victim() {
+    // First, fill any empty slots before evicting anything
+    for (size_t s = 0; s < slot_meta_.size(); ++s) {
+        if (slot_meta_[s].expert_id == -1) return s;
+    }
+
+    switch (cache_policy_) {
+        case CachePolicy::LRU:    return pick_lru();
+        case CachePolicy::MRU:    return pick_mru();
+        case CachePolicy::LFU:    return pick_lfu();
+        case CachePolicy::MFU:    return pick_mfu();
+        case CachePolicy::CLOCK:  return pick_clock();
+        case CachePolicy::RANDOM: return pick_random();
+        case CachePolicy::LFRU:   return pick_lfru();
+        case CachePolicy::PREFILL:return pick_lru();
+        default:                  return pick_lru();
+    }
+}
+
+size_t MixtureOfExpertsImpl::pick_lru() {
+    size_t victim = 0;
+    uint64_t oldest = std::numeric_limits<uint64_t>::max();
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (cache_policy_ == CachePolicy::PREFILL) {
+            if (std::find(locked_experts_.begin(), locked_experts_.end(), slot_meta_[i].expert_id) != locked_experts_.end()) continue;
+        }
+        if (slot_meta_[i].last_access < oldest) {
+            oldest = slot_meta_[i].last_access;
+            victim = i;
+        }
+    }
+    return victim;
+}
+
+size_t MixtureOfExpertsImpl::pick_mru() {
+    return std::max_element(slot_meta_.begin(), slot_meta_.end(),
+        [](const auto& a, const auto& b){ return a.last_access < b.last_access; })
+        - slot_meta_.begin();
+}
+
+size_t MixtureOfExpertsImpl::pick_lfu() {
+    return std::min_element(slot_meta_.begin(), slot_meta_.end(),
+        [](const auto& a, const auto& b){ return a.access_count < b.access_count; })
+        - slot_meta_.begin();
+}
+
+size_t MixtureOfExpertsImpl::pick_mfu() {
+    return std::max_element(slot_meta_.begin(), slot_meta_.end(),
+        [](const auto& a, const auto& b){ return a.access_count < b.access_count; })
+        - slot_meta_.begin();
+}
+
+size_t MixtureOfExpertsImpl::pick_clock() {
+    while (true) {
+        auto& m = slot_meta_[clock_hand_];
+        if (m.clock_bit == 0) {
+            size_t victim = clock_hand_;
+            clock_hand_ = (clock_hand_ + 1) % slot_meta_.size();
+            return victim;
+        }
+        m.clock_bit = 0;  // give a second chance
+        clock_hand_ = (clock_hand_ + 1) % slot_meta_.size();
+    }
+}
+
+size_t MixtureOfExpertsImpl::pick_random() {
+    static std::mt19937 rng(42);
+    std::uniform_int_distribution<size_t> dist(0, slot_meta_.size() - 1);
+    return dist(rng);
+}
+
+size_t MixtureOfExpertsImpl::pick_lfru() {
+    return std::min_element(slot_meta_.begin(), slot_meta_.end(),
+        [&](const auto& a, const auto& b) {
+            double score_a = (double)a.access_count / (access_clock_ - a.last_access + 1);
+            double score_b = (double)b.access_count / (access_clock_ - b.last_access + 1);
+            return score_a < score_b;
+        }) - slot_meta_.begin();
 }
 
 torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
@@ -812,6 +891,26 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
     for (const auto& [eid, tokens] : expert_to_tokens) {
         experts_to_process.push_back(eid);
     }
+    
+    // PREFILL Cache Policy logic
+    if (cache_policy_ == CachePolicy::PREFILL) {
+        std::vector<std::pair<int64_t, int64_t>> expert_counts;
+        for (const auto& [eid, tokens] : expert_to_tokens) {
+            expert_counts.push_back({eid, tokens.size()});
+        }
+        std::sort(expert_counts.begin(), expert_counts.end(), [](const auto& a, const auto& b){
+            if (a.second != b.second) return a.second > b.second;
+            return a.first < b.first;
+        });
+        
+        locked_experts_.clear();
+        int64_t n_lock = prefill_top_n_ > 0 ? prefill_top_n_ : max_cached_experts_;
+        for (size_t i = 0; i < std::min((size_t)n_lock, expert_counts.size()); ++i) {
+            locked_experts_.push_back(expert_counts[i].first);
+            ensure_expert_cached(expert_counts[i].first, false);
+        }
+    }
+
     std::sort(experts_to_process.begin(), experts_to_process.end());
     
     // Process expert-by-expert (like mixtral_torch), but batch tokens for each expert
@@ -873,8 +972,49 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
 
     // ============== Router Logit Modification (Lambda Parameter) ==============
     torch::Tensor topk_vals, topk_idx;
-    
-    if (std::abs(lambda_) > 1e-9) {  // Only apply if lambda is non-zero
+
+    // ---- EXPERIMENT MODE: random_fill_mode_ runs independently of lambda ----
+    // Keep the top forced_top_n_ unbiased experts; fill remaining slots with
+    // randomly selected experts. This must bypass the lambda branch entirely so
+    // the experiment is not contaminated by cache-bias routing.
+    if (random_fill_mode_) {
+        int64_t n_keep = std::min(forced_top_n_, num_experts_per_tok_);
+        int64_t n_rand = num_experts_per_tok_ - n_keep;
+        int64_t num_tokens = x_flat.size(0);  // 1 for generation, >1 for prefill
+
+        if (n_keep > 0) {
+            auto real_topk_result = router_out.topk(n_keep, /*dim=*/-1);
+            auto real_idx = std::get<1>(real_topk_result);  // [num_tokens, n_keep]
+
+            if (n_rand > 0) {
+                // Expand rand_idx to [num_tokens, n_rand] so cat works for both
+                // generation (num_tokens=1) and prefill (num_tokens>1).
+                auto rand_perm = torch::randperm(num_experts_,
+                    torch::TensorOptions().device(router_out.device()).dtype(torch::kLong));
+                auto rand_idx = rand_perm.slice(0, 0, n_rand)
+                                         .unsqueeze(0)
+                                         .expand({num_tokens, n_rand})
+                                         .contiguous();         // [num_tokens, n_rand]
+                topk_idx = torch::cat({real_idx, rand_idx}, /*dim=*/-1);  // [num_tokens, K]
+            } else {
+                topk_idx = real_idx;
+            }
+        } else {
+            // n_keep == 0: all slots are random, shape [num_tokens, K]
+            auto rand_perm = torch::randperm(num_experts_,
+                torch::TensorOptions().device(router_out.device()).dtype(torch::kLong));
+            topk_idx = rand_perm.slice(0, 0, num_experts_per_tok_)
+                                 .unsqueeze(0)
+                                 .expand({num_tokens, num_experts_per_tok_})
+                                 .contiguous();                 // [num_tokens, K]
+        }
+
+        // Weights: gather from unbiased softmax and renormalize
+        auto unbiased_scores = torch::softmax(router_out.to(torch::kFloat32), -1).to(router_out.dtype());
+        topk_vals = torch::gather(unbiased_scores, /*dim=*/-1, topk_idx);
+        auto denom = topk_vals.sum(-1, true).clamp_min(1e-9);
+        topk_vals = (topk_vals / denom).to(router_out.dtype());
+    } else if (std::abs(lambda_) > 1e-9) {  // Only apply if lambda is non-zero
         // Update delta_avg (running average of logit ranges)
         auto max_logits = std::get<0>(torch::max(router_out, /*dim=*/-1));  // [num_tokens]
         auto min_logits = std::get<0>(torch::min(router_out, /*dim=*/-1));  // [num_tokens]
@@ -892,14 +1032,20 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
         auto cache_mask = torch::tensor(expert_cache_bitmask_, 
                                        router_out.options().dtype(torch::kFloat32));
         
-        // Ensure top expert is always included in mask
-        bool has_cached = std::any_of(expert_cache_bitmask_.begin(), 
-                                     expert_cache_bitmask_.end(), 
-                                     [](int64_t v) { return v == 1; });
-        if (has_cached) {
-            auto top1_experts = torch::argmax(router_out, /*dim=*/-1);
+        bool has_cached = std::any_of(expert_cache_bitmask_.begin(),
+                                      expert_cache_bitmask_.end(),
+                                      [](int64_t v) { return v == 1; });
+
+        // Force top forced_top_n_ unbiased experts into the cache mask so they are always
+        // available (and thus preferred under the lambda bias).
+        if (forced_top_n_ > 0 && has_cached) {
+            int64_t n_force = std::min(forced_top_n_, num_experts_per_tok_);
+            auto topn_result = router_out.topk(n_force, /*dim=*/-1);
+            auto topn_idx    = std::get<1>(topn_result);  // [num_tokens, n_force]
             auto top_expert_mask = torch::zeros({num_experts_}, cache_mask.options());
-            top_expert_mask.index_put_({top1_experts}, 1.0);
+            for (int64_t ti = 0; ti < topn_idx.size(0); ti++) {
+                top_expert_mask.index_put_({topn_idx[ti]}, 1.0);
+            }
             cache_mask = torch::maximum(cache_mask, top_expert_mask);
         }
         
@@ -907,24 +1053,19 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
         auto bias = lambda_ * delta_avg_ * cache_mask;
         auto z_prime = router_out + bias;
         
-        // Get expert INDICES using biased logits
+        // Standard biased top-k selection
         torch::Tensor router_scores_for_indices = z_prime;
         if (use_softmax_before_topk_) {
             router_scores_for_indices = torch::softmax(router_scores_for_indices.to(torch::kFloat32), -1).to(router_out.dtype());
         }
         auto topk_result = router_scores_for_indices.topk(num_experts_per_tok_, -1);
         topk_idx = std::get<1>(topk_result);
-        
-        // Get expert WEIGHTS using original logits (for correct probability distribution)
+
         torch::Tensor router_scores_for_weights = router_out;
         if (use_softmax_before_topk_) {
             router_scores_for_weights = torch::softmax(router_scores_for_weights.to(torch::kFloat32), -1).to(router_out.dtype());
         }
-        
-        // Extract weights for the selected experts
         topk_vals = torch::gather(router_scores_for_weights, /*dim=*/-1, topk_idx);
-        
-        // Normalize if needed
         if (use_softmax_before_topk_) {
             if (normalize_topk_prob_) {
                 auto denom = topk_vals.sum(-1, true).clamp_min(1e-9);
@@ -936,7 +1077,7 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
             topk_vals = torch::softmax(topk_vals.to(torch::kFloat32), -1).to(router_out.dtype());
         }
     } else {
-        // Standard routing (no lambda bias) - original logic
+        // Standard routing (no lambda bias, no random fill) - original logic
         torch::Tensor router_scores = router_out;
         if (use_softmax_before_topk_) {
             router_scores = torch::softmax(router_scores.to(torch::kFloat32), -1).to(router_out.dtype());
@@ -2295,12 +2436,12 @@ void UnifiedLLMW4A16Impl::set_lambda(double lambda, int64_t layer_idx) {
             throw std::out_of_range("Layer index " + std::to_string(layer_idx) + 
                                    " out of range [0, " + std::to_string(num_hidden_layers_) + ")");
         }
-        if (arch_type_ == ArchitectureType::MIXTRAL) {
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
             moe_layers[layer_idx]->set_lambda(lambda);
         }
     } else {
         // Set for all layers
-        if (arch_type_ == ArchitectureType::MIXTRAL) {
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
             for (auto& layer : moe_layers) {
                 layer->set_lambda(lambda);
             }
@@ -2313,10 +2454,66 @@ double UnifiedLLMW4A16Impl::get_lambda(int64_t layer_idx) const {
         throw std::out_of_range("Layer index " + std::to_string(layer_idx) + 
                                " out of range [0, " + std::to_string(num_hidden_layers_) + ")");
     }
-    if (arch_type_ == ArchitectureType::MIXTRAL) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         return moe_layers[layer_idx]->get_lambda();
     }
     return 0.0;
+}
+
+void UnifiedLLMW4A16Impl::set_forced_top_n(int64_t n) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (auto& layer : moe_layers) {
+            layer->set_forced_top_n(n);
+        }
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_prefill_top_n(int64_t n) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (auto& layer : moe_layers) {
+            layer->set_prefill_top_n(n);
+        }
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_random_fill_mode(bool on) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (auto& layer : moe_layers) {
+            layer->set_random_fill_mode(on);
+        }
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_cache_policy(const std::string& policy_name, int64_t layer_idx) {
+    MixtureOfExpertsImpl::CachePolicy policy;
+    std::string upper_name = policy_name;
+    std::transform(upper_name.begin(), upper_name.end(), upper_name.begin(), ::toupper);
+    
+    if (upper_name == "LRU") policy = MixtureOfExpertsImpl::CachePolicy::LRU;
+    else if (upper_name == "MRU") policy = MixtureOfExpertsImpl::CachePolicy::MRU;
+    else if (upper_name == "LFU") policy = MixtureOfExpertsImpl::CachePolicy::LFU;
+    else if (upper_name == "MFU") policy = MixtureOfExpertsImpl::CachePolicy::MFU;
+    else if (upper_name == "CLOCK") policy = MixtureOfExpertsImpl::CachePolicy::CLOCK;
+    else if (upper_name == "RANDOM") policy = MixtureOfExpertsImpl::CachePolicy::RANDOM;
+    else if (upper_name == "LFRU") policy = MixtureOfExpertsImpl::CachePolicy::LFRU;
+    else if (upper_name == "PREFILL") policy = MixtureOfExpertsImpl::CachePolicy::PREFILL;
+    else throw std::invalid_argument("Unknown cache policy: " + policy_name);
+
+    if (layer_idx >= 0) {
+        if (layer_idx >= num_hidden_layers_) {
+            throw std::out_of_range("Layer index " + std::to_string(layer_idx) + 
+                                   " out of range [0, " + std::to_string(num_hidden_layers_) + ")");
+        }
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            moe_layers[layer_idx]->set_cache_policy(policy);
+        }
+    } else {
+        if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+            for (auto& layer : moe_layers) {
+                layer->set_cache_policy(policy);
+            }
+        }
+    }
 }
 
 void MixtureOfExpertsImpl::print_cache_stats() const {
@@ -2329,7 +2526,7 @@ void MixtureOfExpertsImpl::print_cache_stats() const {
 
 void UnifiedLLMW4A16Impl::print_cache_stats() const {
     std::cout << "\nExpert Cache Statistics:" << std::endl;
-    if (arch_type_ == ArchitectureType::MIXTRAL) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         for (const auto& layer : moe_layers) {
             layer->print_cache_stats();
         }
@@ -2343,7 +2540,7 @@ void MixtureOfExpertsImpl::reset_cache_stats() {
 }
 
 void UnifiedLLMW4A16Impl::reset_cache_stats() {
-    if (arch_type_ == ArchitectureType::MIXTRAL) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         for (auto& layer : moe_layers) {
             layer->reset_cache_stats();
         }
@@ -2354,7 +2551,7 @@ std::pair<int64_t, int64_t> UnifiedLLMW4A16Impl::get_cache_stats() const {
     int64_t total_hits = 0;
     int64_t total_misses = 0;
     
-    if (arch_type_ == ArchitectureType::MIXTRAL) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         for (const auto& layer : moe_layers) {
             auto [hits, misses] = layer->get_cache_stats();
             total_hits += hits;

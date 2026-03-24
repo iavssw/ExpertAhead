@@ -130,12 +130,27 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     
     // Lambda parameter control (router logit biasing)
     void set_lambda(double lambda) { 
-        if (lambda < 0.0 || lambda > 1.0) {
-            throw std::invalid_argument("Lambda must be in range [0, 1], got: " + std::to_string(lambda));
+        if (lambda < 0.0 || lambda > 100.0) {
+            throw std::invalid_argument("Lambda must be in range [0, 100], got: " + std::to_string(lambda));
         }
         lambda_ = lambda; 
     }
     double get_lambda() const { return lambda_; }
+
+    // Forced top-N guarantee: how many unbiased top experts are always kept in the bias mask.
+    void set_forced_top_n(int64_t n) { forced_top_n_ = std::max(int64_t(0), n); }
+    int64_t get_forced_top_n() const { return forced_top_n_; }
+
+    // Number of top experts to lock into cache during prefill.
+    void set_prefill_top_n(int64_t n) { prefill_top_n_ = std::max(int64_t(0), n); }
+    int64_t get_prefill_top_n() const { return prefill_top_n_; }
+
+    // Experiment mode: keep top forced_top_n_ correct experts, fill remaining slots with random experts.
+    void set_random_fill_mode(bool on) { random_fill_mode_ = on; }
+    
+    // Cache policy control
+    enum class CachePolicy { LRU, MRU, LFU, MFU, CLOCK, RANDOM, LFRU, PREFILL };
+    void set_cache_policy(CachePolicy policy) { cache_policy_ = policy; }
     
     // Training data collection
     torch::Tensor get_last_router_logits() const { return last_router_logits_; }
@@ -177,10 +192,25 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double lambda_ = 0.0;                        // Bias parameter [0, 1]
     double delta_avg_ = 0.0;                     // Running average of logit ranges
     std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
+    int64_t forced_top_n_ = 1;                   // How many unbiased top-k experts are forced into the mask
+    int64_t prefill_top_n_ = 0;                  // How many top experts from prefill to lock in cache
+    bool random_fill_mode_ = false;               // Experiment: substitute non-top-N slots with random experts
 
     // Cache State
     std::vector<int64_t> expert_slots_indices; // Maps Slot ID [0..max_cached] -> Global Expert ID. -1 if empty.
-    std::vector<size_t> expert_lru_order_;       // List of Slot IDs, ordered by usage (LRU at front, MRU at back).
+    std::vector<int64_t> locked_experts_;      // Experts that are locked in the cache by the PREFILL policy
+    
+    struct ExpertSlotMeta {
+        int64_t expert_id = -1;    // global expert in this slot (-1 = empty)
+        uint64_t access_count = 0; // for LFU/MFU/LFRU
+        uint64_t last_access = 0;  // for LRU/MRU/LFRU
+        uint8_t clock_bit = 0;     // for CLOCK algorithm
+    };
+
+    std::vector<ExpertSlotMeta> slot_meta_; // Per-slot metadata
+    uint64_t access_clock_ = 0;             // global logical clock for recency
+    size_t clock_hand_ = 0;                 // clock hands for CLOCK eviction
+    CachePolicy cache_policy_ = CachePolicy::LRU;
     
     int64_t cache_hits_ = 0;
     int64_t cache_misses_ = 0;
@@ -191,6 +221,14 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
+    size_t pick_victim();
+    size_t pick_lru();
+    size_t pick_mru();
+    size_t pick_lfu();
+    size_t pick_mfu();
+    size_t pick_clock();
+    size_t pick_random();
+    size_t pick_lfru();
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);
@@ -235,7 +273,14 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void set_lambda(double lambda, int64_t layer_idx = -1);
     double get_lambda(int64_t layer_idx = 0) const;
 
-    // Move model to device
+    // Forced top-N and random-fill experiment controls (applied to all layers)
+    void set_forced_top_n(int64_t n);
+    void set_prefill_top_n(int64_t n);
+    void set_random_fill_mode(bool on);
+
+    // Cache Policy Control
+    void set_cache_policy(const std::string& policy_name, int64_t layer_idx = -1);
+
     // Move model to device
     UnifiedLLMW4A16Impl &to(torch::Device device);
 

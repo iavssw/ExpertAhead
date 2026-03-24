@@ -155,5 +155,9 @@ PYBIND11_MODULE(unified_llm_w4a16_base_libtorch, m) {
              py::arg("filename"))
         .def("load_quantized_weights_from_bins", &UnifiedLLMW4A16Impl::load_quantized_weights_from_bins, py::arg("weights_dir"))
         .def("initialize_dummy_weights", &UnifiedLLMW4A16Impl::initialize_dummy_weights, py::arg("seed") = 42,
-             "Initialize dummy weights for testing");
+             "Initialize dummy weights for testing")
+        .def("set_forced_top_n", &UnifiedLLMW4A16Impl::set_forced_top_n, py::arg("n"),
+             "Keep top-n correct experts per token; randomize the rest. Pass n=K to disable.")
+        .def("set_random_fill_mode", &UnifiedLLMW4A16Impl::set_random_fill_mode, py::arg("on"),
+             "Enable or disable the random-fill substitution across all MoE layers.");
 }

@@ -1,0 +1,13 @@
+avg_load_ms,backend,cache_hit_rate,cache_size,gen_ppl,lambda,layers,pred_hit_rate,pred_match_0,pred_match_1,pred_match_2,prefetch_count,prefetch_loads,stall_loads,tps
+,cached,34.84,8,,0.0,N/A,,,,,,,,1.5404
+1.02,predict,25.0,8,,0.0,all,52.98,3,4,21,4,100,174,2.4679
+,cached,34.84,8,,0.5,N/A,,,,,,,,1.5425
+1.03,predict,25.0,8,,0.5,all,52.98,3,4,21,4,100,174,2.471
+,cached,34.84,8,,1.0,N/A,,,,,,,,1.5394
+1.03,predict,25.0,8,,1.0,all,52.98,3,4,21,4,100,174,2.4724
+,cached,58.83,16,,0.0,N/A,,,,,,,,2.0068
+1.04,predict,37.5,16,,0.0,all,52.98,3,4,21,4,88,145,3.1092
+,cached,58.83,16,,0.5,N/A,,,,,,,,2.0035
+1.02,predict,37.5,16,,0.5,all,52.98,3,4,21,4,88,145,3.0955
+,cached,58.83,16,,1.0,N/A,,,,,,,,2.0016
+1.05,predict,37.5,16,,1.0,all,52.98,3,4,21,4,88,145,3.098

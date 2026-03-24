@@ -356,7 +356,8 @@ private:
             
             torch::NoGradGuard no_grad;
             auto output = model_.forward(inputs).toTensor();
-            
+           
+            //std::cout << "predictor model output: " << output << std::endl;
             // Extract prediction
             auto indices = output.argsort(-1, true).to(torch::kCPU, torch::kInt64);
             
@@ -409,58 +410,4 @@ private:
     double delta_avg_ = 0.0;
     
     std::atomic<int64_t> next_job_id_{0};
-};
-
-class RandomExpertPredictor : public IExpertPredictor {
-public:
-    RandomExpertPredictor(int64_t num_experts) 
-        : num_experts_(num_experts),
-          gen_(std::random_device{}()) {}
-
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
-        // Generate a random ranking of all experts
-        std::vector<int64_t> experts(num_experts_);
-        std::iota(experts.begin(), experts.end(), 0);
-        std::shuffle(experts.begin(), experts.end(), gen_);
-        
-        std::lock_guard<std::mutex> lock(mutex_);
-        predicted_experts_ = experts;
-        ready_ = true;
-    }
-
-    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
-        std::vector<int64_t> experts(num_experts_);
-        std::iota(experts.begin(), experts.end(), 0);
-        std::shuffle(experts.begin(), experts.end(), gen_);
-        return experts;
-    }
-    
-    bool is_ready() override {
-        return ready_.load();
-    }
-
-    std::vector<int64_t> get_prediction() override {
-        std::lock_guard<std::mutex> lock(mutex_);
-        ready_ = false; // Reset for next prediction
-        return predicted_experts_;
-    }
-
-    std::vector<int64_t> try_get_prediction() override {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (!ready_) return {};
-        // ready_ = false;
-        return predicted_experts_;
-    }
-
-    double get_prediction_time_ms() override {
-        return 0.0; // Negligible time
-    }
-
-private:
-    int64_t num_experts_;
-    std::mt19937 gen_;
-    
-    std::mutex mutex_;
-    std::vector<int64_t> predicted_experts_;
-    std::atomic<bool> ready_{false};
 };

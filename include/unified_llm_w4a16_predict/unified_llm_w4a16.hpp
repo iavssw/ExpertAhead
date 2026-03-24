@@ -135,12 +135,21 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     
     // Lambda parameter control (router logit biasing)
     void set_lambda(double lambda) { 
-        if (lambda < 0.0 || lambda > 1.0) {
-            throw std::invalid_argument("Lambda must be in range [0, 1], got: " + std::to_string(lambda));
+        if (lambda < 0.0 || lambda > 100.0) {
+            throw std::invalid_argument("Lambda must be in range [0, 100], got: " + std::to_string(lambda));
         }
         lambda_ = lambda; 
     }
     double get_lambda() const { return lambda_; }
+
+    // Forced top-N guarantee: how many unbiased top experts are always kept in the bias mask.
+    // Default 1 matches original behavior. Set to num_experts_per_tok to never override routing.
+    void set_forced_top_n(int64_t n) { forced_top_n_ = std::max(int64_t(0), n); }
+    int64_t get_forced_top_n() const { return forced_top_n_; }
+
+    // Experiment mode: keep top forced_top_n_ correct experts, fill remaining slots with random experts.
+    // Used to measure perplexity impact of substituting lower-ranked active experts.
+    void set_random_fill_mode(bool on) { random_fill_mode_ = on; }
     
     // Correlation-based expert tracking
     // We still keep correlation constant API around if something calls it but ignore it, or remove it. Let's remove it.
@@ -209,6 +218,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double lambda_ = 0.0;                        // Bias parameter [0, 1]
     double delta_avg_ = 0.0;                     // Running average of logit ranges
     std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
+    int64_t forced_top_n_ = 1;                   // How many unbiased top-k experts are forced into the mask
+    bool random_fill_mode_ = false;               // Experiment: substitute non-top-N slots with random experts
 
     // Prefill distribution tracking
     torch::Tensor prefill_expert_counts_;
@@ -219,7 +230,21 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     
     int64_t cache_hits_ = 0;
     int64_t cache_misses_ = 0;
-    double total_expert_load_time_ms_ = 0.0;
+    std::atomic<double> total_expert_load_time_ms_{0.0};
+    
+    // Tracking loads per step
+    std::atomic<int64_t> experts_loaded_this_step_{0};
+    int64_t total_steps_0_loaded_ = 0;
+    int64_t total_steps_1_loaded_ = 0;
+    int64_t total_steps_gt1_loaded_ = 0;
+
+    int64_t stall_loads_ = 0;
+    int64_t prefetch_loads_ = 0;
+
+    // Tracker for how many of the prefetched experts were correctly in the actual Top-K chosen
+    int64_t pred_match_0_ = 0;
+    int64_t pred_match_1_ = 0;
+    int64_t pred_match_2_ = 0;
 
     // Predictor hit-rate counters (generation only)
     int64_t pred_hits_no_bias_   = 0;  // tokens where predictor's prefetched expert(s) matched unbiased top-1
@@ -296,6 +321,10 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Lambda parameter control for router logit biasing
     void set_lambda(double lambda, int64_t layer_idx = -1);
     double get_lambda(int64_t layer_idx = 0) const;
+
+    // Forced top-N and random-fill experiment controls (applied to all layers)
+    void set_forced_top_n(int64_t n);
+    void set_random_fill_mode(bool on);
 
     // Move model to device
     // Move model to device

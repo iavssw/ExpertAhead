@@ -576,13 +576,20 @@ class Mixtral8x7BW4A16Model:
         Raises:
             ValueError: If lambda_value is not in [0, 1]
         """
-        if lambda_value < 0.0 or lambda_value > 2.0:
-            raise ValueError(f"Lambda must be in range [0, 2], got: {lambda_value}")
+        if lambda_value < 0.0 or lambda_value > 100.0:
+            raise ValueError(f"Lambda must be in range [0, 100], got: {lambda_value}")
         self.model.set_lambda(lambda_value, layer_idx)
 
     def get_lambda(self, layer_idx: int = 0) -> float:
         """Get lambda parameter for specified layer."""
         return self.model.get_lambda(layer_idx)
+
+    def set_cache_policy(self, policy: str, layer_idx: int = -1):
+        """Set the eviction policy for the expert cache (e.g., 'LRU', 'LFU', 'CLOCK', etc.)"""
+        if hasattr(self.model, "set_cache_policy"):
+            self.model.set_cache_policy(policy, layer_idx)
+        else:
+            print(f"Warning: Backend does not support set_cache_policy.")
 
     def set_layer_correlation_constants(self, constants: List[float]):
         """Set the correlation constant for each layer."""
@@ -624,6 +631,21 @@ class Mixtral8x7BW4A16Model:
         if hasattr(self.model, "get_cache_stats"):
             return self.model.get_cache_stats()
         return (0, 0)
+
+    def set_forced_top_n(self, n: int):
+        """Set how many unbiased top-K experts are forced into the lambda bias mask."""
+        if hasattr(self.model, "set_forced_top_n"):
+            self.model.set_forced_top_n(n)
+
+    def set_prefill_top_n(self, n: int):
+        """Lock the top n most used experts from prefill into the cache under PREFILL policy."""
+        if hasattr(self.model, "set_prefill_top_n"):
+            self.model.set_prefill_top_n(n)
+
+    def set_random_fill_mode(self, on: bool):
+        """Experiment mode: keep top forced_top_n correct experts; fill remaining with random experts."""
+        if hasattr(self.model, "set_random_fill_mode"):
+            self.model.set_random_fill_mode(on)
 
     def get_predictor_stats(self):
         """
@@ -1238,6 +1260,13 @@ def main():
         help="Lambda value for router logit biasing (range [0, 1])"
     )
     parser.add_argument(
+        "--cache-policy",
+        type=str,
+        default="LRU",
+        choices=["LRU", "MRU", "LFU", "MFU", "CLOCK", "RANDOM", "LFRU", "PREFILL", "lru", "mru", "lfu", "mfu", "clock", "random", "lfru", "prefill"],
+        help="Cache eviction policy for experts"
+    )
+    parser.add_argument(
         "--expert-correlation-csv",
         type=str,
         default=None,
@@ -1316,6 +1345,10 @@ def main():
         default=None,
         help="Path to a JSON file containing a list of prompts. Runs all prompts sequentially without reloading."
     )
+    parser.add_argument(
+        "--prefill-top-n", type=int, default=0,
+        help="(cached backend) Under PREFILL policy, lock the top-N experts from prefill into the cache."
+    )
     
     args = parser.parse_args()
 
@@ -1364,8 +1397,11 @@ def main():
             prefetch_experts_count=args.prefetch_experts_count,
             predict_layers=args.predict_layers,
         )
-
         print("Model initialized successfully!")
+
+        if getattr(args, "prefill_top_n", 0) > 0 and hasattr(model, 'set_prefill_top_n'):
+            model.set_prefill_top_n(args.prefill_top_n)
+            print(f"Set prefill top-{args.prefill_top_n} locked experts.")
     except Exception as e:
         print(f"Error initializing model: {e}")
         import traceback
@@ -1380,6 +1416,11 @@ def main():
     if args.lambda_val != 0.0:
         print(f"Setting lambda to {args.lambda_val}")
         model.set_lambda(args.lambda_val)
+
+    # Set cache policy if specified
+    if args.cache_policy:
+        print(f"Setting cache policy to {args.cache_policy}")
+        model.set_cache_policy(args.cache_policy)
 
     if args.expert_correlation_csv:
         print(f"Loading correlations from {args.expert_correlation_csv}")

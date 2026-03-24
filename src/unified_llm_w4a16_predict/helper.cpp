@@ -18,6 +18,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <future>
 #include <vector>
 
 // Helper function to sample from logits
@@ -1202,6 +1203,55 @@ void MixtureOfExpertsImpl::prefill_cache_for_testing() {
     }
 }
 
+void MixtureOfExpertsImpl::print_cache_stats() const {
+    double hit_rate = 0.0;
+    if (cache_hits_ + cache_misses_ > 0) {
+        hit_rate = 100.0 * cache_hits_ / (cache_hits_ + cache_misses_);
+    }
+    std::cout << "Layer " << layer_idx_ << " Cache Stats: "
+              << "Hits=" << cache_hits_ << ", Misses=" << cache_misses_ 
+              << ", HitRate=" << std::fixed << std::setprecision(2) << hit_rate << "%\n"
+              << "    Unbiased Top-1 Predictor HitRate=";
+
+    if (pred_total_ > 0) {
+        double pred_rate = 100.0 * pred_hits_no_bias_ / pred_total_;
+        std::cout << pred_rate << "% (" << pred_hits_no_bias_ << "/" << pred_total_ << ")\n";
+    } else {
+        std::cout << "N/A\n";
+    }
+
+    int64_t total_loads = stall_loads_ + prefetch_loads_;
+    double avg_load_time = total_loads > 0 ? (total_expert_load_time_ms_.load() / total_loads) : 0.0;
+
+    std::cout << "    Loads Per Step: 0Loads=" << total_steps_0_loaded_
+              << ", 1Load=" << total_steps_1_loaded_
+              << ", >1Load=" << total_steps_gt1_loaded_ << "\n"
+              << "    Bandwidth: StallLoads=" << stall_loads_
+              << ", PrefetchLoads=" << prefetch_loads_ 
+              << ", AvgLoadTime=" << std::fixed << std::setprecision(2) << avg_load_time << "ms\n"
+              << "    Predictor TopK matches: 0=" << pred_match_0_
+              << " 1=" << pred_match_1_
+              << " >=2=" << pred_match_2_
+              << std::endl;
+}
+
+void MixtureOfExpertsImpl::reset_cache_stats() {
+    cache_hits_ = 0;
+    cache_misses_ = 0;
+    total_expert_load_time_ms_.store(0.0);
+    pred_hits_no_bias_ = 0;
+    pred_total_ = 0;
+    last_true_top1_expert_ = -1;
+    total_steps_0_loaded_ = 0;
+    total_steps_1_loaded_ = 0;
+    total_steps_gt1_loaded_ = 0;
+    stall_loads_ = 0;
+    prefetch_loads_ = 0;
+    pred_match_0_ = 0;
+    pred_match_1_ = 0;
+    pred_match_2_ = 0;
+}
+
 void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
     if (num_to_warm > max_cached_experts_) {
         num_to_warm = max_cached_experts_;
@@ -1244,6 +1294,8 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
 
 void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
     auto start_time = std::chrono::high_resolution_clock::now();
+    
+    experts_loaded_this_step_++;
 
     if (weights_dir.empty()) {
         throw std::runtime_error("Weights directory not set for MoE layer " + std::to_string(layer_idx_));
@@ -1261,7 +1313,6 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
     std::string down_prefix   = expert_prefix + "_down";
 
     auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot, const std::vector<int64_t>& shape, torch::ScalarType dtype) {
-        if (bufs.size() <= static_cast<size_t>(slot)) bufs.resize(max_cached_experts_);
         if (!bufs[slot].defined()) {
             bufs[slot] = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU).pinned_memory(true));
         } else if (bufs[slot].sizes() != shape) {
@@ -1307,12 +1358,17 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
         char* ptr_s = static_cast<char*>(dest_s.data_ptr());
         char* ptr_z = static_cast<char*>(dest_z.data_ptr());
 
-        read_bin_tensor_pread(gq, ptr_q, expected_q);
-        read_bin_tensor_pread(uq, ptr_q + expected_q, expected_q);
-        read_bin_tensor_pread(gs, ptr_s, expected_s);
-        read_bin_tensor_pread(us, ptr_s + expected_s, expected_s);
-        read_bin_tensor_pread(gz, ptr_z, expected_z);
-        read_bin_tensor_pread(uz, ptr_z + expected_z, expected_z);
+        std::vector<std::future<void>> futures;
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, gq, ptr_q, expected_q));
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, uq, ptr_q + expected_q, expected_q));
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, gs, ptr_s, expected_s));
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, us, ptr_s + expected_s, expected_s));
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, gz, ptr_z, expected_z));
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, uz, ptr_z + expected_z, expected_z));
+
+        for (auto& f : futures) {
+            f.get();
+        }
 
         gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
     }
@@ -1347,14 +1403,24 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
         size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
         size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
 
-        read_bin_tensor_pread(dq, dest_q.data_ptr(), expected_q);
-        read_bin_tensor_pread(ds, dest_s.data_ptr(), expected_s);
-        read_bin_tensor_pread(dz, dest_z.data_ptr(), expected_z);
+        std::vector<std::future<void>> futures;
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, dq, dest_q.data_ptr(), expected_q));
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, ds, dest_s.data_ptr(), expected_s));
+        futures.push_back(std::async(std::launch::async, read_bin_tensor_pread, dz, dest_z.data_ptr(), expected_z));
+
+        for (auto& f : futures) {
+            f.get();
+        }
 
         down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();
     double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
-    total_expert_load_time_ms_ += ms;
+    
+    // Thread-safe accumulation of total load time
+    double current_time = total_expert_load_time_ms_.load();
+    while(!total_expert_load_time_ms_.compare_exchange_weak(current_time, current_time + ms)) {
+        // loop until successful
+    }
 }

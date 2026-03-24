@@ -266,11 +266,13 @@ class Qwen3_30BA3BW4A16Model:
                 _json.dump(base_cfg, tmp)
                 tmp.close()
                 _temp_config_path = tmp.name
-                constructor_args.append(_temp_config_path)
+                config_to_pass = _temp_config_path
             else:
-                constructor_args.append(config_path)
+                config_to_pass = config_path
+            
             constructor_args.append(max_cached_experts_per_layer)
             constructor_args.append(predictor_models_dir)
+            constructor_args.append(config_to_pass)
             constructor_args.append(prefetch_experts_count)
             constructor_args.append(predict_layers if predict_layers is not None else [])
             constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
@@ -585,6 +587,26 @@ class Qwen3_30BA3BW4A16Model:
     def reset_predictor_stats(self):
         if hasattr(self.model, "reset_predictor_stats"):
             self.model.reset_predictor_stats()
+
+    def set_cache_policy(self, policy: str):
+        """Set the expert cache eviction policy."""
+        if hasattr(self.model, "set_cache_policy"):
+            self.model.set_cache_policy(policy)
+
+    def set_forced_top_n(self, n: int):
+        """Set how many unbiased top-K experts are forced into the lambda bias mask."""
+        if hasattr(self.model, "set_forced_top_n"):
+            self.model.set_forced_top_n(n)
+
+    def set_prefill_top_n(self, n: int):
+        """Lock the top n most used experts from prefill into the cache under PREFILL policy."""
+        if hasattr(self.model, "set_prefill_top_n"):
+            self.model.set_prefill_top_n(n)
+
+    def set_random_fill_mode(self, on: bool):
+        """Experiment mode: keep top forced_top_n correct experts; fill remaining with random experts."""
+        if hasattr(self.model, "set_random_fill_mode"):
+            self.model.set_random_fill_mode(on)
     def perplexity(self, input_ids: Union[str, torch.Tensor]) -> dict:
         """
         Compute causal-LM perplexity for the provided sequence(s).
@@ -1163,6 +1185,28 @@ def main():
         default=2048,
         help="Stride for sliding-window WikiText-2 perplexity."
     )
+    parser.add_argument("--sweep-prompts-file", type=str, default=None)
+    parser.add_argument("--generation-perplexity", action="store_true", default=False)
+    parser.add_argument("--lambda-val", type=float, default=0.0)
+    parser.add_argument("--predict-layers", type=int, nargs="+", default=None)
+    parser.add_argument("--predictor-model", type=str, default="")
+    parser.add_argument("--predictor-device", type=str, default="gpu")
+    parser.add_argument(
+        "--forced-top-n", type=int, default=0,
+        help="(cached backend) Force the top-N unbiased experts into the cache mask every step. "
+             "0 = disabled (standard routing)."
+    )
+    parser.add_argument(
+        "--cache-policy",
+        type=str,
+        default="LRU",
+        choices=["LRU", "MRU", "LFU", "MFU", "CLOCK", "RANDOM", "LFRU", "PREFILL", "lru", "mru", "lfu", "mfu", "clock", "random", "lfru", "prefill"],
+        help="Cache eviction policy for experts"
+    )
+    parser.add_argument(
+        "--prefill-top-n", type=int, default=0,
+        help="(cached backend) Under PREFILL policy, lock the top-N experts from prefill into the cache."
+    )
 
     args = parser.parse_args()
 
@@ -1207,6 +1251,9 @@ def main():
             config_path=args.config_path,
             max_cached_experts_per_layer=args.max_cached_experts,
             prefetch_experts_count=args.prefetch_experts_count,
+            predictor_models_dir=args.predictor_model,
+            predictor_device=args.predictor_device,
+            predict_layers=args.predict_layers,
         )
 
         print("Model initialized successfully!")
@@ -1220,6 +1267,19 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
+    # Apply forced-top-N if requested (cached backend only)
+    if args.forced_top_n > 0 and hasattr(model, 'set_forced_top_n'):
+        model.set_forced_top_n(args.forced_top_n)
+        print(f"Forced top-{args.forced_top_n} experts into cache mask.")
+
+    if args.prefill_top_n > 0 and hasattr(model, 'set_prefill_top_n'):
+        model.set_prefill_top_n(args.prefill_top_n)
+        print(f"Set prefill top-{args.prefill_top_n} locked experts.")
+
+    if hasattr(args, "cache_policy") and hasattr(model, 'set_cache_policy'):
+        model.set_cache_policy(args.cache_policy)
+        print(f"Set expert cache policy to {args.cache_policy}.")
+
     # Read all prompts from prompts.txt
     script_dir = Path(__file__).parent
     prompts_file = script_dir / "prompts.txt"
@@ -1230,6 +1290,83 @@ def main():
     else:
         print(f"Warning: {prompts_file} not found, falling back to --text argument.")
         prompts = [args.text]
+
+    if args.sweep_prompts_file:
+        import json
+        global json
+        print(f"\nRunning sweep using prompts from JSON: {args.sweep_prompts_file}")
+        with open(args.sweep_prompts_file, 'r') as f:
+            prompts = json.load(f)
+            
+        print(f"Loaded {len(prompts)} prompts for sweeping.")
+        total_ppl = 0.0
+        valid_ppl_count = 0
+        total_time = 0.0
+        total_generated_tokens = 0
+        
+        model.reset_cache_stats()
+
+        for i, prompt in enumerate(prompts):
+            print(f"\nProcessing Prompt {i+1}/{len(prompts)}...")
+            try:
+                if args.generation_perplexity:
+                    # Qwen script may not have generation_perplexity defined, just skip for now or use `model.perplexity()`
+                    # but perplexity is per prompt, not token by token. For sweep script, let's just use regular perplexity
+                    input_ids = model.tokenize(prompt)
+                    metrics = model.perplexity(input_ids)
+                    total_ppl += metrics['perplexity']
+                    valid_ppl_count += 1
+                
+                if args.generate:
+                    input_ids = model.tokenize(prompt)
+                    start_time = time.time()
+                    generated = model.generate(
+                        input_ids,
+                        max_new_tokens=args.max_new_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        top_k=args.top_k
+                    )
+                    end_time = time.time()
+                    elapsed = end_time - start_time
+                    num_generated = generated.size(1) - input_ids.size(1)
+                    
+                    if num_generated > 0:
+                        total_time += elapsed
+                        total_generated_tokens += num_generated
+
+            except Exception as e:
+                print(f"  Error on prompt {i+1}: {e}")
+
+        print("\n" + "=" * 60)
+        print("Sweep Complete.")
+        
+        if args.generation_perplexity and valid_ppl_count > 0:
+            avg_ppl = total_ppl / valid_ppl_count
+            print(f"Generation Perplexity: {avg_ppl:.4f}")
+            
+        if args.generate and total_generated_tokens > 0:
+            avg_tps = total_generated_tokens / total_time
+            print(f"Average Time per Token: {1.0 / avg_tps:.6f}") # Output inverse since parser expects time per token
+            print(f"End-to-End TPS: {avg_tps:.4f}")
+
+        # Get and print cache stats for entire sweep
+        hits, misses = model.get_cache_stats()
+        total = hits + misses
+        hit_rate = (hits / total * 100.0) if total > 0 else 0.0
+        print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
+        
+        pred_stats = model.get_predictor_stats()
+        if pred_stats:
+            pred_hits = sum(s[0] for s in pred_stats)
+            pred_total = sum(s[1] for s in pred_stats)
+            pred_rate = (pred_hits / pred_total * 100.0) if pred_total > 0 else 0.0
+            print(f"Predictor Stats: Hits={pred_hits}, Total={pred_total}, HitRate={pred_rate:.2f}%")
+
+        if hasattr(model, "print_cache_stats"):
+            model.print_cache_stats()
+        return 0
+
     print(f"Processing text: '{args.text}'")
 
     if args.perplexity:

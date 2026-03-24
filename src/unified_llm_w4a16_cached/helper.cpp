@@ -1222,16 +1222,16 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
         load_expert_weights(i, i, weights_dir_);
         expert_slots_indices[i] = i;
         
-        // Ensure slot i is in LRU order (as MRU)
-        bool found = false;
-        for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
-            if (*it == (size_t)i) {
-                expert_lru_order_.erase(it);
-                found = true;
-                break;
-            }
+        // Ensure slot i is initialized properly in metadata
+        ++access_clock_;
+        slot_meta_[i].expert_id = i;
+        slot_meta_[i].access_count = 1;
+        slot_meta_[i].last_access = access_clock_;
+        slot_meta_[i].clock_bit = 1;
+
+        if (expert_cache_bitmask_.size() == num_experts_) {
+            expert_cache_bitmask_[i] = 1;
         }
-        expert_lru_order_.push_back(i);
     }
 }
 

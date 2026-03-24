@@ -2215,3 +2215,15 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
 
     return input_tensor.narrow(1, 0, token_len);
 }
+
+void UnifiedLLMW4A16Impl::set_forced_top_n(int64_t n) {
+    for (auto& layer : moe_layers) {
+        layer->set_forced_top_n(n);
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_random_fill_mode(bool on) {
+    for (auto& layer : moe_layers) {
+        layer->set_random_fill_mode(on);
+    }
+}
