@@ -147,6 +147,13 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void set_forced_top_n(int64_t n) { forced_top_n_ = std::max(int64_t(0), n); }
     int64_t get_forced_top_n() const { return forced_top_n_; }
 
+    enum class CachePolicy { LRU, PREFILL };
+    void set_cache_policy(CachePolicy policy) { cache_policy_ = policy; }
+    
+    // Number of top experts to lock into cache during prefill.
+    void set_prefill_top_n(int64_t n) { prefill_top_n_ = std::max(int64_t(0), n); }
+    int64_t get_prefill_top_n() const { return prefill_top_n_; }
+
     // Experiment mode: keep top forced_top_n_ correct experts, fill remaining slots with random experts.
     // Used to measure perplexity impact of substituting lower-ranked active experts.
     void set_random_fill_mode(bool on) { random_fill_mode_ = on; }
@@ -219,7 +226,11 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double delta_avg_ = 0.0;                     // Running average of logit ranges
     std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
     int64_t forced_top_n_ = 1;                   // How many unbiased top-k experts are forced into the mask
+    int64_t prefill_top_n_ = 0;                  // How many top experts from prefill to lock in cache
     bool random_fill_mode_ = false;               // Experiment: substitute non-top-N slots with random experts
+
+    CachePolicy cache_policy_ = CachePolicy::LRU;
+    std::vector<int64_t> locked_experts_;        // Experts that are locked in the cache by the PREFILL policy
 
     // Prefill distribution tracking
     torch::Tensor prefill_expert_counts_;
@@ -325,6 +336,8 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Forced top-N and random-fill experiment controls (applied to all layers)
     void set_forced_top_n(int64_t n);
     void set_random_fill_mode(bool on);
+    void set_prefill_top_n(int64_t n);
+    void set_cache_policy(std::string policy_name, int64_t layer_idx = -1);
 
     // Move model to device
     // Move model to device

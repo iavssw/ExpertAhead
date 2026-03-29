@@ -157,6 +157,8 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
         .def("set_lambda", &UnifiedLLMW4A16Impl::set_lambda, py::arg("lambda"), py::arg("layer_idx") = -1)
         .def("get_lambda", &UnifiedLLMW4A16Impl::get_lambda, py::arg("layer_idx") = 0)
         .def("set_forced_top_n", &UnifiedLLMW4A16Impl::set_forced_top_n, py::arg("n"))
+        .def("set_prefill_top_n", &UnifiedLLMW4A16Impl::set_prefill_top_n, py::arg("n"))
+        .def("set_cache_policy", &UnifiedLLMW4A16Impl::set_cache_policy, py::arg("policy_name"), py::arg("layer_idx") = -1)
         .def("set_random_fill_mode", &UnifiedLLMW4A16Impl::set_random_fill_mode, py::arg("on"))
         .def("calculate_generation_perplexity", &UnifiedLLMW4A16Impl::calculate_generation_perplexity, py::arg("input_ids"))
         .def("print_cache_stats", &UnifiedLLMW4A16Impl::print_cache_stats)

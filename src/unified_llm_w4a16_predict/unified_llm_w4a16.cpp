@@ -2810,6 +2810,31 @@ void UnifiedLLMW4A16Impl::set_forced_top_n(int64_t n) {
     }
 }
 
+void UnifiedLLMW4A16Impl::set_prefill_top_n(int64_t n) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (auto& layer : moe_layers) {
+            layer->set_prefill_top_n(n);
+        }
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_cache_policy(std::string policy_name, int64_t layer_idx) {
+    MixtureOfExpertsImpl::CachePolicy policy = MixtureOfExpertsImpl::CachePolicy::LRU;
+    std::string p = policy_name;
+    std::transform(p.begin(), p.end(), p.begin(), ::tolower);
+    if (p == "prefill") policy = MixtureOfExpertsImpl::CachePolicy::PREFILL;
+
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        if (layer_idx >= 0 && layer_idx < static_cast<int64_t>(moe_layers.size())) {
+            moe_layers[layer_idx]->set_cache_policy(policy);
+        } else {
+            for (auto &layer : moe_layers) {
+                layer->set_cache_policy(policy);
+            }
+        }
+    }
+}
+
 void UnifiedLLMW4A16Impl::set_random_fill_mode(bool on) {
     if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         for (auto& layer : moe_layers) {

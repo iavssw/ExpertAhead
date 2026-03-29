@@ -128,7 +128,7 @@ def load_prompts(args):
 def build_cmd(args, model_script, policy, cache_size, lambda_val, temp_prompts_path, phase):
     cmd = [
         sys.executable, model_script,
-        "--backend", "cached",
+        "--backend", args.backend,
         "--device", "cuda",
         "--cache-policy", policy,
         "--expert-cache", str(cache_size),
@@ -220,7 +220,7 @@ def generate_plots(results, output_prefix):
         ax.set_xticklabels(policies)
         ax.set_ylabel("Cache Hit Rate (%)")
         ax.set_title(f"Hit Rate by Policy (λ={lam})")
-        ax.legend()
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         save(fig, f"hitrate_bar_lambda_{lam}")
 
     # Plot 2: PPL vs policy
@@ -234,11 +234,12 @@ def generate_plots(results, output_prefix):
         ax.set_xticklabels(policies)
         ax.set_ylabel("Generation PPL")
         ax.set_title(f"PPL by Policy (λ={lam})")
-        ax.legend()
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         save(fig, f"ppl_bar_lambda_{lam}")
 
 def build_parser():
     p = argparse.ArgumentParser()
+    p.add_argument("--backend", choices=["cached", "predict", "base"], default="cached", help="Model backend to evaluate")
     p.add_argument("--policies", nargs="+", default=["LRU", "MRU", "LFU", "MFU", "CLOCK", "RANDOM", "LFRU", "PREFILL"], help="Policies to test")
     p.add_argument("--cache-sizes", type=int, nargs="+", default=[2])
     p.add_argument("--lambdas", type=float, nargs="+", default=[0.0])

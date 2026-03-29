@@ -735,7 +735,7 @@ size_t MixtureOfExpertsImpl::pick_clock() {
 }
 
 size_t MixtureOfExpertsImpl::pick_random() {
-    static std::mt19937 rng(42);
+    thread_local std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<size_t> dist(0, slot_meta_.size() - 1);
     return dist(rng);
 }
