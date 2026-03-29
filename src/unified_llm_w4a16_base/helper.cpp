@@ -1016,26 +1016,35 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &we
         }
     };
 
-    auto load_gate_up_from_bins = [&](QuantizedLinear &gate_up, const std::string &gate_prefix, const std::string &up_prefix) {
+    // Load gate+up combined from two separate bins into CPU first, cat, then move to target GPU.
+    // This avoids temp allocations on GPU 0 for layers that live on GPU 1+.
+    auto load_gate_up_from_bins = [&](QuantizedLinear &gate_up, const std::string &gate_prefix, const std::string &up_prefix,
+                                      torch::Device target_device) {
+        // Load gate/up into CPU-backed temporary modules so set_unpacked_params handles shapes.
         QuantizedLinear tmp_gate(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_gate");
         QuantizedLinear tmp_up(hidden_size_, intermediate_size_, false, max_seq_len_, "tmp_moe_up");
         load_layer(tmp_gate, gate_prefix);
         load_layer(tmp_up, up_prefix);
+        // Concatenate on CPU to avoid transient GPU allocation, then move to target.
         auto q = torch::cat({tmp_gate->get_quantized_weights(), tmp_up->get_quantized_weights()}, 0).contiguous();
         auto s = torch::cat({tmp_gate->get_scales(), tmp_up->get_scales()}, 0).contiguous();
         auto z = torch::cat({tmp_gate->get_zeros(), tmp_up->get_zeros()}, 0).contiguous();
-        gate_up->set_unpacked_params(q, s, z);
+        gate_up->set_unpacked_params(q.to(target_device), s.to(target_device), z.to(target_device));
     };
 
     for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        auto layer_device = q_layers[i]->get_quantized_weights().device();
+
         load_layer(q_layers[i], "layer_" + std::to_string(i) + "_q");
         load_layer(k_layers[i], "layer_" + std::to_string(i) + "_k");
         load_layer(v_layers[i], "layer_" + std::to_string(i) + "_v");
         load_layer(o_layers[i], "layer_" + std::to_string(i) + "_o");
+
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
             for (int64_t e = 0; e < num_experts_; ++e) {
                 std::string expert_prefix = "layer_" + std::to_string(i) + "_expert_" + std::to_string(e);
-                load_gate_up_from_bins(moe_layers[i]->gate_up_experts[e], expert_prefix + "_gate", expert_prefix + "_up");
+                load_gate_up_from_bins(moe_layers[i]->gate_up_experts[e], expert_prefix + "_gate", expert_prefix + "_up",
+                                       layer_device);
                 load_layer(moe_layers[i]->down_experts[e], expert_prefix + "_down");
             }
         }

@@ -1,5 +1,5 @@
 """
-Mixtral 8x7B v0.1 AWQ w4a16 Python frontend.
+Mixtral 8x22B v0.1 AWQ w4a16 Python frontend.
 Handles tokenization and interfaces with the C++ base backend.
 """
 
@@ -161,18 +161,18 @@ def _get_quantized_tensors(state_dict, base_name: str):
     return qweight, scales, qzeros, g_idx
 
 
-class Mixtral8x7BW4A16Model:
-    """Mixtral 8x7B v0.1 AWQ w4a16 quantized model wrapper."""
+class Mixtral8x22BW4A16Model:
+    """Mixtral 8x22B v0.1 AWQ w4a16 quantized model wrapper."""
 
     def __init__(
         self,
-        model_path: Optional[str] = "TheBloke/mixtral-8x7b-v0.1-AWQ",
+        model_path: Optional[str] = "mistral-community/Mixtral-8x22B-v0.1-AWQ",
         tokenizer_path: Optional[str] = None,
         vocab_size: int = 32000,
-        hidden_size: int = 4096,
-        intermediate_size: int = 14336,
-        num_hidden_layers: int = 32,
-        num_attention_heads: int = 32,
+        hidden_size: int = 6144,
+        intermediate_size: int = 16384,
+        num_hidden_layers: int = 56,
+        num_attention_heads: int = 48,
         num_key_value_heads: int = 8,
         head_dim: int = 128,
         rms_norm_eps: float = 1e-5,
@@ -195,7 +195,7 @@ class Mixtral8x7BW4A16Model:
         per_layer_cache_sizes: Optional[List[int]] = None,
     ):
         """
-        Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
+        Initialize Mixtral 8x22B v0.1 AWQ w4a16 quantized model.
 
         predictor_device: where to run the TorchScript expert predictor.
             "gpu"  -> same GPU as the MoE layer (default — use this to benchmark/validate
@@ -265,7 +265,7 @@ class Mixtral8x7BW4A16Model:
                  constructor_args.append(predictor_models_dir)
 
         if config_path is None:
-            config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5"))
+            config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral8x22B.json5"))
 
         # If predictor_device override is requested, write a temp config with the field injected.
         # The C++ constructor reads predictor_device from the JSON on construction.
@@ -576,20 +576,13 @@ class Mixtral8x7BW4A16Model:
         Raises:
             ValueError: If lambda_value is not in [0, 1]
         """
-        if lambda_value < 0.0 or lambda_value > 100.0:
-            raise ValueError(f"Lambda must be in range [0, 100], got: {lambda_value}")
+        if lambda_value < 0.0 or lambda_value > 2.0:
+            raise ValueError(f"Lambda must be in range [0, 2], got: {lambda_value}")
         self.model.set_lambda(lambda_value, layer_idx)
 
     def get_lambda(self, layer_idx: int = 0) -> float:
         """Get lambda parameter for specified layer."""
         return self.model.get_lambda(layer_idx)
-
-    def set_cache_policy(self, policy: str, layer_idx: int = -1):
-        """Set the eviction policy for the expert cache (e.g., 'LRU', 'LFU', 'CLOCK', etc.)"""
-        if hasattr(self.model, "set_cache_policy"):
-            self.model.set_cache_policy(policy, layer_idx)
-        else:
-            print(f"Warning: Backend does not support set_cache_policy.")
 
     def set_layer_correlation_constants(self, constants: List[float]):
         """Set the correlation constant for each layer."""
@@ -631,21 +624,6 @@ class Mixtral8x7BW4A16Model:
         if hasattr(self.model, "get_cache_stats"):
             return self.model.get_cache_stats()
         return (0, 0)
-
-    def set_forced_top_n(self, n: int):
-        """Set how many unbiased top-K experts are forced into the lambda bias mask."""
-        if hasattr(self.model, "set_forced_top_n"):
-            self.model.set_forced_top_n(n)
-
-    def set_prefill_top_n(self, n: int):
-        """Lock the top n most used experts from prefill into the cache under PREFILL policy."""
-        if hasattr(self.model, "set_prefill_top_n"):
-            self.model.set_prefill_top_n(n)
-
-    def set_random_fill_mode(self, on: bool):
-        """Experiment mode: keep top forced_top_n correct experts; fill remaining with random experts."""
-        if hasattr(self.model, "set_random_fill_mode"):
-            self.model.set_random_fill_mode(on)
 
     def get_predictor_stats(self):
         """
@@ -753,7 +731,7 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
     try:
         from transformers import AutoTokenizer
         if tokenizer_path is None:
-            tokenizer_path = "mistralai/Mixtral-8x7B-v0.1"
+            tokenizer_path = "mistral-community/Mixtral-8x22B-v0.1-AWQ"
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
@@ -810,11 +788,11 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
     print("=" * 60 + "\n")
 
     if model_path is None:
-        model_path = "TheBloke/mixtral-8x7b-v0.1-AWQ"
+        model_path = "mistral-community/Mixtral-8x22B-v0.1-AWQ"
 
-    print("Initializing Mixtral 8x7B v0.1 AWQ w4a16 quantized model...")
+    print("Initializing Mixtral 8x22B v0.1 AWQ w4a16 quantized model...")
     try:
-        model = Mixtral8x7BW4A16Model(
+        model = Mixtral8x22BW4A16Model(
             model_path=model_path,
             tokenizer_path=tokenizer_path,
             device=device,
@@ -1001,11 +979,11 @@ def run_wikitext2_perplexity(
     text = _load_wikitext2_raw_text(model_weights_dir, split=split)
 
     if model_path is None:
-        model_path = "TheBloke/mixtral-8x7b-v0.1-AWQ"
+        model_path = "mistral-community/Mixtral-8x22B-v0.1-AWQ"
 
-    print("Initializing Mixtral 8x7B v0.1 AWQ w4a16 quantized model...")
+    print("Initializing Mixtral 8x22B v0.1 AWQ w4a16 quantized model...")
     try:
-        model = Mixtral8x7BW4A16Model(
+        model = Mixtral8x22BW4A16Model(
             model_path=model_path,
             tokenizer_path=tokenizer_path,
             device=device,
@@ -1155,10 +1133,10 @@ def run_wikitext2_perplexity(
 
 
 def main():
-    """Example usage of Mixtral8x7BW4A16Model when run as a script."""
+    """Example usage of Mixtral8x22BW4A16Model when run as a script."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Mixtral 8x7B v0.1 AWQ W4A16 Quantized Model - Unified LibTorch Backend")
+    parser = argparse.ArgumentParser(description="Mixtral 8x22B v0.1 AWQ W4A16 Quantized Model - Unified LibTorch Backend")
     parser.add_argument(
         "--text",
         type=str,
@@ -1174,7 +1152,7 @@ def main():
     parser.add_argument(
         "--model-path",
         type=str,
-        default="TheBloke/mixtral-8x7b-v0.1-AWQ",
+        default="mistral-community/Mixtral-8x22B-v0.1-AWQ",
         # default="casperhansen/mixtral-instruct-awq",        
         help="Path to quantized model (default: TheBloke/mixtral-8x7b-v0.1-AWQ)"
     )
@@ -1201,7 +1179,7 @@ def main():
     parser.add_argument(
         "--config-path",
         type=str,
-        default=os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5")),
+        default=os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral8x22B.json5")),
         help="Path to NPU config JSON"
     )
     parser.add_argument(
@@ -1258,13 +1236,6 @@ def main():
         type=float,
         default=0.0,
         help="Lambda value for router logit biasing (range [0, 1])"
-    )
-    parser.add_argument(
-        "--cache-policy",
-        type=str,
-        default="LRU",
-        choices=["LRU", "MRU", "LFU", "MFU", "CLOCK", "RANDOM", "LFRU", "PREFILL", "lru", "mru", "lfu", "mfu", "clock", "random", "lfru", "prefill"],
-        help="Cache eviction policy for experts"
     )
     parser.add_argument(
         "--expert-correlation-csv",
@@ -1345,10 +1316,6 @@ def main():
         default=None,
         help="Path to a JSON file containing a list of prompts. Runs all prompts sequentially without reloading."
     )
-    parser.add_argument(
-        "--prefill-top-n", type=int, default=0,
-        help="(cached backend) Under PREFILL policy, lock the top-N experts from prefill into the cache."
-    )
     
     args = parser.parse_args()
 
@@ -1381,11 +1348,11 @@ def main():
         )
 
     print("=" * 60)
-    print("Initializing Mixtral 8x7B v0.1 AWQ w4a16 quantized model...")
+    print("Initializing Mixtral 8x22B v0.1 AWQ w4a16 quantized model...")
     print("=" * 60)
 
     try:
-        model = Mixtral8x7BW4A16Model(
+        model = Mixtral8x22BW4A16Model(
             model_path=args.model_path,
             tokenizer_path=args.tokenizer_path,
             device=args.device,
@@ -1397,11 +1364,8 @@ def main():
             prefetch_experts_count=args.prefetch_experts_count,
             predict_layers=args.predict_layers,
         )
-        print("Model initialized successfully!")
 
-        if getattr(args, "prefill_top_n", 0) > 0 and hasattr(model, 'set_prefill_top_n'):
-            model.set_prefill_top_n(args.prefill_top_n)
-            print(f"Set prefill top-{args.prefill_top_n} locked experts.")
+        print("Model initialized successfully!")
     except Exception as e:
         print(f"Error initializing model: {e}")
         import traceback
@@ -1416,11 +1380,6 @@ def main():
     if args.lambda_val != 0.0:
         print(f"Setting lambda to {args.lambda_val}")
         model.set_lambda(args.lambda_val)
-
-    # Set cache policy if specified
-    if args.cache_policy:
-        print(f"Setting cache policy to {args.cache_policy}")
-        model.set_cache_policy(args.cache_policy)
 
     if args.expert_correlation_csv:
         print(f"Loading correlations from {args.expert_correlation_csv}")
@@ -1735,4 +1694,4 @@ if __name__ == "__main__":
     exit(main())
 
     # Perplexity test for wikitext2
-    # python3 mixtral_8x7B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
+    # python3 mixtral_8x22B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048

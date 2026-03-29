@@ -1,0 +1,21 @@
+{
+    // choice between cpu, gpu, hetero, npu
+    "heterogeneity": "gpu",
+    // number of GPUs to use when heterogeneity is set to gpu
+    // if the system has more GPUs than this count, runtime auto-selects GPUs by highest free VRAM
+    "gpu-count": 2,
+    "warmup": false,
+    "preload_moe_kernels": true,
+    "dummy_weights": false,
+    "debug_verbosity": 1,
+    // -2 uses model default, -1 disables replacement, >=0 replaces expert ranks >= this index
+    "random_replace_rank_start_idx": -1,
+    "usePreSavedWeights": true,
+    "minimal_pdi": true,
+    // Where to run the expert predictor TorchScript model:
+    //   "auto" -> inferred from heterogeneity ("hetero"/"npu" -> CPU/NPU, "gpu" -> GPU, "cpu" -> CPU)
+    //   "cpu"  -> run predictor on CPU (routes through Ryzen AI NPU backend on Strix)
+    //   "gpu"  -> run predictor on the same GPU as the MoE layer
+    "predictor_device": "auto",
+    "kernels_gemm": []
+}

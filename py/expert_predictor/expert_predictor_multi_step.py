@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
-expert_predictor.py — Unified Expert Predictor
-==============================================
-Trains a lightweight MLP to predict the top-K router experts at token t+1,
-given features from token t. Supports:
-  - predict_k=1  → CrossEntropyLoss + top-1 accuracy   (Mixtral style)
-  - predict_k>1  → BCEWithLogitsLoss + recall@K         (Qwen style)
+expert_predictor_multi_step.py — Unified Multi-Step Expert Predictor
+====================================================================
+Trains a lightweight MLP or Transformer to predict the top-K router experts
+for the next `N` tokens (t+1, t+2, ..., t+N), given features from token t.
 """
 
 import argparse
@@ -18,22 +16,18 @@ from datetime import datetime
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.nn.utils as nn_utils
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 
-# (emb_dim, num_experts, active_k, num_layers, prefetch_k, predict_k)
 MODEL_DEFAULTS = {
     "mixtral_8x7b":  (4096, 8,   2, 32, 1, 1),
     "mixtral_8x22b": (4096, 8,   2, 56, 1, 1),
     "qwen3_30b":     (2048, 128, 8, 48, 4, 4),
     "qwen3_480b":    (7168, 128, 8, 94, 4, 4),
 }
-
-# ──────────────────────────────────────────────────────────────────────────────
-# 1. Model & Wrapper
-# ──────────────────────────────────────────────────────────────────────────────
 
 class ResidualBlock(nn.Module):
     def __init__(self, dim, dropout=0.1):
@@ -49,21 +43,12 @@ class ResidualBlock(nn.Module):
     def forward(self, x):
         return x + self.net(self.ln(x))
 
-class ExpertPredictor(nn.Module):
-    """
-    Predicts the top-K router experts at the next token.
-    
-    Inputs (all optional except embedding):
-      - embedding:    [B, hidden_size]   hidden state at token t
-      - prefill_dist: [B, num_experts]   expert usage distribution from prefill
-      - prev_onehot:  [B, num_experts]   multi-hot of active experts at token t
-                                         (normalized to sum=1)
-    Output:
-      - logits: [B, num_experts]  → argmax for top-1, topk for top-K
-    """
+class MultiStepExpertPredictor(nn.Module):
     def __init__(
         self,
-        hidden_size: int = 4096,
+        history: int = 1,
+        future_steps: int = 2,
+        emb_dim: int = 4096,
         num_experts: int = 8,
         hidden_dim: int = 256,
         dropout: float = 0.1,
@@ -76,11 +61,15 @@ class ExpertPredictor(nn.Module):
     ):
         super().__init__()
         self.config = {
-            'hidden_size': hidden_size, 'num_experts': num_experts,
-            'hidden_dim': hidden_dim, 'use_embedding': use_embedding,
-            'use_prefill': use_prefill, 'use_prev': use_prev,
-            'use_markov': use_markov, 'noise_std': noise_std
+            'arch': 'mlp',
+            'history': history, 'future_steps': future_steps,
+            'emb_dim': emb_dim, 'hidden_size': history * emb_dim,
+            'num_experts': num_experts, 'hidden_dim': hidden_dim,
+            'use_embedding': use_embedding, 'use_prefill': use_prefill,
+            'use_prev': use_prev, 'use_markov': use_markov, 'noise_std': noise_std
         }
+        self.history = history
+        self.future_steps = future_steps
         self.use_embedding = use_embedding
         self.use_prefill   = use_prefill
         self.use_prev      = use_prev
@@ -88,13 +77,13 @@ class ExpertPredictor(nn.Module):
         self.num_experts   = num_experts
         self.noise_std     = noise_std
 
-        # Markov transition matrix: [num_experts, num_experts]
         if transition_matrix is not None:
             self.register_buffer("transition_matrix", transition_matrix)
         else:
             self.register_buffer("transition_matrix", torch.zeros((num_experts, num_experts)))
 
         fused_dim = 0
+        hidden_size = history * emb_dim
 
         if use_embedding:
             self.emb_branch = nn.Sequential(
@@ -128,7 +117,8 @@ class ExpertPredictor(nn.Module):
             fused_dim += p_dim
 
         self.post_fusion_norm = nn.LayerNorm(fused_dim)
-
+        
+        # Predicts a single Union multi-hot target
         self.classifier = nn.Sequential(
             nn.Linear(fused_dim, fused_dim),
             ResidualBlock(fused_dim, dropout),
@@ -145,40 +135,35 @@ class ExpertPredictor(nn.Module):
 
         if self.use_embedding:
             feats.append(self.emb_branch(embedding))
-
         if self.use_prefill:
             if prefill_dist is None:
                 prefill_dist = torch.full((B, self.num_experts), 1.0 / self.num_experts, device=embedding.device)
             feats.append(self.pfill_branch(prefill_dist))
-
         if self.use_prev:
             if prev_onehot is None:
                 prev_onehot = torch.zeros(B, self.num_experts, device=embedding.device)
             feats.append(self.prev_branch(prev_onehot))
-
         if self.use_markov:
-            # prev_onehot is a (normalized) distribution over active experts.
-            # Weighted sum of their transition rows gives expected next-expert dist.
             if prev_onehot is None:
                 prev_onehot = torch.zeros(B, self.num_experts, device=embedding.device)
-            markov_prior = prev_onehot @ self.transition_matrix  # [B, num_experts]
+            markov_prior = prev_onehot @ self.transition_matrix
             feats.append(self.markov_branch(markov_prior))
 
         fused = self.post_fusion_norm(torch.cat(feats, dim=-1))
-        return self.classifier(fused)
+        logits = self.classifier(fused)
+        return logits
 
     def save(self, path: Path):
         torch.save({'state': self.state_dict(), 'config': self.config}, path)
         with open(path.with_suffix('.json'), 'w') as f:
             json.dump(self.config, f, indent=2)
 
-class TransformerPredictor(nn.Module):
-    """
-    Predicts the top-K router experts at the next token using a Transformer.
-    """
+
+class TransformerMultiStepPredictor(nn.Module):
     def __init__(
         self,
         history: int = 1,
+        future_steps: int = 2,
         emb_dim: int = 4096,
         num_experts: int = 8,
         hidden_dim: int = 256,
@@ -195,14 +180,15 @@ class TransformerPredictor(nn.Module):
         super().__init__()
         self.config = {
             'arch': 'transformer',
-            'history': history, 'emb_dim': emb_dim,
-            'hidden_size': history * emb_dim, 
+            'history': history, 'future_steps': future_steps,
+            'emb_dim': emb_dim, 'hidden_size': history * emb_dim, 
             'num_experts': num_experts, 'hidden_dim': hidden_dim,
             'tx_layers': tx_layers, 'tx_heads': tx_heads,
             'use_embedding': use_embedding, 'use_prefill': use_prefill,
             'use_prev': use_prev, 'use_markov': use_markov, 'noise_std': noise_std
         }
         self.history = history
+        self.future_steps = future_steps
         self.emb_dim = emb_dim
         self.use_embedding = use_embedding
         self.use_prefill   = use_prefill
@@ -283,7 +269,8 @@ class TransformerPredictor(nn.Module):
             feats.append(self.markov_branch(markov_prior))
 
         fused = self.post_fusion_norm(torch.cat(feats, dim=-1))
-        return self.classifier(fused)
+        logits = self.classifier(fused)
+        return logits
 
     def save(self, path: Path):
         torch.save({'state': self.state_dict(), 'config': self.config}, path)
@@ -291,31 +278,19 @@ class TransformerPredictor(nn.Module):
             json.dump(self.config, f, indent=2)
 
 class JITWrapper(nn.Module):
-    """Fixed (emb, pfill, prev) signature for C++ LibTorch."""
     def __init__(self, model):
         super().__init__()
         self.model = model
     def forward(self, emb, pfill, prev):
         return self.model(emb, pfill, prev)
 
-# ──────────────────────────────────────────────────────────────────────────────
-# 2. Dataset
-# ──────────────────────────────────────────────────────────────────────────────
 
-class ExpertDataset(Dataset):
-    """
-    Builds (embedding, prefill_dist, prev_multihot) → target samples.
-
-    predict_k=1  → target is a scalar class index (for CrossEntropyLoss)
-    predict_k>1  → target is a float multi-hot vector (for BCEWithLogitsLoss)
-
-    prev_onehot is always multi-hot over all active_k experts, normalized
-    to sum=1 so it acts as a prior distribution.
-    """
-    def __init__(self, files, layer_idx, num_experts, active_k, predict_k, history):
+class ExpertDatasetMultiStep(Dataset):
+    def __init__(self, files, layer_idx, num_experts, active_k, predict_k, history, future_steps):
         self.samples = []
         self.num_experts = num_experts
         self.predict_k   = predict_k
+        self.future_steps = future_steps
 
         for fp in tqdm(files, desc=f"Loading L{layer_idx}"):
             payload = torch.load(fp, map_location='cpu', weights_only=False)
@@ -329,7 +304,7 @@ class ExpertDataset(Dataset):
             logits   = layer_data['router_logits']  # [T, num_experts]
             prev_ids = layer_data.get('prev_expert_ids')  # [T, active_k] or None
 
-            # Prefill distribution: [num_experts]
+            # Prefill distribution
             if 'prefill_expert_dist' in layer_data:
                 pfill = layer_data['prefill_expert_dist'].float()
             elif 'prefill_expert_count' in layer_data:
@@ -339,90 +314,75 @@ class ExpertDataset(Dataset):
                 pfill = torch.softmax(logits.float(), dim=-1).mean(dim=0)
 
             T = len(embs)
-            for t in range(T - 1):
-                # ── History window ─────────────────────────────────────────
+            
+            # Predict labels up to t + future_steps
+            for t in range(T - future_steps):
                 window = []
                 for h in range(history):
                     src = t - (history - 1 - h)
                     window.append(embs[src] if src >= 0 else torch.zeros_like(embs[0]))
 
-                # ── Previous experts: multi-hot, normalized ─────────────────
                 prev_oh = torch.zeros(num_experts)
                 if prev_ids is not None:
-                    prev_oh[prev_ids[t]] = 1.0        # all active_k bits
+                    prev_oh[prev_ids[t]] = 1.0
                 else:
                     prev_oh[logits[t].topk(active_k).indices] = 1.0
                 s = prev_oh.sum()
                 if s > 0:
                     prev_oh = prev_oh / s
 
-                # ── Target ─────────────────────────────────────────────────
-                if predict_k == 1:
-                    target = logits[t + 1].argmax().long()          # scalar
-                else:
-                    top_k_idx = logits[t + 1].topk(predict_k).indices
-                    target = torch.zeros(num_experts, dtype=torch.float32)
-                    target[top_k_idx] = 1.0                         # multi-hot
+                target_union = torch.zeros(num_experts, dtype=torch.float32)
+                target_weights = torch.ones(num_experts, dtype=torch.float32)
+                for f in range(1, future_steps + 1):
+                    t_idx = logits[t + f].topk(predict_k).indices
+                    target_union[t_idx] = 1.0
+                    target_weights[t_idx] += 1.0
 
                 self.samples.append({
                     'emb':    torch.cat(window),
-                    'target': target,
+                    'target': target_union,
+                    'weight': target_weights,
                     'pfill':  pfill,
                     'prev':   prev_oh,
                 })
 
+        if len(self.samples) > 0:
+            avg_union = sum(s['target'].sum().item() for s in self.samples) / len(self.samples)
+            print(f"  [{layer_idx}] Avg union size: {avg_union:.1f} / {num_experts} ({100*avg_union/num_experts:.1f}% dense)")
+
     def __len__(self):  return len(self.samples)
     def __getitem__(self, i): return self.samples[i]
 
-# ──────────────────────────────────────────────────────────────────────────────
-# 3. Metrics
-# ──────────────────────────────────────────────────────────────────────────────
 
 def compute_recall_at_k(logits: torch.Tensor, targets_mh: torch.Tensor, k: int) -> float:
-    """
-    Recall@K for multi-label prediction.
-    targets_mh: [B, num_experts] float multi-hot
-    Returns fraction of true experts captured in the top-K predictions.
-    """
-    pred_idx = logits.topk(k, dim=-1).indices          # [B, k]
-    pred_mh  = torch.zeros_like(targets_mh).scatter_(1, pred_idx, 1.0)
+    # logits/targets shape: [B, num_experts]
+    pred_idx = logits.topk(k, dim=-1).indices
+    pred_mh  = torch.zeros_like(targets_mh).scatter_(-1, pred_idx, 1.0)
     true_pos = (pred_mh * targets_mh).sum()
     total    = targets_mh.sum().clamp(min=1)
     return (true_pos / total).item()
 
-# ──────────────────────────────────────────────────────────────────────────────
-# 4. Transition Matrix
-# ──────────────────────────────────────────────────────────────────────────────
+def smooth_bce_loss(logits, targets, weights=None, smoothing=0.1):
+    # Only smooth the negatives — don't penalize confident positives
+    smoothed = targets * (1 - smoothing) + (1 - targets) * smoothing
+    return F.binary_cross_entropy_with_logits(logits, smoothed, weight=weights)
 
 def compute_transition_matrix(loader, num_experts: int) -> torch.Tensor:
-    """
-    Build a [num_experts, num_experts] row-stochastic transition matrix
-    from training data. Works for both scalar and multi-hot targets.
-    """
     counts = torch.zeros((num_experts, num_experts))
     for batch in loader:
-        curr = batch['prev']    # [B, num_experts] distribution
-        tgt  = batch['target']  # scalar or multi-hot
-        if tgt.dim() == 1 and tgt.dtype == torch.long:
-            # scalar → one-hot next
-            nxt = torch.zeros(len(tgt), num_experts).scatter_(1, tgt.unsqueeze(1), 1.0)
-        else:
-            nxt = tgt.float()
-        # Outer product accumulation: curr^T @ nxt
-        counts += curr.T.float() @ nxt.float()
+        curr = batch['prev'] 
+        tgt  = batch['target']
+        counts += curr.T.float() @ tgt.float()
     counts += 1e-5
     return counts / counts.sum(dim=1, keepdim=True)
 
-# ──────────────────────────────────────────────────────────────────────────────
-# 5. Training Engine
-# ──────────────────────────────────────────────────────────────────────────────
 
 def run_predictor_task(args, layer_idx, hidden_dim, history,
                        use_emb=True, use_pfill=True, use_prev=False,
                        use_markov=False, custom_name=None):
-    """Train a single model configuration and return best validation metric."""
 
-    predict_k   = args.predict_k
+    predict_k    = args.predict_k
+    future_steps = args.future_steps
     multilabel   = (predict_k > 1)
     
     arch = getattr(args, 'arch', 'mlp')
@@ -430,12 +390,15 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
     if custom_name:
         config_name = f"{arch_prefix}{custom_name}"
     else:
-        config_name = f"{arch_prefix}eh{history}_h{hidden_dim}"
+        config_name = f"{arch_prefix}eh{history}_h{hidden_dim}_f{future_steps}"
 
-    out_dir      = Path(args.output_dir) / config_name / f"layer_{layer_idx}"
+    out_dir = Path(args.output_dir) / config_name / f"layer_{layer_idx}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # ── Data ──────────────────────────────────────────────────────────────────
+    print(f"\n" + "="*60)
+    print(f"Starting Task: {config_name} | Layer: {layer_idx}")
+    print("="*60)
+
     data_path = Path(args.data_dir)
     if not data_path.exists():
         sys.exit(f"ERROR: data_dir does not exist: {data_path.resolve()}")
@@ -444,70 +407,72 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
         sys.exit(f"ERROR: No .pt files found in: {data_path.resolve()}")
     print(f"  Found {len(files)} .pt files in {data_path.resolve()}")
 
-    random.seed(42); random.shuffle(files)
-    split = max(1, int(0.8 * len(files)))   # at least 1 train file
-
     ds_kwargs = dict(
         layer_idx=layer_idx, num_experts=args.n_exp,
-        active_k=args.active_k, predict_k=predict_k, history=history
+        active_k=args.active_k, predict_k=predict_k, 
+        history=history, future_steps=future_steps
     )
+    random.seed(42); random.shuffle(files)
+    split = max(1, int(0.8 * len(files)))
     train_files = list(files)[:split]
-    val_files   = list(files)[split:] if split < len(files) else [files[-1]]  # reuse last if tiny set
-    train_ds = ExpertDataset(train_files, **ds_kwargs)
-    val_ds   = ExpertDataset(val_files,   **ds_kwargs)
+    val_files   = list(files)[split:] if split < len(files) else train_files[-1:]
+
+    train_ds = ExpertDatasetMultiStep(train_files, **ds_kwargs)
+    val_ds   = ExpertDatasetMultiStep(val_files,   **ds_kwargs)
 
     loader_kwargs = dict(batch_size=args.batch_size, num_workers=2, pin_memory=True)
     train_loader  = DataLoader(train_ds, shuffle=True,  **loader_kwargs)
     val_loader    = DataLoader(val_ds,   shuffle=False, **loader_kwargs)
 
-    # ── Model ─────────────────────────────────────────────────────────────────
     trans_mat = None
     if use_markov:
         trans_mat = compute_transition_matrix(train_loader, args.n_exp)
 
     model_kwargs = dict(
-        num_experts=args.n_exp, hidden_dim=hidden_dim, 
+        future_steps=future_steps,
+        num_experts=args.n_exp, hidden_dim=hidden_dim,
+        dropout=getattr(args, 'dropout', 0.1),
         use_embedding=use_emb, use_prefill=use_pfill, 
         use_prev=use_prev, use_markov=use_markov,
         transition_matrix=trans_mat, noise_std=args.noise
     )
 
-    if getattr(args, 'arch', 'mlp') == 'transformer':
-        model = TransformerPredictor(
+    if arch == 'transformer':
+        model = TransformerMultiStepPredictor(
             history=history, emb_dim=args.emb_dim,
             tx_layers=args.tx_layers, tx_heads=args.tx_heads,
             **model_kwargs
         ).to(args.device)
     else:
-        model = ExpertPredictor(
-            hidden_size=args.emb_dim * history,
+        model = MultiStepExpertPredictor(
+            history=history, emb_dim=args.emb_dim,
             **model_kwargs
         ).to(args.device)
 
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"  Architecture     : {getattr(args, 'arch', 'mlp').upper()}")
+    print(f"  Architecture     : {arch.upper()} (Predicting {future_steps} steps ahead)")
     print(f"  Trainable Params : {total_params:,}\n")
 
-    # ── Loss ──────────────────────────────────────────────────────────────────
-    multilabel = (predict_k > 1)
-    if multilabel:
-        criterion = nn.BCEWithLogitsLoss()
-    else:
-        criterion = nn.CrossEntropyLoss(label_smoothing=args.smoothing)
+    # Given the Union Lookahead Target, we strictly evaluate BCE
+    criterion = nn.BCEWithLogitsLoss()
 
     optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=args.lr * 0.01)
 
     best_metric, logs = 0.0, []
-    metric_name = f"recall@{predict_k}" if multilabel else "top1_acc"
+    eval_k = getattr(args, 'prefetch_k', predict_k)
+    metric_name = f"union_recall@{eval_k}"
 
-    # ── Training Loop ─────────────────────────────────────────────────────────
+    patience = getattr(args, 'patience', 3)
+    no_improve = 0
+
     for epoch in range(args.epochs):
         epoch_log = {'epoch': epoch + 1}
 
         for phase in ('train', 'val'):
             model.train(phase == 'train')
-            loss_sum, metric_sum, total = 0.0, 0.0, 0
+            loss_sum, tp_sum, tot_sum = 0.0, 0.0, 0.0
+            total = 0
 
             with torch.set_grad_enabled(phase == 'train'):
                 loader = train_loader if phase == 'train' else val_loader
@@ -516,12 +481,15 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
                     b = {k: v.to(args.device) for k, v in b.items()}
                     out_logits = model(b['emb'], b['pfill'], b['prev'])
 
-                    if multilabel:
-                        loss = criterion(out_logits, b['target'])
-                        batch_metric = compute_recall_at_k(out_logits, b['target'], predict_k)
-                    else:
-                        loss = criterion(out_logits, b['target'])
-                        batch_metric = (out_logits.argmax(-1) == b['target']).float().mean().item()
+                    loss = smooth_bce_loss(out_logits, b['target'], weights=b.get('weight'), smoothing=args.smoothing)
+                    eval_k = getattr(args, 'prefetch_k', predict_k)
+                    
+                    with torch.no_grad():
+                        pred_idx = out_logits.topk(eval_k, dim=-1).indices
+                        pred_mh  = torch.zeros_like(b['target']).scatter_(-1, pred_idx, 1.0)
+                        batch_tp = (pred_mh * b['target']).sum().item()
+                        batch_tot = b['target'].sum().clamp(min=1).item()
+                        batch_metric = batch_tp / max(batch_tot, 1)
 
                     if phase == 'train':
                         optimizer.zero_grad(set_to_none=True)
@@ -531,16 +499,17 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
 
                     B = len(b['target'])
                     loss_sum    += loss.item() * B
-                    metric_sum  += batch_metric * B
+                    tp_sum      += batch_tp
+                    tot_sum     += batch_tot
                     total       += B
                     
-                    pbar.set_postfix({'loss': loss.item(), metric_name: batch_metric})
+                    pbar.set_postfix({'loss': f"{loss.item():.4f}", metric_name: f"{batch_metric:.4f}"})
 
             if phase == 'train':
                 scheduler.step()
 
             avg_loss = loss_sum / total
-            avg_metric = metric_sum / total
+            avg_metric = tp_sum / max(tot_sum, 1)
             epoch_log[phase] = {'loss': avg_loss, metric_name: avg_metric}
 
             if phase == 'val':
@@ -559,32 +528,36 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
                         torch.jit.trace(wrapper, (ex_emb, ex_pf, ex_pr), check_trace=False, strict=False).save(str(out_dir / "best_jit.pt"))
                     except Exception as e:
                         print(f"  JIT failed: {e}")
+                    no_improve = 0
+                else:
+                    no_improve += 1
+
+        if no_improve >= patience:
+            print(f"  Early stopping triggered at epoch {epoch+1}")
+            break
 
         logs.append(epoch_log)
 
     with open(out_dir / "training_metrics.json", 'w') as f:
         json.dump({
             'layer_idx': layer_idx, 'hidden_dim': hidden_dim, 'history': history,
-            'config_name': config_name, 'predict_k': predict_k,
-            'metric': metric_name, 'best': best_metric, 'best_acc': best_metric,  # best_acc alias for plot compat
+            'future_steps': future_steps, 'config_name': config_name, 
+            'predict_k': predict_k, 'metric': metric_name, 
+            'best': best_metric, 'best_acc': best_metric,
             'epochs': logs
         }, f, indent=2)
 
     return best_metric
 
-# ──────────────────────────────────────────────────────────────────────────────
-# 6. CLI & Orchestration
-# ──────────────────────────────────────────────────────────────────────────────
-
 def resolve_args(args):
-    """Inject model defaults if a model name was provided."""
     if args.model:
         emb_dim, n_exp, active_k, n_layers, pf_k, predict_k = MODEL_DEFAULTS[args.model]
         args.emb_dim, args.n_exp, args.active_k = emb_dim, n_exp, active_k
         args.n_layers, args.pf_k = n_layers, pf_k
-        # CLI --predict_k overrides the model default
         if not getattr(args, 'predict_k', None):
             args.predict_k = predict_k
+        if not getattr(args, 'prefetch_k', None):
+            args.prefetch_k = args.pf_k
     else:
         if not hasattr(args, 'emb_dim'):   args.emb_dim  = 4096
         if not hasattr(args, 'n_exp'):     args.n_exp    = 8
@@ -593,7 +566,6 @@ def resolve_args(args):
         if not hasattr(args, 'predict_k') or not args.predict_k:
             args.predict_k = args.active_k
             
-    # Auto-resolve directories based on model if not provided
     model_name = args.model if args.model else "mixtral_8x7b"
     if not getattr(args, 'data_dir', None):
         args.data_dir = f"../../trainingData/{model_name}"
@@ -602,49 +574,42 @@ def resolve_args(args):
         
     return args
 
-
 if __name__ == "__main__":
-    date_str = datetime.now().strftime('%Y%m%d_%H%M%S')
-
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    # Shared base args
     base = argparse.ArgumentParser(add_help=False)
     base.add_argument('--data_dir',   default=None)
     base.add_argument('--output_dir', default=None)
     base.add_argument('--model',      choices=MODEL_DEFAULTS.keys())
-    base.add_argument('--predict_k',  type=int, default=None,
-                      help="How many top experts to predict. Defaults to model's active_k. "
-                           "predict_k=1 uses CrossEntropyLoss; predict_k>1 uses BCEWithLogitsLoss + Recall@K.")
+    base.add_argument('--predict_k',  type=int, default=None)
+    base.add_argument('--prefetch_k', type=int, default=None, help="Cache budget for recall metric")
+    base.add_argument('--future_steps', type=int, default=2, help="How many steps ahead to predict.")
     base.add_argument('--device',     default='cuda' if torch.cuda.is_available() else 'cpu')
     base.add_argument('--epochs',     type=int, default=10)
     base.add_argument('--batch_size', type=int, default=128)
     base.add_argument('--lr',         type=float, default=1e-3)
     base.add_argument('--noise',      type=float, default=0.01)
-    base.add_argument('--smoothing',  type=float, default=0.1,
-                      help="Label smoothing for CrossEntropyLoss (predict_k=1 only).")
+    base.add_argument('--smoothing',  type=float, default=0.1)
+    base.add_argument('--dropout',    type=float, default=0.1, help="Dropout rate in model layers")
+    base.add_argument('--patience',   type=int, default=3)
     base.add_argument('--weight_decay', type=float, default=0.01)
 
-    # Architecture
     base.add_argument('--arch',       choices=['mlp', 'transformer'], default='mlp')
     base.add_argument('--tx_layers',  type=int, default=2)
     base.add_argument('--tx_heads',   type=int, default=4)
 
-    # ── train ─────────────────────────────────────────────────────────────────
     p_train = subparsers.add_parser('train', parents=[base])
     p_train.add_argument('--layer',   type=int)
     p_train.add_argument('--history', type=int, default=1)
     p_train.add_argument('--hidden',  type=int, default=128)
 
-    # ── sweep ─────────────────────────────────────────────────────────────────
     p_sweep = subparsers.add_parser('sweep', parents=[base])
     p_sweep.add_argument('--hiddens',   nargs='+', type=int, default=[64, 128, 256])
     p_sweep.add_argument('--histories', nargs='+', type=int, default=[1, 2])
     p_sweep.add_argument('--layers',    nargs='+', type=int, default=list(range(32)))
     p_sweep.add_argument('--max_mb',    type=float, default=70.0)
 
-    # ── ablation ──────────────────────────────────────────────────────────────
     p_abl = subparsers.add_parser('ablation', parents=[base])
     p_abl.add_argument('--layers',    nargs='+', type=int, default=list(range(32)))
     p_abl.add_argument('--hiddens',   nargs='+', type=int, default=[128, 256])
@@ -652,7 +617,6 @@ if __name__ == "__main__":
 
     args = resolve_args(parser.parse_args())
 
-    # Ablation variants: (name, use_emb, use_pfill, use_prev, use_markov)
     ABLATION_VARIANTS = [
         ("emb_only",      True,  False, False, False),
         ("pfill_only",    False, True,  False, False),
@@ -687,5 +651,5 @@ if __name__ == "__main__":
                         run_predictor_task(
                             args, l, h, hist,
                             use_emb=e, use_pfill=pf, use_prev=pr, use_markov=mk,
-                            custom_name=f"ablation_{name}_hist{hist}_h{h}"
+                            custom_name=f"ablation_{name}_hist{hist}_h{h}_f{args.future_steps}"
                         )

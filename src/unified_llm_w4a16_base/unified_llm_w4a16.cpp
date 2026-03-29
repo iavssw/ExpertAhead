@@ -578,22 +578,34 @@ void QuantizedLinearImpl::set_quantized_weights(torch::Tensor qweight, torch::Te
     auto w_high = w_view.select(-1, 1).to(torch::kUInt8);
     auto packed_w = torch::bitwise_or(torch::bitwise_and(w_low, 0x0F), torch::bitwise_left_shift(torch::bitwise_and(w_high, 0x0F), 4));
 
-    quantized_weight_ = packed_w;
+    // Force resize to match incoming shapes so we can copy_ in place
+    quantized_weight_.resize_(packed_w.sizes());
+    quantized_weight_.copy_(packed_w.to(device));
 
     // Handle Scales and Zeros
     if (scale.size(0) == out_features_ && scale.dim() == 1) {
-        scale_ = scale.to(device).to(torch::kBFloat16);
-        zero_point_ = zero_point.to(device).to(torch::kInt8);
+        scale_.resize_(scale.sizes());
+        zero_point_.resize_(scale.sizes());
+        scale_.copy_(scale.to(device).to(torch::kBFloat16));
+        zero_point_.copy_(zero_point.to(device).to(torch::kInt8));
     } else {
         int64_t num_scales = scale.numel();
         int64_t n_groups = num_scales / out_features_;
 
         if (scale.size(1) == out_features_) {
-            scale_ = scale.t().contiguous().to(device).to(torch::kBFloat16);
-            zero_point_ = zero_point.t().contiguous().to(device).to(torch::kInt8);
+            auto s_flat = scale.t().contiguous();
+            auto z_flat = zero_point.t().contiguous();
+            scale_.resize_(s_flat.sizes());
+            zero_point_.resize_(z_flat.sizes());
+            scale_.copy_(s_flat.to(device).to(torch::kBFloat16));
+            zero_point_.copy_(z_flat.to(device).to(torch::kInt8));
         } else {
-            scale_ = scale.reshape({out_features_, n_groups}).to(device).to(torch::kBFloat16);
-            zero_point_ = zero_point.reshape({out_features_, n_groups}).to(device).to(torch::kInt8);
+            auto s_shaped = scale.reshape({out_features_, n_groups});
+            auto z_shaped = zero_point.reshape({out_features_, n_groups});
+            scale_.resize_(s_shaped.sizes());
+            zero_point_.resize_(z_shaped.sizes());
+            scale_.copy_(s_shaped.to(device).to(torch::kBFloat16));
+            zero_point_.copy_(z_shaped.to(device).to(torch::kInt8));
         }
     }
 }
@@ -601,9 +613,13 @@ void QuantizedLinearImpl::set_quantized_weights(torch::Tensor qweight, torch::Te
 void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torch::Tensor scale, torch::Tensor zero_point) {
     auto device = quantized_weight_.device();
 
-    quantized_weight_ = qweight_packed.to(torch::kUInt8).contiguous().to(device);
-    scale_ = scale.to(torch::kBFloat16).contiguous().to(device);
-    zero_point_ = zero_point.to(torch::kInt8).contiguous().to(device);
+    quantized_weight_.resize_(qweight_packed.sizes());
+    scale_.resize_(scale.sizes());
+    zero_point_.resize_(zero_point.sizes());
+
+    quantized_weight_.copy_(qweight_packed.to(torch::kUInt8).contiguous().to(device));
+    scale_.copy_(scale.to(torch::kBFloat16).contiguous().to(device));
+    zero_point_.copy_(zero_point.to(torch::kInt8).contiguous().to(device));
 }
 
 // MixtureOfExpertsImpl Implementation
@@ -1120,8 +1136,8 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
     bool use_qkv_bias = false;
 
     // Initialize quantized layers for each transformer block
-    // Initialize quantized layers for each transformer block
     for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        torch::DeviceGuard device_guard(layer_devices_[i]);
         // Attention layers (quantized)
         q_layers.push_back(register_module(
             "q_" + std::to_string(i), QuantizedLinear(hidden_size_, num_attention_heads_ * head_dim_, use_qkv_bias, max_seq_len_, "q")));
