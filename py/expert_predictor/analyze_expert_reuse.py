@@ -13,6 +13,7 @@ import torch
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
 
 MODEL_DEFAULTS = {
     "mixtral_8x7b":  (8,   2, 32),
@@ -118,7 +119,30 @@ def analyze_reuse(args):
 
     if log_file:
         log_file.close()
-        print(f"\nFull report saved to: {args.output_file}")
+        print(f"\nFull report saved to: {output_file_full}")
+
+    # --- CSV Export ---
+    csv_filename = f"{output_prefix}_{args.model}.csv"
+    try:
+        with open(csv_filename, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            sorted_layers = sorted(plot_data.keys())
+            # Header: window_size, layer_0, layer_1, ...
+            header = ['window_size'] + [f'layer_{l}' for l in sorted_layers]
+            writer.writerow(header)
+            
+            for w_idx in range(args.max_window):
+                window_size = w_idx + 1
+                row = [window_size]
+                for l_idx in sorted_layers:
+                    if w_idx < len(plot_data[l_idx]):
+                        row.append(f"{plot_data[l_idx][w_idx]:.4f}")
+                    else:
+                        row.append("")
+                writer.writerow(row)
+        print(f"Data saved to CSV: {csv_filename}")
+    except Exception as e:
+        print(f"Warning: Could not save CSV: {e}")
 
     if args.plot:
         # Plot 1: Unique Experts vs Window Size (Normalized to total experts)

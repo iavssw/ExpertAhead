@@ -522,10 +522,16 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
                     model.save(out_dir / "best.pt")
                     try:
                         wrapper = JITWrapper(model).eval()
-                        ex_emb = torch.randn(1, args.emb_dim * history).to(args.device)
-                        ex_pf  = torch.zeros(1, args.n_exp).to(args.device)
-                        ex_pr  = torch.zeros(1, args.n_exp).to(args.device)
-                        torch.jit.trace(wrapper, (ex_emb, ex_pf, ex_pr), check_trace=False, strict=False).save(str(out_dir / "best_jit.pt"))
+                        # Must match the model's first Linear in_features (history * emb_dim), not args.emb_dim alone
+                        # (args can disagree with MODEL_DEFAULTS / checkpoint after resolve_args -> matmul shape errors).
+                        hs = int(model.config["hidden_size"])
+                        ne = int(model.config["num_experts"])
+                        ex_emb = torch.randn(1, hs).to(args.device)
+                        ex_pf = torch.zeros(1, ne).to(args.device)
+                        ex_pr = torch.zeros(1, ne).to(args.device)
+                        torch.jit.trace(wrapper, (ex_emb, ex_pf, ex_pr), check_trace=False, strict=False).save(
+                            str(out_dir / "best_jit.pt")
+                        )
                     except Exception as e:
                         print(f"  JIT failed: {e}")
                     no_improve = 0
