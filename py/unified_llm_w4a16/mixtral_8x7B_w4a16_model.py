@@ -193,6 +193,7 @@ class Mixtral8x7BW4A16Model:
         prefetch_experts_count: int = 1,
         predict_layers: Optional[List[int]] = None,
         per_layer_cache_sizes: Optional[List[int]] = None,
+        expert_reuse_csv: Optional[str] = None,
     ):
         """
         Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
@@ -283,9 +284,17 @@ class Mixtral8x7BW4A16Model:
         else:
             constructor_args.append(config_path)
         if backend == "predict":
+            # If CSV provided, calibrate fair metrics
+            if expert_reuse_csv and predictor_models_dir:
+                per_layer_cache_sizes, per_layer_prefetch_counts = self._calibrate_from_csv(expert_reuse_csv, predictor_models_dir)
+                print(f"[Calibration] Loaded per-layer counts from {expert_reuse_csv}")
+            else:
+                per_layer_prefetch_counts = []
+
             constructor_args.append(prefetch_experts_count)
             constructor_args.append(predict_layers if predict_layers is not None else [])
             constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
+            constructor_args.append(per_layer_prefetch_counts)
             
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
 
@@ -333,6 +342,57 @@ class Mixtral8x7BW4A16Model:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
         else:
             self.tokenizer = None
+    def _calibrate_from_csv(self, csv_path: str, predictor_path: str):
+        """
+        Calibrate global 'fair' cache and prefetch counts from an expert reuse CSV file.
+        Matches window_size in CSV with 'fN' in predictor_path.
+        Formula:
+          cache_size = ceil(1.2 * max(unique_experts_per_layer))
+          prefetch_budget = round(avg(unique_experts_per_layer))
+        """
+        import csv
+        import math
+
+        # 1. Detect window size (fN) from predictor_path
+        window_size = 1
+        match = re.search(r"f(\d+)", predictor_path)
+        if match:
+            window_size = int(match.group(1))
+            print(f"[Calibration] Detected window_size {window_size} from predictor path")
+        else:
+            print(f"[Calibration] Warning: Could not detect window_size from path '{predictor_path}', defaulting to f1")
+
+        raw_counts = None
+        try:
+            with open(csv_path, mode='r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if int(row['window_size']) == window_size:
+                        raw_counts = []
+                        for k, v in row.items():
+                            if k.startswith('layer_'):
+                                raw_counts.append(float(v))
+                        break
+        except Exception as e:
+            print(f"[Calibration] Error reading CSV {csv_path}: {e}")
+
+        if not raw_counts:
+            print(f"[Calibration] Warning: window_size {window_size} not found in CSV, using fallback defaults")
+            return [8] * self.num_hidden_layers, [8] * self.num_hidden_layers
+
+        # Formula:
+        # 1. Cache Size: 1.2 * max(unique experts)
+        fair_cache = int(math.ceil(1.2 * max(raw_counts)))
+        # 2. Prefetch Budget: avg(unique experts)
+        fair_prefetch = int(round(sum(raw_counts) / len(raw_counts)))
+        
+        print(f"[Calibration] Calculated Fair Metrics: Cache={fair_cache}, Prefetch={fair_prefetch}")
+
+        # Return flat lists to satisfy the predict backend's per-layer requirement
+        cache_list = [fair_cache] * self.num_hidden_layers
+        prefetch_list = [fair_prefetch] * self.num_hidden_layers
+        
+        return cache_list, prefetch_list
 
     def _load_quantized_weights(self, model_path: str, weights_folder: str = "model_weights"):
         """Load quantized weights from safetensors and pass to the C++ backend."""

@@ -191,6 +191,8 @@ class Qwen3_30BA3BW4A16Model:
         prefetch_experts_count: int = 1,
         predict_layers: Optional[List[int]] = None,
         per_layer_cache_sizes: Optional[List[int]] = None,
+        expert_reuse_csv: Optional[str] = None,
+        predictor_lookahead: int = 1,
     ):
         """
         Initialize Qwen3 30B-A3B AWQ w4a16 quantized model.
@@ -270,16 +272,26 @@ class Qwen3_30BA3BW4A16Model:
             else:
                 config_to_pass = config_path
             
+            if expert_reuse_csv and predictor_models_dir:
+                per_layer_cache_sizes, per_layer_prefetch_counts = self._calibrate_from_csv(expert_reuse_csv, predictor_models_dir)
+                print(f"[Calibration] Loaded per-layer counts from {expert_reuse_csv}")
+            else:
+                per_layer_prefetch_counts = []
+
             constructor_args.append(max_cached_experts_per_layer)
             constructor_args.append(predictor_models_dir)
             constructor_args.append(config_to_pass)
             constructor_args.append(prefetch_experts_count)
             constructor_args.append(predict_layers if predict_layers is not None else [])
             constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
+            constructor_args.append(per_layer_prefetch_counts)
         else:
             constructor_args.append(config_path)
 
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
+
+        if backend == "predict" and predictor_lookahead > 1 and hasattr(self.model, "set_predictor_lookahead"):
+            self.model.set_predictor_lookahead(predictor_lookahead)
 
         # Clean up temp config
         if backend == "predict" and 'tmp' in dir() and hasattr(tmp, 'name'):
@@ -325,6 +337,59 @@ class Qwen3_30BA3BW4A16Model:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
         else:
             self.tokenizer = None
+
+    def _calibrate_from_csv(self, csv_path: str, predictor_path: str):
+        """
+        Calibrate global 'fair' cache and prefetch counts from an expert reuse CSV file.
+        Matches window_size in CSV with 'fN' in predictor_path.
+        Formula:
+          cache_size = ceil(1.2 * max(unique_experts_per_layer))
+          prefetch_budget = round(avg(unique_experts_per_layer))
+        """
+        import csv
+        import math
+
+        # 1. Detect window size (fN) from predictor_path
+        window_size = 1
+        match = re.search(r"f(\d+)", predictor_path)
+        if match:
+            window_size = int(match.group(1))
+            print(f"[Calibration] Detected window_size {window_size} from predictor path")
+        else:
+            print(f"[Calibration] Warning: Could not detect window_size from path '{predictor_path}', defaulting to f1")
+
+        raw_counts = None
+        try:
+            with open(csv_path, mode='r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if int(row['window_size']) == window_size:
+                        raw_counts = []
+                        for k, v in row.items():
+                            if k.startswith('layer_'):
+                                raw_counts.append(float(v))
+                        break
+        except Exception as e:
+            print(f"[Calibration] Error reading CSV {csv_path}: {e}")
+
+        if not raw_counts:
+            print(f"[Calibration] Warning: window_size {window_size} not found in CSV, using fallback defaults")
+            # Default to 8 experts per layer if CSV fails
+            return [8] * self.num_hidden_layers, [8] * self.num_hidden_layers
+
+        # Formula:
+        # 1. Cache Size: 1.2 * max(unique experts)
+        fair_cache = int(math.ceil(1.2 * max(raw_counts)))
+        # 2. Prefetch Budget: avg(unique experts)
+        fair_prefetch = int(round(sum(raw_counts) / len(raw_counts)))
+        
+        print(f"[Calibration] Calculated Fair Metrics: Cache={fair_cache}, Prefetch={fair_prefetch}")
+
+        # Return flat lists to satisfy the predict backend's per-layer requirement
+        cache_list = [fair_cache] * self.num_hidden_layers
+        prefetch_list = [fair_prefetch] * self.num_hidden_layers
+        
+        return cache_list, prefetch_list
 
     def _load_quantized_weights(self, model_path: str, weights_folder: str = "model_weights"):
         """Load quantized weights from safetensors and pass to the C++ backend."""
@@ -592,6 +657,21 @@ class Qwen3_30BA3BW4A16Model:
         """Set the expert cache eviction policy."""
         if hasattr(self.model, "set_cache_policy"):
             self.model.set_cache_policy(policy)
+
+    def set_lambda(self, lambda_value: float, layer_idx: int = -1):
+        """Set the cache-conditional routing bias strength (λ).
+
+        When λ > 0 the router logits are biased toward currently-cached experts,
+        increasing cache hit rate without a predictor.
+
+        Args:
+            lambda_value: Bias strength in range [0, 100].
+            layer_idx: Layer to target (-1 = all layers).
+        """
+        if lambda_value < 0.0 or lambda_value > 100.0:
+            raise ValueError(f"Lambda must be in range [0, 100], got: {lambda_value}")
+        if hasattr(self.model, "set_lambda"):
+            self.model.set_lambda(lambda_value, layer_idx)
 
     def set_forced_top_n(self, n: int):
         """Set how many unbiased top-K experts are forced into the lambda bias mask."""
@@ -1192,6 +1272,13 @@ def main():
     parser.add_argument("--predictor-model", type=str, default="")
     parser.add_argument("--predictor-device", type=str, default="gpu")
     parser.add_argument(
+        "--predictor-lookahead", type=int, default=1,
+        help="Invoke the predictor every N decode tokens where N = lookahead depth (fN from model path). "
+             "Default 1 = every token (original behaviour)."
+    )
+    parser.add_argument("--expert-reuse-csv", type=str, default=None,
+                        help="Path to expert_reuse.csv to calibrate per-layer cache and prefetch counts.")
+    parser.add_argument(
         "--forced-top-n", type=int, default=0,
         help="(cached backend) Force the top-N unbiased experts into the cache mask every step. "
              "0 = disabled (standard routing)."
@@ -1254,6 +1341,8 @@ def main():
             predictor_models_dir=args.predictor_model,
             predictor_device=args.predictor_device,
             predict_layers=args.predict_layers,
+            expert_reuse_csv=args.expert_reuse_csv,
+            predictor_lookahead=args.predictor_lookahead,
         )
 
         print("Model initialized successfully!")
@@ -1266,6 +1355,10 @@ def main():
         print("  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path")
         print("  3. Model weights are loaded (if required)")
         return 1
+
+    if args.lambda_val != 0.0 and hasattr(model, 'set_lambda'):
+        print(f"Setting lambda to {args.lambda_val}")
+        model.set_lambda(args.lambda_val)
 
     # Apply forced-top-N if requested (cached backend only)
     if args.forced_top_n > 0 and hasattr(model, 'set_forced_top_n'):

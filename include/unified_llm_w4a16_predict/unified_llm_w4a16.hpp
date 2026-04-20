@@ -128,7 +128,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
                          double lambda = 0.0, const std::string& predictor_model_path = "", torch::Device predictor_device = torch::kCPU,
                          int64_t prefetch_experts_count = 1);
 
-    torch::Tensor forward(const torch::Tensor &x);
+    torch::Tensor forward(const torch::Tensor &x, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
     void set_weights_dir(const std::string& dir) { weights_dir_ = dir; }
     void prefill_cache_for_testing();
     void prewarm_experts(int64_t num_to_warm);
@@ -175,7 +175,13 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
         pred_hits_no_bias_ = 0;
         pred_total_ = 0;
         last_true_top1_expert_ = -1;  // Reset so first token doesn't count
+        decode_token_count_ = 0;      // Reset stride counter for new generation
     }
+
+    // Lookahead stride: only invoke the predictor every N tokens (N = lookahead depth).
+    // Default 1 = run every token (original behaviour).
+    void set_lookahead_stride(int64_t stride) { lookahead_stride_ = std::max(int64_t(1), stride); }
+    int64_t get_lookahead_stride() const { return lookahead_stride_; }
 
     // Sequential top1 caching stats (generation only)
     std::tuple<int64_t, int64_t> get_sequential_top1_stats() const {
@@ -189,8 +195,24 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
 
     // Prediction & Speculative Loading
     void set_context_token_ids(const std::vector<int64_t>& token_ids);
-    void trigger_speculative_loading(const torch::Tensor& embedding);
+    void trigger_speculative_loading(const torch::Tensor& embedding, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
+    /// One-shot predictor + prefetch after prefill (uses last / prev-prefill-token routing; does not use decode prev_token state).
+    void run_predictor_prefill_warmup(const torch::Tensor& embedding, const torch::Tensor& prefill_dist_row,
+                                    const torch::Tensor& prev_expert_mh_row, c10::optional<torch::Tensor> prev_layers_feat);
     void load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids);
+
+    bool has_predictor() const { return predictor_ != nullptr; }
+    void set_suppress_predictor_stats(bool v) { suppress_predictor_stats_ = v; }
+    void wait_for_speculative_idle() {
+        if (speculative_load_future_.valid()) {
+            speculative_load_future_.wait();
+        }
+    }
+    torch::Tensor get_prefill_expert_counts() const { return prefill_expert_counts_; }
+
+    torch::Tensor routing_mh_current_token_cpu() const { return routing_mh_current_token_; }
+    torch::Tensor prefill_last_token_mh_cpu() const { return prefill_last_token_mh_; }
+    torch::Tensor prefill_prev_token_mh_cpu() const { return prefill_prev_token_mh_; }
 
     // Exposed for weight loading
     LinearMatmul router{nullptr};
@@ -275,6 +297,15 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
     
+    // Unbiased routing features (float32, CPU) for predictor inputs — matches training multi-hot + normalize.
+    torch::Tensor routing_mh_current_token_;  // current forward row (decode: one token; prefill: last row)
+    torch::Tensor prev_token_routing_mh_;      // previous token (for decode predictor "prev" branch)
+    torch::Tensor prefill_last_token_mh_;      // last prefill position, per layer
+    torch::Tensor prefill_prev_token_mh_;      // second-to-last prefill position (prompt_len >= 2)
+    bool suppress_predictor_stats_ = false;    // prefill-end warmup: do not count predictor hits / prefetch loads in stats
+    int64_t lookahead_stride_ = 1;             // invoke predictor every N decode tokens (N = lookahead depth)
+    int64_t decode_token_count_ = 0;           // counts decode tokens since last predictor call
+
     // Prediction & Speculative Loading
     std::unique_ptr<IExpertPredictor> predictor_;
     std::vector<int64_t> recent_token_ids_;
@@ -290,7 +321,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);
     torch::Tensor forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
-                                     torch::Tensor &output, int64_t current_true_top1);
+                                     torch::Tensor &output, int64_t current_true_top1,
+                                     c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
     torch::Tensor forward_prefill(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                                   torch::Tensor &output);
 };
@@ -307,7 +339,8 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                         torch::Device device = torch::kCPU, int64_t max_cached_experts_per_layer = 0,
                         const std::string& predictor_model_path = "", int64_t prefetch_experts_count = 1,
                         const std::vector<int>& predict_layers = {},
-                        const std::vector<int64_t>& per_layer_cache_sizes = {});
+                        const std::vector<int64_t>& per_layer_cache_sizes = {},
+                        const std::vector<int64_t>& per_layer_prefetch_counts = {});
 
     // Forward pass: takes token IDs and returns logits
     torch::Tensor forward(torch::Tensor input_ids, int64_t start_pos = 0);
@@ -354,6 +387,10 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Each element: (hits, total) for that layer
     std::vector<std::tuple<int64_t, int64_t>> get_predictor_stats() const;
     void reset_predictor_stats();
+
+    // Set how often the predictor fires: every `stride` decode tokens.
+    // Call this after construction with stride = lookahead depth (fN from predictor path).
+    void set_predictor_lookahead(int64_t stride);
 
     std::vector<std::tuple<int64_t, int64_t>> get_sequential_top1_stats() const;
     void reset_sequential_top1_stats();
@@ -456,6 +493,12 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     torch::Tensor forward_mixtral(torch::Tensor x, int64_t start_pos);
     torch::Tensor forward_qwen_multi_gpu(torch::Tensor x, int64_t start_pos);
     torch::Tensor forward_qwen(torch::Tensor x, int64_t start_pos);
+
+    /// After a multi-token prefill, run each layer predictor once to prefetch experts for the first decode step.
+    void warm_predictor_caches_after_prefill(int64_t prompt_len);
+
+    // Last-token MoE inputs from the most recent forward (for prefill warmup); [hidden_size] per layer, CPU.
+    std::vector<torch::Tensor> prefill_last_moe_inputs_cpu_;
 
     // Activation functions
     torch::Tensor silu(const torch::Tensor &x);

@@ -22,7 +22,7 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
                         int64_t num_hidden_layers, int64_t num_attention_heads, int64_t num_key_value_heads, int64_t head_dim,
                         float rms_norm_eps, float rope_theta, int64_t max_seq_len, int64_t max_batch_size, int64_t groupsize,
                         int64_t num_experts, int64_t num_experts_per_tok, const std::string &device_str,
-                        int64_t max_cached_experts_per_layer, const std::string predictor_model_path, const std::string &config_path, int64_t prefetch_experts_count, std::vector<int> predict_layers, std::vector<int64_t> per_layer_cache_sizes) {
+                        int64_t max_cached_experts_per_layer, const std::string predictor_model_path, const std::string &config_path, int64_t prefetch_experts_count, std::vector<int> predict_layers, std::vector<int64_t> per_layer_cache_sizes, std::vector<int64_t> per_layer_prefetch_counts) {
                 torch::Device device = (device_str == "cuda") ? torch::kCUDA : torch::kCPU;
 
                 NPUGlobalConfig config;
@@ -120,7 +120,7 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
                 return std::make_shared<UnifiedLLMW4A16Impl>(arch_type, vocab_size, hidden_size, intermediate_size, num_hidden_layers,
                                                              num_attention_heads, num_key_value_heads, head_dim, rms_norm_eps, rope_theta,
                                                              config, max_seq_len, max_batch_size, groupsize, num_experts,
-                                                             num_experts_per_tok, device, max_cached_experts_per_layer, predictor_model_path, prefetch_experts_count, predict_layers, per_layer_cache_sizes);
+                                                             num_experts_per_tok, device, max_cached_experts_per_layer, predictor_model_path, prefetch_experts_count, predict_layers, per_layer_cache_sizes, per_layer_prefetch_counts);
             }),
             py::arg("arch_type"), py::arg("vocab_size"), py::arg("hidden_size"), py::arg("intermediate_size"), py::arg("num_hidden_layers"),
             py::arg("num_attention_heads"), py::arg("num_key_value_heads"), py::arg("head_dim"), py::arg("rms_norm_eps"),
@@ -128,7 +128,8 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
             py::arg("num_experts") = 0, py::arg("num_experts_per_tok") = 0, py::arg("device") = "cpu",
             py::arg("max_cached_experts_per_layer") = 0, py::arg("predictor_model_path") = "", py::arg("config_path") = "",
             py::arg("prefetch_experts_count") = 1, py::arg("predict_layers") = std::vector<int>(),
-            py::arg("per_layer_cache_sizes") = std::vector<int64_t>())
+            py::arg("per_layer_cache_sizes") = std::vector<int64_t>(),
+            py::arg("per_layer_prefetch_counts") = std::vector<int64_t>())
         .def(
             "forward",
             [](UnifiedLLMW4A16Impl &self, torch::Tensor input_ids, int64_t start_pos) -> torch::Tensor {
@@ -166,6 +167,8 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
         .def("get_cache_stats", &UnifiedLLMW4A16Impl::get_cache_stats)
         .def("get_predictor_stats", &UnifiedLLMW4A16Impl::get_predictor_stats)
         .def("reset_predictor_stats", &UnifiedLLMW4A16Impl::reset_predictor_stats)
+        .def("set_predictor_lookahead", &UnifiedLLMW4A16Impl::set_predictor_lookahead, py::arg("stride"),
+             "Fire the predictor every `stride` decode tokens (set to lookahead depth fN).")
         .def("get_sequential_top1_stats", &UnifiedLLMW4A16Impl::get_sequential_top1_stats)
         .def("reset_sequential_top1_stats", &UnifiedLLMW4A16Impl::reset_sequential_top1_stats)
         .def("prewarm_experts", &UnifiedLLMW4A16Impl::prewarm_experts, py::arg("num_to_warm"), py::arg("verbose") = true)

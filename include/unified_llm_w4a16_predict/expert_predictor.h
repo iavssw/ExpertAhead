@@ -58,8 +58,8 @@ class IExpertPredictor {
 public:
     virtual ~IExpertPredictor() = default;
     
-    virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) = 0;
-    virtual std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) = 0;
+    virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) = 0;
+    virtual std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) = 0;
     virtual bool is_ready() = 0;
     virtual std::vector<int64_t> get_prediction() = 0;
     virtual std::vector<int64_t> try_get_prediction() = 0;
@@ -112,7 +112,7 @@ public:
         shm_unlink(shm_name_.c_str());
     }
     
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) override {
         response_->reset();
         
         request_->token_id = 0; // Deprecated
@@ -122,8 +122,8 @@ public:
         request_->ready.store(true);
     }
     
-    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
-        predict_async(embedding, prefill_dist, prev_expert_onehot);
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) override {
+        predict_async(embedding, prefill_dist, prev_expert_onehot, prev_layers_feat);
         return get_prediction();
     }
 
@@ -178,6 +178,7 @@ public:
         torch::Tensor embedding;
         c10::optional<torch::Tensor> prefill_dist;
         c10::optional<torch::Tensor> prev_expert_onehot;
+        c10::optional<torch::Tensor> prev_layers_feat;
         int64_t job_id;
     };
     
@@ -203,10 +204,13 @@ public:
             // We bypass the flaky TorchScript schema reflection which can throw on traced modules.
             model_accepts_prefill_dist_ = true;
             model_accepts_prev_expert_ = true;
+            model_accepts_prev_layers_ = true;
             std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_
-                      << "] Assuming prefill_dist and prev_expert_onehot support (v2 API)." << std::endl;
+                      << "] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API)." << std::endl;
             std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_
-                      << "] prefill_dist support: " << (model_accepts_prefill_dist_ ? "yes" : "no") << ", prev_expert_onehot support: " << (model_accepts_prev_expert_ ? "yes" : "no") << std::endl;
+                      << "] prefill_dist support: " << (model_accepts_prefill_dist_ ? "yes" : "no") 
+                      << ", prev_expert_onehot support: " << (model_accepts_prev_expert_ ? "yes" : "no") 
+                      << ", prev_layers_feat support: " << (model_accepts_prev_layers_ ? "yes" : "no") << std::endl;
             std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
                       << "] Loaded model: " << model_path << std::endl;
         } catch (const c10::Error& e) {
@@ -240,11 +244,12 @@ public:
                   << "] Shutdown complete" << std::endl;
     }
     
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) override {
         PredictionJob job;
         job.embedding = embedding;
         job.prefill_dist = prefill_dist;
         job.prev_expert_onehot = prev_expert_onehot;
+        job.prev_layers_feat = prev_layers_feat;
         job.job_id = next_job_id_++;
         
         {
@@ -254,8 +259,8 @@ public:
         queue_cv_.notify_one();
     }
 
-    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt) override {
-        return internal_predict(embedding, prefill_dist, prev_expert_onehot);
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) override {
+        return internal_predict(embedding, prefill_dist, prev_expert_onehot, prev_layers_feat);
     }
     
     bool is_ready() override {
@@ -314,7 +319,7 @@ private:
     }
     
     void process_prediction(const PredictionJob& job) {
-        auto result = internal_predict(job.embedding, job.prefill_dist, job.prev_expert_onehot);
+        auto result = internal_predict(job.embedding, job.prefill_dist, job.prev_expert_onehot, job.prev_layers_feat);
         {
             std::lock_guard<std::mutex> lock(result_mutex_);
             predicted_experts_ = result;
@@ -323,7 +328,7 @@ private:
         result_cv_.notify_all();
     }
 
-    std::vector<int64_t> internal_predict(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist, c10::optional<torch::Tensor> prev_expert_onehot) {
+    std::vector<int64_t> internal_predict(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist, c10::optional<torch::Tensor> prev_expert_onehot, c10::optional<torch::Tensor> prev_layers_feat) {
         auto start = std::chrono::high_resolution_clock::now();
         
         if (!model_loaded_) {
@@ -355,8 +360,27 @@ private:
             }
             
             torch::NoGradGuard no_grad;
-            auto output = model_.forward(inputs).toTensor();
+            torch::jit::IValue output_ivalue;
+
+            if (model_accepts_prev_layers_ && prev_layers_feat.has_value()) {
+                torch::Tensor pl_feat = prev_layers_feat.value().to(torch::kFloat32).to(device_);
+                if (pl_feat.dim() == 1) pl_feat = pl_feat.unsqueeze(0);
+                std::vector<torch::jit::IValue> inputs_4 = inputs;
+                inputs_4.push_back(pl_feat);
+                
+                try {
+                    output_ivalue = model_.forward(inputs_4);
+                } catch (const c10::Error& e) {
+                    // Fallback to 3 args if the model doesn't support the 4th feature tensor
+                    model_accepts_prev_layers_ = false;
+                    output_ivalue = model_.forward(inputs);
+                }
+            } else {
+                output_ivalue = model_.forward(inputs);
+            }
            
+            auto output = output_ivalue.toTensor();
+            
             //std::cout << "predictor model output: " << output << std::endl;
             // Extract prediction
             auto indices = output.argsort(-1, true).to(torch::kCPU, torch::kInt64);
@@ -393,6 +417,7 @@ private:
     bool model_loaded_;
     bool model_accepts_prefill_dist_ = false;  // Detected from the model's forward schema at load time
     bool model_accepts_prev_expert_ = false;   // Detected from the model's forward schema at load time
+    bool model_accepts_prev_layers_ = false;   // Fallback detected dynamically on first call
     
     std::atomic<bool> running_;
     std::thread worker_thread_;
