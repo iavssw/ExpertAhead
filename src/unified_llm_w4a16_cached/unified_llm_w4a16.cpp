@@ -973,6 +973,10 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
     // ============== Router Logit Modification (Lambda Parameter) ==============
     torch::Tensor topk_vals, topk_idx;
 
+    // ---- Cache-conditional routing (lambda) ----
+    // forced_top_n and probability-mass threshold (PM) only OR into the bias mask; resident
+    // experts are already in the mask. Remaining top-k slots are filled by top-k on biased
+    // logits z' = z + lambda * delta_avg * mask (same mechanism for FN and PM sweeps at lambda=1).
     // ---- EXPERIMENT MODE: random_fill_mode_ runs independently of lambda ----
     // Keep the top forced_top_n_ unbiased experts; fill remaining slots with
     // randomly selected experts. This must bypass the lambda branch entirely so
@@ -1028,13 +1032,22 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
             delta_avg_ = momentum * delta_avg_ + (1.0 - momentum) * current_avg_range;
         }
         
-        // Create cache mask tensor
-        auto cache_mask = torch::tensor(expert_cache_bitmask_, 
-                                       router_out.options().dtype(torch::kFloat32));
-        
         bool has_cached = std::any_of(expert_cache_bitmask_.begin(),
                                       expert_cache_bitmask_.end(),
                                       [](int64_t v) { return v == 1; });
+
+        const int64_t num_tokens = x_flat.size(0);
+        const bool use_pm_lambda_mask = mass_threshold_substitution_p_ > 0.0;
+
+        torch::Tensor cache_mask;
+        if (use_pm_lambda_mask) {
+            cache_mask = torch::tensor(expert_cache_bitmask_, router_out.options().dtype(torch::kFloat32))
+                             .unsqueeze(0)
+                             .expand({num_tokens, num_experts_})
+                             .clone();
+        } else {
+            cache_mask = torch::tensor(expert_cache_bitmask_, router_out.options().dtype(torch::kFloat32));
+        }
 
         // Force top forced_top_n_ unbiased experts into the cache mask so they are always
         // available (and thus preferred under the lambda bias).
@@ -1042,11 +1055,57 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
             int64_t n_force = std::min(forced_top_n_, num_experts_per_tok_);
             auto topn_result = router_out.topk(n_force, /*dim=*/-1);
             auto topn_idx    = std::get<1>(topn_result);  // [num_tokens, n_force]
-            auto top_expert_mask = torch::zeros({num_experts_}, cache_mask.options());
-            for (int64_t ti = 0; ti < topn_idx.size(0); ti++) {
-                top_expert_mask.index_put_({topn_idx[ti]}, 1.0);
+            if (use_pm_lambda_mask) {
+                cache_mask.scatter_(1, topn_idx, torch::ones_like(topn_idx, cache_mask.dtype()));
+            } else {
+                auto top_expert_mask = torch::zeros({num_experts_}, cache_mask.options());
+                for (int64_t ti = 0; ti < topn_idx.size(0); ti++) {
+                    top_expert_mask.index_put_({topn_idx[ti]}, 1.0);
+                }
+                cache_mask = torch::maximum(cache_mask, top_expert_mask);
             }
-            cache_mask = torch::maximum(cache_mask, top_expert_mask);
+        }
+
+        // Force the minimum set of experts whose cumulative softmax probability >= forced_top_p_.
+        // Adapts to routing confidence: a peaked distribution forces fewer experts than a flat one.
+        if (forced_top_p_ > 0.0 && has_cached) {
+            auto probs = torch::softmax(router_out.to(torch::kFloat32), -1);  // [num_tokens, num_experts]
+            auto mean_probs = probs.mean(0);                                   // [num_experts]
+            auto sort_result = torch::sort(mean_probs, -1, /*descending=*/true);
+            auto sorted_vals = std::get<0>(sort_result);                       // [num_experts]
+            auto sorted_idx  = std::get<1>(sort_result);                       // [num_experts]
+            auto cumsum = torch::cumsum(sorted_vals, -1);                      // [num_experts]
+            // Include expert i when the cumulative mass before it is still below the threshold.
+            auto pre_cumsum = cumsum - sorted_vals;
+            auto include_sorted = pre_cumsum.lt(static_cast<float>(forced_top_p_)).to(torch::kFloat32);
+            auto top_p_mask = torch::zeros({num_experts_}, cache_mask.options());
+            top_p_mask.scatter_(-1, sorted_idx, include_sorted);
+            if (use_pm_lambda_mask) {
+                cache_mask = torch::maximum(cache_mask, top_p_mask.unsqueeze(0).expand({num_tokens, num_experts_}));
+            } else {
+                cache_mask = torch::maximum(cache_mask, top_p_mask);
+            }
+        }
+
+        // Per-token PM prefix: smallest sorted-probability prefix with cumulative mass >= p (adaptive
+        // vs fixed FN). OR into mask; lambda bias then prefers resident experts for other top-k slots.
+        if (use_pm_lambda_mask) {
+            const float pm_thresh = static_cast<float>(mass_threshold_substitution_p_);
+            auto probs_pm = torch::softmax(router_out.to(torch::kFloat32), -1);
+            auto pm_sort = torch::sort(probs_pm, -1, /*descending=*/true);
+            auto sorted_probs_pm = std::get<0>(pm_sort);
+            auto sorted_idx_pm = std::get<1>(pm_sort);
+            auto cumsum_pm = sorted_probs_pm.cumsum(-1);
+            auto reached_pm = cumsum_pm >= static_cast<double>(pm_thresh);
+            auto first_ge_pm = reached_pm.to(torch::kFloat32).argmax(-1, /*keepdim=*/true);
+            auto positions_pm =
+                torch::arange(num_experts_, torch::TensorOptions().device(router_out.device()).dtype(torch::kLong))
+                    .unsqueeze(0)
+                    .expand({num_tokens, num_experts_});
+            auto in_prefix_sorted = positions_pm <= first_ge_pm;
+            auto pm_row_mask = torch::zeros_like(probs_pm);
+            pm_row_mask.scatter_(1, sorted_idx_pm, in_prefix_sorted.to(torch::kFloat32));
+            cache_mask = torch::maximum(cache_mask, pm_row_mask);
         }
         
         // Apply bias to router logits
@@ -2458,6 +2517,18 @@ double UnifiedLLMW4A16Impl::get_lambda(int64_t layer_idx) const {
         return moe_layers[layer_idx]->get_lambda();
     }
     return 0.0;
+}
+
+void UnifiedLLMW4A16Impl::set_forced_top_p(double p) {
+    for (auto& layer : moe_layers) {
+        layer->set_forced_top_p(p);
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_mass_threshold_substitution_p(double p) {
+    for (auto& layer : moe_layers) {
+        layer->set_mass_threshold_substitution_p(p);
+    }
 }
 
 void UnifiedLLMW4A16Impl::set_forced_top_n(int64_t n) {

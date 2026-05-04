@@ -152,7 +152,10 @@ PYBIND11_MODULE(unified_llm_w4a16_cached_libtorch, m) {
         .def("load_quantized_weights_from_safetensors", &UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors, py::arg("filename"))
         .def("load_non_quantized_weights_from_safetensors", &UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors,
              py::arg("filename"))
-        .def("load_quantized_weights_from_bins", &UnifiedLLMW4A16Impl::load_quantized_weights_from_bins, py::arg("weights_dir"))
+        .def("load_quantized_weights_from_bins", &UnifiedLLMW4A16Impl::load_quantized_weights_from_bins,
+             py::arg("weights_dir"), py::arg("expert_weights_dir") = "",
+             "Load bins from weights_dir (attention) and optionally expert_weights_dir (MoE experts). "
+             "Expert dir auto-detects packed (layer_L_expert_E.bin) vs unpacked format.")
         .def("prewarm_experts", &UnifiedLLMW4A16Impl::prewarm_experts, py::arg("num_to_warm"), py::arg("verbose") = true,
              "Pre-warm expert cache by loading weights into slots")
         .def("initialize_dummy_weights", &UnifiedLLMW4A16Impl::initialize_dummy_weights, py::arg("seed") = 42,
@@ -165,6 +168,13 @@ PYBIND11_MODULE(unified_llm_w4a16_cached_libtorch, m) {
              "Get lambda parameter for specified layer")
         .def("set_forced_top_n", &UnifiedLLMW4A16Impl::set_forced_top_n, py::arg("n"),
              "Set how many unbiased top-K experts are forced into the cache bias mask (default 1)")
+        .def("set_forced_top_p", &UnifiedLLMW4A16Impl::set_forced_top_p, py::arg("p"),
+             "Force the minimum set of experts whose cumulative softmax probability >= p into the cache mask. "
+             "Adapts to routing confidence: peaked distributions force fewer experts than flat ones. "
+             "Set to -1.0 to disable (default).")
+        .def("set_mass_threshold_substitution_p", &UnifiedLLMW4A16Impl::set_mass_threshold_substitution_p, py::arg("p"),
+             "Alternate routing mode: keep the smallest top-k prefix with cumulative probability >= p, "
+             "then substitute the remaining routed slots.")
         .def("set_prefill_top_n", &UnifiedLLMW4A16Impl::set_prefill_top_n, py::arg("n"),
              "Lock the top n most used experts from prefill into the cache under PREFILL policy.")
         .def("set_random_fill_mode", &UnifiedLLMW4A16Impl::set_random_fill_mode, py::arg("on"),

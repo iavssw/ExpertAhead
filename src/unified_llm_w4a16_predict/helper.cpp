@@ -1028,9 +1028,14 @@ static void read_bin_tensor_pread(const std::string &path, void* dest_ptr, size_
     close(fd);
 }
 
-void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir) {
+void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir,
+                                                            const std::string &expert_weights_dir) {
+    const std::string &moe_dir = expert_weights_dir.empty() ? weights_dir : expert_weights_dir;
+
     if (debug_verbosity >= 1) {
         std::cout << "Loading quantized weights from bins: " << weights_dir << std::endl;
+        if (!expert_weights_dir.empty())
+            std::cout << "  Expert weights dir override: " << moe_dir << std::endl;
     }
 
     this->eval();
@@ -1092,22 +1097,9 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &we
         load_layer(v_layers[i], "layer_" + std::to_string(i) + "_v");
         load_layer(o_layers[i], "layer_" + std::to_string(i) + "_o");
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-             // For cached backend, we rely on on-demand loading.
-             // For cached backend, we rely on on-demand loading.
-             // We just set the directory for each MoE layer.
              for (int64_t lay = 0; lay < num_hidden_layers_; ++lay) {
-                  moe_layers[lay]->set_weights_dir(weights_dir);
+                  moe_layers[lay]->set_weights_dir(moe_dir);
              }
-             
-             // If we wanted to pre-load some, we could do it here, but let's stick to pure lazy loading for now.
-             // The original code loaded all experts:
-             /*
-             for (int64_t e = 0; e < num_experts_; ++e) {
-                 std::string expert_prefix = "layer_" + std::to_string(i) + "_expert_" + std::to_string(e);
-                 load_gate_up_from_bins(moe_layers[i]->gate_up_experts[e], expert_prefix + "_gate", expert_prefix + "_up");
-                 load_layer(moe_layers[i]->down_experts[e], expert_prefix + "_down");
-             }
-             */
         }
     }
 }
@@ -1211,11 +1203,33 @@ void MixtureOfExpertsImpl::print_cache_stats() const {
     std::cout << "Layer " << layer_idx_ << " Cache Stats: "
               << "Hits=" << cache_hits_ << ", Misses=" << cache_misses_ 
               << ", HitRate=" << std::fixed << std::setprecision(2) << hit_rate << "%\n"
-              << "    Unbiased Top-1 Predictor HitRate=";
+              << "    Predictor Routed-Expert HitRate=";
 
     if (pred_total_ > 0) {
         double pred_rate = 100.0 * pred_hits_no_bias_ / pred_total_;
-        std::cout << pred_rate << "% (" << pred_hits_no_bias_ << "/" << pred_total_ << ")\n";
+        int64_t routed_eval_n = (forced_top_n_ > 0) ? std::min(forced_top_n_, num_experts_per_tok_) : num_experts_per_tok_;
+        std::cout << pred_rate << "% (" << pred_hits_no_bias_ << "/" << pred_total_
+                  << ", routed_n=" << routed_eval_n << ", horizon=" << lookahead_stride_ << ")\n";
+        if (pred_total_routed_forced_n_ > 0) {
+            double r_forced = 100.0 * pred_hits_routed_forced_n_ / pred_total_routed_forced_n_;
+            std::cout << "    Predictor RoutedForcedN HitRate=" << r_forced
+                      << "% (" << pred_hits_routed_forced_n_ << "/" << pred_total_routed_forced_n_ << ")\n";
+        }
+        if (pred_total_routed_topk_ > 0) {
+            double r_topk = 100.0 * pred_hits_routed_topk_ / pred_total_routed_topk_;
+            std::cout << "    Predictor RoutedTopK HitRate=" << r_topk
+                      << "% (" << pred_hits_routed_topk_ << "/" << pred_total_routed_topk_ << ")\n";
+        }
+        if (pred_requested_total_forced_n_ > 0) {
+            double p_forced = 100.0 * pred_requested_hits_forced_n_ / pred_requested_total_forced_n_;
+            std::cout << "    Predicted RequestedByRouterForcedN Rate=" << p_forced
+                      << "% (" << pred_requested_hits_forced_n_ << "/" << pred_requested_total_forced_n_ << ")\n";
+        }
+        if (pred_requested_total_topk_ > 0) {
+            double p_topk = 100.0 * pred_requested_hits_topk_ / pred_requested_total_topk_;
+            std::cout << "    Predicted RequestedByRouterTopK Rate=" << p_topk
+                      << "% (" << pred_requested_hits_topk_ << "/" << pred_requested_total_topk_ << ")\n";
+        }
     } else {
         std::cout << "N/A\n";
     }
@@ -1241,6 +1255,14 @@ void MixtureOfExpertsImpl::reset_cache_stats() {
     total_expert_load_time_ms_.store(0.0);
     pred_hits_no_bias_ = 0;
     pred_total_ = 0;
+    pred_hits_routed_forced_n_ = 0;
+    pred_total_routed_forced_n_ = 0;
+    pred_hits_routed_topk_ = 0;
+    pred_total_routed_topk_ = 0;
+    pred_requested_hits_forced_n_ = 0;
+    pred_requested_total_forced_n_ = 0;
+    pred_requested_hits_topk_ = 0;
+    pred_requested_total_topk_ = 0;
     last_true_top1_expert_ = -1;
     total_steps_0_loaded_ = 0;
     total_steps_1_loaded_ = 0;
@@ -1292,6 +1314,157 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
     }
 }
 
+// ─── Packed expert loading (EXPK format) — predict backend ──────────────────
+//
+// Packed file layout (produced by pack_experts.py):
+//   [0..3]   Magic: b"EXPK"
+//   [4..7]   uint32  num_tensors (always 9)
+//   [8..439] 9 × 48-byte descriptors: char name[32] + uint64 offset + uint64 size
+//   [440+]   Raw tensor data, concatenated
+//
+// Strategy: read just the 440-byte header, then fire one pread() per tensor
+// directly into the pinned destination buffers — no staging buffer, no memcpy.
+// pread() does not touch the fd's file offset, so concurrent calls on the same
+// fd from different threads are safe without any locking.
+// This matches the parallelism of the unpacked path (which uses std::async too),
+// keeping expert loading overhead identical between packed and unpacked so that
+// benchmark comparisons between backends reflect prediction gains only.
+
+static constexpr uint32_t EXPK_MAGIC_LE_P   = 0x4B505845u;
+static constexpr size_t   EXPK_HEADER_SIZE_P = 8 + 9 * 48; // 440 bytes
+
+struct ExpkDescP { char name[32]; uint64_t offset; uint64_t size; };
+
+static const ExpkDescP* expk_find_p(const ExpkDescP* descs, int n, const char* tensor_name) {
+    for (int i = 0; i < n; ++i) {
+        if (std::strncmp(descs[i].name, tensor_name, 32) == 0)
+            return &descs[i];
+    }
+    return nullptr;
+}
+
+void MixtureOfExpertsImpl::load_expert_weights_packed(
+        int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
+    std::string path = weights_dir + "/layer_" + std::to_string(layer_idx_)
+                     + "_expert_" + std::to_string(expert_idx) + ".bin";
+
+    int fd = open(path.c_str(), O_RDONLY);
+    if (fd == -1)
+        throw std::runtime_error("Cannot open packed expert: " + path + " (" + strerror(errno) + ")");
+
+    // ── 1. Read and validate the fixed-size header (no staging buffer needed) ─
+    alignas(8) char header_buf[EXPK_HEADER_SIZE_P];
+    if (pread(fd, header_buf, EXPK_HEADER_SIZE_P, 0) != static_cast<ssize_t>(EXPK_HEADER_SIZE_P)) {
+        close(fd); throw std::runtime_error("Short header read for packed expert: " + path);
+    }
+    if (*reinterpret_cast<const uint32_t*>(header_buf) != EXPK_MAGIC_LE_P) {
+        close(fd); throw std::runtime_error("Bad EXPK magic in: " + path);
+    }
+
+    uint32_t num_tensors = *reinterpret_cast<const uint32_t*>(header_buf + 4);
+    const ExpkDescP* descs = reinterpret_cast<const ExpkDescP*>(header_buf + 8);
+
+    auto require = [&](const char* name) -> const ExpkDescP& {
+        const ExpkDescP* d = expk_find_p(descs, static_cast<int>(num_tensors), name);
+        if (!d) { close(fd); throw std::runtime_error(std::string("Missing tensor '") + name + "' in: " + path); }
+        return *d;
+    };
+
+    const ExpkDescP& gate_qw = require("gate.qweight");
+    const ExpkDescP& gate_sc = require("gate.scales");
+    const ExpkDescP& gate_zr = require("gate.zeros");
+    const ExpkDescP& up_qw   = require("up.qweight");
+    const ExpkDescP& up_sc   = require("up.scales");
+    const ExpkDescP& up_zr   = require("up.zeros");
+    const ExpkDescP& down_qw = require("down.qweight");
+    const ExpkDescP& down_sc = require("down.scales");
+    const ExpkDescP& down_zr = require("down.zeros");
+
+    // ── 2. Allocate pinned destination buffers ───────────────────────────────
+    auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot,
+                                    const std::vector<int64_t>& shape, torch::ScalarType dtype) {
+        if (!bufs[slot].defined()) {
+            bufs[slot] = torch::empty(shape, torch::TensorOptions().dtype(dtype)
+                                                                    .device(torch::kCPU)
+                                                                    .pinned_memory(true));
+        } else if (bufs[slot].sizes() != shape) {
+            bufs[slot].resize_(shape);
+        }
+        return bufs[slot];
+    };
+
+    // gate_up: gate rows [0..out_feat) then up rows [out_feat..2*out_feat)
+    int64_t out_feat  = intermediate_size_;
+    int64_t packed_in = (hidden_size_ + 1) / 2;
+    int64_t gs_grps = static_cast<int64_t>(gate_sc.size / 2) / out_feat; // bf16 → /2
+    std::vector<int64_t> s_shape = (gs_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                   : std::vector<int64_t>{out_feat, gs_grps};
+    int64_t gz_grps = static_cast<int64_t>(gate_zr.size) / out_feat;     // int8 → /1
+    std::vector<int64_t> z_shape = (gz_grps <= 1) ? std::vector<int64_t>{out_feat}
+                                                   : std::vector<int64_t>{out_feat, gz_grps};
+    auto dest_q = ensure_pinned_buffer(gate_up_q_pinned_, slot_idx,
+                                       {out_feat * 2, packed_in}, torch::kUInt8);
+    auto dest_s = ensure_pinned_buffer(gate_up_s_pinned_, slot_idx,
+                                       {s_shape[0] * 2, s_shape.size() > 1 ? s_shape[1] : 1}, torch::kBFloat16);
+    auto dest_z = ensure_pinned_buffer(gate_up_z_pinned_, slot_idx,
+                                       {z_shape[0] * 2, z_shape.size() > 1 ? z_shape[1] : 1}, torch::kInt8);
+    char* ptr_q = static_cast<char*>(dest_q.data_ptr());
+    char* ptr_s = static_cast<char*>(dest_s.data_ptr());
+    char* ptr_z = static_cast<char*>(dest_z.data_ptr());
+
+    // down
+    auto& down_layer = down_experts[slot_idx];
+    int64_t d_out_feat  = down_layer->out_features();
+    int64_t d_packed_in = (down_layer->in_features() + 1) / 2;
+    int64_t ds_grps = static_cast<int64_t>(down_sc.size / 2) / d_out_feat;
+    std::vector<int64_t> ds_shape = (ds_grps <= 1) ? std::vector<int64_t>{d_out_feat}
+                                                    : std::vector<int64_t>{d_out_feat, ds_grps};
+    int64_t dz_grps = static_cast<int64_t>(down_zr.size) / d_out_feat;
+    std::vector<int64_t> dz_shape = (dz_grps <= 1) ? std::vector<int64_t>{d_out_feat}
+                                                    : std::vector<int64_t>{d_out_feat, dz_grps};
+    auto dest_dq = ensure_pinned_buffer(down_q_pinned_, slot_idx, {d_out_feat, d_packed_in}, torch::kUInt8);
+    auto dest_ds = ensure_pinned_buffer(down_s_pinned_, slot_idx, ds_shape, torch::kBFloat16);
+    auto dest_dz = ensure_pinned_buffer(down_z_pinned_, slot_idx, dz_shape, torch::kInt8);
+    char* ptr_dq = static_cast<char*>(dest_dq.data_ptr());
+    char* ptr_ds = static_cast<char*>(dest_ds.data_ptr());
+    char* ptr_dz = static_cast<char*>(dest_dz.data_ptr());
+
+    // ── 3. Read all 9 tensors concurrently directly into pinned dest buffers ─
+    auto pread_exact = [&path](int fd_, char* dest, size_t size, off_t offset) {
+        size_t done = 0;
+        while (done < size) {
+            ssize_t ret = pread(fd_, dest + done, size - done, offset + static_cast<off_t>(done));
+            if (ret <= 0) throw std::runtime_error("pread failed reading packed expert: " + path);
+            done += static_cast<size_t>(ret);
+        }
+    };
+
+    std::vector<std::future<void>> futures;
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_q,                gate_qw.size, static_cast<off_t>(gate_qw.offset)));
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_q + gate_qw.size, up_qw.size,   static_cast<off_t>(up_qw.offset)));
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_s,                gate_sc.size, static_cast<off_t>(gate_sc.offset)));
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_s + gate_sc.size, up_sc.size,   static_cast<off_t>(up_sc.offset)));
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_z,                gate_zr.size, static_cast<off_t>(gate_zr.offset)));
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_z + gate_zr.size, up_zr.size,   static_cast<off_t>(up_zr.offset)));
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_dq,               down_qw.size, static_cast<off_t>(down_qw.offset)));
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_ds,               down_sc.size, static_cast<off_t>(down_sc.offset)));
+    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_dz,               down_zr.size, static_cast<off_t>(down_zr.offset)));
+
+    try {
+        for (auto& f : futures) f.get();
+    } catch (...) {
+        posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+        close(fd);
+        throw;
+    }
+    posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+    close(fd);
+
+    // ── 4. Register the loaded weights ───────────────────────────────────────
+    gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+    down_layer->set_unpacked_params(dest_dq, dest_ds, dest_dz);
+}
+
 void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
     auto start_time = std::chrono::high_resolution_clock::now();
     
@@ -1304,6 +1477,25 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
     if (weights_dir == "DUMMY") {
         if (debug_verbosity >= 2)
             std::cout << "DUMMY load for expert " << expert_idx << " into slot " << slot_idx << std::endl;
+        return;
+    }
+
+    // Auto-detect format on first real load.
+    if (expert_format_ == ExpertFormat::UNKNOWN) {
+        std::string probe = weights_dir + "/layer_" + std::to_string(layer_idx_) + "_expert_0.bin";
+        expert_format_ = std::filesystem::exists(probe) ? ExpertFormat::PACKED : ExpertFormat::UNPACKED;
+        if (debug_verbosity >= 1)
+            std::cout << "Layer " << layer_idx_ << ": using "
+                      << (expert_format_ == ExpertFormat::PACKED ? "packed" : "unpacked")
+                      << " expert format." << std::endl;
+    }
+
+    if (expert_format_ == ExpertFormat::PACKED) {
+        load_expert_weights_packed(slot_idx, expert_idx, weights_dir);
+        auto end_time = std::chrono::high_resolution_clock::now();
+        double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
+        double current_time = total_expert_load_time_ms_.load();
+        while (!total_expert_load_time_ms_.compare_exchange_weak(current_time, current_time + ms)) {}
         return;
     }
 

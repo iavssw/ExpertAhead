@@ -193,6 +193,7 @@ class Qwen3_30BA3BW4A16Model:
         per_layer_cache_sizes: Optional[List[int]] = None,
         expert_reuse_csv: Optional[str] = None,
         predictor_lookahead: int = 1,
+        expert_weights_dir: Optional[str] = None,
     ):
         """
         Initialize Qwen3 30B-A3B AWQ w4a16 quantized model.
@@ -303,6 +304,7 @@ class Qwen3_30BA3BW4A16Model:
         self.config = {}
         self.use_pre_saved_weights = False
         self.debug_verbosity = 0
+        self.expert_weights_dir = expert_weights_dir
 
         use_dummy = False
         if config_path:
@@ -322,7 +324,8 @@ class Qwen3_30BA3BW4A16Model:
             print("Initializing dummy weights...")
             self.model.initialize_dummy_weights()
         elif model_path:
-            self._load_quantized_weights(model_path, weights_folder="model_weights")
+            self._load_quantized_weights(model_path, weights_folder="model_weights",
+                                         expert_weights_dir=expert_weights_dir)
 
         if backend in ["cached", "predict"]:
             num_to_warm = max(per_layer_cache_sizes) if per_layer_cache_sizes else max_cached_experts_per_layer
@@ -391,8 +394,24 @@ class Qwen3_30BA3BW4A16Model:
         
         return cache_list, prefetch_list
 
-    def _load_quantized_weights(self, model_path: str, weights_folder: str = "model_weights"):
-        """Load quantized weights from safetensors and pass to the C++ backend."""
+    def _load_quantized_weights(self, model_path: str, weights_folder: str = "model_weights",
+                               expert_weights_dir: Optional[str] = None):
+        """Load quantized weights from safetensors and pass to the C++ backend.
+
+        Args:
+            model_path: HuggingFace repo ID or local path to the quantized model.
+            weights_folder: Sub-folder under the script directory used to cache
+                downloaded safetensors and pre-saved bins.
+            expert_weights_dir: Optional path to a directory containing either
+                unpacked expert bins (``layer_{L}_expert_{E}_gate.qweight.bin``
+                etc.) or packed expert bins (``layer_{L}_expert_{E}.bin``).
+                When supplied the C++ backend will point each MoE layer at this
+                directory for on-demand expert loading, while the attention
+                weights continue to be served from ``--bin-dir`` / safetensors.
+                The backend auto-detects packed vs unpacked by probing for the
+                packed filename.  When omitted the standard presaved-bins path
+                (``{model_name}_unpacked``) is used as before.
+        """
         print(f"Loading quantized weights from {model_path}...")
         try:
             from huggingface_hub import snapshot_download
@@ -436,7 +455,30 @@ class Qwen3_30BA3BW4A16Model:
 
             use_presaved = self.use_pre_saved_weights
 
-            if use_presaved:
+            if expert_weights_dir is not None:
+                # Explicit expert directory supplied (packed or unpacked).
+                # Detect format by probing for a packed file.
+                expert_path = Path(expert_weights_dir)
+                probe = expert_path / f"layer_0_expert_0.bin"
+                fmt = "packed" if probe.exists() else "unpacked"
+                print(f"Expert weights dir: {expert_path}  (format: {fmt})")
+
+                # Load non-MoE weights from safetensors, then set the expert
+                # directory so the C++ backend can load experts on demand.
+                presaved_dir = weights_dir / f"{model_name}_unpacked"
+                self._prepare_presaved_weights(saved_safetensors, presaved_dir)
+
+                t0 = time.time()
+                self.model.load_non_quantized_weights_from_safetensors(str(saved_safetensors))
+                # Load attention weights from the unpacked presaved dir.
+                # Expert weights are served from expert_weights_dir (auto-detect packed/unpacked in C++).
+                self.model.load_quantized_weights_from_bins(str(presaved_dir),
+                                                            str(expert_path))
+                t1 = time.time()
+                self.load_time = t1 - t0
+                print(f"Weights loaded (expert dir override) in {self.load_time:.2f} seconds")
+
+            elif use_presaved:
                 presaved_dir = weights_dir / f"{model_name}_unpacked"
                 self._prepare_presaved_weights(saved_safetensors, presaved_dir)
 
@@ -644,7 +686,7 @@ class Qwen3_30BA3BW4A16Model:
             self.model.print_cache_stats()
 
     def get_predictor_stats(self):
-        """Return per-layer (no_bias_hits, with_bias_hits, total) tuples."""
+        """Return per-layer (hits, total) tuples for unbiased top-1 predictor accuracy."""
         if hasattr(self.model, "get_predictor_stats"):
             return self.model.get_predictor_stats()
         return []
@@ -677,6 +719,25 @@ class Qwen3_30BA3BW4A16Model:
         """Set how many unbiased top-K experts are forced into the lambda bias mask."""
         if hasattr(self.model, "set_forced_top_n"):
             self.model.set_forced_top_n(n)
+
+    def set_forced_top_p(self, p: float):
+        """Force the minimum set of experts whose cumulative softmax probability >= p.
+
+        Unlike forced_top_n (fixed count), this adapts to routing confidence: a peaked
+        distribution forces fewer experts than a flat one. Set to -1.0 to disable.
+        """
+        if hasattr(self.model, "set_forced_top_p"):
+            self.model.set_forced_top_p(p)
+
+    def set_mass_threshold_substitution_p(self, p: float):
+        """Enable probability-mass routing with tail substitution.
+
+        Keeps the smallest top-k prefix whose cumulative router probability >= p,
+        then substitutes the remaining routed slots (instead of dropping tail experts).
+        Set to -1.0 to disable.
+        """
+        if hasattr(self.model, "set_mass_threshold_substitution_p"):
+            self.model.set_mass_threshold_substitution_p(p)
 
     def set_prefill_top_n(self, n: int):
         """Lock the top n most used experts from prefill into the cache under PREFILL policy."""
@@ -1284,6 +1345,24 @@ def main():
              "0 = disabled (standard routing)."
     )
     parser.add_argument(
+        "--forced-top-p", type=float, default=-1.0,
+        help="(cached backend) Force the minimum set of experts whose cumulative softmax "
+             "probability >= p into the cache mask every step. Adapts to routing confidence. "
+             "-1.0 = disabled (default)."
+    )
+    parser.add_argument(
+        "--mass-threshold-substitution-p", type=float, default=-1.0,
+        help="(cached/predict backends) Alternate routing: keep smallest top-k prefix "
+             "with cumulative mass >= p and substitute remaining routed slots. "
+             "-1.0 = disabled (default)."
+    )
+    parser.add_argument(
+        "--expert-weights-dir", type=str, default=None,
+        help="Optional directory for MoE expert weight files. Supports both unpacked "
+             "(9 files/expert) and packed (1 file/expert, EXPK format) layouts — "
+             "auto-detected at runtime. When omitted, the standard presaved-bins path is used."
+    )
+    parser.add_argument(
         "--cache-policy",
         type=str,
         default="LRU",
@@ -1343,6 +1422,7 @@ def main():
             predict_layers=args.predict_layers,
             expert_reuse_csv=args.expert_reuse_csv,
             predictor_lookahead=args.predictor_lookahead,
+            expert_weights_dir=args.expert_weights_dir,
         )
 
         print("Model initialized successfully!")
@@ -1360,10 +1440,22 @@ def main():
         print(f"Setting lambda to {args.lambda_val}")
         model.set_lambda(args.lambda_val)
 
-    # Apply forced-top-N if requested (cached backend only)
     if args.forced_top_n > 0 and hasattr(model, 'set_forced_top_n'):
         model.set_forced_top_n(args.forced_top_n)
         print(f"Forced top-{args.forced_top_n} experts into cache mask.")
+
+    if args.forced_top_p >= 0.0 and hasattr(model, 'set_forced_top_p'):
+        model.set_forced_top_p(args.forced_top_p)
+        print(f"Forced top-p={args.forced_top_p} experts into cache mask.")
+
+    if args.mass_threshold_substitution_p >= 0.0 and hasattr(model, 'set_mass_threshold_substitution_p'):
+        model.set_mass_threshold_substitution_p(args.mass_threshold_substitution_p)
+        print(
+            f"Probability-mass prefix p={args.mass_threshold_substitution_p} OR'd into cache mask "
+            f"(same λ-biased top-k as forced_top_n; use --lambda-val e.g. 1.0 for cache-conditional routing)."
+        )
+        if args.lambda_val == 0.0:
+            print("Warning: --mass-threshold-substitution-p has no effect while --lambda-val is 0.")
 
     if args.prefill_top_n > 0 and hasattr(model, 'set_prefill_top_n'):
         model.set_prefill_top_n(args.prefill_top_n)

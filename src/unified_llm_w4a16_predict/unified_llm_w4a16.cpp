@@ -694,7 +694,8 @@ void MixtureOfExpertsImpl::set_context_token_ids(const std::vector<int64_t>& tok
     }
 }
 
-void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embedding, c10::optional<torch::Tensor> prev_layers_feat) {
+void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embedding, int64_t source_decode_step,
+                                                       c10::optional<torch::Tensor> prev_layers_feat) {
     // Check if predictor is available
     if (!predictor_) {
         return;
@@ -755,8 +756,8 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
     // Reset ready flag before launching new async work
     pred_results_ready_.store(false);
     
-    speculative_load_future_ = std::async(std::launch::async, 
-        [this, embedding_copy, pdist_opt, prev_expert_opt, prev_layers_copy]() {
+    speculative_load_future_ = std::async(std::launch::async,
+        [this, embedding_copy, pdist_opt, prev_expert_opt, prev_layers_copy, source_decode_step]() {
             std::vector<int64_t> pred_result = predictor_->predict_sync(embedding_copy, pdist_opt, prev_expert_opt, prev_layers_copy);
 
             // Store rankings safely for forward_generation to compare
@@ -765,6 +766,17 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
                 last_pred_no_bias_   = pred_result;
             }
             pred_results_ready_.store(true);
+
+            // Queue this prediction for horizon-aware evaluation:
+            // prediction emitted at step t is evaluated at step t + lookahead_stride_.
+            if (!pred_result.empty()) {
+                int limit = std::min((int)pred_result.size(), (int)prefetch_experts_count_);
+                std::vector<int64_t> top_experts(pred_result.begin(), pred_result.begin() + limit);
+                {
+                    std::lock_guard<std::mutex> qlock(pending_predictions_mutex_);
+                    pending_predictions_.push_back({source_decode_step + lookahead_stride_, top_experts});
+                }
+            }
             
             if (!pred_result.empty()) {
                 int limit = std::min((int)pred_result.size(), (int)prefetch_experts_count_);
@@ -819,8 +831,16 @@ void MixtureOfExpertsImpl::run_predictor_prefill_warmup(const torch::Tensor& emb
 
 
 void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids) {
-    // Iterate in reverse so the most confident expert becomes the most recently used (pushed to back of LRU last)
-    for (auto pred_it = predicted_expert_ids.rbegin(); pred_it != predicted_expert_ids.rend(); ++pred_it) {
+    // Load experts in confidence order (index 0 = highest confidence first) so the most
+    // important expert arrives in VRAM as early as possible, minimising the chance the
+    // main inference thread blocks on it.
+    //
+    // A separate LRU-promotion pass at the end (iterating in reverse) then marks the
+    // most confident expert as MRU so it is least likely to be evicted.  Previously a
+    // single reverse-iteration loop tried to serve both goals but achieved neither: the
+    // most confident expert both arrived last AND the LRU promotion was the same either
+    // way (each loaded slot is push_back-ed to lru_order_ at slot-claim time).
+    for (auto pred_it = predicted_expert_ids.begin(); pred_it != predicted_expert_ids.end(); ++pred_it) {
         int64_t eid = *pred_it;
         std::unique_lock<std::mutex> lock(expert_slots_mutex_);
         
@@ -828,16 +848,8 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
         auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
         
         if (it != expert_slots_indices.end()) {
-            // Already loaded - just update LRU
-            size_t slot_idx = std::distance(expert_slots_indices.begin(), it);
-            // Move to back (MRU)
-             for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
-                if (*lit == slot_idx) {
-                    expert_lru_order_.erase(lit);
-                    expert_lru_order_.push_back(slot_idx);
-                    break;
-                }
-            }
+            // Already loaded - LRU promotion handled in the post-load pass below.
+            (void)it;
         } else {
             // Not loaded - need to load it
             size_t slot_to_use;
@@ -920,6 +932,26 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
             lock.lock();
             expert_slot_ready_[slot_to_use] = true;
             expert_slots_cv_.notify_all();
+        }
+    }
+
+    // LRU promotion pass: iterate in reverse confidence order (least confident first) so
+    // that the most confident expert ends up at the back of lru_order_ (MRU position),
+    // making it the last to be evicted if the cache fills up.
+    {
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        for (auto pred_it = predicted_expert_ids.rbegin(); pred_it != predicted_expert_ids.rend(); ++pred_it) {
+            int64_t eid = *pred_it;
+            auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
+            if (it == expert_slots_indices.end()) continue;
+            size_t slot_idx = std::distance(expert_slots_indices.begin(), it);
+            for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
+                if (*lit == slot_idx) {
+                    expert_lru_order_.erase(lit);
+                    expert_lru_order_.push_back(slot_idx);
+                    break;
+                }
+            }
         }
     }
 }
@@ -1080,6 +1112,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
                                                        c10::optional<torch::Tensor> prev_layers_feat) {
     in_generation_mode_ = true;
     experts_loaded_this_step_ = 0;
+    const int64_t current_decode_step = decode_step_counter_++;
     
     // Speculative loading runs entirely in the background. The main thread will only wait 
     // dynamically inside `ensure_expert_cached` if it actually needs an expert that is currently streaming.
@@ -1142,48 +1175,82 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     down_batched.mul_(weights);
     output.add_(down_batched.sum(0, true));
 
-    // ── Predictor hit-rate accounting ────────────────────────────────────────
-    // Compare the previous token's prediction against THIS token's unbiased top-1
-    // expert.
-    // This mirrors exactly the training metric: predict(embedding_T) == unbiased_top1(T+1).
-    if (!suppress_predictor_stats_ && predictor_ && pred_results_ready_.load() && last_true_top1_expert_ != -1) {
-        std::lock_guard<std::mutex> lock(pred_results_mutex_);
-        if (!last_pred_no_bias_.empty()) {
-            // Ground truth: the unbiased top-1 expert for THIS token
-            // (computed from raw router_out above, before any lambda bias)
-            int n_check = std::min((int64_t)prefetch_experts_count_,
-                                   (int64_t)last_pred_no_bias_.size());
-            int hits_no_bias = 0;
-            for (int i = 0; i < n_check; ++i) {
-                if (last_pred_no_bias_[i] == current_true_top1)  { hits_no_bias++; break; }
+    // ── Predictor accuracy accounting (horizon-aware, routed-expert denominator) ─
+    if (!suppress_predictor_stats_ && predictor_) {
+        std::vector<int64_t> pred_set;
+        {
+            std::lock_guard<std::mutex> qlock(pending_predictions_mutex_);
+            while (!pending_predictions_.empty() && pending_predictions_.front().first < current_decode_step) {
+                // Prediction arrived too late to evaluate at its intended horizon.
+                pending_predictions_.pop_front();
             }
-            
-            if (debug_verbosity >= 2) {
-                std::cout << "[Layer " << layer_idx_ << " STAT] Pred=" << last_pred_no_bias_[0] 
-                          << " Actual=" << current_true_top1 
-                          << " " << (hits_no_bias ? "HIT" : "MISS") 
-                          << " (SeqBaseline=" << (last_true_top1_expert_ == current_true_top1 ? "HIT" : "MISS") << ")" 
-                          << std::endl;
+            if (!pending_predictions_.empty() && pending_predictions_.front().first == current_decode_step) {
+                pred_set = pending_predictions_.front().second;
+                pending_predictions_.pop_front();
+            }
+        }
+
+        if (!pred_set.empty()) {
+            const int64_t routed_topk_n = active_experts;
+            const int64_t routed_forced_n = (forced_top_n_ > 0) ? std::min(forced_top_n_, active_experts) : routed_topk_n;
+
+            int routed_hits_topk = 0;
+            for (int64_t k = 0; k < routed_topk_n; ++k) {
+                int64_t routed_eid = topk_accessor[k];
+                if (std::find(pred_set.begin(), pred_set.end(), routed_eid) != pred_set.end()) {
+                    routed_hits_topk++;
+                }
             }
 
-            pred_hits_no_bias_ += hits_no_bias;
-            pred_total_++;
-            
-            // Check top-K matches for THIS token against prefetched experts
-            int match_count = 0;
-            for (int i = 0; i < n_check; ++i) {
-                int64_t prefetched_eid = last_pred_no_bias_[i];
-                for (int k = 0; k < active_experts; ++k) {
-                    if (prefetched_eid == topk_accessor[k]) {
-                        match_count++;
+            int routed_hits_forced_n = 0;
+            for (int64_t k = 0; k < routed_forced_n; ++k) {
+                int64_t routed_eid = topk_accessor[k];
+                if (std::find(pred_set.begin(), pred_set.end(), routed_eid) != pred_set.end()) {
+                    routed_hits_forced_n++;
+                }
+            }
+
+            // Legacy aggregate used by existing parser/plots:
+            // forced_n denominator when forced_top_n > 0, otherwise full top-k.
+            pred_hits_no_bias_ += routed_hits_forced_n;
+            pred_total_ += routed_forced_n;
+
+            pred_hits_routed_forced_n_ += routed_hits_forced_n;
+            pred_total_routed_forced_n_ += routed_forced_n;
+            pred_hits_routed_topk_ += routed_hits_topk;
+            pred_total_routed_topk_ += routed_topk_n;
+
+            // Precision-style metric: among predicted experts, how many are requested by router?
+            int pred_hits_topk = 0;
+            int pred_hits_forced_n = 0;
+            for (int64_t pred_eid : pred_set) {
+                bool in_topk = false;
+                bool in_forced_n = false;
+                for (int64_t k = 0; k < routed_topk_n; ++k) {
+                    if (pred_eid == topk_accessor[k]) {
+                        in_topk = true;
+                        if (k < routed_forced_n) {
+                            in_forced_n = true;
+                        }
                         break;
                     }
                 }
+                if (in_topk) {
+                    pred_hits_topk++;
+                }
+                if (in_forced_n) {
+                    pred_hits_forced_n++;
+                }
             }
-            if (active_experts > 0) {
-                if (match_count == 0) pred_match_0_++;
-                else if (match_count == 1) pred_match_1_++;
-                else if (match_count >= 2) pred_match_2_++;
+            pred_requested_hits_topk_ += pred_hits_topk;
+            pred_requested_total_topk_ += static_cast<int64_t>(pred_set.size());
+            pred_requested_hits_forced_n_ += pred_hits_forced_n;
+            pred_requested_total_forced_n_ += static_cast<int64_t>(pred_set.size());
+
+            if (routed_forced_n > 0) {
+                if (routed_hits_forced_n == 0) pred_match_0_++;
+                else if (routed_hits_forced_n == 1) pred_match_1_++;
+                else pred_match_2_++;
             }
         }
     }
@@ -1202,7 +1269,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     last_top1_expert_ = top1_global_e;
 
     // Trigger speculative loading for the next token based on current embedding
-    trigger_speculative_loading(x_flat, prev_layers_feat);
+    trigger_speculative_loading(x_flat, current_decode_step, prev_layers_feat);
 
     // Previous token's routing (for predictor "prev" on the *next* step) is this token's unbiased top-k distribution.
     prev_token_routing_mh_ = routing_mh_current_token_.clone();
@@ -1212,7 +1279,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     else if (loaded == 1) total_steps_1_loaded_++;
     else total_steps_gt1_loaded_++;
     
-    if (loaded > 1) {
+    if (loaded > 6) {
         std::cout << "[WARNING] Layer " << layer_idx_ << " loaded " << loaded << " experts in a single generation step!" << std::endl;
     }
     
@@ -1338,7 +1405,9 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x, c10::optiona
     // ============== Router Logit Modification (Lambda Parameter) ==============
     torch::Tensor topk_vals, topk_idx;
     
-    if (std::abs(lambda_) > 1e-9) {  // Only apply if lambda is non-zero
+    // PM and forced_top_n extend the cache-conditional bias mask only; same lambda-biased top-k
+    // for remaining slots (use lambda>0, e.g. 1.0, for comparable FN vs PM sweeps).
+    if (std::abs(lambda_) > 1e-9) {  // Cache-conditional routing (mask + biased top-k)
         // Update delta_avg (running average of logit ranges)
         auto max_logits = std::get<0>(torch::max(router_out, /*dim=*/-1));  // [num_tokens]
         auto min_logits = std::get<0>(torch::min(router_out, /*dim=*/-1));  // [num_tokens]
@@ -1352,13 +1421,43 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x, c10::optiona
             delta_avg_ = momentum * delta_avg_ + (1.0 - momentum) * current_avg_range;
         }
         
-        // Create cache mask tensor
-        auto cache_mask = torch::tensor(expert_cache_bitmask_, 
-                                       router_out.options().dtype(torch::kFloat32));
-        
         bool has_cached = std::any_of(expert_cache_bitmask_.begin(),
                                       expert_cache_bitmask_.end(),
                                       [](int64_t v) { return v == 1; });
+
+        const int64_t num_tokens = x_flat.size(0);
+        const bool use_pm_lambda_mask = mass_threshold_substitution_p_ > 0.0;
+
+        torch::Tensor cache_mask;
+        if (use_pm_lambda_mask) {
+            cache_mask = torch::tensor(expert_cache_bitmask_, router_out.options().dtype(torch::kFloat32))
+                             .unsqueeze(0)
+                             .expand({num_tokens, num_experts_})
+                             .clone();
+        } else {
+            cache_mask = torch::tensor(expert_cache_bitmask_, router_out.options().dtype(torch::kFloat32));
+        }
+
+        // Force the minimum set of experts whose cumulative softmax probability >= forced_top_p_.
+        // Adapts to routing confidence: a peaked distribution forces fewer experts than a flat one.
+        if (forced_top_p_ > 0.0 && has_cached) {
+            auto probs = torch::softmax(router_out.to(torch::kFloat32), -1);  // [num_tokens, num_experts]
+            auto mean_probs = probs.mean(0);                                   // [num_experts]
+            auto sort_result = torch::sort(mean_probs, -1, /*descending=*/true);
+            auto sorted_vals = std::get<0>(sort_result);                       // [num_experts]
+            auto sorted_idx  = std::get<1>(sort_result);                       // [num_experts]
+            auto cumsum = torch::cumsum(sorted_vals, -1);                      // [num_experts]
+            // Include expert i when the cumulative mass before it is still below the threshold.
+            auto pre_cumsum = cumsum - sorted_vals;
+            auto include_sorted = pre_cumsum.lt(static_cast<float>(forced_top_p_)).to(torch::kFloat32);
+            auto top_p_mask = torch::zeros({num_experts_}, cache_mask.options());
+            top_p_mask.scatter_(-1, sorted_idx, include_sorted);
+            if (use_pm_lambda_mask) {
+                cache_mask = torch::maximum(cache_mask, top_p_mask.unsqueeze(0).expand({num_tokens, num_experts_}));
+            } else {
+                cache_mask = torch::maximum(cache_mask, top_p_mask);
+            }
+        }
 
         // Force top forced_top_n_ unbiased experts into the cache mask so they are always
         // available (and thus preferred under the lambda bias).
@@ -1366,11 +1465,34 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x, c10::optiona
             int64_t n_force = std::min(forced_top_n_, num_experts_per_tok_);
             auto topn_result = router_out.topk(n_force, /*dim=*/-1);
             auto topn_idx    = std::get<1>(topn_result);  // [num_tokens, n_force]
-            auto top_expert_mask = torch::zeros({num_experts_}, cache_mask.options());
-            for (int64_t ti = 0; ti < topn_idx.size(0); ti++) {
-                top_expert_mask.index_put_({topn_idx[ti]}, 1.0);
+            if (use_pm_lambda_mask) {
+                cache_mask.scatter_(1, topn_idx, torch::ones_like(topn_idx, cache_mask.dtype()));
+            } else {
+                auto top_expert_mask = torch::zeros({num_experts_}, cache_mask.options());
+                for (int64_t ti = 0; ti < topn_idx.size(0); ti++) {
+                    top_expert_mask.index_put_({topn_idx[ti]}, 1.0);
+                }
+                cache_mask = torch::maximum(cache_mask, top_expert_mask);
             }
-            cache_mask = torch::maximum(cache_mask, top_expert_mask);
+        }
+
+        if (use_pm_lambda_mask) {
+            const float pm_thresh = static_cast<float>(mass_threshold_substitution_p_);
+            auto probs_pm = torch::softmax(router_out.to(torch::kFloat32), -1);
+            auto pm_sort = torch::sort(probs_pm, -1, /*descending=*/true);
+            auto sorted_probs_pm = std::get<0>(pm_sort);
+            auto sorted_idx_pm = std::get<1>(pm_sort);
+            auto cumsum_pm = sorted_probs_pm.cumsum(-1);
+            auto reached_pm = cumsum_pm >= static_cast<double>(pm_thresh);
+            auto first_ge_pm = reached_pm.to(torch::kFloat32).argmax(-1, /*keepdim=*/true);
+            auto positions_pm =
+                torch::arange(num_experts_, torch::TensorOptions().device(router_out.device()).dtype(torch::kLong))
+                    .unsqueeze(0)
+                    .expand({num_tokens, num_experts_});
+            auto in_prefix_sorted = positions_pm <= first_ge_pm;
+            auto pm_row_mask = torch::zeros_like(probs_pm);
+            pm_row_mask.scatter_(1, sorted_idx_pm, in_prefix_sorted.to(torch::kFloat32));
+            cache_mask = torch::maximum(cache_mask, pm_row_mask);
         }
         
         // Apply bias to router logits
@@ -3002,6 +3124,18 @@ double UnifiedLLMW4A16Impl::get_lambda(int64_t layer_idx) const {
         return moe_layers[layer_idx]->get_lambda();
     }
     return 0.0;
+}
+
+void UnifiedLLMW4A16Impl::set_forced_top_p(double p) {
+    for (auto& layer : moe_layers) {
+        layer->set_forced_top_p(p);
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_mass_threshold_substitution_p(double p) {
+    for (auto& layer : moe_layers) {
+        layer->set_mass_threshold_substitution_p(p);
+    }
 }
 
 void UnifiedLLMW4A16Impl::set_forced_top_n(int64_t n) {

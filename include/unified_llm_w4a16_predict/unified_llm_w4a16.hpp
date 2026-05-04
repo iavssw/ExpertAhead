@@ -6,6 +6,7 @@
 #include <torch/torch.h>
 #include <utility>
 #include <vector>
+#include <deque>
 #include <mutex>
 #include <future>
 #include <unified_llm_w4a16_predict/expert_predictor.h>
@@ -147,6 +148,19 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void set_forced_top_n(int64_t n) { forced_top_n_ = std::max(int64_t(0), n); }
     int64_t get_forced_top_n() const { return forced_top_n_; }
 
+    // Forced top-P: force the minimum set of experts whose softmax probabilities sum to >= p.
+    // Adapts to routing confidence: peaked distributions force fewer experts than flat ones.
+    // Set to -1.0 to disable (default). Mutually composable with forced_top_n_.
+    void set_forced_top_p(double p) { forced_top_p_ = p; }
+    double get_forced_top_p() const { return forced_top_p_; }
+
+    // Per-token probability-mass prefix threshold p: smallest sorted-prob prefix with mass >= p is
+    // OR'd into the cache-conditional bias mask (with forced_top_n / forced_top_p). Experts in the
+    // mask get +lambda*delta_avg; remaining top-k slots come from biased top-k (same path as FN).
+    // Requires lambda>0 for effect. Set to -1.0 to disable.
+    void set_mass_threshold_substitution_p(double p) { mass_threshold_substitution_p_ = p; }
+    double get_mass_threshold_substitution_p() const { return mass_threshold_substitution_p_; }
+
     enum class CachePolicy { LRU, PREFILL };
     void set_cache_policy(CachePolicy policy) { cache_policy_ = policy; }
     
@@ -174,8 +188,26 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void reset_predictor_stats() {
         pred_hits_no_bias_ = 0;
         pred_total_ = 0;
+        pred_hits_routed_forced_n_ = 0;
+        pred_total_routed_forced_n_ = 0;
+        pred_hits_routed_topk_ = 0;
+        pred_total_routed_topk_ = 0;
+        pred_requested_hits_forced_n_ = 0;
+        pred_requested_total_forced_n_ = 0;
+        pred_requested_hits_topk_ = 0;
+        pred_requested_total_topk_ = 0;
         last_true_top1_expert_ = -1;  // Reset so first token doesn't count
         decode_token_count_ = 0;      // Reset stride counter for new generation
+        decode_step_counter_ = 0;
+        pred_results_ready_.store(false);
+        {
+            std::lock_guard<std::mutex> lock(pred_results_mutex_);
+            last_pred_no_bias_.clear();
+        }
+        {
+            std::lock_guard<std::mutex> lock(pending_predictions_mutex_);
+            pending_predictions_.clear();
+        }
     }
 
     // Lookahead stride: only invoke the predictor every N tokens (N = lookahead depth).
@@ -195,7 +227,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
 
     // Prediction & Speculative Loading
     void set_context_token_ids(const std::vector<int64_t>& token_ids);
-    void trigger_speculative_loading(const torch::Tensor& embedding, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
+    void trigger_speculative_loading(const torch::Tensor& embedding, int64_t source_decode_step,
+                                     c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
     /// One-shot predictor + prefetch after prefill (uses last / prev-prefill-token routing; does not use decode prev_token state).
     void run_predictor_prefill_warmup(const torch::Tensor& embedding, const torch::Tensor& prefill_dist_row,
                                     const torch::Tensor& prev_expert_mh_row, c10::optional<torch::Tensor> prev_layers_feat);
@@ -248,6 +281,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double delta_avg_ = 0.0;                     // Running average of logit ranges
     std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
     int64_t forced_top_n_ = 1;                   // How many unbiased top-k experts are forced into the mask
+    double  forced_top_p_ = -1.0;               // Cumulative prob mass threshold for forced experts (-1 = disabled)
+    double  mass_threshold_substitution_p_ = -1.0; // Alternate routing threshold (-1 = disabled)
     int64_t prefill_top_n_ = 0;                  // How many top experts from prefill to lock in cache
     bool random_fill_mode_ = false;               // Experiment: substitute non-top-N slots with random experts
 
@@ -279,9 +314,23 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t pred_match_1_ = 0;
     int64_t pred_match_2_ = 0;
 
-    // Predictor hit-rate counters (generation only)
-    int64_t pred_hits_no_bias_   = 0;  // tokens where predictor's prefetched expert(s) matched unbiased top-1
-    int64_t pred_total_          = 0;  // total evaluated generation tokens
+    // Predictor accuracy counters (generation only)
+    // Definition:
+    //   denominator = number of routed experts evaluated per token
+    //                 (forced_top_n_ if >0, otherwise full routed top-k size).
+    //   numerator   = among those routed experts, how many are present in the
+    //                 predictor's prefetched set at the configured horizon.
+    int64_t pred_hits_no_bias_   = 0;  // legacy aggregate (kept for compatibility)
+    int64_t pred_total_          = 0;  // legacy aggregate (kept for compatibility)
+    int64_t pred_hits_routed_forced_n_ = 0;
+    int64_t pred_total_routed_forced_n_ = 0;
+    int64_t pred_hits_routed_topk_ = 0;
+    int64_t pred_total_routed_topk_ = 0;
+    // Precision-style metric: of predicted experts, how many were requested by router.
+    int64_t pred_requested_hits_forced_n_ = 0;
+    int64_t pred_requested_total_forced_n_ = 0;
+    int64_t pred_requested_hits_topk_ = 0;
+    int64_t pred_requested_total_topk_ = 0;
     int64_t last_true_top1_expert_ = -1; // unbiased top-1 from previous token (ground truth for predictor stat)
     
     // Sequential top1 tracking
@@ -293,6 +342,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::vector<int64_t> last_pred_no_bias_;
     std::mutex pred_results_mutex_;
     std::atomic<bool> pred_results_ready_{false};
+    std::deque<std::pair<int64_t, std::vector<int64_t>>> pending_predictions_;
+    std::mutex pending_predictions_mutex_;
     
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
@@ -305,6 +356,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     bool suppress_predictor_stats_ = false;    // prefill-end warmup: do not count predictor hits / prefetch loads in stats
     int64_t lookahead_stride_ = 1;             // invoke predictor every N decode tokens (N = lookahead depth)
     int64_t decode_token_count_ = 0;           // counts decode tokens since last predictor call
+    int64_t decode_step_counter_ = 0;          // absolute decode step index within current generation
 
     // Prediction & Speculative Loading
     std::unique_ptr<IExpertPredictor> predictor_;
@@ -315,7 +367,15 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::vector<bool> expert_slot_ready_; // For condition variable, size max_cached_experts_
     std::condition_variable expert_slots_cv_; // To wait for background loading
     
+    // Expert file format (auto-detected on first load)
+    enum class ExpertFormat { UNKNOWN, UNPACKED, PACKED };
+
+    // Pinned staging buffer reused across packed loads (avoids per-call allocation)
+    torch::Tensor expert_staging_buf_;
+    ExpertFormat  expert_format_ = ExpertFormat::UNKNOWN;
+
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
+    void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
@@ -356,8 +416,11 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void load_quantized_weights_from_safetensors(const std::string &filename);
     // Load non-quantized weights only (embeddings, norms, lm_head) from safetensors
     void load_non_quantized_weights_from_safetensors(const std::string &filename);
-    // Load quantized weights from preprocessed bin directory
-    void load_quantized_weights_from_bins(const std::string &weights_dir);
+    // Load quantized weights from preprocessed bin directory.
+    // If expert_weights_dir is non-empty it overrides weights_dir for MoE expert
+    // files (supports both packed and unpacked formats — auto-detected at runtime).
+    void load_quantized_weights_from_bins(const std::string &weights_dir,
+                                          const std::string &expert_weights_dir = "");
 
     // Pre-warm expert cache
     void prewarm_experts(int64_t num_to_warm, bool verbose = true);
@@ -366,8 +429,10 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void set_lambda(double lambda, int64_t layer_idx = -1);
     double get_lambda(int64_t layer_idx = 0) const;
 
-    // Forced top-N and random-fill experiment controls (applied to all layers)
+    // Forced top-N / top-P and random-fill experiment controls (applied to all layers)
     void set_forced_top_n(int64_t n);
+    void set_forced_top_p(double p);
+    void set_mass_threshold_substitution_p(double p);
     void set_random_fill_mode(bool on);
     void set_prefill_top_n(int64_t n);
     void set_cache_policy(std::string policy_name, int64_t layer_idx = -1);

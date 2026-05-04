@@ -141,6 +141,19 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void set_forced_top_n(int64_t n) { forced_top_n_ = std::max(int64_t(0), n); }
     int64_t get_forced_top_n() const { return forced_top_n_; }
 
+    // Forced top-P: force the minimum set of experts whose softmax probabilities sum to >= p.
+    // Adapts to routing confidence: peaked distributions force fewer experts than flat ones.
+    // Set to -1.0 to disable (default). Mutually composable with forced_top_n_.
+    void set_forced_top_p(double p) { forced_top_p_ = p; }
+    double get_forced_top_p() const { return forced_top_p_; }
+
+    // Per-token probability-mass prefix threshold p: smallest sorted-prob prefix with mass >= p is
+    // OR'd into the cache-conditional bias mask (with forced_top_n / forced_top_p). Experts in the
+    // mask get +lambda*delta_avg; remaining top-k slots come from biased top-k (same path as FN).
+    // Requires lambda>0 for effect. Set to -1.0 to disable.
+    void set_mass_threshold_substitution_p(double p) { mass_threshold_substitution_p_ = p; }
+    double get_mass_threshold_substitution_p() const { return mass_threshold_substitution_p_; }
+
     // Number of top experts to lock into cache during prefill.
     void set_prefill_top_n(int64_t n) { prefill_top_n_ = std::max(int64_t(0), n); }
     int64_t get_prefill_top_n() const { return prefill_top_n_; }
@@ -193,6 +206,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double delta_avg_ = 0.0;                     // Running average of logit ranges
     std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
     int64_t forced_top_n_ = 1;                   // How many unbiased top-k experts are forced into the mask
+    double  forced_top_p_ = -1.0;               // Cumulative prob mass threshold for forced experts (-1 = disabled)
+    double  mass_threshold_substitution_p_ = -1.0; // Alternate routing threshold (-1 = disabled)
     int64_t prefill_top_n_ = 0;                  // How many top experts from prefill to lock in cache
     bool random_fill_mode_ = false;               // Experiment: substitute non-top-N slots with random experts
 
@@ -219,7 +234,15 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
     
+    // Expert file format (auto-detected on first load)
+    enum class ExpertFormat { UNKNOWN, UNPACKED, PACKED };
+
+    // Pinned staging buffer reused across packed loads (avoids per-call allocation)
+    torch::Tensor expert_staging_buf_;
+    ExpertFormat  expert_format_ = ExpertFormat::UNKNOWN;
+
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
+    void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
     size_t pick_victim();
     size_t pick_lru();
@@ -263,8 +286,11 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void load_quantized_weights_from_safetensors(const std::string &filename);
     // Load non-quantized weights only (embeddings, norms, lm_head) from safetensors
     void load_non_quantized_weights_from_safetensors(const std::string &filename);
-    // Load quantized weights from preprocessed bin directory
-    void load_quantized_weights_from_bins(const std::string &weights_dir);
+    // Load quantized weights from preprocessed bin directory.
+    // If expert_weights_dir is non-empty it overrides weights_dir for MoE expert
+    // files (supports both packed and unpacked formats — auto-detected at runtime).
+    void load_quantized_weights_from_bins(const std::string &weights_dir,
+                                          const std::string &expert_weights_dir = "");
 
     // Pre-warm expert cache
     void prewarm_experts(int64_t num_to_warm, bool verbose = true);
@@ -273,8 +299,10 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void set_lambda(double lambda, int64_t layer_idx = -1);
     double get_lambda(int64_t layer_idx = 0) const;
 
-    // Forced top-N and random-fill experiment controls (applied to all layers)
+    // Forced top-N / top-P and random-fill experiment controls (applied to all layers)
     void set_forced_top_n(int64_t n);
+    void set_forced_top_p(double p);
+    void set_mass_threshold_substitution_p(double p);
     void set_prefill_top_n(int64_t n);
     void set_random_fill_mode(bool on);
 
