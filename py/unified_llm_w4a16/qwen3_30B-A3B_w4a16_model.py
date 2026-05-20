@@ -11,7 +11,7 @@ import re
 import math
 import subprocess
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Any
 from urllib.request import urlopen
 
 import torch
@@ -33,6 +33,38 @@ else:
         sys.path.insert(0, str(_local_build.resolve()))
 
 ArchitectureType = None
+
+
+def _apply_routing_and_cache_cli(model: Any, args: Any) -> None:
+    """Apply lambda / forced routing / cache policy from argparse (shared by main and WikiText eval)."""
+    if args.lambda_val != 0.0 and hasattr(model, "set_lambda"):
+        print(f"Setting lambda to {args.lambda_val}")
+        model.set_lambda(args.lambda_val)
+
+    if args.forced_top_n > 0 and hasattr(model, "set_forced_top_n"):
+        model.set_forced_top_n(args.forced_top_n)
+        print(f"Forced top-{args.forced_top_n} experts into cache mask.")
+
+    if args.forced_top_p >= 0.0 and hasattr(model, "set_forced_top_p"):
+        model.set_forced_top_p(args.forced_top_p)
+        print(f"Forced top-p={args.forced_top_p} experts into cache mask.")
+
+    if args.mass_threshold_substitution_p >= 0.0 and hasattr(model, "set_mass_threshold_substitution_p"):
+        model.set_mass_threshold_substitution_p(args.mass_threshold_substitution_p)
+        print(
+            f"Probability-mass prefix p={args.mass_threshold_substitution_p} OR'd into cache mask "
+            f"(same λ-biased top-k as forced_top_n; use --lambda-val e.g. 1.0 for cache-conditional routing)."
+        )
+        if args.lambda_val == 0.0:
+            print("Warning: --mass-threshold-substitution-p has no effect while --lambda-val is 0.")
+
+    if args.prefill_top_n > 0 and hasattr(model, "set_prefill_top_n"):
+        model.set_prefill_top_n(args.prefill_top_n)
+        print(f"Set prefill top-{args.prefill_top_n} locked experts.")
+
+    if hasattr(args, "cache_policy") and hasattr(model, "set_cache_policy"):
+        model.set_cache_policy(args.cache_policy)
+        print(f"Set expert cache policy to {args.cache_policy}.")
 
 
 def load_config_with_comments(path: str) -> dict:
@@ -203,13 +235,17 @@ class Qwen3_30BA3BW4A16Model:
             raise ValueError(f"Invalid backend: {backend}. Choose from: base, predict, cached")
 
         try:
+            old_flags = sys.getdlopenflags()
+            sys.setdlopenflags(os.RTLD_GLOBAL | os.RTLD_LAZY)
             if backend == "base":
                 import unified_llm_w4a16_base_libtorch as backend_module
             elif backend == "predict":
                 import unified_llm_w4a16_predict_libtorch as backend_module
             elif backend == "cached":
                 import unified_llm_w4a16_cached_libtorch as backend_module
+            sys.setdlopenflags(old_flags)
         except ImportError as e:
+            sys.setdlopenflags(old_flags)
             raise ImportError(f"Could not import {backend} backend: {e}")
 
         global ArchitectureType
@@ -796,6 +832,49 @@ class Qwen3_30BA3BW4A16Model:
             "num_tokens": num_tokens,
         }
 
+    def generation_perplexity(self, prompt_ids: torch.Tensor, full_ids: torch.Tensor) -> dict:
+        """Perplexity of the generated continuation only (not the prompt).
+
+        For each generated position t in [P, T-1], computes -log p(full_ids[t] | full_ids[:t])
+        using a single teacher-forced forward on ``full_ids`` (same routing as standard ``forward``).
+
+        Pool multiple prompts with token weighting: sum_nll / sum(num_gen_tokens), then exp.
+
+        Returns keys: perplexity, mean_nll, sum_nll, num_gen_tokens.
+        """
+        if prompt_ids.dim() != 2 or full_ids.dim() != 2:
+            raise ValueError("Expected prompt_ids and full_ids shaped [batch, seq].")
+        if prompt_ids.size(0) != 1 or full_ids.size(0) != 1:
+            raise ValueError("generation_perplexity currently supports batch size 1.")
+        P = int(prompt_ids.size(1))
+        T = int(full_ids.size(1))
+        if T <= P:
+            return {
+                "perplexity": float("inf"),
+                "mean_nll": float("inf"),
+                "sum_nll": 0.0,
+                "num_gen_tokens": 0,
+            }
+
+        with torch.no_grad():
+            logits = self.model.forward(full_ids, 0)
+
+        logits = logits[:, :-1, :].float().contiguous()
+        vocab_size = logits.size(-1)
+        # logits[:, i, :] predicts token at index i+1
+        gen_logits = logits[0, P - 1 : T - 1, :]
+        gen_targets = full_ids[0, P:T].to(logits.device).long()
+        loss_vec = F.cross_entropy(gen_logits, gen_targets, reduction="none")
+        sum_nll = float(loss_vec.sum().item())
+        n_gen = int(gen_targets.numel())
+        mean_nll = sum_nll / max(n_gen, 1)
+        return {
+            "perplexity": float(math.exp(mean_nll)),
+            "mean_nll": float(mean_nll),
+            "sum_nll": sum_nll,
+            "num_gen_tokens": n_gen,
+        }
+
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
                     max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50,
@@ -1025,10 +1104,18 @@ def run_wikitext2_perplexity(
     split: str = "test",
     max_length: int = 2048,
     stride: int = 2048,
+    max_windows: int = 0,
+    cli_args: Any = None,
 ):
     """
     Evaluate perplexity on WikiText-2 with sliding-window evaluation.
     Saves fetched text and tokenized IDs under model_weights.
+
+    If *cli_args* is set (typically ``argparse.Namespace`` from ``main``), the model is
+    constructed like a normal CLI run (cache size, predict backend, etc.) and routing
+    flags (lambda, forced top-n / mass, cache policy) are applied.
+
+    *max_windows*: if > 0, stop after that many windows (quick smoke test).
     """
     if max_length < 2:
         raise ValueError("max_length must be >= 2")
@@ -1050,13 +1137,31 @@ def run_wikitext2_perplexity(
 
     print("Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...")
     try:
-        model = Qwen3_30BA3BW4A16Model(
-            model_path=model_path,
-            tokenizer_path=tokenizer_path,
-            device=device,
-            backend=backend,
-            config_path=config_path,
-        )
+        if cli_args is not None:
+            model = Qwen3_30BA3BW4A16Model(
+                model_path=cli_args.model_path or model_path,
+                tokenizer_path=cli_args.tokenizer_path or tokenizer_path,
+                device=cli_args.device,
+                backend=cli_args.backend,
+                config_path=cli_args.config_path or config_path,
+                max_cached_experts_per_layer=cli_args.max_cached_experts,
+                prefetch_experts_count=cli_args.prefetch_experts_count,
+                predictor_models_dir=cli_args.predictor_model,
+                predictor_device=cli_args.predictor_device,
+                predict_layers=cli_args.predict_layers,
+                expert_reuse_csv=cli_args.expert_reuse_csv,
+                predictor_lookahead=cli_args.predictor_lookahead,
+                expert_weights_dir=cli_args.expert_weights_dir,
+            )
+            _apply_routing_and_cache_cli(model, cli_args)
+        else:
+            model = Qwen3_30BA3BW4A16Model(
+                model_path=model_path,
+                tokenizer_path=tokenizer_path,
+                device=device,
+                backend=backend,
+                config_path=config_path,
+            )
         print("Model initialized successfully!")
     except Exception as e:
         print(f"Error initializing model: {e}")
@@ -1080,6 +1185,8 @@ def run_wikitext2_perplexity(
     print(f"Saved tokenized WikiText-2 tensor: {token_cache_path}")
     print(f"Total tokens: {input_ids_full.size(1)}")
     print(f"Eval max_length: {max_length}, stride: {stride}")
+    if max_windows > 0:
+        print(f"Quick test: evaluating at most {max_windows} sliding window(s).")
     backend_prefill_chunk = None
     if hasattr(model, "model") and hasattr(model.model, "get_prefill_chunk_size"):
         try:
@@ -1100,6 +1207,8 @@ def run_wikitext2_perplexity(
     total_windows = len(window_starts)
 
     for window_idx, begin_loc in enumerate(window_starts):
+        if max_windows > 0 and window_idx >= max_windows:
+            break
         end_loc = min(begin_loc + max_length, seq_len)
         trg_len = end_loc - prev_end_loc
         input_ids_window = input_ids_full[:, begin_loc:end_loc]
@@ -1326,8 +1435,19 @@ def main():
         default=2048,
         help="Stride for sliding-window WikiText-2 perplexity."
     )
+    parser.add_argument(
+        "--wikitext2-max-windows",
+        type=int,
+        default=0,
+        help="If > 0, only evaluate this many sliding windows (smoke test / cheap run). 0 = full split.",
+    )
     parser.add_argument("--sweep-prompts-file", type=str, default=None)
-    parser.add_argument("--generation-perplexity", action="store_true", default=False)
+    parser.add_argument(
+        "--generation-perplexity",
+        action="store_true",
+        default=False,
+        help="Score -log p(generated token | prefix) on model-generated continuations (requires generation).",
+    )
     parser.add_argument("--lambda-val", type=float, default=0.0)
     parser.add_argument("--predict-layers", type=int, nargs="+", default=None)
     parser.add_argument("--predictor-model", type=str, default="")
@@ -1386,6 +1506,8 @@ def main():
             split=args.wikitext2_split,
             max_length=args.wikitext2_max_length,
             stride=args.wikitext2_stride,
+            max_windows=args.wikitext2_max_windows,
+            cli_args=args,
         )
 
     if args.prompt_test is not None:
@@ -1436,56 +1558,21 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
-    if args.lambda_val != 0.0 and hasattr(model, 'set_lambda'):
-        print(f"Setting lambda to {args.lambda_val}")
-        model.set_lambda(args.lambda_val)
-
-    if args.forced_top_n > 0 and hasattr(model, 'set_forced_top_n'):
-        model.set_forced_top_n(args.forced_top_n)
-        print(f"Forced top-{args.forced_top_n} experts into cache mask.")
-
-    if args.forced_top_p >= 0.0 and hasattr(model, 'set_forced_top_p'):
-        model.set_forced_top_p(args.forced_top_p)
-        print(f"Forced top-p={args.forced_top_p} experts into cache mask.")
-
-    if args.mass_threshold_substitution_p >= 0.0 and hasattr(model, 'set_mass_threshold_substitution_p'):
-        model.set_mass_threshold_substitution_p(args.mass_threshold_substitution_p)
-        print(
-            f"Probability-mass prefix p={args.mass_threshold_substitution_p} OR'd into cache mask "
-            f"(same λ-biased top-k as forced_top_n; use --lambda-val e.g. 1.0 for cache-conditional routing)."
-        )
-        if args.lambda_val == 0.0:
-            print("Warning: --mass-threshold-substitution-p has no effect while --lambda-val is 0.")
-
-    if args.prefill_top_n > 0 and hasattr(model, 'set_prefill_top_n'):
-        model.set_prefill_top_n(args.prefill_top_n)
-        print(f"Set prefill top-{args.prefill_top_n} locked experts.")
-
-    if hasattr(args, "cache_policy") and hasattr(model, 'set_cache_policy'):
-        model.set_cache_policy(args.cache_policy)
-        print(f"Set expert cache policy to {args.cache_policy}.")
-
-    # Read all prompts from prompts.txt
-    script_dir = Path(__file__).parent
-    prompts_file = script_dir / "prompts.txt"
-    if prompts_file.exists():
-        with open(prompts_file, "r", encoding="utf-8") as f:
-            raw_prompts = [line.strip() for line in f.readlines()]
-        prompts = [p for p in raw_prompts if p]  # drop blank lines
-    else:
-        print(f"Warning: {prompts_file} not found, falling back to --text argument.")
-        prompts = [args.text]
+    _apply_routing_and_cache_cli(model, args)
 
     if args.sweep_prompts_file:
-        import json
-        global json
         print(f"\nRunning sweep using prompts from JSON: {args.sweep_prompts_file}")
-        with open(args.sweep_prompts_file, 'r') as f:
+        if not os.path.exists(args.sweep_prompts_file):
+            print(f"Error: Prompts file {args.sweep_prompts_file} not found.")
+            return 1
+
+        with open(args.sweep_prompts_file, "r", encoding="utf-8") as f:
             prompts = json.load(f)
-            
+
         print(f"Loaded {len(prompts)} prompts for sweeping.")
-        total_ppl = 0.0
-        valid_ppl_count = 0
+        total_nll_sum = 0.0
+        total_gen_toks_for_ppl = 0
+        prompts_with_gen = 0
         total_time = 0.0
         total_generated_tokens = 0
         
@@ -1494,28 +1581,38 @@ def main():
         for i, prompt in enumerate(prompts):
             print(f"\nProcessing Prompt {i+1}/{len(prompts)}...")
             try:
+                input_ids = model.tokenize(prompt)
+
                 if args.generation_perplexity:
-                    # Qwen script may not have generation_perplexity defined, just skip for now or use `model.perplexity()`
-                    # but perplexity is per prompt, not token by token. For sweep script, let's just use regular perplexity
-                    input_ids = model.tokenize(prompt)
-                    metrics = model.perplexity(input_ids)
-                    total_ppl += metrics['perplexity']
-                    valid_ppl_count += 1
-                
-                if args.generate:
-                    input_ids = model.tokenize(prompt)
+                    start_time = time.time()
+                    full_ids = model.generate(
+                        input_ids,
+                        max_new_tokens=args.max_new_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        top_k=args.top_k,
+                    )
+                    elapsed = time.time() - start_time
+                    num_generated = full_ids.size(1) - input_ids.size(1)
+                    if num_generated > 0:
+                        gp = model.generation_perplexity(input_ids, full_ids)
+                        total_nll_sum += gp["sum_nll"]
+                        total_gen_toks_for_ppl += gp["num_gen_tokens"]
+                        prompts_with_gen += 1
+                        if args.generate:
+                            total_time += elapsed
+                            total_generated_tokens += num_generated
+                elif args.generate:
                     start_time = time.time()
                     generated = model.generate(
                         input_ids,
                         max_new_tokens=args.max_new_tokens,
                         temperature=args.temperature,
                         top_p=args.top_p,
-                        top_k=args.top_k
+                        top_k=args.top_k,
                     )
-                    end_time = time.time()
-                    elapsed = end_time - start_time
+                    elapsed = time.time() - start_time
                     num_generated = generated.size(1) - input_ids.size(1)
-                    
                     if num_generated > 0:
                         total_time += elapsed
                         total_generated_tokens += num_generated
@@ -1526,9 +1623,14 @@ def main():
         print("\n" + "=" * 60)
         print("Sweep Complete.")
         
-        if args.generation_perplexity and valid_ppl_count > 0:
-            avg_ppl = total_ppl / valid_ppl_count
+        if args.generation_perplexity and total_gen_toks_for_ppl > 0:
+            avg_nll = total_nll_sum / total_gen_toks_for_ppl
+            avg_ppl = math.exp(avg_nll)
             print(f"Generation Perplexity: {avg_ppl:.4f}")
+            print(
+                f"(token-weighted over {total_gen_toks_for_ppl} generated tokens, "
+                f"{prompts_with_gen}/{len(prompts)} prompts with ≥1 new token)"
+            )
             
         if args.generate and total_generated_tokens > 0:
             avg_tps = total_generated_tokens / total_time
@@ -1657,6 +1759,8 @@ def main():
     print(f"\n{'=' * 60}")
     if hasattr(model, "load_time"):
         print(f"Weight loading time: {model.load_time:.2f} seconds")
+    if hasattr(model, "print_cache_stats"):
+        model.print_cache_stats()
     print("Done!")
     print(f"{'=' * 60}\n")
     return 0
@@ -1665,4 +1769,6 @@ def main():
 if __name__ == "__main__":
     exit(main())
 
-    # python3 qwen3_30B-A3B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
+    # WikiText-2 (full): --wikitext2-perplexity --wikitext2-split test --wikitext2-max-length 4096 --wikitext2-stride 2048
+    # Quick cached smoke: --backend cached --max-cached-experts 36 --lambda-val 1.0 --forced-top-n 4 \
+    #   --wikitext2-perplexity --wikitext2-max-windows 2 --wikitext2-max-length 512 --wikitext2-stride 512

@@ -8,6 +8,7 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_base/helper.hpp"
 #include "unified_llm_w4a16_base/npuSetup.hpp"
+#include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 #include <algorithm>
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
@@ -694,6 +695,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
 
 torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
                                                        const torch::Tensor &topk_idx, torch::Tensor &output) {
+    const auto compute_start = std::chrono::high_resolution_clock::now();
     auto opts = x_flat.options();
     const int64_t active_experts = num_experts_per_tok_;
 
@@ -744,6 +746,11 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     auto weights = topk_vals[0].to(output.dtype()).view({active_experts, 1});
     down_batched.mul_(weights);
     output.add_(down_batched.sum(0, true));
+
+    const auto compute_end = std::chrono::high_resolution_clock::now();
+    total_moe_compute_time_ms_ +=
+        std::chrono::duration_cast<std::chrono::microseconds>(compute_end - compute_start).count() / 1000.0;
+    moe_expert_invocations_ += active_experts;
     return output;
 }
 
@@ -2230,6 +2237,36 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     }
 
     return input_tensor.narrow(1, 0, token_len);
+}
+
+void MixtureOfExpertsImpl::print_moe_timing_stats() const {
+    unified_llm_w4a16_common::print_moe_compute_only(std::cout, moe_expert_invocations_, total_moe_compute_time_ms_);
+}
+
+void MixtureOfExpertsImpl::reset_moe_timing_stats() {
+    moe_expert_invocations_ = 0;
+    total_moe_compute_time_ms_ = 0.0;
+}
+
+void UnifiedLLMW4A16Impl::print_cache_stats() const {
+    std::cout << "\nMoE Timing Statistics (base backend, compute-only — no SSD expert loads):" << std::endl;
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (size_t i = 0; i < moe_layers.size(); ++i) {
+            if (moe_layers[i]->get_moe_expert_invocations() > 0) {
+                std::cout << "Layer " << i;
+                moe_layers[i]->print_moe_timing_stats();
+            }
+        }
+    }
+    std::cout << "============================================================" << std::endl;
+}
+
+void UnifiedLLMW4A16Impl::reset_cache_stats() {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (auto& layer : moe_layers) {
+            layer->reset_moe_timing_stats();
+        }
+    }
 }
 
 void UnifiedLLMW4A16Impl::set_forced_top_n(int64_t n) {

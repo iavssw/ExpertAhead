@@ -1,6 +1,7 @@
 #include "unified_llm_w4a16_cached/helper.hpp"
 #include "unified_llm_w4a16_cached/npuSetup.hpp"
 #include "unified_llm_w4a16_cached/unified_llm_w4a16.hpp"
+#include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -985,51 +986,7 @@ static torch::Tensor read_bin_tensor(const std::string &path, torch::ScalarType 
     return tensor;
 }
 
-static void read_bin_tensor_pread(const std::string &path, void* dest_ptr, size_t copy_size) {
-    // Open with O_DIRECT to bypass the OS page cache — expert weights must come
-    // from SSD, not from a silent RAM buffer that would give unrealistically fast
-    // load times on machines with plenty of free RAM.
-    int flags = O_RDONLY | O_DIRECT;
-    int fd = open(path.c_str(), flags);
-    if (fd == -1 && errno == EINVAL) {
-        // O_DIRECT not supported by this filesystem (e.g. tmpfs) — fall back.
-        fd = open(path.c_str(), O_RDONLY);
-    }
-    if (fd == -1) {
-        throw std::runtime_error("Could not open file: " + path + " (" + strerror(errno) + ")");
-    }
-
-    struct stat sb;
-    if (fstat(fd, &sb) == -1) {
-        close(fd);
-        throw std::runtime_error("fstat failed for: " + path);
-    }
-    size_t file_size = static_cast<size_t>(sb.st_size);
-    if (file_size != copy_size) {
-        close(fd);
-        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(copy_size) +
-                                 ", got " + std::to_string(file_size) + ")");
-    }
-
-    bool is_direct = (fcntl(fd, F_GETFL) & O_DIRECT) != 0;
-    char* ptr = static_cast<char*>(dest_ptr);
-
-    // O_DIRECT requires 512-byte alignment for both the destination pointer and
-    // the transfer size. Pinned memory is usually aligned, but check and fall
-    // back gracefully if not.
-    if (is_direct && (((uintptr_t)ptr % 512 != 0) || (copy_size % 512 != 0))) {
-        int current_flags = fcntl(fd, F_GETFL);
-        fcntl(fd, F_SETFL, current_flags & ~O_DIRECT);
-    }
-
-    size_t bytes_read = 0;
-    while (bytes_read < copy_size) {
-        ssize_t ret = pread(fd, ptr + bytes_read, copy_size - bytes_read, bytes_read);
-        if (ret <= 0) break;
-        bytes_read += ret;
-    }
-    close(fd);
-}
+#include "unified_llm_w4a16_common/moe_expert_io.inl"
 
 void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir,
                                                             const std::string &expert_weights_dir) {
@@ -1228,158 +1185,9 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
     }
 }
 
-// ─── Packed expert loading (EXPK format) ─────────────────────────────────────
-//
-// Packed file layout (produced by pack_experts.py):
-//   [0..3]   Magic: b"EXPK"
-//   [4..7]   uint32  num_tensors (always 9)
-//   [8..439] 9 × 48-byte descriptors: char name[32] + uint64 offset + uint64 size
-//   [440+]   Raw tensor data, concatenated
-//
-// Strategy: read just the 440-byte header, then fire one pread() per tensor
-// directly into the pinned destination buffers — no staging buffer, no memcpy.
-// pread() does not touch the fd's file offset, so concurrent calls on the same
-// fd from different threads are safe without any locking.
-// This mirrors the predict backend exactly so that expert loading overhead is
-// identical between cached and predict; benchmark differences reflect only the
-// prediction / prefetch benefit, not implementation asymmetry.
-
-static constexpr uint32_t EXPK_MAGIC_LE   = 0x4B505845u; // "EXPK" little-endian
-static constexpr int      EXPK_NUM_TENSORS = 9;
-static constexpr size_t   EXPK_DESC_SIZE   = 48; // 32 name + 8 offset + 8 size
-static constexpr size_t   EXPK_HEADER_SIZE = 8 + EXPK_NUM_TENSORS * EXPK_DESC_SIZE; // 440 bytes
-
-struct ExpkDesc { char name[32]; uint64_t offset; uint64_t size; };
-
-static const ExpkDesc* expk_find(const ExpkDesc* descs, int n, const char* tensor_name) {
-    for (int i = 0; i < n; ++i) {
-        if (std::strncmp(descs[i].name, tensor_name, 32) == 0)
-            return &descs[i];
-    }
-    return nullptr;
-}
-
-void MixtureOfExpertsImpl::load_expert_weights_packed(
-        int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
-    std::string path = weights_dir + "/layer_" + std::to_string(layer_idx_)
-                     + "_expert_" + std::to_string(expert_idx) + ".bin";
-
-    int fd = open(path.c_str(), O_RDONLY);
-    if (fd == -1)
-        throw std::runtime_error("Cannot open packed expert: " + path + " (" + strerror(errno) + ")");
-
-    // ── 1. Read and validate the fixed-size header (no staging buffer needed) ─
-    alignas(8) char header_buf[EXPK_HEADER_SIZE];
-    if (pread(fd, header_buf, EXPK_HEADER_SIZE, 0) != static_cast<ssize_t>(EXPK_HEADER_SIZE)) {
-        close(fd); throw std::runtime_error("Short header read for packed expert: " + path);
-    }
-    if (*reinterpret_cast<const uint32_t*>(header_buf) != EXPK_MAGIC_LE) {
-        close(fd); throw std::runtime_error("Bad EXPK magic in: " + path);
-    }
-
-    uint32_t num_tensors = *reinterpret_cast<const uint32_t*>(header_buf + 4);
-    const ExpkDesc* descs = reinterpret_cast<const ExpkDesc*>(header_buf + 8);
-
-    auto require = [&](const char* name) -> const ExpkDesc& {
-        const ExpkDesc* d = expk_find(descs, static_cast<int>(num_tensors), name);
-        if (!d) { close(fd); throw std::runtime_error(std::string("Missing tensor '") + name + "' in: " + path); }
-        return *d;
-    };
-
-    const ExpkDesc& gate_qw = require("gate.qweight");
-    const ExpkDesc& gate_sc = require("gate.scales");
-    const ExpkDesc& gate_zr = require("gate.zeros");
-    const ExpkDesc& up_qw   = require("up.qweight");
-    const ExpkDesc& up_sc   = require("up.scales");
-    const ExpkDesc& up_zr   = require("up.zeros");
-    const ExpkDesc& down_qw = require("down.qweight");
-    const ExpkDesc& down_sc = require("down.scales");
-    const ExpkDesc& down_zr = require("down.zeros");
-
-    // ── 2. Allocate pinned destination buffers ───────────────────────────────
-    auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot,
-                                    const std::vector<int64_t>& shape, torch::ScalarType dtype) {
-        if (bufs.size() <= static_cast<size_t>(slot)) bufs.resize(max_cached_experts_);
-        if (!bufs[slot].defined()) {
-            bufs[slot] = torch::empty(shape, torch::TensorOptions().dtype(dtype)
-                                                                    .device(torch::kCPU)
-                                                                    .pinned_memory(true));
-        } else if (bufs[slot].sizes() != shape) {
-            bufs[slot].resize_(shape);
-        }
-        return bufs[slot];
-    };
-
-    // gate_up: gate rows [0..out_feat) then up rows [out_feat..2*out_feat)
-    int64_t out_feat  = intermediate_size_;
-    int64_t packed_in = (hidden_size_ + 1) / 2;
-    int64_t gs_grps = static_cast<int64_t>(gate_sc.size / 2) / out_feat; // bf16 → /2
-    std::vector<int64_t> s_shape = (gs_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                   : std::vector<int64_t>{out_feat, gs_grps};
-    int64_t gz_grps = static_cast<int64_t>(gate_zr.size) / out_feat;     // int8 → /1
-    std::vector<int64_t> z_shape = (gz_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                   : std::vector<int64_t>{out_feat, gz_grps};
-    auto dest_q = ensure_pinned_buffer(gate_up_q_pinned_, slot_idx,
-                                       {out_feat * 2, packed_in}, torch::kUInt8);
-    auto dest_s = ensure_pinned_buffer(gate_up_s_pinned_, slot_idx,
-                                       {s_shape[0] * 2, s_shape.size() > 1 ? s_shape[1] : 1}, torch::kBFloat16);
-    auto dest_z = ensure_pinned_buffer(gate_up_z_pinned_, slot_idx,
-                                       {z_shape[0] * 2, z_shape.size() > 1 ? z_shape[1] : 1}, torch::kInt8);
-    char* ptr_q = static_cast<char*>(dest_q.data_ptr());
-    char* ptr_s = static_cast<char*>(dest_s.data_ptr());
-    char* ptr_z = static_cast<char*>(dest_z.data_ptr());
-
-    // down
-    auto& down_layer = down_experts[slot_idx];
-    int64_t d_out_feat  = down_layer->out_features();
-    int64_t d_packed_in = (down_layer->in_features() + 1) / 2;
-    int64_t ds_grps = static_cast<int64_t>(down_sc.size / 2) / d_out_feat;
-    std::vector<int64_t> ds_shape = (ds_grps <= 1) ? std::vector<int64_t>{d_out_feat}
-                                                    : std::vector<int64_t>{d_out_feat, ds_grps};
-    int64_t dz_grps = static_cast<int64_t>(down_zr.size) / d_out_feat;
-    std::vector<int64_t> dz_shape = (dz_grps <= 1) ? std::vector<int64_t>{d_out_feat}
-                                                    : std::vector<int64_t>{d_out_feat, dz_grps};
-    auto dest_dq = ensure_pinned_buffer(down_q_pinned_, slot_idx, {d_out_feat, d_packed_in}, torch::kUInt8);
-    auto dest_ds = ensure_pinned_buffer(down_s_pinned_, slot_idx, ds_shape, torch::kBFloat16);
-    auto dest_dz = ensure_pinned_buffer(down_z_pinned_, slot_idx, dz_shape, torch::kInt8);
-    char* ptr_dq = static_cast<char*>(dest_dq.data_ptr());
-    char* ptr_ds = static_cast<char*>(dest_ds.data_ptr());
-    char* ptr_dz = static_cast<char*>(dest_dz.data_ptr());
-
-    // ── 3. Read all 9 tensors concurrently directly into pinned dest buffers ─
-    auto pread_exact = [&path](int fd_, char* dest, size_t size, off_t offset) {
-        size_t done = 0;
-        while (done < size) {
-            ssize_t ret = pread(fd_, dest + done, size - done, offset + static_cast<off_t>(done));
-            if (ret <= 0) throw std::runtime_error("pread failed reading packed expert: " + path);
-            done += static_cast<size_t>(ret);
-        }
-    };
-
-    std::vector<std::future<void>> futures;
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_q,                gate_qw.size, static_cast<off_t>(gate_qw.offset)));
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_q + gate_qw.size, up_qw.size,   static_cast<off_t>(up_qw.offset)));
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_s,                gate_sc.size, static_cast<off_t>(gate_sc.offset)));
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_s + gate_sc.size, up_sc.size,   static_cast<off_t>(up_sc.offset)));
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_z,                gate_zr.size, static_cast<off_t>(gate_zr.offset)));
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_z + gate_zr.size, up_zr.size,   static_cast<off_t>(up_zr.offset)));
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_dq,               down_qw.size, static_cast<off_t>(down_qw.offset)));
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_ds,               down_sc.size, static_cast<off_t>(down_sc.offset)));
-    futures.push_back(std::async(std::launch::async, pread_exact, fd, ptr_dz,               down_zr.size, static_cast<off_t>(down_zr.offset)));
-
-    try {
-        for (auto& f : futures) f.get();
-    } catch (...) {
-        posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
-        close(fd);
-        throw;
-    }
-    posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
-    close(fd);
-
-    // ── 4. Register the loaded weights ───────────────────────────────────────
-    gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
-    down_layer->set_unpacked_params(dest_dq, dest_ds, dest_dz);
+void MixtureOfExpertsImpl::load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx,
+                                                      const std::string& weights_dir) {
+#include "unified_llm_w4a16_common/moe_expert_load_packed.inl"
 }
 
 void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
@@ -1412,104 +1220,12 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
         return;
     }
 
-    std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
-    std::string gate_prefix   = expert_prefix + "_gate";
-    std::string up_prefix     = expert_prefix + "_up";
-    std::string down_prefix   = expert_prefix + "_down";
+    const std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
+    const std::string gate_prefix = expert_prefix + "_gate";
+    const std::string up_prefix = expert_prefix + "_up";
+    const std::string down_prefix = expert_prefix + "_down";
 
-    auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot, const std::vector<int64_t>& shape, torch::ScalarType dtype) {
-        if (bufs.size() <= static_cast<size_t>(slot)) bufs.resize(max_cached_experts_);
-        if (!bufs[slot].defined()) {
-            bufs[slot] = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU).pinned_memory(true));
-        } else if (bufs[slot].sizes() != shape) {
-            bufs[slot].resize_(shape);
-        }
-        return bufs[slot];
-    };
-
-    // ---- gate_up slot ----
-    {
-        int64_t out_feat   = intermediate_size_;
-        int64_t in_feat    = hidden_size_;
-        int64_t packed_in  = (in_feat + 1) / 2;
-
-        std::string gq = weights_dir + "/" + gate_prefix + ".qweight.bin";
-        std::string gs = weights_dir + "/" + gate_prefix + ".scales.bin";
-        std::string gz = weights_dir + "/" + gate_prefix + ".zeros.bin";
-        std::string uq = weights_dir + "/" + up_prefix   + ".qweight.bin";
-        std::string us = weights_dir + "/" + up_prefix   + ".scales.bin";
-        std::string uz = weights_dir + "/" + up_prefix   + ".zeros.bin";
-
-        // Determine scales/zeros shape from file sizes.
-        size_t gs_bytes  = std::filesystem::file_size(gs);
-        int64_t gs_numel = static_cast<int64_t>(gs_bytes / 2); // bf16
-        int64_t gs_grps  = gs_numel / out_feat;
-        std::vector<int64_t> s_shape = (gs_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, gs_grps};
-        size_t gz_bytes  = std::filesystem::file_size(gz);
-        int64_t gz_numel = static_cast<int64_t>(gz_bytes);
-        int64_t gz_grps  = gz_numel / out_feat;
-        std::vector<int64_t> z_shape = (gz_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, gz_grps};
-
-        auto dest_q = ensure_pinned_buffer(gate_up_q_pinned_, slot_idx, {out_feat * 2, packed_in}, torch::kUInt8);
-        auto dest_s = ensure_pinned_buffer(gate_up_s_pinned_, slot_idx, {s_shape[0] * 2, s_shape.size() > 1 ? s_shape[1] : 1}, torch::kBFloat16);
-        auto dest_z = ensure_pinned_buffer(gate_up_z_pinned_, slot_idx, {z_shape[0] * 2, z_shape.size() > 1 ? z_shape[1] : 1}, torch::kInt8);
-
-        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
-        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
-        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
-
-        char* ptr_q = static_cast<char*>(dest_q.data_ptr());
-        char* ptr_s = static_cast<char*>(dest_s.data_ptr());
-        char* ptr_z = static_cast<char*>(dest_z.data_ptr());
-
-        read_bin_tensor_pread(gq, ptr_q, expected_q);
-        read_bin_tensor_pread(uq, ptr_q + expected_q, expected_q);
-        read_bin_tensor_pread(gs, ptr_s, expected_s);
-        read_bin_tensor_pread(us, ptr_s + expected_s, expected_s);
-        read_bin_tensor_pread(gz, ptr_z, expected_z);
-        read_bin_tensor_pread(uz, ptr_z + expected_z, expected_z);
-
-        gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
-    }
-
-    // ---- down slot ----
-    {
-        auto &down_layer = down_experts[slot_idx];
-        int64_t out_feat  = down_layer->out_features();
-        int64_t in_feat   = down_layer->in_features();
-        int64_t packed_in = (in_feat + 1) / 2;
-
-        std::string dq = weights_dir + "/" + down_prefix + ".qweight.bin";
-        std::string ds = weights_dir + "/" + down_prefix + ".scales.bin";
-        std::string dz = weights_dir + "/" + down_prefix + ".zeros.bin";
-
-        size_t ds_bytes  = std::filesystem::file_size(ds);
-        int64_t ds_numel = static_cast<int64_t>(ds_bytes / 2);
-        int64_t ds_grps  = ds_numel / out_feat;
-        std::vector<int64_t> s_shape = (ds_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, ds_grps};
-        size_t dz_bytes  = std::filesystem::file_size(dz);
-        int64_t dz_numel = static_cast<int64_t>(dz_bytes);
-        int64_t dz_grps  = dz_numel / out_feat;
-        std::vector<int64_t> z_shape = (dz_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, dz_grps};
-
-        auto dest_q = ensure_pinned_buffer(down_q_pinned_, slot_idx, {out_feat, packed_in}, torch::kUInt8);
-        auto dest_s = ensure_pinned_buffer(down_s_pinned_, slot_idx, s_shape, torch::kBFloat16);
-        auto dest_z = ensure_pinned_buffer(down_z_pinned_, slot_idx, z_shape, torch::kInt8);
-
-        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
-        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
-        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
-
-        read_bin_tensor_pread(dq, dest_q.data_ptr(), expected_q);
-        read_bin_tensor_pread(ds, dest_s.data_ptr(), expected_s);
-        read_bin_tensor_pread(dz, dest_z.data_ptr(), expected_z);
-
-        down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
-    }
+#include "unified_llm_w4a16_common/moe_expert_load_unpacked.inl"
 
     auto end_time = std::chrono::high_resolution_clock::now();
     double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;

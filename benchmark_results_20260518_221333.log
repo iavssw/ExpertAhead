@@ -1,0 +1,3996 @@
+Starting benchmarks. Log: /home/michael/heteroPredict/benchmark_results_20260518_221333.log
+  EXPERT_DIR=/home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+  MODEL_PATH=QuixiAI/Qwen3-30B-A3B-AWQ
+======================================================
+
+=== Rebuilding libtorch extensions (must match rocmPytorch env) ===
+-- Found Python: /home/michael/heteroPredict/utils/rocmPytorch/bin/python3.12 (found version "3.12.3") found components: Interpreter
+-- Found PyTorch in Python environment: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch
+-- Found pybind11 CMake directory: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/pybind11/share/cmake/pybind11
+Building PyTorch for GPU arch: gfx1100
+-- Found HIP: /opt/rocm-7.1.1 (found suitable version "7.1.52802-26aae437f6", minimum required is "1.0")
+HIP VERSION: 7.1.52802-26aae437f6
+hip VERSION: 7.1.52802
+HIP version: 7.1.52802
+-- Reading ROCM version from: /opt/rocm-7.1.1/include/rocm-core/rocm_version.h
+-- Content: 
+
+***** ROCm version from rocm_version.h ****
+
+ROCM_VERSION_DEV: 7.1.1
+ROCM_VERSION_DEV_MAJOR: 7
+ROCM_VERSION_DEV_MINOR: 1
+ROCM_VERSION_DEV_PATCH: 1
+ROCM_VERSION_DEV_INT:   70101
+HIP_VERSION_MAJOR: 7
+HIP_VERSION_MINOR: 1
+TORCH_HIP_VERSION: 701
+
+***** Library versions from cmake find_package *****
+
+amd_comgr VERSION: 3.0.0
+rocrand VERSION: 4.1.0
+hiprand VERSION: 3.1.0
+rocblas VERSION: 5.1.1
+hipblas VERSION: 3.1.0
+miopen VERSION: 3.5.1
+hipfft VERSION: 1.0.21
+hipsparse VERSION: 4.1.0
+rocprim VERSION: 4.1.0
+hipcub VERSION: 4.1.0
+rocthrust VERSION: 4.1.0
+hipsolver VERSION: 3.1.0
+rocsolver VERSION: 3.31.0
+CMake Warning at utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/public/LoadHIP.cmake:189 (message):
+  Work around hiprtc cmake failure for cmake >= 4
+Call Stack (most recent call first):
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:62 (find_package)
+  CMakeLists.txt:51 (find_package)
+
+
+hiprtc VERSION: 7.1.52802
+hipblaslt VERSION: 1.1.0
+rccl VERSION: 2.27.7
+hsa-runtime64 VERSION: 1.18.70101
+hipsparselt VERSION: 0.2.5
+hipblaslt is using scale pointer outer vec
+-- GFX gfx1100 not in whitelist. Setting HSA_OVERRIDE_GFX_VERSION=11.0.0 and targeting gfx1100
+-- Using HIP architectures: gfx1100
+Building PyTorch for GPU arch: gfx1100
+-- Found HIP: /opt/rocm-7.1.1 (found suitable version "7.1.52802", minimum required is "1.0")
+HIP VERSION: 7.1.52802
+hip VERSION: 7.1.52802
+HIP version: 7.1.52802
+-- Reading ROCM version from: /opt/rocm-7.1.1/include/rocm-core/rocm_version.h
+-- Content: ////////////////////////////////////////////////////////////////////////////////
+//
+// MIT License
+//
+// Copyright (c) 2017 - 2023 Advanced Micro Devices, Inc. All rights Reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+#ifndef _ROCM_VERSION_H_
+#define _ROCM_VERSION_H_
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif  /* __cplusplus */
+
+
+#define LIB_API_PUBLIC __attribute__ ((visibility ("default")))
+
+
+#define ROCM_VERSION_MAJOR   7
+#define ROCM_VERSION_MINOR   1
+#define ROCM_VERSION_PATCH   1
+
+#define ROCM_BUILD_INFO	     "7.1.1.0-38-26aae437f6"
+
+typedef enum {
+	VerSuccess=0,
+	VerIncorrecPararmeters,
+	VerValuesNotDefined,
+	VerErrorMAX		//This should always be last value in the enumerations
+} VerErrors;
+
+
+//  API for getting the verion
+//  Return val :  VerErros : API execution status.  The parameters are valid only when the exetution status is SUCCESS==0
+LIB_API_PUBLIC VerErrors getROCmVersion(unsigned int* Major, unsigned int* Minor, unsigned int* Patch) __attribute__((nonnull)) ;
+//  Usage :
+//  int mj=0,mn=0,p=0,ret=0;
+//  ret=getROCMVersion(&mj,&mn,&p);
+//  if(ret !=VerSuccess )  // error occured
+//
+//  check for the values and
+//
+
+
+
+//API for building build info on console
+LIB_API_PUBLIC VerErrors printBuildInfo();
+
+
+#ifdef __cplusplus
+}  // end extern "C" block
+#endif
+
+#endif  //_ROCM_VERSION_H_  header guard
+
+
+
+***** ROCm version from rocm_version.h ****
+
+ROCM_VERSION_DEV: 7.1.1
+ROCM_VERSION_DEV_MAJOR: 7
+ROCM_VERSION_DEV_MINOR: 1
+ROCM_VERSION_DEV_PATCH: 1
+ROCM_VERSION_DEV_INT:   70101
+HIP_VERSION_MAJOR: 7
+HIP_VERSION_MINOR: 1
+TORCH_HIP_VERSION: 701
+
+***** Library versions from cmake find_package *****
+
+amd_comgr VERSION: 3.0.0
+rocrand VERSION: 4.1.0
+hiprand VERSION: 3.1.0
+rocblas VERSION: 5.1.1
+hipblas VERSION: 3.1.0
+miopen VERSION: 3.5.1
+hipfft VERSION: 1.0.21
+hipsparse VERSION: 4.1.0
+rocprim VERSION: 4.1.0
+hipcub VERSION: 4.1.0
+rocthrust VERSION: 4.1.0
+hipsolver VERSION: 3.1.0
+rocsolver VERSION: 3.31.0
+CMake Warning at utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/public/LoadHIP.cmake:189 (message):
+  Work around hiprtc cmake failure for cmake >= 4
+Call Stack (most recent call first):
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:62 (find_package)
+  src/hipkernels/CMakeLists.txt:5 (find_package)
+
+
+hiprtc VERSION: 7.1.52802
+hipblaslt VERSION: 1.1.0
+rccl VERSION: 2.27.7
+hsa-runtime64 VERSION: 1.18.70101
+hipsparselt VERSION: 0.2.5
+hipblaslt is using scale pointer outer vec
+-- npu_matmul_func library configured
+Building PyTorch for GPU arch: gfx1100
+HIP VERSION: 7.1.52802
+hip VERSION: 7.1.52802
+HIP version: 7.1.52802
+-- Reading ROCM version from: /opt/rocm-7.1.1/include/rocm-core/rocm_version.h
+-- Content: ////////////////////////////////////////////////////////////////////////////////
+//
+// MIT License
+//
+// Copyright (c) 2017 - 2023 Advanced Micro Devices, Inc. All rights Reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+#ifndef _ROCM_VERSION_H_
+#define _ROCM_VERSION_H_
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif  /* __cplusplus */
+
+
+#define LIB_API_PUBLIC __attribute__ ((visibility ("default")))
+
+
+#define ROCM_VERSION_MAJOR   7
+#define ROCM_VERSION_MINOR   1
+#define ROCM_VERSION_PATCH   1
+
+#define ROCM_BUILD_INFO	     "7.1.1.0-38-26aae437f6"
+
+typedef enum {
+	VerSuccess=0,
+	VerIncorrecPararmeters,
+	VerValuesNotDefined,
+	VerErrorMAX		//This should always be last value in the enumerations
+} VerErrors;
+
+
+//  API for getting the verion
+//  Return val :  VerErros : API execution status.  The parameters are valid only when the exetution status is SUCCESS==0
+LIB_API_PUBLIC VerErrors getROCmVersion(unsigned int* Major, unsigned int* Minor, unsigned int* Patch) __attribute__((nonnull)) ;
+//  Usage :
+//  int mj=0,mn=0,p=0,ret=0;
+//  ret=getROCMVersion(&mj,&mn,&p);
+//  if(ret !=VerSuccess )  // error occured
+//
+//  check for the values and
+//
+
+
+
+//API for building build info on console
+LIB_API_PUBLIC VerErrors printBuildInfo();
+
+
+#ifdef __cplusplus
+}  // end extern "C" block
+#endif
+
+#endif  //_ROCM_VERSION_H_  header guard
+
+
+
+***** ROCm version from rocm_version.h ****
+
+ROCM_VERSION_DEV: 7.1.1
+ROCM_VERSION_DEV_MAJOR: 7
+ROCM_VERSION_DEV_MINOR: 1
+ROCM_VERSION_DEV_PATCH: 1
+ROCM_VERSION_DEV_INT:   70101
+HIP_VERSION_MAJOR: 7
+HIP_VERSION_MINOR: 1
+TORCH_HIP_VERSION: 701
+
+***** Library versions from cmake find_package *****
+
+amd_comgr VERSION: 3.0.0
+rocrand VERSION: 4.1.0
+hiprand VERSION: 3.1.0
+rocblas VERSION: 5.1.1
+hipblas VERSION: 3.1.0
+miopen VERSION: 3.5.1
+hipfft VERSION: 1.0.21
+hipsparse VERSION: 4.1.0
+rocprim VERSION: 4.1.0
+hipcub VERSION: 4.1.0
+rocthrust VERSION: 4.1.0
+hipsolver VERSION: 3.1.0
+rocsolver VERSION: 3.31.0
+CMake Warning at utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/public/LoadHIP.cmake:189 (message):
+  Work around hiprtc cmake failure for cmake >= 4
+Call Stack (most recent call first):
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:62 (find_package)
+  src/microbenchmarks/CMakeLists.txt:6 (find_package)
+
+
+hiprtc VERSION: 7.1.52802
+hipblaslt VERSION: 1.1.0
+rccl VERSION: 2.27.7
+hsa-runtime64 VERSION: 1.18.70101
+hipsparselt VERSION: 0.2.5
+hipblaslt is using scale pointer outer vec
+-- Using ROCM_PATH: /opt/rocm-7.1.1
+-- Found pybind11: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/pybind11/include (found version "3.0.4")
+-- Found Python: /home/michael/heteroPredict/utils/rocmPytorch/bin/python3.12 (found version "3.12.3") found components: Interpreter Development Development.Module Development.Embed
+-- Found PyTorch in Python environment: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch
+Building PyTorch for GPU arch: gfx1100
+HIP VERSION: 7.1.52802
+hip VERSION: 7.1.52802
+HIP version: 7.1.52802
+-- Reading ROCM version from: /opt/rocm-7.1.1/include/rocm-core/rocm_version.h
+-- Content: ////////////////////////////////////////////////////////////////////////////////
+//
+// MIT License
+//
+// Copyright (c) 2017 - 2023 Advanced Micro Devices, Inc. All rights Reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+#ifndef _ROCM_VERSION_H_
+#define _ROCM_VERSION_H_
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif  /* __cplusplus */
+
+
+#define LIB_API_PUBLIC __attribute__ ((visibility ("default")))
+
+
+#define ROCM_VERSION_MAJOR   7
+#define ROCM_VERSION_MINOR   1
+#define ROCM_VERSION_PATCH   1
+
+#define ROCM_BUILD_INFO	     "7.1.1.0-38-26aae437f6"
+
+typedef enum {
+	VerSuccess=0,
+	VerIncorrecPararmeters,
+	VerValuesNotDefined,
+	VerErrorMAX		//This should always be last value in the enumerations
+} VerErrors;
+
+
+//  API for getting the verion
+//  Return val :  VerErros : API execution status.  The parameters are valid only when the exetution status is SUCCESS==0
+LIB_API_PUBLIC VerErrors getROCmVersion(unsigned int* Major, unsigned int* Minor, unsigned int* Patch) __attribute__((nonnull)) ;
+//  Usage :
+//  int mj=0,mn=0,p=0,ret=0;
+//  ret=getROCMVersion(&mj,&mn,&p);
+//  if(ret !=VerSuccess )  // error occured
+//
+//  check for the values and
+//
+
+
+
+//API for building build info on console
+LIB_API_PUBLIC VerErrors printBuildInfo();
+
+
+#ifdef __cplusplus
+}  // end extern "C" block
+#endif
+
+#endif  //_ROCM_VERSION_H_  header guard
+
+
+
+***** ROCm version from rocm_version.h ****
+
+ROCM_VERSION_DEV: 7.1.1
+ROCM_VERSION_DEV_MAJOR: 7
+ROCM_VERSION_DEV_MINOR: 1
+ROCM_VERSION_DEV_PATCH: 1
+ROCM_VERSION_DEV_INT:   70101
+HIP_VERSION_MAJOR: 7
+HIP_VERSION_MINOR: 1
+TORCH_HIP_VERSION: 701
+
+***** Library versions from cmake find_package *****
+
+amd_comgr VERSION: 3.0.0
+rocrand VERSION: 4.1.0
+hiprand VERSION: 3.1.0
+rocblas VERSION: 5.1.1
+hipblas VERSION: 3.1.0
+miopen VERSION: 3.5.1
+hipfft VERSION: 1.0.21
+hipsparse VERSION: 4.1.0
+rocprim VERSION: 4.1.0
+hipcub VERSION: 4.1.0
+rocthrust VERSION: 4.1.0
+hipsolver VERSION: 3.1.0
+rocsolver VERSION: 3.31.0
+CMake Warning at utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/public/LoadHIP.cmake:189 (message):
+  Work around hiprtc cmake failure for cmake >= 4
+Call Stack (most recent call first):
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:62 (find_package)
+  src/unified_llm_w4a16_predict/CMakeLists.txt:81 (find_package)
+
+
+hiprtc VERSION: 7.1.52802
+hipblaslt VERSION: 1.1.0
+rccl VERSION: 2.27.7
+hsa-runtime64 VERSION: 1.18.70101
+hipsparselt VERSION: 0.2.5
+hipblaslt is using scale pointer outer vec
+-- Found torch_python library: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib/libtorch_python.so
+-- Using ROCM_PATH: /opt/rocm-7.1.1
+-- Found pybind11: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/pybind11/include (found version "3.0.4")
+-- Found PyTorch in Python environment: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch
+Building PyTorch for GPU arch: gfx1100
+HIP VERSION: 7.1.52802
+hip VERSION: 7.1.52802
+HIP version: 7.1.52802
+-- Reading ROCM version from: /opt/rocm-7.1.1/include/rocm-core/rocm_version.h
+-- Content: ////////////////////////////////////////////////////////////////////////////////
+//
+// MIT License
+//
+// Copyright (c) 2017 - 2023 Advanced Micro Devices, Inc. All rights Reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+#ifndef _ROCM_VERSION_H_
+#define _ROCM_VERSION_H_
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif  /* __cplusplus */
+
+
+#define LIB_API_PUBLIC __attribute__ ((visibility ("default")))
+
+
+#define ROCM_VERSION_MAJOR   7
+#define ROCM_VERSION_MINOR   1
+#define ROCM_VERSION_PATCH   1
+
+#define ROCM_BUILD_INFO	     "7.1.1.0-38-26aae437f6"
+
+typedef enum {
+	VerSuccess=0,
+	VerIncorrecPararmeters,
+	VerValuesNotDefined,
+	VerErrorMAX		//This should always be last value in the enumerations
+} VerErrors;
+
+
+//  API for getting the verion
+//  Return val :  VerErros : API execution status.  The parameters are valid only when the exetution status is SUCCESS==0
+LIB_API_PUBLIC VerErrors getROCmVersion(unsigned int* Major, unsigned int* Minor, unsigned int* Patch) __attribute__((nonnull)) ;
+//  Usage :
+//  int mj=0,mn=0,p=0,ret=0;
+//  ret=getROCMVersion(&mj,&mn,&p);
+//  if(ret !=VerSuccess )  // error occured
+//
+//  check for the values and
+//
+
+
+
+//API for building build info on console
+LIB_API_PUBLIC VerErrors printBuildInfo();
+
+
+#ifdef __cplusplus
+}  // end extern "C" block
+#endif
+
+#endif  //_ROCM_VERSION_H_  header guard
+
+
+
+***** ROCm version from rocm_version.h ****
+
+ROCM_VERSION_DEV: 7.1.1
+ROCM_VERSION_DEV_MAJOR: 7
+ROCM_VERSION_DEV_MINOR: 1
+ROCM_VERSION_DEV_PATCH: 1
+ROCM_VERSION_DEV_INT:   70101
+HIP_VERSION_MAJOR: 7
+HIP_VERSION_MINOR: 1
+TORCH_HIP_VERSION: 701
+
+***** Library versions from cmake find_package *****
+
+amd_comgr VERSION: 3.0.0
+rocrand VERSION: 4.1.0
+hiprand VERSION: 3.1.0
+rocblas VERSION: 5.1.1
+hipblas VERSION: 3.1.0
+miopen VERSION: 3.5.1
+hipfft VERSION: 1.0.21
+hipsparse VERSION: 4.1.0
+rocprim VERSION: 4.1.0
+hipcub VERSION: 4.1.0
+rocthrust VERSION: 4.1.0
+hipsolver VERSION: 3.1.0
+rocsolver VERSION: 3.31.0
+CMake Warning at utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/public/LoadHIP.cmake:189 (message):
+  Work around hiprtc cmake failure for cmake >= 4
+Call Stack (most recent call first):
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:62 (find_package)
+  src/unified_llm_w4a16_base/CMakeLists.txt:80 (find_package)
+
+
+hiprtc VERSION: 7.1.52802
+hipblaslt VERSION: 1.1.0
+rccl VERSION: 2.27.7
+hsa-runtime64 VERSION: 1.18.70101
+hipsparselt VERSION: 0.2.5
+hipblaslt is using scale pointer outer vec
+-- Found torch_python library: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib/libtorch_python.so
+-- Using ROCM_PATH: /opt/rocm-7.1.1
+-- Found pybind11: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/pybind11/include (found version "3.0.4")
+-- Found PyTorch in Python environment: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch
+Building PyTorch for GPU arch: gfx1100
+HIP VERSION: 7.1.52802
+hip VERSION: 7.1.52802
+HIP version: 7.1.52802
+-- Reading ROCM version from: /opt/rocm-7.1.1/include/rocm-core/rocm_version.h
+-- Content: ////////////////////////////////////////////////////////////////////////////////
+//
+// MIT License
+//
+// Copyright (c) 2017 - 2023 Advanced Micro Devices, Inc. All rights Reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+#ifndef _ROCM_VERSION_H_
+#define _ROCM_VERSION_H_
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif  /* __cplusplus */
+
+
+#define LIB_API_PUBLIC __attribute__ ((visibility ("default")))
+
+
+#define ROCM_VERSION_MAJOR   7
+#define ROCM_VERSION_MINOR   1
+#define ROCM_VERSION_PATCH   1
+
+#define ROCM_BUILD_INFO	     "7.1.1.0-38-26aae437f6"
+
+typedef enum {
+	VerSuccess=0,
+	VerIncorrecPararmeters,
+	VerValuesNotDefined,
+	VerErrorMAX		//This should always be last value in the enumerations
+} VerErrors;
+
+
+//  API for getting the verion
+//  Return val :  VerErros : API execution status.  The parameters are valid only when the exetution status is SUCCESS==0
+LIB_API_PUBLIC VerErrors getROCmVersion(unsigned int* Major, unsigned int* Minor, unsigned int* Patch) __attribute__((nonnull)) ;
+//  Usage :
+//  int mj=0,mn=0,p=0,ret=0;
+//  ret=getROCMVersion(&mj,&mn,&p);
+//  if(ret !=VerSuccess )  // error occured
+//
+//  check for the values and
+//
+
+
+
+//API for building build info on console
+LIB_API_PUBLIC VerErrors printBuildInfo();
+
+
+#ifdef __cplusplus
+}  // end extern "C" block
+#endif
+
+#endif  //_ROCM_VERSION_H_  header guard
+
+
+
+***** ROCm version from rocm_version.h ****
+
+ROCM_VERSION_DEV: 7.1.1
+ROCM_VERSION_DEV_MAJOR: 7
+ROCM_VERSION_DEV_MINOR: 1
+ROCM_VERSION_DEV_PATCH: 1
+ROCM_VERSION_DEV_INT:   70101
+HIP_VERSION_MAJOR: 7
+HIP_VERSION_MINOR: 1
+TORCH_HIP_VERSION: 701
+
+***** Library versions from cmake find_package *****
+
+amd_comgr VERSION: 3.0.0
+rocrand VERSION: 4.1.0
+hiprand VERSION: 3.1.0
+rocblas VERSION: 5.1.1
+hipblas VERSION: 3.1.0
+miopen VERSION: 3.5.1
+hipfft VERSION: 1.0.21
+hipsparse VERSION: 4.1.0
+rocprim VERSION: 4.1.0
+hipcub VERSION: 4.1.0
+rocthrust VERSION: 4.1.0
+hipsolver VERSION: 3.1.0
+rocsolver VERSION: 3.31.0
+CMake Warning at utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/public/LoadHIP.cmake:189 (message):
+  Work around hiprtc cmake failure for cmake >= 4
+Call Stack (most recent call first):
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)
+  utils/rocmPytorch/lib/python3.12/site-packages/torch/share/cmake/Torch/TorchConfig.cmake:62 (find_package)
+  src/unified_llm_w4a16_cached/CMakeLists.txt:80 (find_package)
+
+
+hiprtc VERSION: 7.1.52802
+hipblaslt VERSION: 1.1.0
+rccl VERSION: 2.27.7
+hsa-runtime64 VERSION: 1.18.70101
+hipsparselt VERSION: 0.2.5
+hipblaslt is using scale pointer outer vec
+-- Found torch_python library: /home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib/libtorch_python.so
+-- Configuring done (8.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/michael/heteroPredict/build
+[ 57%] Built target hipkernels
+[ 85%] Built target unified_llm_w4a16_cached_lib
+[100%] Built target unified_llm_w4a16_cached_libtorch
+[ 12%] Built target npu_matmul_func
+[ 62%] Built target hipkernels
+[ 87%] Built target unified_llm_w4a16_predict_lib
+[100%] Built target unified_llm_w4a16_predict_libtorch
+[ 57%] Built target hipkernels
+[ 85%] Built target unified_llm_w4a16_base_lib
+[100%] Built target unified_llm_w4a16_base_libtorch
+
+
+=== 1. MICROBENCHMARK: Expert loading (ssd / h2d / compute) ===
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=87.85/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 0: using packed expert format.
+Layer 1: Pre-warming 8 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 8 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 8 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 8 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 8 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 8 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 8 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 8 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 8 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 8 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 8 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 8 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 8 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 8 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 8 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 8 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 8 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 8 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 8 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 8 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 8 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 8 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 8 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 8 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 8 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 8 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 8 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 8 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 8 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 8 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 8 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 8 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 8 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 8 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 8 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 8 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 1: Pre-warming 8 experts.
+Layer 2: Pre-warming 8 experts.
+Layer 3: Pre-warming 8 experts.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 5: Pre-warming 8 experts.
+Layer 6: Pre-warming 8 experts.
+Layer 7: Pre-warming 8 experts.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 9: Pre-warming 8 experts.
+Layer 10: Pre-warming 8 experts.
+Layer 11: Pre-warming 8 experts.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 13: Pre-warming 8 experts.
+Layer 14: Pre-warming 8 experts.
+Layer 15: Pre-warming 8 experts.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 17: Pre-warming 8 experts.
+Layer 18: Pre-warming 8 experts.
+Layer 19: Pre-warming 8 experts.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 21: Pre-warming 8 experts.
+Layer 22: Pre-warming 8 experts.
+Layer 23: Pre-warming 8 experts.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 25: Pre-warming 8 experts.
+Layer 26: Pre-warming 8 experts.
+Layer 27: Pre-warming 8 experts.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 29: Pre-warming 8 experts.
+Layer 30: Pre-warming 8 experts.
+Layer 31: Pre-warming 8 experts.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 33: Pre-warming 8 experts.
+Layer 34: Pre-warming 8 experts.
+Layer 35: Pre-warming 8 experts.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 37: Pre-warming 8 experts.
+Layer 38: Pre-warming 8 experts.
+Layer 39: Pre-warming 8 experts.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 41: Pre-warming 8 experts.
+Layer 42: Pre-warming 8 experts.
+Layer 43: Pre-warming 8 experts.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 45: Pre-warming 8 experts.
+Layer 46: Pre-warming 8 experts.
+Layer 47: Pre-warming 8 experts.
+Prewarmed experts for layer 48/48
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing pre-saved weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.27 seconds
+Pre-warming expert cache with 8 experts...
+
+[SSD] bytes/expert=2.47 MB  total/round=949 MB  cache=8×48 layers  [packed (1 file/expert)]
+[SSD] Warmup (2 rounds)…
+  warmup 1: 315.5 ms  (0.82 ms/expert, 3006 MB/s)  hits=0 misses=0
+  warmup 2: 316.3 ms  (0.82 ms/expert, 2999 MB/s)  hits=0 misses=0
+[SSD] Measuring (20 rounds)…
+  round   1/20: 316.8 ms  (0.83 ms/expert, 2994 MB/s)  hits=0 misses=0
+  round   2/20: 315.8 ms  (0.82 ms/expert, 3004 MB/s)  hits=0 misses=0
+  round   3/20: 319.3 ms  (0.83 ms/expert, 2970 MB/s)  hits=0 misses=0
+  round   4/20: 317.0 ms  (0.83 ms/expert, 2992 MB/s)  hits=0 misses=0
+  round   5/20: 318.4 ms  (0.83 ms/expert, 2979 MB/s)  hits=0 misses=0
+  round   6/20: 325.2 ms  (0.85 ms/expert, 2917 MB/s)  hits=0 misses=0
+  round   7/20: 321.8 ms  (0.84 ms/expert, 2947 MB/s)  hits=0 misses=0
+  round   8/20: 323.6 ms  (0.84 ms/expert, 2932 MB/s)  hits=0 misses=0
+  round   9/20: 332.0 ms  (0.86 ms/expert, 2857 MB/s)  hits=0 misses=0
+  round  10/20: 323.4 ms  (0.84 ms/expert, 2933 MB/s)  hits=0 misses=0
+  round  11/20: 325.3 ms  (0.85 ms/expert, 2916 MB/s)  hits=0 misses=0
+  round  12/20: 323.9 ms  (0.84 ms/expert, 2929 MB/s)  hits=0 misses=0
+  round  13/20: 328.3 ms  (0.86 ms/expert, 2889 MB/s)  hits=0 misses=0
+  round  14/20: 323.6 ms  (0.84 ms/expert, 2931 MB/s)  hits=0 misses=0
+  round  15/20: 326.5 ms  (0.85 ms/expert, 2905 MB/s)  hits=0 misses=0
+  round  16/20: 320.6 ms  (0.83 ms/expert, 2959 MB/s)  hits=0 misses=0
+  round  17/20: 323.3 ms  (0.84 ms/expert, 2935 MB/s)  hits=0 misses=0
+  round  18/20: 326.8 ms  (0.85 ms/expert, 2902 MB/s)  hits=0 misses=0
+  round  19/20: 326.1 ms  (0.85 ms/expert, 2909 MB/s)  hits=0 misses=0
+  round  20/20: 325.7 ms  (0.85 ms/expert, 2913 MB/s)  hits=0 misses=0
+[H2D DMA] Loading actual expert weights into pinned memory from /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed...
+
+[H2D DMA] 949 MB (2.47 MB × 384 experts)  pinned CPU → VRAM
+[H2D DMA] Warmup (2 rounds)…
+  warmup 1: 25.0 ms  (0.07 ms/expert, 37891 MB/s)
+  warmup 2: 24.2 ms  (0.06 ms/expert, 39145 MB/s)
+[H2D DMA] Measuring (20 rounds)…
+  round   1/20: 24.1 ms  (0.06 ms/expert, 39410 MB/s)
+  round   2/20: 24.1 ms  (0.06 ms/expert, 39385 MB/s)
+  round   3/20: 24.0 ms  (0.06 ms/expert, 39453 MB/s)
+  round   4/20: 24.1 ms  (0.06 ms/expert, 39427 MB/s)
+  round   5/20: 24.2 ms  (0.06 ms/expert, 39127 MB/s)
+  round   6/20: 24.1 ms  (0.06 ms/expert, 39300 MB/s)
+  round   7/20: 24.1 ms  (0.06 ms/expert, 39417 MB/s)
+  round   8/20: 24.1 ms  (0.06 ms/expert, 39404 MB/s)
+  round   9/20: 24.1 ms  (0.06 ms/expert, 39424 MB/s)
+  round  10/20: 24.1 ms  (0.06 ms/expert, 39399 MB/s)
+  round  11/20: 24.0 ms  (0.06 ms/expert, 39443 MB/s)
+  round  12/20: 24.1 ms  (0.06 ms/expert, 39375 MB/s)
+  round  13/20: 24.0 ms  (0.06 ms/expert, 39446 MB/s)
+  round  14/20: 25.0 ms  (0.07 ms/expert, 37871 MB/s)
+  round  15/20: 24.9 ms  (0.06 ms/expert, 38168 MB/s)
+  round  16/20: 24.3 ms  (0.06 ms/expert, 39093 MB/s)
+  round  17/20: 24.1 ms  (0.06 ms/expert, 39339 MB/s)
+  round  18/20: 24.1 ms  (0.06 ms/expert, 39333 MB/s)
+  round  19/20: 24.1 ms  (0.06 ms/expert, 39356 MB/s)
+  round  20/20: 24.1 ms  (0.06 ms/expert, 39306 MB/s)
+
+[Compute] hidden=2048  intermediate=2048  active_k=8  moe_layers=48
+[Compute] Expert invocations per token: 384
+[Compute] Benchmarking with fp16 matmuls (shape matches W4A16 expert)
+[Compute] Measuring (20 rounds, each = 384 expert FFNs)…
+  round   1/20: 210.89 ms/token  (0.549 ms/expert)
+  round   2/20: 211.61 ms/token  (0.551 ms/expert)
+  round   3/20: 214.37 ms/token  (0.558 ms/expert)
+  round   4/20: 213.27 ms/token  (0.555 ms/expert)
+  round   5/20: 210.95 ms/token  (0.549 ms/expert)
+  round   6/20: 218.19 ms/token  (0.568 ms/expert)
+  round   7/20: 212.52 ms/token  (0.553 ms/expert)
+  round   8/20: 213.81 ms/token  (0.557 ms/expert)
+  round   9/20: 213.30 ms/token  (0.555 ms/expert)
+  round  10/20: 212.15 ms/token  (0.552 ms/expert)
+  round  11/20: 212.04 ms/token  (0.552 ms/expert)
+  round  12/20: 211.76 ms/token  (0.551 ms/expert)
+  round  13/20: 213.40 ms/token  (0.556 ms/expert)
+  round  14/20: 213.64 ms/token  (0.556 ms/expert)
+  round  15/20: 212.73 ms/token  (0.554 ms/expert)
+  round  16/20: 214.26 ms/token  (0.558 ms/expert)
+  round  17/20: 213.46 ms/token  (0.556 ms/expert)
+  round  18/20: 211.43 ms/token  (0.551 ms/expert)
+  round  19/20: 211.27 ms/token  (0.550 ms/expert)
+  round  20/20: 213.59 ms/token  (0.556 ms/expert)
+
+==================================================================
+  EXPERT LOADING BENCHMARK — QWEN3
+==================================================================
+
+  ── SSD → O_DIRECT pread → H2D DMA → VRAM  (prewarm_experts) ──
+  Avg  total time      : 323.2 ms   (std 4.2, p95 332.0)
+  Avg  per-expert      : 0.84 ms/expert
+  Avg  throughput      : 2935 MB/s  (2.935 GB/s)
+  Min / Max            : 315.8 / 332.0 ms
+
+  ── H2D DMA only  (pinned CPU → VRAM, synthetic) ──
+  Avg  total time      : 24.2 ms   (std 0.3, p95 25.0)
+  Avg  per-expert      : 0.06 ms/expert
+  Avg  throughput      : 39219 MB/s  (39.219 GB/s)
+  Min / Max            : 24.0 / 25.0 ms
+
+  ── GPU Compute ──
+  Avg  time/token      : 212.93 ms/token   (std 1.65, p95 218.19)
+  Avg  per-expert      : 0.555 ms/expert  (384 experts/token)
+  Min / Max            : 210.89 / 218.19 ms/token
+
+==================================================================
+  LATENCY BREAKDOWN (per expert)
+==================================================================
+  GPU compute          : 554.5 µs/expert
+  H2D DMA (pinned→VRAM): 63.0 µs/expert  (2.47 MB @ 39219 MB/s)
+  SSD read (O_DIRECT)  : 778.6 µs/expert  (2.47 MB @ 3173 MB/s)  [= SSD_total − H2D]
+  SSD load total       : 841.6 µs/expert  (O_DIRECT pread + H2D)
+
+  SSD load / compute   : 1.5×  (one SSD miss ≈ 1.5 compute-only experts)
+  H2D DMA / compute    : 0.1×
+
+  Per-token impact — varying cache hit rate:
+    100% hit rate  : 212.9 ms/token  (384 GEMMs)
+     90% hit rate  : 223.8 ms/token  (38 SSD loads)  → 4.5 TPS
+     80% hit rate  : 234.8 ms/token  (76 SSD loads)  → 4.3 TPS
+     60% hit rate  : 256.9 ms/token  (153 SSD loads)  → 3.9 TPS
+     40% hit rate  : 279.0 ms/token  (230 SSD loads)  → 3.6 TPS
+     20% hit rate  : 301.1 ms/token  (307 SSD loads)  → 3.3 TPS
+      0% hit rate  : 323.2 ms/token  (384 SSD loads)  → 3.1 TPS
+==================================================================
+
+
+=== 2. MACROBENCHMARK: End-to-end decode ===
+
+--- BASE (all experts permanently in System RAM — TPS ceiling) ---
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=87.85/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Libtorch input_ids shape: [1, 18]
+Skipping warmup.
+Generation phase
+Prefill time: 0.790585 seconds
+Total Generation Time: 6.19587 seconds
+Average Time per Token: 0.0487863 seconds
+Libtorch input_ids shape: [1, 18]
+Skipping warmup.
+Generation phase
+Prefill time: 0.638963 seconds
+Total Generation Time: 6.1848 seconds
+Average Time per Token: 0.0486992 seconds
+
+MoE Timing Statistics (base backend, compute-only — no SSD expert loads):
+Layer 0    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.074ms
+Layer 1    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 2    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 3    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 4    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 5    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 6    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 7    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 8    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 9    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 10    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 11    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 12    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 13    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 14    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 15    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 16    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 17    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 18    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 19    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 20    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 21    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 22    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 23    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 24    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 25    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 26    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 27    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 28    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 29    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 30    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.097ms
+Layer 31    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 32    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 33    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 34    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.100ms
+Layer 35    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 36    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 37    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.100ms
+Layer 38    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.101ms
+Layer 39    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 40    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 41    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 42    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 43    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 44    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 45    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.099ms
+Layer 46    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+Layer 47    MoE Compute: ExpertInvocations=2032, AvgComputeTime=0.098ms
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Using existing pre-saved weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded from pre-saved bins in 3.79 seconds
+Model initialized successfully!
+Set expert cache policy to LRU.
+Warning: /home/michael/heteroPredict/py/unified_llm_w4a16/prompts.txt not found, falling back to --text argument.
+Processing text: 'In a detailed essay, explain the theory of relativity and its implications on modern physics.'
+Generating 128 tokens...
+
+
+============================================================
+Full output (prompt + generated):
+============================================================
+In a detailed essay, explain the theory of relativity and its implications on modern physics. The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. The essay should be written in a way that is accessible to readers with no prior knowledge of physics. Additionally, the essay should include at least one example of a real-world application of the theory of relativity. The essay should also include a reference to a scientific paper or book that discusses the theory of relativity.
+============================================================
+Generated text only:
+============================================================
+ The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. The essay should be written in a way that is accessible to readers with no prior knowledge of physics. Additionally, the essay should include at least one example of a real-world application of the theory of relativity. The essay should also include a reference to a scientific paper or book that discusses the theory of relativity.
+============================================================
+Running 1 prompt(s) from --text...
+
+
+============================================================
+PROMPT 1/1: In a detailed essay, explain the theory of relativity and its implications on mo...
+============================================================
+Generated text:
+============================================================
+ The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. The essay should be written in a way that is accessible to readers with no prior knowledge of physics. Additionally, the essay should include at least one example of a real-world application of the theory of relativity. The essay should also include a reference to a scientific paper or book that discusses the theory of relativity.
+============================================================
+
+============================================================
+Weight loading time: 3.79 seconds
+Done!
+============================================================
+
+
+--- CACHED (SSD -> RAM LRU, cache=24) ---
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=87.85/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Pre-warming 24 experts for all layers...
+Layer 0: Pre-warming 24 experts.
+Layer 0: using packed expert format.
+Layer 1: Pre-warming 24 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 24 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 24 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 24 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 24 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 24 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 24 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 24 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 24 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 24 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 24 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 24 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 24 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 24 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 24 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 24 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 24 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 24 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 24 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 24 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 24 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 24 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 24 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 24 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 24 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 24 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 24 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 24 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 24 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 24 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 24 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 24 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 24 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 24 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 24 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 24 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 24 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 24 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 24 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 24 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 24 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 24 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 24 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 24 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 24 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 24 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 24 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Libtorch input_ids shape: [1, 18]
+Skipping warmup.
+Prefill time: 2.58924 seconds
+Generation phase
+[gen 5/127] elapsed=1.0s  TPS=4.949
+[gen 10/127] elapsed=1.9s  TPS=5.300
+[gen 15/127] elapsed=2.5s  TPS=5.963
+[gen 20/127] elapsed=3.4s  TPS=5.883
+[gen 25/127] elapsed=4.5s  TPS=5.616
+[gen 30/127] elapsed=5.4s  TPS=5.562
+[gen 35/127] elapsed=6.3s  TPS=5.523
+[gen 40/127] elapsed=7.3s  TPS=5.498
+[gen 45/127] elapsed=8.3s  TPS=5.392
+[gen 50/127] elapsed=9.2s  TPS=5.436
+[gen 55/127] elapsed=9.9s  TPS=5.536
+[gen 60/127] elapsed=10.6s  TPS=5.653
+[gen 65/127] elapsed=11.4s  TPS=5.682
+[gen 70/127] elapsed=12.4s  TPS=5.658
+[gen 75/127] elapsed=13.4s  TPS=5.595
+[gen 80/127] elapsed=14.3s  TPS=5.590
+[gen 85/127] elapsed=15.3s  TPS=5.566
+[gen 90/127] elapsed=16.2s  TPS=5.571
+[gen 95/127] elapsed=17.0s  TPS=5.596
+[gen 100/127] elapsed=17.9s  TPS=5.599
+[gen 105/127] elapsed=18.7s  TPS=5.614
+[gen 110/127] elapsed=19.6s  TPS=5.600
+[gen 115/127] elapsed=20.5s  TPS=5.617
+[gen 120/127] elapsed=21.2s  TPS=5.656
+[gen 125/127] elapsed=22.2s  TPS=5.632
+Prefill time (summary): 2.589 seconds
+Total Generation Time: 22.672 seconds
+Average Time per Token: 0.179 seconds
+Libtorch input_ids shape: [1, 18]
+Skipping warmup.
+Prefill time: 2.855 seconds
+Generation phase
+[gen 5/127] elapsed=1.0s  TPS=4.896
+[gen 10/127] elapsed=1.9s  TPS=5.172
+[gen 15/127] elapsed=2.6s  TPS=5.829
+[gen 20/127] elapsed=3.5s  TPS=5.735
+[gen 25/127] elapsed=4.6s  TPS=5.490
+[gen 30/127] elapsed=5.5s  TPS=5.442
+[gen 35/127] elapsed=6.5s  TPS=5.404
+[gen 40/127] elapsed=7.4s  TPS=5.398
+[gen 45/127] elapsed=8.5s  TPS=5.295
+[gen 50/127] elapsed=9.4s  TPS=5.340
+[gen 55/127] elapsed=10.1s  TPS=5.440
+[gen 60/127] elapsed=10.8s  TPS=5.556
+[gen 65/127] elapsed=11.6s  TPS=5.583
+[gen 70/127] elapsed=12.6s  TPS=5.562
+[gen 75/127] elapsed=13.6s  TPS=5.502
+[gen 80/127] elapsed=14.6s  TPS=5.495
+[gen 85/127] elapsed=15.5s  TPS=5.475
+[gen 90/127] elapsed=16.4s  TPS=5.478
+[gen 95/127] elapsed=17.2s  TPS=5.509
+[gen 100/127] elapsed=18.1s  TPS=5.513
+[gen 105/127] elapsed=19.0s  TPS=5.528
+[gen 110/127] elapsed=19.9s  TPS=5.516
+[gen 115/127] elapsed=20.8s  TPS=5.533
+[gen 120/127] elapsed=21.5s  TPS=5.576
+[gen 125/127] elapsed=22.5s  TPS=5.551
+Prefill time (summary): 2.855 seconds
+Total Generation Time: 23.003 seconds
+Average Time per Token: 0.181 seconds
+
+Expert Cache Statistics:
+Layer 0: Hits=257, Misses=759, HitRate=25.30%
+    Bandwidth: MissLoads=759, AvgLoadTime=0.88ms
+Layer 1: Hits=430, Misses=586, HitRate=42.32%
+    Bandwidth: MissLoads=586, AvgLoadTime=0.87ms
+Layer 2: Hits=549, Misses=467, HitRate=54.04%
+    Bandwidth: MissLoads=467, AvgLoadTime=0.88ms
+Layer 3: Hits=582, Misses=434, HitRate=57.28%
+    Bandwidth: MissLoads=434, AvgLoadTime=0.87ms
+Layer 4: Hits=572, Misses=444, HitRate=56.30%
+    Bandwidth: MissLoads=444, AvgLoadTime=0.88ms
+Layer 5: Hits=539, Misses=477, HitRate=53.05%
+    Bandwidth: MissLoads=477, AvgLoadTime=0.88ms
+Layer 6: Hits=813, Misses=203, HitRate=80.02%
+    Bandwidth: MissLoads=203, AvgLoadTime=0.91ms
+Layer 7: Hits=862, Misses=154, HitRate=84.84%
+    Bandwidth: MissLoads=154, AvgLoadTime=0.89ms
+Layer 8: Hits=751, Misses=265, HitRate=73.92%
+    Bandwidth: MissLoads=265, AvgLoadTime=0.89ms
+Layer 9: Hits=719, Misses=297, HitRate=70.77%
+    Bandwidth: MissLoads=297, AvgLoadTime=0.89ms
+Layer 10: Hits=670, Misses=346, HitRate=65.94%
+    Bandwidth: MissLoads=346, AvgLoadTime=0.88ms
+Layer 11: Hits=655, Misses=361, HitRate=64.47%
+    Bandwidth: MissLoads=361, AvgLoadTime=0.87ms
+Layer 12: Hits=678, Misses=338, HitRate=66.73%
+    Bandwidth: MissLoads=338, AvgLoadTime=0.88ms
+Layer 13: Hits=572, Misses=444, HitRate=56.30%
+    Bandwidth: MissLoads=444, AvgLoadTime=0.89ms
+Layer 14: Hits=615, Misses=401, HitRate=60.53%
+    Bandwidth: MissLoads=401, AvgLoadTime=0.88ms
+Layer 15: Hits=802, Misses=214, HitRate=78.94%
+    Bandwidth: MissLoads=214, AvgLoadTime=0.89ms
+Layer 16: Hits=650, Misses=366, HitRate=63.98%
+    Bandwidth: MissLoads=366, AvgLoadTime=0.89ms
+Layer 17: Hits=618, Misses=398, HitRate=60.83%
+    Bandwidth: MissLoads=398, AvgLoadTime=0.88ms
+Layer 18: Hits=858, Misses=158, HitRate=84.45%
+    Bandwidth: MissLoads=158, AvgLoadTime=0.88ms
+Layer 19: Hits=878, Misses=138, HitRate=86.42%
+    Bandwidth: MissLoads=138, AvgLoadTime=0.90ms
+Layer 20: Hits=799, Misses=217, HitRate=78.64%
+    Bandwidth: MissLoads=217, AvgLoadTime=0.89ms
+Layer 21: Hits=761, Misses=255, HitRate=74.90%
+    Bandwidth: MissLoads=255, AvgLoadTime=0.88ms
+Layer 22: Hits=691, Misses=325, HitRate=68.01%
+    Bandwidth: MissLoads=325, AvgLoadTime=0.89ms
+Layer 23: Hits=579, Misses=437, HitRate=56.99%
+    Bandwidth: MissLoads=437, AvgLoadTime=0.88ms
+Layer 24: Hits=694, Misses=322, HitRate=68.31%
+    Bandwidth: MissLoads=322, AvgLoadTime=0.90ms
+Layer 25: Hits=594, Misses=422, HitRate=58.46%
+    Bandwidth: MissLoads=422, AvgLoadTime=0.88ms
+Layer 26: Hits=565, Misses=451, HitRate=55.61%
+    Bandwidth: MissLoads=451, AvgLoadTime=0.87ms
+Layer 27: Hits=741, Misses=275, HitRate=72.93%
+    Bandwidth: MissLoads=275, AvgLoadTime=0.88ms
+Layer 28: Hits=653, Misses=363, HitRate=64.27%
+    Bandwidth: MissLoads=363, AvgLoadTime=0.87ms
+Layer 29: Hits=634, Misses=382, HitRate=62.40%
+    Bandwidth: MissLoads=382, AvgLoadTime=0.89ms
+Layer 30: Hits=856, Misses=160, HitRate=84.25%
+    Bandwidth: MissLoads=160, AvgLoadTime=0.88ms
+Layer 31: Hits=871, Misses=145, HitRate=85.73%
+    Bandwidth: MissLoads=145, AvgLoadTime=0.89ms
+Layer 32: Hits=765, Misses=251, HitRate=75.30%
+    Bandwidth: MissLoads=251, AvgLoadTime=0.88ms
+Layer 33: Hits=722, Misses=294, HitRate=71.06%
+    Bandwidth: MissLoads=294, AvgLoadTime=0.88ms
+Layer 34: Hits=643, Misses=373, HitRate=63.29%
+    Bandwidth: MissLoads=373, AvgLoadTime=0.87ms
+Layer 35: Hits=610, Misses=406, HitRate=60.04%
+    Bandwidth: MissLoads=406, AvgLoadTime=0.88ms
+Layer 36: Hits=657, Misses=359, HitRate=64.67%
+    Bandwidth: MissLoads=359, AvgLoadTime=0.88ms
+Layer 37: Hits=530, Misses=486, HitRate=52.17%
+    Bandwidth: MissLoads=486, AvgLoadTime=0.89ms
+Layer 38: Hits=620, Misses=396, HitRate=61.02%
+    Bandwidth: MissLoads=396, AvgLoadTime=0.87ms
+Layer 39: Hits=673, Misses=343, HitRate=66.24%
+    Bandwidth: MissLoads=343, AvgLoadTime=0.88ms
+Layer 40: Hits=644, Misses=372, HitRate=63.39%
+    Bandwidth: MissLoads=372, AvgLoadTime=0.88ms
+Layer 41: Hits=541, Misses=475, HitRate=53.25%
+    Bandwidth: MissLoads=475, AvgLoadTime=0.88ms
+Layer 42: Hits=620, Misses=396, HitRate=61.02%
+    Bandwidth: MissLoads=396, AvgLoadTime=0.87ms
+Layer 43: Hits=725, Misses=291, HitRate=71.36%
+    Bandwidth: MissLoads=291, AvgLoadTime=0.87ms
+Layer 44: Hits=723, Misses=293, HitRate=71.16%
+    Bandwidth: MissLoads=293, AvgLoadTime=0.88ms
+Layer 45: Hits=742, Misses=274, HitRate=73.03%
+    Bandwidth: MissLoads=274, AvgLoadTime=0.89ms
+Layer 46: Hits=684, Misses=332, HitRate=67.32%
+    Bandwidth: MissLoads=332, AvgLoadTime=0.89ms
+Layer 47: Hits=512, Misses=504, HitRate=50.39%
+    Bandwidth: MissLoads=504, AvgLoadTime=0.87ms
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing pre-saved weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.26 seconds
+Pre-warming expert cache with 24 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+Warning: /home/michael/heteroPredict/py/unified_llm_w4a16/prompts.txt not found, falling back to --text argument.
+Processing text: 'In a detailed essay, explain the theory of relativity and its implications on modern physics.'
+Generating 128 tokens...
+
+
+============================================================
+Full output (prompt + generated):
+============================================================
+In a detailed essay, explain the theory of relativity and its implications on modern physics. The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally, the essay should include at least two references to scientific sources, properly cited in APA format. The essay should also include a brief explanation of the concept of spacetime and the equivalence principle. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally
+============================================================
+Generated text only:
+============================================================
+ The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally, the essay should include at least two references to scientific sources, properly cited in APA format. The essay should also include a brief explanation of the concept of spacetime and the equivalence principle. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally
+============================================================
+Running 1 prompt(s) from --text...
+
+
+============================================================
+PROMPT 1/1: In a detailed essay, explain the theory of relativity and its implications on mo...
+============================================================
+Generated text:
+============================================================
+ The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally, the essay should include at least two references to scientific sources, properly cited in APA format. The essay should also include a brief explanation of the concept of spacetime and the equivalence principle. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally
+============================================================
+
+============================================================
+Weight loading time: 0.26 seconds
+Done!
+============================================================
+
+
+--- PREDICT (SSD -> RAM Prefetch, prefetch=18, lookahead=2, cache=24) ---
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=87.85/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[Predictor] Layer 0 model path resolved to: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_0/best_jit.pt
+[Predictor] Running on device: GPU (heterogeneity="gpu", predictor_device="gpu")
+[ThreadedTorchScriptPredictor Layer 0] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 0] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 0] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 0] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_0/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 0] Worker thread started
+[ThreadedTorchScriptPredictor Layer 1] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 1] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 1] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 1] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_1/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 1] Worker thread started
+[ThreadedTorchScriptPredictor Layer 2] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 2] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 2] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 2] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_2/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 2] Worker thread started
+[ThreadedTorchScriptPredictor Layer 3] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 3] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 3] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 3] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_3/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 3] Worker thread started
+[ThreadedTorchScriptPredictor Layer 4] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 4] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 4] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 4] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_4/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 4] Worker thread started
+[ThreadedTorchScriptPredictor Layer 5] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 5] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 5] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 5] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_5/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 5] Worker thread started
+[ThreadedTorchScriptPredictor Layer 6] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 6] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 6] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 6] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_6/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 6] Worker thread started
+[ThreadedTorchScriptPredictor Layer 7] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 7] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 7] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 7] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_7/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 7] Worker thread started
+[ThreadedTorchScriptPredictor Layer 8] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 8] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 8] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 8] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_8/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 8] Worker thread started
+[ThreadedTorchScriptPredictor Layer 9] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 9] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 9] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 9] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_9/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 9] Worker thread started
+[ThreadedTorchScriptPredictor Layer 10] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 10] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 10] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 10] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_10/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 10] Worker thread started
+[ThreadedTorchScriptPredictor Layer 11] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 11] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 11] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 11] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_11/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 11] Worker thread started
+[ThreadedTorchScriptPredictor Layer 12] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 12] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 12] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 12] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_12/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 12] Worker thread started
+[ThreadedTorchScriptPredictor Layer 13] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 13] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 13] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 13] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_13/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 13] Worker thread started
+[ThreadedTorchScriptPredictor Layer 14] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 14] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 14] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 14] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_14/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 14] Worker thread started
+[ThreadedTorchScriptPredictor Layer 15] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 15] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 15] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 15] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_15/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 15] Worker thread started
+[ThreadedTorchScriptPredictor Layer 16] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 16] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 16] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 16] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_16/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 16] Worker thread started
+[ThreadedTorchScriptPredictor Layer 17] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 17] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 17] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 17] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_17/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 17] Worker thread started
+[ThreadedTorchScriptPredictor Layer 18] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 18] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 18] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 18] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_18/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 18] Worker thread started
+[ThreadedTorchScriptPredictor Layer 19] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 19] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 19] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 19] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_19/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 19] Worker thread started
+[ThreadedTorchScriptPredictor Layer 20] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 20] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 20] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 20] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_20/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 20] Worker thread started
+[ThreadedTorchScriptPredictor Layer 21] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 21] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 21] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 21] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_21/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 21] Worker thread started
+[ThreadedTorchScriptPredictor Layer 22] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 22] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 22] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 22] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_22/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 22] Worker thread started
+[ThreadedTorchScriptPredictor Layer 23] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 23] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 23] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 23] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_23/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 23] Worker thread started
+[ThreadedTorchScriptPredictor Layer 24] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 24] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 24] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 24] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_24/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 24] Worker thread started
+[ThreadedTorchScriptPredictor Layer 25] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 25] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 25] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 25] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_25/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 25] Worker thread started
+[ThreadedTorchScriptPredictor Layer 26] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 26] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 26] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 26] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_26/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 26] Worker thread started
+[ThreadedTorchScriptPredictor Layer 27] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 27] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 27] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 27] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_27/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 27] Worker thread started
+[ThreadedTorchScriptPredictor Layer 28] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 28] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 28] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 28] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_28/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 28] Worker thread started
+[ThreadedTorchScriptPredictor Layer 29] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 29] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 29] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 29] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_29/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 29] Worker thread started
+[ThreadedTorchScriptPredictor Layer 30] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 30] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 30] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 30] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_30/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 30] Worker thread started
+[ThreadedTorchScriptPredictor Layer 31] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 31] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 31] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 31] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_31/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 31] Worker thread started
+[ThreadedTorchScriptPredictor Layer 32] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 32] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 32] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 32] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_32/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 32] Worker thread started
+[ThreadedTorchScriptPredictor Layer 33] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 33] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 33] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 33] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_33/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 33] Worker thread started
+[ThreadedTorchScriptPredictor Layer 34] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 34] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 34] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 34] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_34/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 34] Worker thread started
+[ThreadedTorchScriptPredictor Layer 35] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 35] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 35] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 35] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_35/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 35] Worker thread started
+[ThreadedTorchScriptPredictor Layer 36] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 36] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 36] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 36] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_36/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 36] Worker thread started
+[ThreadedTorchScriptPredictor Layer 37] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 37] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 37] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 37] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_37/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 37] Worker thread started
+[ThreadedTorchScriptPredictor Layer 38] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 38] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 38] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 38] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_38/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 38] Worker thread started
+[ThreadedTorchScriptPredictor Layer 39] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 39] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 39] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 39] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_39/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 39] Worker thread started
+[ThreadedTorchScriptPredictor Layer 40] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 40] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 40] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 40] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_40/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 40] Worker thread started
+[ThreadedTorchScriptPredictor Layer 41] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 41] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 41] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 41] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_41/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 41] Worker thread started
+[ThreadedTorchScriptPredictor Layer 42] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 42] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 42] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 42] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_42/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 42] Worker thread started
+[ThreadedTorchScriptPredictor Layer 43] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 43] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 43] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 43] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_43/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 43] Worker thread started
+[ThreadedTorchScriptPredictor Layer 44] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 44] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 44] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 44] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_44/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 44] Worker thread started
+[ThreadedTorchScriptPredictor Layer 45] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 45] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 45] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 45] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_45/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 45] Worker thread started
+[ThreadedTorchScriptPredictor Layer 46] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 46] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 46] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 46] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_46/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 46] Worker thread started
+[ThreadedTorchScriptPredictor Layer 47] Loading model on device: cuda:0 (NPU/GPU)
+[ThreadedTorchScriptPredictor Layer 47] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[ThreadedTorchScriptPredictor Layer 47] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[ThreadedTorchScriptPredictor Layer 47] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model/eh1_h32_f2/layer_47/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 47] Worker thread started
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 2 (predictor fires every 2 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 24 experts for all layers...
+Layer 0: Pre-warming 24 experts.
+Layer 0: using packed expert format.
+Layer 1: Pre-warming 24 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 24 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 24 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 24 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 24 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 24 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 24 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 24 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 24 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 24 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 24 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 24 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 24 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 24 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 24 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 24 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 24 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 24 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 24 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 24 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 24 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 24 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 24 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 24 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 24 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 24 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 24 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 24 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 24 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 24 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 24 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 24 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 24 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 24 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 24 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 24 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 24 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 24 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 24 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 24 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 24 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 24 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 24 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 24 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 24 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 24 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 24 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Libtorch input_ids shape: [1, 18]
+Skipping warmup.
+Prefill time: 2.69679 seconds
+[Predictor] Prefill-end expert cache warmup (excluded from generation TPS).
+Generation phase
+[WARNING] Layer 18 loaded 7 experts in a single generation step!
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[gen 5/127] elapsed=0.9s  TPS=5.363
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 36 loaded 7 experts in a single generation step!
+[WARNING] Layer 37 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 1 loaded 8 experts in a single generation step!
+[WARNING] Layer 14 loaded 7 experts in a single generation step!
+[WARNING] Layer 3 loaded 7 experts in a single generation step!
+[gen 10/127] elapsed=1.9s  TPS=5.320
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[gen 15/127] elapsed=2.6s  TPS=5.816
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[WARNING] Layer 35 loaded 7 experts in a single generation step!
+[gen 20/127] elapsed=3.5s  TPS=5.638
+[WARNING] Layer 22 loaded 7 experts in a single generation step!
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 27 loaded 7 experts in a single generation step!
+[WARNING] Layer 32 loaded 7 experts in a single generation step!
+[WARNING] Layer 36 loaded 7 experts in a single generation step!
+[WARNING] Layer 12 loaded 7 experts in a single generation step!
+[WARNING] Layer 13 loaded 8 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 37 loaded 7 experts in a single generation step!
+[WARNING] Layer 23 loaded 10 experts in a single generation step!
+[gen 25/127] elapsed=4.8s  TPS=5.253
+[WARNING] Layer 26 loaded 8 experts in a single generation step!
+[WARNING] Layer 40 loaded 7 experts in a single generation step!
+[WARNING] Layer 41 loaded 7 experts in a single generation step!
+[WARNING] Layer 42 loaded 7 experts in a single generation step!
+[WARNING] Layer 44 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[WARNING] Layer 10 loaded 7 experts in a single generation step!
+[WARNING] Layer 12 loaded 7 experts in a single generation step!
+[WARNING] Layer 13 loaded 8 experts in a single generation step!
+[WARNING] Layer 21 loaded 7 experts in a single generation step!
+[gen 30/127] elapsed=6.0s  TPS=5.032
+[WARNING] Layer 5 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 5 loaded 7 experts in a single generation step!
+[WARNING] Layer 9 loaded 7 experts in a single generation step!
+[WARNING] Layer 10 loaded 8 experts in a single generation step!
+[WARNING] Layer 12 loaded 8 experts in a single generation step!
+[WARNING] Layer 22 loaded 7 experts in a single generation step!
+[WARNING] Layer 24 loaded 8 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 36 loaded 7 experts in a single generation step!
+[WARNING] Layer 37 loaded 7 experts in a single generation step!
+[WARNING] Layer 41 loaded 7 experts in a single generation step!
+[WARNING] Layer 46 loaded 8 experts in a single generation step!
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[gen 35/127] elapsed=7.2s  TPS=4.882
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[gen 40/127] elapsed=8.1s  TPS=4.938
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 45/127] elapsed=9.1s  TPS=4.919
+[gen 50/127] elapsed=10.0s  TPS=4.998
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 55/127] elapsed=11.0s  TPS=5.004
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[WARNING] Layer 2 loaded 7 experts in a single generation step!
+[gen 60/127] elapsed=11.9s  TPS=5.038
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[gen 65/127] elapsed=12.8s  TPS=5.082
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 29 loaded 7 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 35 loaded 8 experts in a single generation step!
+[gen 70/127] elapsed=13.8s  TPS=5.076
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[WARNING] Layer 2 loaded 7 experts in a single generation step!
+[WARNING] Layer 21 loaded 7 experts in a single generation step!
+[WARNING] Layer 23 loaded 7 experts in a single generation step!
+[WARNING] Layer 35 loaded 7 experts in a single generation step!
+[WARNING] Layer 36 loaded 8 experts in a single generation step!
+[WARNING] Layer 38 loaded 8 experts in a single generation step!
+[WARNING] Layer 39 loaded 7 experts in a single generation step!
+[WARNING] Layer 40 loaded 8 experts in a single generation step!
+[WARNING] Layer 42 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 4 loaded 7 experts in a single generation step!
+[WARNING] Layer 42 loaded 8 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 42 loaded 8 experts in a single generation step!
+[WARNING] Layer 46 loaded 7 experts in a single generation step!
+[gen 75/127] elapsed=15.2s  TPS=4.938
+[WARNING] Layer 3 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 16 loaded 7 experts in a single generation step!
+[gen 80/127] elapsed=16.2s  TPS=4.935
+[WARNING] Layer 5 loaded 7 experts in a single generation step!
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 5 loaded 7 experts in a single generation step!
+[WARNING] Layer 13 loaded 7 experts in a single generation step!
+[gen 85/127] elapsed=17.4s  TPS=4.892
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 41 loaded 7 experts in a single generation step!
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[gen 90/127] elapsed=18.2s  TPS=4.939
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 95/127] elapsed=19.2s  TPS=4.958
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[gen 100/127] elapsed=20.2s  TPS=4.958
+[WARNING] Layer 13 loaded 7 experts in a single generation step!
+[WARNING] Layer 22 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 105/127] elapsed=21.3s  TPS=4.922
+[gen 110/127] elapsed=22.3s  TPS=4.938
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[gen 115/127] elapsed=23.3s  TPS=4.934
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[gen 120/127] elapsed=24.3s  TPS=4.945
+[WARNING] Layer 30 loaded 7 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 32 loaded 7 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 35 loaded 7 experts in a single generation step!
+[WARNING] Layer 41 loaded 7 experts in a single generation step!
+[gen 125/127] elapsed=25.6s  TPS=4.890
+Prefill time (summary): 2.697 seconds
+Total Generation Time: 25.937 seconds
+Average Time per Token: 0.204 seconds
+Libtorch input_ids shape: [1, 18]
+Skipping warmup.
+Prefill time: 2.927 seconds
+[Predictor] Prefill-end expert cache warmup (excluded from generation TPS).
+Generation phase
+[WARNING] Layer 18 loaded 7 experts in a single generation step!
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[gen 5/127] elapsed=0.9s  TPS=5.447
+[WARNING] Layer 36 loaded 7 experts in a single generation step!
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[WARNING] Layer 3 loaded 7 experts in a single generation step!
+[gen 10/127] elapsed=1.9s  TPS=5.323
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 15/127] elapsed=3.0s  TPS=5.043
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 20/127] elapsed=4.0s  TPS=5.058
+[WARNING] Layer 9 loaded 7 experts in a single generation step!
+[WARNING] Layer 13 loaded 8 experts in a single generation step!
+[gen 25/127] elapsed=5.1s  TPS=4.937
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 40 loaded 7 experts in a single generation step!
+[WARNING] Layer 41 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[WARNING] Layer 21 loaded 7 experts in a single generation step!
+[gen 30/127] elapsed=6.2s  TPS=4.834
+[WARNING] Layer 5 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 5 loaded 7 experts in a single generation step!
+[WARNING] Layer 9 loaded 7 experts in a single generation step!
+[WARNING] Layer 10 loaded 8 experts in a single generation step!
+[WARNING] Layer 12 loaded 8 experts in a single generation step!
+[WARNING] Layer 22 loaded 7 experts in a single generation step!
+[WARNING] Layer 24 loaded 8 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 36 loaded 7 experts in a single generation step!
+[WARNING] Layer 37 loaded 7 experts in a single generation step!
+[WARNING] Layer 41 loaded 7 experts in a single generation step!
+[WARNING] Layer 46 loaded 8 experts in a single generation step!
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[gen 35/127] elapsed=7.4s  TPS=4.699
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[gen 40/127] elapsed=8.4s  TPS=4.762
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 45/127] elapsed=9.5s  TPS=4.752
+[gen 50/127] elapsed=10.4s  TPS=4.787
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 55/127] elapsed=11.4s  TPS=4.809
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[WARNING] Layer 2 loaded 7 experts in a single generation step!
+[gen 60/127] elapsed=12.4s  TPS=4.850
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[gen 65/127] elapsed=13.4s  TPS=4.864
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 29 loaded 7 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 35 loaded 8 experts in a single generation step!
+[gen 70/127] elapsed=14.4s  TPS=4.870
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[WARNING] Layer 2 loaded 7 experts in a single generation step!
+[WARNING] Layer 21 loaded 7 experts in a single generation step!
+[WARNING] Layer 23 loaded 7 experts in a single generation step!
+[WARNING] Layer 35 loaded 7 experts in a single generation step!
+[WARNING] Layer 36 loaded 8 experts in a single generation step!
+[WARNING] Layer 38 loaded 8 experts in a single generation step!
+[WARNING] Layer 39 loaded 7 experts in a single generation step!
+[WARNING] Layer 40 loaded 8 experts in a single generation step!
+[WARNING] Layer 42 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 4 loaded 7 experts in a single generation step!
+[WARNING] Layer 42 loaded 8 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[WARNING] Layer 42 loaded 8 experts in a single generation step!
+[WARNING] Layer 46 loaded 7 experts in a single generation step!
+[gen 75/127] elapsed=15.8s  TPS=4.752
+[WARNING] Layer 3 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 16 loaded 7 experts in a single generation step!
+[gen 80/127] elapsed=16.8s  TPS=4.759
+[WARNING] Layer 5 loaded 7 experts in a single generation step!
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 5 loaded 7 experts in a single generation step!
+[WARNING] Layer 13 loaded 7 experts in a single generation step!
+[gen 85/127] elapsed=18.0s  TPS=4.728
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 41 loaded 7 experts in a single generation step!
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[gen 90/127] elapsed=18.8s  TPS=4.780
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 95/127] elapsed=19.8s  TPS=4.802
+[WARNING] Layer 47 loaded 7 experts in a single generation step!
+[gen 100/127] elapsed=20.8s  TPS=4.809
+[WARNING] Layer 13 loaded 7 experts in a single generation step!
+[WARNING] Layer 22 loaded 7 experts in a single generation step!
+[WARNING] Layer 1 loaded 7 experts in a single generation step!
+[gen 105/127] elapsed=22.1s  TPS=4.757
+[gen 110/127] elapsed=23.0s  TPS=4.781
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[gen 115/127] elapsed=24.0s  TPS=4.782
+[WARNING] Layer 0 loaded 7 experts in a single generation step!
+[WARNING] Layer 0 loaded 8 experts in a single generation step!
+[gen 120/127] elapsed=25.0s  TPS=4.799
+[WARNING] Layer 30 loaded 7 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 26 loaded 7 experts in a single generation step!
+[WARNING] Layer 32 loaded 7 experts in a single generation step!
+[WARNING] Layer 34 loaded 7 experts in a single generation step!
+[WARNING] Layer 35 loaded 7 experts in a single generation step!
+[WARNING] Layer 41 loaded 7 experts in a single generation step!
+[gen 125/127] elapsed=26.2s  TPS=4.769
+Prefill time (summary): 2.927 seconds
+Total Generation Time: 26.702 seconds
+Average Time per Token: 0.210 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=498, Misses=518, HitRate=49.02%
+    Predictor Routed-Expert HitRate=46.03% (29/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=46.03% (29/63)
+    Predictor RoutedTopK HitRate=45.83% (231/504)
+    Predicted RequestedByRouterForcedN Rate=2.56% (29/1134)
+    Predicted RequestedByRouterTopK Rate=20.37% (231/1134)
+    Loads Per Step: 0Loads=3, 1Load=13, >1Load=111
+    Bandwidth: StallLoads=518, PrefetchLoads=814, AvgLoadTime=1.18ms
+    Predictor TopK matches: 0=34 1=29 >=2=0
+Layer 1 Cache Stats: Hits=597, Misses=419, HitRate=58.76%
+    Predictor Routed-Expert HitRate=58.73% (37/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=58.73% (37/63)
+    Predictor RoutedTopK HitRate=47.62% (240/504)
+    Predicted RequestedByRouterForcedN Rate=3.26% (37/1134)
+    Predicted RequestedByRouterTopK Rate=21.16% (240/1134)
+    Loads Per Step: 0Loads=3, 1Load=24, >1Load=100
+    Bandwidth: StallLoads=419, PrefetchLoads=728, AvgLoadTime=1.27ms
+    Predictor TopK matches: 0=26 1=37 >=2=0
+Layer 2 Cache Stats: Hits=611, Misses=405, HitRate=60.14%
+    Predictor Routed-Expert HitRate=65.08% (41/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=65.08% (41/63)
+    Predictor RoutedTopK HitRate=46.43% (234/504)
+    Predicted RequestedByRouterForcedN Rate=3.62% (41/1134)
+    Predicted RequestedByRouterTopK Rate=20.63% (234/1134)
+    Loads Per Step: 0Loads=8, 1Load=14, >1Load=105
+    Bandwidth: StallLoads=405, PrefetchLoads=764, AvgLoadTime=1.34ms
+    Predictor TopK matches: 0=22 1=41 >=2=0
+Layer 3 Cache Stats: Hits=636, Misses=380, HitRate=62.60%
+    Predictor Routed-Expert HitRate=47.62% (30/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=47.62% (30/63)
+    Predictor RoutedTopK HitRate=43.65% (220/504)
+    Predicted RequestedByRouterForcedN Rate=2.65% (30/1134)
+    Predicted RequestedByRouterTopK Rate=19.40% (220/1134)
+    Loads Per Step: 0Loads=0, 1Load=15, >1Load=112
+    Bandwidth: StallLoads=380, PrefetchLoads=721, AvgLoadTime=1.41ms
+    Predictor TopK matches: 0=33 1=30 >=2=0
+Layer 4 Cache Stats: Hits=656, Misses=360, HitRate=64.57%
+    Predictor Routed-Expert HitRate=65.08% (41/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=65.08% (41/63)
+    Predictor RoutedTopK HitRate=50.79% (256/504)
+    Predicted RequestedByRouterForcedN Rate=3.62% (41/1134)
+    Predicted RequestedByRouterTopK Rate=22.57% (256/1134)
+    Loads Per Step: 0Loads=6, 1Load=23, >1Load=98
+    Bandwidth: StallLoads=360, PrefetchLoads=615, AvgLoadTime=1.53ms
+    Predictor TopK matches: 0=22 1=41 >=2=0
+Layer 5 Cache Stats: Hits=632, Misses=384, HitRate=62.20%
+    Predictor Routed-Expert HitRate=63.49% (40/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=63.49% (40/63)
+    Predictor RoutedTopK HitRate=50.60% (255/504)
+    Predicted RequestedByRouterForcedN Rate=3.53% (40/1134)
+    Predicted RequestedByRouterTopK Rate=22.49% (255/1134)
+    Loads Per Step: 0Loads=3, 1Load=17, >1Load=107
+    Bandwidth: StallLoads=384, PrefetchLoads=656, AvgLoadTime=1.58ms
+    Predictor TopK matches: 0=23 1=40 >=2=0
+Layer 6 Cache Stats: Hits=809, Misses=207, HitRate=79.63%
+    Predictor Routed-Expert HitRate=55.56% (35/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=55.56% (35/63)
+    Predictor RoutedTopK HitRate=54.17% (273/504)
+    Predicted RequestedByRouterForcedN Rate=3.09% (35/1134)
+    Predicted RequestedByRouterTopK Rate=24.07% (273/1134)
+    Loads Per Step: 0Loads=19, 1Load=40, >1Load=68
+    Bandwidth: StallLoads=207, PrefetchLoads=515, AvgLoadTime=1.71ms
+    Predictor TopK matches: 0=28 1=35 >=2=0
+Layer 7 Cache Stats: Hits=851, Misses=165, HitRate=83.76%
+    Predictor Routed-Expert HitRate=76.19% (48/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=76.19% (48/63)
+    Predictor RoutedTopK HitRate=60.12% (303/504)
+    Predicted RequestedByRouterForcedN Rate=4.23% (48/1134)
+    Predicted RequestedByRouterTopK Rate=26.72% (303/1134)
+    Loads Per Step: 0Loads=33, 1Load=47, >1Load=47
+    Bandwidth: StallLoads=165, PrefetchLoads=454, AvgLoadTime=1.73ms
+    Predictor TopK matches: 0=15 1=48 >=2=0
+Layer 8 Cache Stats: Hits=777, Misses=239, HitRate=76.48%
+    Predictor Routed-Expert HitRate=63.49% (40/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=63.49% (40/63)
+    Predictor RoutedTopK HitRate=50.00% (252/504)
+    Predicted RequestedByRouterForcedN Rate=3.53% (40/1134)
+    Predicted RequestedByRouterTopK Rate=22.22% (252/1134)
+    Loads Per Step: 0Loads=17, 1Load=35, >1Load=75
+    Bandwidth: StallLoads=239, PrefetchLoads=590, AvgLoadTime=1.83ms
+    Predictor TopK matches: 0=23 1=40 >=2=0
+Layer 9 Cache Stats: Hits=745, Misses=271, HitRate=73.33%
+    Predictor Routed-Expert HitRate=76.19% (48/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=76.19% (48/63)
+    Predictor RoutedTopK HitRate=55.56% (280/504)
+    Predicted RequestedByRouterForcedN Rate=4.23% (48/1134)
+    Predicted RequestedByRouterTopK Rate=24.69% (280/1134)
+    Loads Per Step: 0Loads=13, 1Load=32, >1Load=82
+    Bandwidth: StallLoads=271, PrefetchLoads=481, AvgLoadTime=1.79ms
+    Predictor TopK matches: 0=15 1=48 >=2=0
+Layer 10 Cache Stats: Hits=741, Misses=275, HitRate=72.93%
+    Predictor Routed-Expert HitRate=68.25% (43/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=68.25% (43/63)
+    Predictor RoutedTopK HitRate=59.52% (300/504)
+    Predicted RequestedByRouterForcedN Rate=3.79% (43/1134)
+    Predicted RequestedByRouterTopK Rate=26.46% (300/1134)
+    Loads Per Step: 0Loads=21, 1Load=26, >1Load=80
+    Bandwidth: StallLoads=275, PrefetchLoads=570, AvgLoadTime=1.65ms
+    Predictor TopK matches: 0=20 1=43 >=2=0
+Layer 11 Cache Stats: Hits=736, Misses=280, HitRate=72.44%
+    Predictor Routed-Expert HitRate=69.84% (44/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=69.84% (44/63)
+    Predictor RoutedTopK HitRate=51.79% (261/504)
+    Predicted RequestedByRouterForcedN Rate=3.88% (44/1134)
+    Predicted RequestedByRouterTopK Rate=23.02% (261/1134)
+    Loads Per Step: 0Loads=12, 1Load=36, >1Load=79
+    Bandwidth: StallLoads=280, PrefetchLoads=630, AvgLoadTime=1.63ms
+    Predictor TopK matches: 0=19 1=44 >=2=0
+Layer 12 Cache Stats: Hits=704, Misses=312, HitRate=69.29%
+    Predictor Routed-Expert HitRate=58.73% (37/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=58.73% (37/63)
+    Predictor RoutedTopK HitRate=44.05% (222/504)
+    Predicted RequestedByRouterForcedN Rate=3.26% (37/1134)
+    Predicted RequestedByRouterTopK Rate=19.58% (222/1134)
+    Loads Per Step: 0Loads=8, 1Load=24, >1Load=95
+    Bandwidth: StallLoads=312, PrefetchLoads=608, AvgLoadTime=1.60ms
+    Predictor TopK matches: 0=26 1=37 >=2=0
+Layer 13 Cache Stats: Hits=691, Misses=325, HitRate=68.01%
+    Predictor Routed-Expert HitRate=71.43% (45/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=71.43% (45/63)
+    Predictor RoutedTopK HitRate=62.30% (314/504)
+    Predicted RequestedByRouterForcedN Rate=3.97% (45/1134)
+    Predicted RequestedByRouterTopK Rate=27.69% (314/1134)
+    Loads Per Step: 0Loads=10, 1Load=26, >1Load=91
+    Bandwidth: StallLoads=325, PrefetchLoads=588, AvgLoadTime=1.61ms
+    Predictor TopK matches: 0=18 1=45 >=2=0
+Layer 14 Cache Stats: Hits=654, Misses=362, HitRate=64.37%
+    Predictor Routed-Expert HitRate=65.08% (41/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=65.08% (41/63)
+    Predictor RoutedTopK HitRate=48.81% (246/504)
+    Predicted RequestedByRouterForcedN Rate=3.62% (41/1134)
+    Predicted RequestedByRouterTopK Rate=21.69% (246/1134)
+    Loads Per Step: 0Loads=5, 1Load=17, >1Load=105
+    Bandwidth: StallLoads=362, PrefetchLoads=669, AvgLoadTime=1.49ms
+    Predictor TopK matches: 0=22 1=41 >=2=0
+Layer 15 Cache Stats: Hits=833, Misses=183, HitRate=81.99%
+    Predictor Routed-Expert HitRate=79.37% (50/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=79.37% (50/63)
+    Predictor RoutedTopK HitRate=66.07% (333/504)
+    Predicted RequestedByRouterForcedN Rate=4.41% (50/1134)
+    Predicted RequestedByRouterTopK Rate=29.37% (333/1134)
+    Loads Per Step: 0Loads=32, 1Load=42, >1Load=53
+    Bandwidth: StallLoads=183, PrefetchLoads=446, AvgLoadTime=1.61ms
+    Predictor TopK matches: 0=13 1=50 >=2=0
+Layer 16 Cache Stats: Hits=749, Misses=267, HitRate=73.72%
+    Predictor Routed-Expert HitRate=65.08% (41/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=65.08% (41/63)
+    Predictor RoutedTopK HitRate=59.72% (301/504)
+    Predicted RequestedByRouterForcedN Rate=3.62% (41/1134)
+    Predicted RequestedByRouterTopK Rate=26.54% (301/1134)
+    Loads Per Step: 0Loads=10, 1Load=38, >1Load=79
+    Bandwidth: StallLoads=267, PrefetchLoads=552, AvgLoadTime=1.57ms
+    Predictor TopK matches: 0=22 1=41 >=2=0
+Layer 17 Cache Stats: Hits=733, Misses=283, HitRate=72.15%
+    Predictor Routed-Expert HitRate=68.25% (43/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=68.25% (43/63)
+    Predictor RoutedTopK HitRate=59.72% (301/504)
+    Predicted RequestedByRouterForcedN Rate=3.79% (43/1134)
+    Predicted RequestedByRouterTopK Rate=26.54% (301/1134)
+    Loads Per Step: 0Loads=18, 1Load=27, >1Load=82
+    Bandwidth: StallLoads=283, PrefetchLoads=547, AvgLoadTime=1.51ms
+    Predictor TopK matches: 0=20 1=43 >=2=0
+Layer 18 Cache Stats: Hits=817, Misses=199, HitRate=80.41%
+    Predictor Routed-Expert HitRate=50.79% (32/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=50.79% (32/63)
+    Predictor RoutedTopK HitRate=56.75% (286/504)
+    Predicted RequestedByRouterForcedN Rate=2.82% (32/1134)
+    Predicted RequestedByRouterTopK Rate=25.22% (286/1134)
+    Loads Per Step: 0Loads=31, 1Load=41, >1Load=55
+    Bandwidth: StallLoads=199, PrefetchLoads=371, AvgLoadTime=1.49ms
+    Predictor TopK matches: 0=31 1=32 >=2=0
+Layer 19 Cache Stats: Hits=865, Misses=151, HitRate=85.14%
+    Predictor Routed-Expert HitRate=63.49% (40/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=63.49% (40/63)
+    Predictor RoutedTopK HitRate=64.09% (323/504)
+    Predicted RequestedByRouterForcedN Rate=3.53% (40/1134)
+    Predicted RequestedByRouterTopK Rate=28.48% (323/1134)
+    Loads Per Step: 0Loads=38, 1Load=44, >1Load=45
+    Bandwidth: StallLoads=151, PrefetchLoads=410, AvgLoadTime=1.54ms
+    Predictor TopK matches: 0=23 1=40 >=2=0
+Layer 20 Cache Stats: Hits=812, Misses=204, HitRate=79.92%
+    Predictor Routed-Expert HitRate=44.44% (28/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=44.44% (28/63)
+    Predictor RoutedTopK HitRate=50.00% (252/504)
+    Predicted RequestedByRouterForcedN Rate=2.47% (28/1134)
+    Predicted RequestedByRouterTopK Rate=22.22% (252/1134)
+    Loads Per Step: 0Loads=30, 1Load=40, >1Load=57
+    Bandwidth: StallLoads=204, PrefetchLoads=528, AvgLoadTime=1.45ms
+    Predictor TopK matches: 0=35 1=28 >=2=0
+Layer 21 Cache Stats: Hits=755, Misses=261, HitRate=74.31%
+    Predictor Routed-Expert HitRate=73.02% (46/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=73.02% (46/63)
+    Predictor RoutedTopK HitRate=61.51% (310/504)
+    Predicted RequestedByRouterForcedN Rate=4.06% (46/1134)
+    Predicted RequestedByRouterTopK Rate=27.34% (310/1134)
+    Loads Per Step: 0Loads=19, 1Load=33, >1Load=75
+    Bandwidth: StallLoads=261, PrefetchLoads=473, AvgLoadTime=1.45ms
+    Predictor TopK matches: 0=17 1=46 >=2=0
+Layer 22 Cache Stats: Hits=711, Misses=305, HitRate=69.98%
+    Predictor Routed-Expert HitRate=76.19% (48/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=76.19% (48/63)
+    Predictor RoutedTopK HitRate=56.94% (287/504)
+    Predicted RequestedByRouterForcedN Rate=4.23% (48/1134)
+    Predicted RequestedByRouterTopK Rate=25.31% (287/1134)
+    Loads Per Step: 0Loads=17, 1Load=24, >1Load=86
+    Bandwidth: StallLoads=305, PrefetchLoads=533, AvgLoadTime=1.35ms
+    Predictor TopK matches: 0=15 1=48 >=2=0
+Layer 23 Cache Stats: Hits=647, Misses=369, HitRate=63.68%
+    Predictor Routed-Expert HitRate=63.49% (40/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=63.49% (40/63)
+    Predictor RoutedTopK HitRate=50.00% (252/504)
+    Predicted RequestedByRouterForcedN Rate=3.53% (40/1134)
+    Predicted RequestedByRouterTopK Rate=22.22% (252/1134)
+    Loads Per Step: 0Loads=7, 1Load=22, >1Load=98
+    Bandwidth: StallLoads=369, PrefetchLoads=651, AvgLoadTime=1.45ms
+    Predictor TopK matches: 0=23 1=40 >=2=0
+Layer 24 Cache Stats: Hits=737, Misses=279, HitRate=72.54%
+    Predictor Routed-Expert HitRate=69.84% (44/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=69.84% (44/63)
+    Predictor RoutedTopK HitRate=50.99% (257/504)
+    Predicted RequestedByRouterForcedN Rate=3.88% (44/1134)
+    Predicted RequestedByRouterTopK Rate=22.66% (257/1134)
+    Loads Per Step: 0Loads=13, 1Load=35, >1Load=79
+    Bandwidth: StallLoads=279, PrefetchLoads=601, AvgLoadTime=1.50ms
+    Predictor TopK matches: 0=19 1=44 >=2=0
+Layer 25 Cache Stats: Hits=701, Misses=315, HitRate=69.00%
+    Predictor Routed-Expert HitRate=66.67% (42/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=66.67% (42/63)
+    Predictor RoutedTopK HitRate=60.91% (307/504)
+    Predicted RequestedByRouterForcedN Rate=3.70% (42/1134)
+    Predicted RequestedByRouterTopK Rate=27.07% (307/1134)
+    Loads Per Step: 0Loads=10, 1Load=25, >1Load=92
+    Bandwidth: StallLoads=315, PrefetchLoads=642, AvgLoadTime=1.50ms
+    Predictor TopK matches: 0=21 1=42 >=2=0
+Layer 26 Cache Stats: Hits=652, Misses=364, HitRate=64.17%
+    Predictor Routed-Expert HitRate=68.25% (43/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=68.25% (43/63)
+    Predictor RoutedTopK HitRate=52.98% (267/504)
+    Predicted RequestedByRouterForcedN Rate=3.79% (43/1134)
+    Predicted RequestedByRouterTopK Rate=23.54% (267/1134)
+    Loads Per Step: 0Loads=10, 1Load=20, >1Load=97
+    Bandwidth: StallLoads=364, PrefetchLoads=654, AvgLoadTime=1.53ms
+    Predictor TopK matches: 0=20 1=43 >=2=0
+Layer 27 Cache Stats: Hits=783, Misses=233, HitRate=77.07%
+    Predictor Routed-Expert HitRate=77.78% (49/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=77.78% (49/63)
+    Predictor RoutedTopK HitRate=57.94% (292/504)
+    Predicted RequestedByRouterForcedN Rate=4.32% (49/1134)
+    Predicted RequestedByRouterTopK Rate=25.75% (292/1134)
+    Loads Per Step: 0Loads=21, 1Load=38, >1Load=68
+    Bandwidth: StallLoads=233, PrefetchLoads=535, AvgLoadTime=1.57ms
+    Predictor TopK matches: 0=14 1=49 >=2=0
+Layer 28 Cache Stats: Hits=748, Misses=268, HitRate=73.62%
+    Predictor Routed-Expert HitRate=71.43% (45/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=71.43% (45/63)
+    Predictor RoutedTopK HitRate=63.29% (319/504)
+    Predicted RequestedByRouterForcedN Rate=3.97% (45/1134)
+    Predicted RequestedByRouterTopK Rate=28.13% (319/1134)
+    Loads Per Step: 0Loads=14, 1Load=34, >1Load=79
+    Bandwidth: StallLoads=268, PrefetchLoads=534, AvgLoadTime=1.51ms
+    Predictor TopK matches: 0=18 1=45 >=2=0
+Layer 29 Cache Stats: Hits=744, Misses=272, HitRate=73.23%
+    Predictor Routed-Expert HitRate=71.43% (45/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=71.43% (45/63)
+    Predictor RoutedTopK HitRate=61.31% (309/504)
+    Predicted RequestedByRouterForcedN Rate=3.97% (45/1134)
+    Predicted RequestedByRouterTopK Rate=27.25% (309/1134)
+    Loads Per Step: 0Loads=16, 1Load=36, >1Load=75
+    Bandwidth: StallLoads=272, PrefetchLoads=576, AvgLoadTime=1.51ms
+    Predictor TopK matches: 0=18 1=45 >=2=0
+Layer 30 Cache Stats: Hits=853, Misses=163, HitRate=83.96%
+    Predictor Routed-Expert HitRate=68.25% (43/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=68.25% (43/63)
+    Predictor RoutedTopK HitRate=62.10% (313/504)
+    Predicted RequestedByRouterForcedN Rate=3.79% (43/1134)
+    Predicted RequestedByRouterTopK Rate=27.60% (313/1134)
+    Loads Per Step: 0Loads=47, 1Load=34, >1Load=46
+    Bandwidth: StallLoads=163, PrefetchLoads=344, AvgLoadTime=1.52ms
+    Predictor TopK matches: 0=20 1=43 >=2=0
+Layer 31 Cache Stats: Hits=858, Misses=158, HitRate=84.45%
+    Predictor Routed-Expert HitRate=87.30% (55/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=87.30% (55/63)
+    Predictor RoutedTopK HitRate=63.69% (321/504)
+    Predicted RequestedByRouterForcedN Rate=4.85% (55/1134)
+    Predicted RequestedByRouterTopK Rate=28.31% (321/1134)
+    Loads Per Step: 0Loads=38, 1Load=44, >1Load=45
+    Bandwidth: StallLoads=158, PrefetchLoads=331, AvgLoadTime=1.51ms
+    Predictor TopK matches: 0=8 1=55 >=2=0
+Layer 32 Cache Stats: Hits=814, Misses=202, HitRate=80.12%
+    Predictor Routed-Expert HitRate=49.21% (31/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=49.21% (31/63)
+    Predictor RoutedTopK HitRate=50.99% (257/504)
+    Predicted RequestedByRouterForcedN Rate=2.73% (31/1134)
+    Predicted RequestedByRouterTopK Rate=22.66% (257/1134)
+    Loads Per Step: 0Loads=26, 1Load=45, >1Load=56
+    Bandwidth: StallLoads=202, PrefetchLoads=506, AvgLoadTime=1.43ms
+    Predictor TopK matches: 0=32 1=31 >=2=0
+Layer 33 Cache Stats: Hits=766, Misses=250, HitRate=75.39%
+    Predictor Routed-Expert HitRate=73.02% (46/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=73.02% (46/63)
+    Predictor RoutedTopK HitRate=61.90% (312/504)
+    Predicted RequestedByRouterForcedN Rate=4.06% (46/1134)
+    Predicted RequestedByRouterTopK Rate=27.51% (312/1134)
+    Loads Per Step: 0Loads=18, 1Load=34, >1Load=75
+    Bandwidth: StallLoads=250, PrefetchLoads=457, AvgLoadTime=1.38ms
+    Predictor TopK matches: 0=17 1=46 >=2=0
+Layer 34 Cache Stats: Hits=716, Misses=300, HitRate=70.47%
+    Predictor Routed-Expert HitRate=77.78% (49/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=77.78% (49/63)
+    Predictor RoutedTopK HitRate=63.10% (318/504)
+    Predicted RequestedByRouterForcedN Rate=4.32% (49/1134)
+    Predicted RequestedByRouterTopK Rate=28.04% (318/1134)
+    Loads Per Step: 0Loads=12, 1Load=27, >1Load=88
+    Bandwidth: StallLoads=300, PrefetchLoads=563, AvgLoadTime=1.34ms
+    Predictor TopK matches: 0=14 1=49 >=2=0
+Layer 35 Cache Stats: Hits=704, Misses=312, HitRate=69.29%
+    Predictor Routed-Expert HitRate=74.60% (47/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=74.60% (47/63)
+    Predictor RoutedTopK HitRate=50.99% (257/504)
+    Predicted RequestedByRouterForcedN Rate=4.14% (47/1134)
+    Predicted RequestedByRouterTopK Rate=22.66% (257/1134)
+    Loads Per Step: 0Loads=13, 1Load=29, >1Load=85
+    Bandwidth: StallLoads=312, PrefetchLoads=658, AvgLoadTime=1.36ms
+    Predictor TopK matches: 0=16 1=47 >=2=0
+Layer 36 Cache Stats: Hits=742, Misses=274, HitRate=73.03%
+    Predictor Routed-Expert HitRate=60.32% (38/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=60.32% (38/63)
+    Predictor RoutedTopK HitRate=53.77% (271/504)
+    Predicted RequestedByRouterForcedN Rate=3.35% (38/1134)
+    Predicted RequestedByRouterTopK Rate=23.90% (271/1134)
+    Loads Per Step: 0Loads=16, 1Load=33, >1Load=78
+    Bandwidth: StallLoads=274, PrefetchLoads=616, AvgLoadTime=1.40ms
+    Predictor TopK matches: 0=25 1=38 >=2=0
+Layer 37 Cache Stats: Hits=725, Misses=291, HitRate=71.36%
+    Predictor Routed-Expert HitRate=68.25% (43/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=68.25% (43/63)
+    Predictor RoutedTopK HitRate=64.29% (324/504)
+    Predicted RequestedByRouterForcedN Rate=3.79% (43/1134)
+    Predicted RequestedByRouterTopK Rate=28.57% (324/1134)
+    Loads Per Step: 0Loads=17, 1Load=31, >1Load=79
+    Bandwidth: StallLoads=291, PrefetchLoads=654, AvgLoadTime=1.47ms
+    Predictor TopK matches: 0=20 1=43 >=2=0
+Layer 38 Cache Stats: Hits=729, Misses=287, HitRate=71.75%
+    Predictor Routed-Expert HitRate=93.65% (59/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=93.65% (59/63)
+    Predictor RoutedTopK HitRate=51.98% (262/504)
+    Predicted RequestedByRouterForcedN Rate=5.20% (59/1134)
+    Predicted RequestedByRouterTopK Rate=23.10% (262/1134)
+    Loads Per Step: 0Loads=13, 1Load=26, >1Load=88
+    Bandwidth: StallLoads=287, PrefetchLoads=660, AvgLoadTime=1.46ms
+    Predictor TopK matches: 0=4 1=59 >=2=0
+Layer 39 Cache Stats: Hits=763, Misses=253, HitRate=75.10%
+    Predictor Routed-Expert HitRate=71.43% (45/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=71.43% (45/63)
+    Predictor RoutedTopK HitRate=60.91% (307/504)
+    Predicted RequestedByRouterForcedN Rate=3.97% (45/1134)
+    Predicted RequestedByRouterTopK Rate=27.07% (307/1134)
+    Loads Per Step: 0Loads=22, 1Load=26, >1Load=79
+    Bandwidth: StallLoads=253, PrefetchLoads=533, AvgLoadTime=1.44ms
+    Predictor TopK matches: 0=18 1=45 >=2=0
+Layer 40 Cache Stats: Hits=723, Misses=293, HitRate=71.16%
+    Predictor Routed-Expert HitRate=74.60% (47/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=74.60% (47/63)
+    Predictor RoutedTopK HitRate=57.94% (292/504)
+    Predicted RequestedByRouterForcedN Rate=4.14% (47/1134)
+    Predicted RequestedByRouterTopK Rate=25.75% (292/1134)
+    Loads Per Step: 0Loads=18, 1Load=26, >1Load=83
+    Bandwidth: StallLoads=293, PrefetchLoads=662, AvgLoadTime=1.47ms
+    Predictor TopK matches: 0=16 1=47 >=2=0
+Layer 41 Cache Stats: Hits=687, Misses=329, HitRate=67.62%
+    Predictor Routed-Expert HitRate=60.32% (38/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=60.32% (38/63)
+    Predictor RoutedTopK HitRate=53.57% (270/504)
+    Predicted RequestedByRouterForcedN Rate=3.35% (38/1134)
+    Predicted RequestedByRouterTopK Rate=23.81% (270/1134)
+    Loads Per Step: 0Loads=13, 1Load=22, >1Load=92
+    Bandwidth: StallLoads=329, PrefetchLoads=756, AvgLoadTime=1.52ms
+    Predictor TopK matches: 0=25 1=38 >=2=0
+Layer 42 Cache Stats: Hits=733, Misses=283, HitRate=72.15%
+    Predictor Routed-Expert HitRate=68.25% (43/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=68.25% (43/63)
+    Predictor RoutedTopK HitRate=52.78% (266/504)
+    Predicted RequestedByRouterForcedN Rate=3.79% (43/1134)
+    Predicted RequestedByRouterTopK Rate=23.46% (266/1134)
+    Loads Per Step: 0Loads=18, 1Load=31, >1Load=78
+    Bandwidth: StallLoads=283, PrefetchLoads=689, AvgLoadTime=1.52ms
+    Predictor TopK matches: 0=20 1=43 >=2=0
+Layer 43 Cache Stats: Hits=798, Misses=218, HitRate=78.54%
+    Predictor Routed-Expert HitRate=73.02% (46/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=73.02% (46/63)
+    Predictor RoutedTopK HitRate=68.45% (345/504)
+    Predicted RequestedByRouterForcedN Rate=4.06% (46/1134)
+    Predicted RequestedByRouterTopK Rate=30.42% (345/1134)
+    Loads Per Step: 0Loads=33, 1Load=27, >1Load=67
+    Bandwidth: StallLoads=218, PrefetchLoads=454, AvgLoadTime=1.54ms
+    Predictor TopK matches: 0=17 1=46 >=2=0
+Layer 44 Cache Stats: Hits=777, Misses=239, HitRate=76.48%
+    Predictor Routed-Expert HitRate=65.08% (41/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=65.08% (41/63)
+    Predictor RoutedTopK HitRate=64.09% (323/504)
+    Predicted RequestedByRouterForcedN Rate=3.62% (41/1134)
+    Predicted RequestedByRouterTopK Rate=28.48% (323/1134)
+    Loads Per Step: 0Loads=19, 1Load=36, >1Load=72
+    Bandwidth: StallLoads=239, PrefetchLoads=538, AvgLoadTime=1.73ms
+    Predictor TopK matches: 0=22 1=41 >=2=0
+Layer 45 Cache Stats: Hits=801, Misses=215, HitRate=78.84%
+    Predictor Routed-Expert HitRate=74.60% (47/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=74.60% (47/63)
+    Predictor RoutedTopK HitRate=64.29% (324/504)
+    Predicted RequestedByRouterForcedN Rate=4.14% (47/1134)
+    Predicted RequestedByRouterTopK Rate=28.57% (324/1134)
+    Loads Per Step: 0Loads=32, 1Load=36, >1Load=59
+    Bandwidth: StallLoads=215, PrefetchLoads=489, AvgLoadTime=1.67ms
+    Predictor TopK matches: 0=16 1=47 >=2=0
+Layer 46 Cache Stats: Hits=730, Misses=286, HitRate=71.85%
+    Predictor Routed-Expert HitRate=68.25% (43/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=68.25% (43/63)
+    Predictor RoutedTopK HitRate=62.30% (314/504)
+    Predicted RequestedByRouterForcedN Rate=3.79% (43/1134)
+    Predicted RequestedByRouterTopK Rate=27.69% (314/1134)
+    Loads Per Step: 0Loads=20, 1Load=33, >1Load=74
+    Bandwidth: StallLoads=286, PrefetchLoads=517, AvgLoadTime=1.56ms
+    Predictor TopK matches: 0=20 1=43 >=2=0
+Layer 47 Cache Stats: Hits=665, Misses=351, HitRate=65.45%
+    Predictor Routed-Expert HitRate=77.78% (49/63, routed_n=1, horizon=2)
+    Predictor RoutedForcedN HitRate=77.78% (49/63)
+    Predictor RoutedTopK HitRate=59.52% (300/504)
+    Predicted RequestedByRouterForcedN Rate=4.32% (49/1134)
+    Predicted RequestedByRouterTopK Rate=26.46% (300/1134)
+    Loads Per Step: 0Loads=16, 1Load=25, >1Load=86
+    Bandwidth: StallLoads=351, PrefetchLoads=684, AvgLoadTime=1.16ms
+    Predictor TopK matches: 0=14 1=49 >=2=0
+============================================================
+[ThreadedTorchScriptPredictor Layer 0] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 1] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 2] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 3] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 4] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 5] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 6] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 7] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 8] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 9] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 10] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 11] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 12] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 13] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 14] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 15] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 16] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 17] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 18] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 19] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 20] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 21] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 22] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 23] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 24] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 25] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 26] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 27] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 28] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 29] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 30] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 31] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 32] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 33] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 34] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 35] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 36] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 37] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 38] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 39] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 40] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 41] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 42] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 43] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 44] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 45] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 46] Shutdown complete
+[ThreadedTorchScriptPredictor Layer 47] Shutdown complete
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing pre-saved weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.27 seconds
+Pre-warming expert cache with 24 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+Warning: /home/michael/heteroPredict/py/unified_llm_w4a16/prompts.txt not found, falling back to --text argument.
+Processing text: 'In a detailed essay, explain the theory of relativity and its implications on modern physics.'
+Generating 128 tokens...
+
+
+============================================================
+Full output (prompt + generated):
+============================================================
+In a detailed essay, explain the theory of relativity and its implications on modern physics. The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally, the essay should include at least two references to scientific sources, properly cited in APA format. The essay should also include a brief explanation of the concept of spacetime and the equivalence principle. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally
+============================================================
+Generated text only:
+============================================================
+ The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally, the essay should include at least two references to scientific sources, properly cited in APA format. The essay should also include a brief explanation of the concept of spacetime and the equivalence principle. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally
+============================================================
+Running 1 prompt(s) from --text...
+
+
+============================================================
+PROMPT 1/1: In a detailed essay, explain the theory of relativity and its implications on mo...
+============================================================
+Generated text:
+============================================================
+ The essay should be structured with an introduction, body paragraphs, and a conclusion. The body paragraphs should cover the special theory of relativity, the general theory of relativity, and the implications on modern physics. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally, the essay should include at least two references to scientific sources, properly cited in APA format. The essay should also include a brief explanation of the concept of spacetime and the equivalence principle. The essay should be written in English, with a formal tone, and a minimum of 500 words. Additionally
+============================================================
+
+============================================================
+Weight loading time: 0.27 seconds
+Done!
+============================================================
+
+
+======================================================
+Done. Grep /home/michael/heteroPredict/benchmark_results_20260518_221333.log for:
+  Micro:  per-expert ms / GB/s
+  Macro:  TPS, Bandwidth:*AvgLoadTime*, MoE Compute:*AvgComputeTime*

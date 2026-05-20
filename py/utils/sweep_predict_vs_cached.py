@@ -284,7 +284,15 @@ def run_sweep():
                             "--lambda-val", str(lambda_val),
                             "--sweep-prompts-file", temp_prompts_path,
                             "--generation-perplexity",
-                            "--no-generate"
+                            "--generate",
+                            "--max-new-tokens",
+                            str(args.max_new_tokens),
+                            "--temperature",
+                            str(getattr(args, "temperature", 0.0)),
+                            "--top-p",
+                            str(getattr(args, "top_p", 0.9)),
+                            "--top-k",
+                            str(getattr(args, "top_k", 50)),
                         ]
                         
                         cmd.extend(["--max-cached-experts" if args.model == "qwen" else "--expert-cache", str(cache_size)])

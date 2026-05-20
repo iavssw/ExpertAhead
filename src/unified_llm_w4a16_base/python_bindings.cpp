@@ -159,5 +159,7 @@ PYBIND11_MODULE(unified_llm_w4a16_base_libtorch, m) {
         .def("set_forced_top_n", &UnifiedLLMW4A16Impl::set_forced_top_n, py::arg("n"),
              "Keep top-n correct experts per token; randomize the rest. Pass n=K to disable.")
         .def("set_random_fill_mode", &UnifiedLLMW4A16Impl::set_random_fill_mode, py::arg("on"),
-             "Enable or disable the random-fill substitution across all MoE layers.");
+             "Enable or disable the random-fill substitution across all MoE layers.")
+        .def("print_cache_stats", &UnifiedLLMW4A16Impl::print_cache_stats)
+        .def("reset_cache_stats", &UnifiedLLMW4A16Impl::reset_cache_stats);
 }

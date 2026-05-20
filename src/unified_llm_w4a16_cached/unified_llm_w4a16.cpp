@@ -8,6 +8,7 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_cached/helper.hpp"
 #include "unified_llm_w4a16_cached/npuSetup.hpp"
+#include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
 #include <chrono>
@@ -2588,11 +2589,15 @@ void UnifiedLLMW4A16Impl::set_cache_policy(const std::string& policy_name, int64
 }
 
 void MixtureOfExpertsImpl::print_cache_stats() const {
-    double hit_rate = (cache_hits_ + cache_misses_ > 0) ? 
-        static_cast<double>(cache_hits_) / (cache_hits_ + cache_misses_) : 0.0;
-    std::cout << "Layer " << layer_idx_ << ": Hits=" << cache_hits_ 
-              << ", Misses=" << cache_misses_ 
-              << ", HitRate=" << std::fixed << std::setprecision(2) << hit_rate * 100.0 << "%" << std::endl;
+    const double hit_rate = (cache_hits_ + cache_misses_ > 0)
+                                ? static_cast<double>(cache_hits_) / (cache_hits_ + cache_misses_)
+                                : 0.0;
+    std::cout << "Layer " << layer_idx_ << ": Hits=" << cache_hits_ << ", Misses=" << cache_misses_
+              << ", HitRate=" << std::fixed << std::setprecision(2) << hit_rate * 100.0 << "%\n";
+    if (cache_misses_ > 0) {
+        const double avg_load_time = total_expert_load_time_ms_ / static_cast<double>(cache_misses_);
+        unified_llm_w4a16_common::print_moe_miss_bandwidth(std::cout, cache_misses_, avg_load_time);
+    }
 }
 
 void UnifiedLLMW4A16Impl::print_cache_stats() const {
@@ -2608,6 +2613,7 @@ void UnifiedLLMW4A16Impl::print_cache_stats() const {
 void MixtureOfExpertsImpl::reset_cache_stats() {
     cache_hits_ = 0;
     cache_misses_ = 0;
+    total_expert_load_time_ms_ = 0.0;
 }
 
 void UnifiedLLMW4A16Impl::reset_cache_stats() {

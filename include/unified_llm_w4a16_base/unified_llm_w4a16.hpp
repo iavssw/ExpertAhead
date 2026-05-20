@@ -137,6 +137,11 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::vector<QuantizedLinear> gate_up_experts;
     std::vector<QuantizedLinear> down_experts;
 
+    void print_moe_timing_stats() const;
+    void reset_moe_timing_stats();
+    int64_t get_moe_expert_invocations() const { return moe_expert_invocations_; }
+    double get_total_moe_compute_time_ms() const { return total_moe_compute_time_ms_; }
+
   private:
     int64_t hidden_size_;
     int64_t intermediate_size_;
@@ -145,6 +150,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     bool use_softmax_before_topk_;
     bool normalize_topk_prob_;
     int64_t random_replace_rank_start_idx_;
+    int64_t moe_expert_invocations_ = 0;
+    double total_moe_compute_time_ms_ = 0.0;
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);
@@ -192,6 +199,9 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Propagates to all MoE layers. Call before perplexity evaluation.
     void set_forced_top_n(int64_t n);
     void set_random_fill_mode(bool on);
+
+    void print_cache_stats() const;
+    void reset_cache_stats();
 
     // NPU Helper functions
     // We declare them as friends or static/global if they are not members

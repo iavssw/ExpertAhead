@@ -31,9 +31,9 @@ EXPERT DIMENSIONS (Qwen3-30B-A3B)
 -----------------------------------
   hidden_size        = 2048
   intermediate_size  = 2048  (A3B variant — much smaller than full 30B)
-  active_k           = 4 experts/token/layer
+  active_k           = 8 experts/token/layer
   num_moe_layers     = 48
-  ⇒ 4 × 48 = 192 expert invocations per decode token
+  ⇒ 8 × 48 = 384 expert invocations per decode token
 
 USAGE
 -----
@@ -59,7 +59,7 @@ USAGE
 
   # Compute only (GPU GEMM with correct expert shape):
   python benchmark_expert_loading.py --model qwen3 ... --mode compute \\
-      --hidden-size 2048 --intermediate-size 2048 --active-k 4
+      --hidden-size 2048 --intermediate-size 2048 --active-k 8
 """
 
 import argparse
@@ -109,19 +109,21 @@ def expert_total_bytes(bin_dir: str, layer: int, expert: int) -> int:
 
 # ─── model instantiation ──────────────────────────────────────────────────────
 
-def build_model(model_name: str, cache_size: int, device: str):
+def build_model(model_name: str, cache_size: int, device: str, expert_weights_dir: Optional[str] = None):
     script_dir = Path(__file__).parent
     sys.path.insert(0, str(script_dir.parent / "unified_llm_w4a16"))
 
     if model_name in ("mixtral", "mixtral_cached"):
         from mixtral_8x7B_w4a16_model import Mixtral8x7BW4A16Model
         return Mixtral8x7BW4A16Model(backend="cached",
-                                     max_cached_experts_per_layer=cache_size, device=device)
+                                     max_cached_experts_per_layer=cache_size, device=device,
+                                     expert_weights_dir=expert_weights_dir)
     elif model_name in ("qwen3", "qwen3_cached"):
         import importlib
         mod = importlib.import_module("qwen3_30B-A3B_w4a16_model")
         return mod.Qwen3_30BA3BW4A16Model(backend="cached",
-                                          max_cached_experts_per_layer=cache_size, device=device)
+                                          max_cached_experts_per_layer=cache_size, device=device,
+                                          expert_weights_dir=expert_weights_dir)
     else:
         raise ValueError(f"Unknown model '{model_name}'")
 
@@ -139,7 +141,8 @@ def _run_ssd_benchmark(args) -> Tuple[List[float], int]:
 
     Returns (latencies_ms, bytes_per_expert).
     """
-    model = build_model(args.model, args.cache_size, args.device)
+    expert_dir = args.bin_dir if args.bin_dir else None
+    model = build_model(args.model, args.cache_size, args.device, expert_weights_dir=expert_dir)
     m = model.model
 
     bytes_per_expert = 0
@@ -221,6 +224,27 @@ def _run_h2d_benchmark(args, bytes_per_expert: int) -> List[float]:
     cpu_buf = torch.zeros(total_bytes, dtype=torch.uint8).pin_memory()
     gpu_buf = torch.empty(total_bytes, dtype=torch.uint8, device=device)
 
+    if args.bin_dir:
+        print(f"[H2D DMA] Loading actual expert weights into pinned memory from {args.bin_dir}...")
+        offset = 0
+        loaded = 0
+        for l in range(args.num_layers):
+            if loaded >= n_experts: break
+            for e in range(args.num_experts):
+                if loaded >= n_experts: break
+                paths = [f"{args.bin_dir}/layer_{l}_expert_{e}.bin"] if _is_packed_dir(args.bin_dir) else _expert_bin_paths(args.bin_dir, l, e)
+                exp_size = 0
+                for p in paths:
+                    if os.path.exists(p):
+                        size = os.path.getsize(p)
+                        if offset + size <= total_bytes:
+                            with open(p, "rb") as f:
+                                cpu_buf[offset:offset+size].copy_(torch.frombuffer(bytearray(f.read()), dtype=torch.uint8))
+                            offset += size
+                            exp_size += size
+                if exp_size > 0:
+                    loaded += 1
+
     print(f"\n[H2D DMA] {total_bytes/1e6:.0f} MB ({bytes_per_expert/1e6:.2f} MB × {n_experts} experts)  "
           f"pinned CPU → VRAM")
 
@@ -279,26 +303,27 @@ def _run_compute_benchmark(args) -> List[float]:
     # One token, fp16
     x = torch.randn(1, H, dtype=torch.float16, device=device)
 
-    # Expert weight tensors: one set represents one expert
-    w_gate = torch.randn(I, H, dtype=torch.float16, device=device)
-    w_up   = torch.randn(I, H, dtype=torch.float16, device=device)
-    w_down = torch.randn(H, I, dtype=torch.float16, device=device)
+    # Batch K experts together to simulate what the C++ backend does (Grouped GEMM / Batched GEMM)
+    w_gate = torch.randn(K, I, H, dtype=torch.float16, device=device)
+    w_up   = torch.randn(K, I, H, dtype=torch.float16, device=device)
+    w_down = torch.randn(K, H, I, dtype=torch.float16, device=device)
+    x_b = torch.randn(K, 1, H, dtype=torch.float16, device=device)
 
     # Warmup
     for _ in range(args.warmup_rounds + 2):
-        gate = torch.nn.functional.silu(x @ w_gate.t())
-        up   = x @ w_up.t()
-        _    = (gate * up) @ w_down.t()
+        gate = torch.nn.functional.silu(x_b @ w_gate.transpose(1, 2))
+        up   = x_b @ w_up.transpose(1, 2)
+        _    = (gate * up) @ w_down.transpose(1, 2)
     torch.cuda.synchronize()
 
     def one_token_all_experts() -> float:
         """Simulate K active experts across L MoE layers for one decode token."""
         torch.cuda.synchronize()
         t0 = time.perf_counter()
-        for _ in range(K * L):
-            gate = torch.nn.functional.silu(x @ w_gate.t())
-            up   = x @ w_up.t()
-            _    = (gate * up) @ w_down.t()
+        for _ in range(L):
+            gate = torch.nn.functional.silu(x_b @ w_gate.transpose(1, 2))
+            up   = x_b @ w_up.transpose(1, 2)
+            _    = (gate * up) @ w_down.transpose(1, 2)
         torch.cuda.synchronize()
         return (time.perf_counter() - t0) * 1000.0
 
@@ -510,7 +535,7 @@ def main():
     # I/O benchmark args
     p.add_argument("--model", choices=["mixtral", "mixtral_cached", "qwen3", "qwen3_cached"],
                    default="qwen3")
-    p.add_argument("--bin-dir", type=str, default="",
+    p.add_argument("--bin-dir", type=str, default="/home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked",
                    help="Path to _unpacked .bin weight directory (required for ssd/ram modes)")
     p.add_argument("--num-layers",  type=int, default=48, help="Number of transformer layers")
     p.add_argument("--num-experts", type=int, default=128, help="Experts per layer")
@@ -521,8 +546,8 @@ def main():
                    help="Expert hidden dimension (default: 2048 for Qwen3-30B-A3B)")
     p.add_argument("--intermediate-size", type=int, default=2048,
                    help="Expert intermediate dimension (default: 2048 for Qwen3-30B-A3B)")
-    p.add_argument("--active-k",          type=int, default=4,
-                   help="Active experts per token per MoE layer (default: 4 for Qwen3-30B-A3B)")
+    p.add_argument("--active-k",          type=int, default=8,
+                   help="Active experts per token per MoE layer (default: 8 for Qwen3-30B-A3B)")
 
     # Common
     p.add_argument("--num-rounds",    type=int, default=20)

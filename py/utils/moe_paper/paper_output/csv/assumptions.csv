@@ -1,0 +1,8 @@
+assumption,value,source,sensitivity
+reuse_factor,2.0,estimate -- avg tokens an expert is reused after one load,HIGH
+fixed_recall,0.8,benchmark logs: pred_hit_rate_routed_forced_n_pct 68-78%,HIGH
+fixed_precision,0.85,not directly measured; low sensitivity,LOW
+fixed_cache_hit_rate,0.72,"measured: cache=24/layer, hit_rate_pct ~71-72%",MEDIUM
+fixed_lookahead,2.0,matches benchmark --predictor-lookahead 2 (eh1_h32_f2),HIGH
+routing_hit_rate_boost_pp,0.1,ESTIMATE ONLY -- replace with measured lambda-sweep result,MEDIUM
+overlap_efficiency,0.75,ESTIMATE -- fraction of SSD bandwidth usable during compute,HIGH

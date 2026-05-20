@@ -24,10 +24,12 @@ import re
 import subprocess
 import sys
 import tempfile
+import textwrap
 import threading
 import time
 import uuid
 from dataclasses import asdict, dataclass, fields
+from queue import Empty, Queue
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 try:
@@ -77,7 +79,29 @@ DEFAULT_QWEN_REUSE_CSV = os.path.join(ROOT_DIR, "expert_predictor", "expert_reus
 
 
 def run_subprocess(cmd: List[str], timeout: int, log_file: Optional[str] = None) -> Optional[str]:
-    """Run command; optional tee to log_file. Returns merged stdout+stderr."""
+    """Run command; optional tee to log_file. Returns merged stdout+stderr.
+
+    Enforces *timeout* using a **reader thread + wall-clock deadline** on the parent.
+    The old ``threading.Timer`` + ``readline()`` pattern could hang past *timeout* if
+    ``killpg`` failed silently while the child kept running (parent blocked forever on
+    the pipe).
+    """
+    if timeout <= 0:
+        print("[sweep] WARNING: non-positive subprocess timeout; using 60s", flush=True)
+        timeout = 60
+
+    def kill_child(p: subprocess.Popen, reason: str) -> None:
+        try:
+            import signal
+
+            os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+        except Exception as e:
+            print(f"[sweep] killpg({reason}) failed: {e!r}; trying process.kill()", flush=True)
+            try:
+                p.kill()
+            except Exception as e2:
+                print(f"[sweep] process.kill({reason}) failed: {e2!r}", flush=True)
+
     try:
         env = os.environ.copy()
         env.setdefault("HSA_ENABLE_SDMA", "0")
@@ -96,23 +120,53 @@ def run_subprocess(cmd: List[str], timeout: int, log_file: Optional[str] = None)
         output_lines: List[str] = []
         timeout_reached = False
 
-        def kill_process() -> None:
-            nonlocal timeout_reached
-            timeout_reached = True
-            try:
-                import signal
+        q: Queue[Optional[str]] = Queue()
 
-                os.killpg(os.getpgid(process.pid), signal.SIGKILL)
-            except Exception:
-                pass
-
-        timer = threading.Timer(float(timeout), kill_process)
-        timer.start()
-        try:
+        def reader() -> None:
             assert process.stdout is not None
+            try:
+                for line in iter(process.stdout.readline, ""):
+                    q.put(line)
+            finally:
+                q.put(None)
+
+        tr = threading.Thread(target=reader, name="sweep-subproc-reader", daemon=True)
+        tr.start()
+
+        deadline = time.monotonic() + float(timeout)
+        try:
             while True:
-                line = process.stdout.readline()
-                if not line and process.poll() is not None:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    timeout_reached = True
+                    print(
+                        f"[sweep] Subprocess wall timeout ({timeout}s); SIGKILL pid={process.pid}",
+                        flush=True,
+                    )
+                    kill_child(process, "wall-timeout")
+                    break
+                try:
+                    line = q.get(timeout=min(1.0, max(0.05, remaining)))
+                except Empty:
+                    if process.poll() is not None:
+                        while True:
+                            try:
+                                line = q.get(timeout=15.0)
+                            except Empty:
+                                break
+                            if line is None:
+                                break
+                            if line:
+                                print(line, end="")
+                                sys.stdout.flush()
+                                output_lines.append(line)
+                                if log_fp:
+                                    log_fp.write(line)
+                                    log_fp.flush()
+                        break
+                    continue
+
+                if line is None:
                     break
                 if line:
                     print(line, end="")
@@ -122,9 +176,24 @@ def run_subprocess(cmd: List[str], timeout: int, log_file: Optional[str] = None)
                         log_fp.write(line)
                         log_fp.flush()
         finally:
-            timer.cancel()
             if log_fp:
                 log_fp.close()
+
+        if timeout_reached:
+            while True:
+                try:
+                    extra = q.get(timeout=0.3)
+                except Empty:
+                    break
+                if extra is None:
+                    break
+                if extra:
+                    output_lines.append(extra)
+
+        try:
+            process.wait(timeout=120)
+        except subprocess.TimeoutExpired:
+            print("[sweep] WARNING: child not reaped within 120s after stdout closed", flush=True)
 
         if timeout_reached:
             print(f"[sweep_predict_cached_cache_metrics] Command timed out after {timeout}s", flush=True)
@@ -132,7 +201,7 @@ def run_subprocess(cmd: List[str], timeout: int, log_file: Optional[str] = None)
         if process.returncode != 0:
             print(f"[sweep_predict_cached_cache_metrics] exit code {process.returncode}", flush=True)
             return None
-        time.sleep(1.0)
+        time.sleep(0.2)
         return "".join(output_lines)
     except Exception as e:
         print(f"[sweep_predict_cached_cache_metrics] Exception: {e}", flush=True)
@@ -442,6 +511,7 @@ def build_model_cmd(
     expert_reuse_csv: Optional[str] = None,
     predictor_device: Optional[str] = None,
     expert_weights_dir: Optional[str] = None,
+    predictor_stride: Optional[int] = None,
 ) -> List[str]:
     script = QWEN_MODEL_SCRIPT if model == "qwen" else MIXTRAL_MODEL_SCRIPT
     cmd: List[str] = [
@@ -460,8 +530,9 @@ def build_model_cmd(
         cmd.extend(["--predictor-device", predictor_device])
 
     if mode_generation_perplexity:
-        cmd.extend(["--generation-perplexity", "--no-generate"])
-    elif mode_generate:
+        cmd.append("--generation-perplexity")
+    # Real generation perplexity runs decode then teacher-forces the continuation to score it.
+    if mode_generation_perplexity or mode_generate:
         cmd.extend(
             [
                 "--generate",
@@ -486,11 +557,14 @@ def build_model_cmd(
             cmd.extend(["--prefetch-experts-count", str(prefetch_count)])
         if predictor_path:
             cmd.extend(["--predictor-model", predictor_path])
-            # Auto-detect lookahead depth from the fN suffix in the predictor path
-            # and pass it so the C++ backend fires the predictor every N tokens.
-            m_la = re.search(r"f(\d+)", os.path.basename(os.path.normpath(predictor_path)))
-            if m_la:
-                cmd.extend(["--predictor-lookahead", m_la.group(1)])
+            # Invoke stride (--predictor-lookahead): how often the predictor runs and the
+            # evaluation horizon for pending predictions. Defaults to fN from the path.
+            if predictor_stride is not None:
+                cmd.extend(["--predictor-lookahead", str(predictor_stride)])
+            else:
+                m_la = re.search(r"f(\d+)", os.path.basename(os.path.normpath(predictor_path)))
+                if m_la:
+                    cmd.extend(["--predictor-lookahead", m_la.group(1)])
         if predict_layers is not None:
             cmd.append("--predict-layers")
             cmd.extend(str(x) for x in predict_layers)
@@ -677,6 +751,63 @@ def baseline_configs(args: argparse.Namespace) -> List[Dict[str, Any]]:
     return [cfg("BASELINE", "LRU-Baseline", "cached", cs, 0.0, 8) for cs in args.cache_sizes]
 
 
+def stride_sweep_configs(args: argparse.Namespace, min_cache_map: Dict[int, int]) -> List[Dict[str, Any]]:
+    """Decouple predictor checkpoint depth (eh1_h32_fN) from invoke stride (--predictor-lookahead).
+
+    Answers whether steady-state decode benefits from firing the predictor more or less
+    often than the training horizon, holding the same weights and prefetch budget fixed.
+    """
+    configs: List[Dict[str, Any]] = []
+    model_depths = args.stride_sweep_model_depths or args.lookaheads or [4, 8]
+    strides = args.predictor_strides or [1, 2, 4, 8]
+    do_ppl = getattr(args, "custom_include_ppl", False)
+    for cache_size in args.cache_sizes:
+        configs.append(
+            cfg(
+                "STRIDE_SWEEP",
+                "LRU Baseline",
+                "cached",
+                cache_size,
+                0.0,
+                0,
+                lookahead=None,
+                prefetch_budget=None,
+                mode_perplexity=do_ppl,
+                mode_generate=True,
+            )
+        )
+        for model_depth in model_depths:
+            predictor_path = predictor_path_for_lookahead(args.predictor_base_dir, model_depth)
+            if not os.path.isdir(predictor_path):
+                print(
+                    f"[sweep] Warning: predictor path missing for model_depth={model_depth}: {predictor_path}",
+                    flush=True,
+                )
+                continue
+            # Stride sweeps are often run at a fixed operational cache size (e.g. 24);
+            # do not apply the expert-reuse minimum-cache gate used by other sweeps.
+            for budget in iter_custom_prefetch_budgets(args, cache_size):
+                for stride in strides:
+                    label = f"Prefetch f{model_depth} stride={stride} B={budget}"
+                    if stride == model_depth:
+                        label += " (matched)"
+                    c = cfg(
+                        "STRIDE_SWEEP",
+                        label,
+                        "predict",
+                        cache_size,
+                        0.0,
+                        0,
+                        lookahead=model_depth,
+                        prefetch_budget=budget,
+                        mode_perplexity=do_ppl,
+                        mode_generate=True,
+                    )
+                    c["predictor_stride"] = stride
+                    configs.append(c)
+    return configs
+
+
 def predict_configs(args: argparse.Namespace, min_cache_map: Dict[int, int]) -> List[Dict[str, Any]]:
     configs: List[Dict[str, Any]] = []
     lookaheads = args.lookaheads or list(range(1, 17))
@@ -753,10 +884,29 @@ def forced_n_configs(args: argparse.Namespace) -> List[Dict[str, Any]]:
     return configs
 
 
+def _prefetch_forced_top_ns_list(args: argparse.Namespace) -> List[int]:
+    """Extra predict-backend prefetch lines: forced top-J into cache mask (0 = default single line)."""
+    raw = getattr(args, "prefetch_forced_top_ns", None)
+    if not raw:
+        return [0]
+    out = sorted({int(x) for x in raw})
+    return out
+
+
+def iter_custom_prefetch_budgets(args: argparse.Namespace, cache_size: int) -> List[int]:
+    """Prefetch budgets for CUSTOM_1_16 family: explicit list or fractions of cache_size."""
+    if getattr(args, "prefetch_from_budget_fractions", False):
+        return sorted({max(1, int(cache_size * float(f))) for f in args.budget_fractions})
+    if getattr(args, "custom_explicit_prefetch_budgets", False):
+        return sorted({int(b) for b in args.prefetch_budgets if 1 <= int(b) <= int(cache_size)})
+    return sorted({max(1, int(cache_size * float(f))) for f in args.budget_fractions})
+
+
 def custom_1_16_configs(args: argparse.Namespace, predictor_base_dir: Optional[str] = None, predictor_tag: str = "") -> List[Dict[str, Any]]:
     configs: List[Dict[str, Any]] = []
     selected_lookaheads = args.lookaheads if args.lookaheads else [1, 2, 4, 6, 8, 16]
     do_ppl = getattr(args, "custom_include_ppl", False)
+    prefetch_j_list = _prefetch_forced_top_ns_list(args)
     tag_suffix = f" [{predictor_tag}]" if predictor_tag else ""
     for cache_size in args.cache_sizes:
         for lookahead in selected_lookaheads:
@@ -769,19 +919,20 @@ def custom_1_16_configs(args: argparse.Namespace, predictor_base_dir: Optional[s
                     lookahead=lookahead, prefetch_budget=None,
                     mode_perplexity=do_ppl, mode_generate=True,
                 ))
-            for fraction in args.budget_fractions:
-                budget = max(1, int(cache_size * fraction))
-                c = cfg(
-                    "CUSTOM_1_16", f"Prefetch Only B={budget}{tag_suffix}",
-                    "predict", cache_size, 0.0,
-                    0,
-                    lookahead=lookahead, prefetch_budget=budget,
-                    mode_perplexity=do_ppl, mode_generate=True,
-                )
-                if predictor_base_dir:
-                    c["predictor_base_dir"] = predictor_base_dir
-                    c["predictor_tag"] = predictor_tag
-                configs.append(c)
+            for budget in iter_custom_prefetch_budgets(args, cache_size):
+                for pj in prefetch_j_list:
+                    pj_label = f" J={pj}" if pj else ""
+                    c = cfg(
+                        "CUSTOM_1_16", f"Prefetch Only B={budget}{pj_label}{tag_suffix}",
+                        "predict", cache_size, 0.0,
+                        pj,
+                        lookahead=lookahead, prefetch_budget=budget,
+                        mode_perplexity=do_ppl, mode_generate=True,
+                    )
+                    if predictor_base_dir:
+                        c["predictor_base_dir"] = predictor_base_dir
+                        c["predictor_tag"] = predictor_tag
+                    configs.append(c)
                 for lambda_val in args.lambdas:
                     if lambda_val == 0.0:
                         continue
@@ -810,9 +961,69 @@ def custom_1_16_configs(args: argparse.Namespace, predictor_base_dir: Optional[s
     return configs
 
 
+# April 2026 ``lookahead_4way_20prompts`` coupled (cache, lookahead, prefetch budget) per row.
+APRIL_4WAY_GRID: List[Tuple[int, int, int]] = [
+    (9, 1, 8),
+    (15, 2, 13),
+    (24, 4, 20),
+    (30, 6, 25),
+    (36, 8, 30),
+    (44, 12, 37),
+    (50, 16, 42),
+]
+
+
+def april_4way_no_ppl_configs(
+    args: argparse.Namespace,
+    min_cache_map: Dict[int, int],
+    predictor_base_dir: Optional[str] = None,
+    predictor_tag: str = "",
+) -> List[Dict[str, Any]]:
+    """Replicate the April coupled C/LA/B grid: one LRU + one prefetch-only row per triple."""
+    configs: List[Dict[str, Any]] = []
+    forced_n = int(getattr(args, "april_forced_top_n", 6))
+    tag_suffix = f" [{predictor_tag}]" if predictor_tag else ""
+    for cache_size, lookahead, budget in APRIL_4WAY_GRID:
+        if not cache_large_enough(cache_size, lookahead, min_cache_map):
+            continue
+        if not predictor_tag:
+            configs.append(
+                cfg(
+                    "APRIL_4WAY_NO_PPL",
+                    "Neither (LRU)",
+                    "cached",
+                    cache_size,
+                    0.0,
+                    0,
+                    lookahead=lookahead,
+                    prefetch_budget=budget,
+                    mode_perplexity=False,
+                    mode_generate=True,
+                )
+            )
+        c = cfg(
+            "APRIL_4WAY_NO_PPL",
+            f"Prefetch Only B={budget}{tag_suffix}",
+            "predict",
+            cache_size,
+            0.0,
+            forced_n,
+            lookahead=lookahead,
+            prefetch_budget=budget,
+            mode_perplexity=False,
+            mode_generate=True,
+        )
+        if predictor_base_dir:
+            c["predictor_base_dir"] = predictor_base_dir
+            c["predictor_tag"] = predictor_tag
+        configs.append(c)
+    return configs
+
+
 def custom_1_16_no_ppl_configs(args: argparse.Namespace, predictor_base_dir: Optional[str] = None, predictor_tag: str = "") -> List[Dict[str, Any]]:
     configs: List[Dict[str, Any]] = []
-    selected_lookaheads = [1, 2, 4, 6, 8, 12, 16]
+    selected_lookaheads = args.lookaheads if args.lookaheads else [1, 2, 4, 6, 8, 12, 16]
+    prefetch_j_list = _prefetch_forced_top_ns_list(args)
     tag_suffix = f" [{predictor_tag}]" if predictor_tag else ""
     for cache_size in args.cache_sizes:
         for lookahead in selected_lookaheads:
@@ -823,19 +1034,20 @@ def custom_1_16_no_ppl_configs(args: argparse.Namespace, predictor_base_dir: Opt
                     lookahead=lookahead, prefetch_budget=None,
                     mode_perplexity=False, mode_generate=True,
                 ))
-            for fraction in args.budget_fractions:
-                budget = max(1, int(cache_size * fraction))
-                c = cfg(
-                    "CUSTOM_1_16_NO_PPL", f"Prefetch Only B={budget}{tag_suffix}",
-                    "predict", cache_size, 0.0,
-                    0,
-                    lookahead=lookahead, prefetch_budget=budget,
-                    mode_perplexity=False, mode_generate=True,
-                )
-                if predictor_base_dir:
-                    c["predictor_base_dir"] = predictor_base_dir
-                    c["predictor_tag"] = predictor_tag
-                configs.append(c)
+            for budget in iter_custom_prefetch_budgets(args, cache_size):
+                for pj in prefetch_j_list:
+                    pj_label = f" J={pj}" if pj else ""
+                    c = cfg(
+                        "CUSTOM_1_16_NO_PPL", f"Prefetch Only B={budget}{pj_label}{tag_suffix}",
+                        "predict", cache_size, 0.0,
+                        pj,
+                        lookahead=lookahead, prefetch_budget=budget,
+                        mode_perplexity=False, mode_generate=True,
+                    )
+                    if predictor_base_dir:
+                        c["predictor_base_dir"] = predictor_base_dir
+                        c["predictor_tag"] = predictor_tag
+                    configs.append(c)
                 for lambda_val in args.lambdas:
                     if lambda_val == 0.0:
                         continue
@@ -866,7 +1078,8 @@ def custom_1_16_no_ppl_configs(args: argparse.Namespace, predictor_base_dir: Opt
 
 def custom_1_16_ppl_only_configs(args: argparse.Namespace, predictor_base_dir: Optional[str] = None, predictor_tag: str = "") -> List[Dict[str, Any]]:
     configs: List[Dict[str, Any]] = []
-    selected_lookaheads = [1, 2, 4, 6, 8, 12, 16]
+    selected_lookaheads = args.lookaheads if args.lookaheads else [1, 2, 4, 6, 8, 12, 16]
+    prefetch_j_list = _prefetch_forced_top_ns_list(args)
     tag_suffix = f" [{predictor_tag}]" if predictor_tag else ""
     for cache_size in args.cache_sizes:
         for lookahead in selected_lookaheads:
@@ -877,19 +1090,20 @@ def custom_1_16_ppl_only_configs(args: argparse.Namespace, predictor_base_dir: O
                     lookahead=lookahead, prefetch_budget=None,
                     mode_perplexity=True, mode_generate=False,
                 ))
-            for fraction in args.budget_fractions:
-                budget = max(1, int(cache_size * fraction))
-                c = cfg(
-                    "CUSTOM_1_16_PPL_ONLY", f"Prefetch Only B={budget}{tag_suffix}",
-                    "predict", cache_size, 0.0,
-                    0,
-                    lookahead=lookahead, prefetch_budget=budget,
-                    mode_perplexity=True, mode_generate=False,
-                )
-                if predictor_base_dir:
-                    c["predictor_base_dir"] = predictor_base_dir
-                    c["predictor_tag"] = predictor_tag
-                configs.append(c)
+            for budget in iter_custom_prefetch_budgets(args, cache_size):
+                for pj in prefetch_j_list:
+                    pj_label = f" J={pj}" if pj else ""
+                    c = cfg(
+                        "CUSTOM_1_16_PPL_ONLY", f"Prefetch Only B={budget}{pj_label}{tag_suffix}",
+                        "predict", cache_size, 0.0,
+                        pj,
+                        lookahead=lookahead, prefetch_budget=budget,
+                        mode_perplexity=True, mode_generate=False,
+                    )
+                    if predictor_base_dir:
+                        c["predictor_base_dir"] = predictor_base_dir
+                        c["predictor_tag"] = predictor_tag
+                    configs.append(c)
                 for lambda_val in args.lambdas:
                     if lambda_val == 0.0:
                         continue
@@ -1020,6 +1234,7 @@ def cfg_key(config: Dict[str, Any]) -> Tuple[Any, ...]:
         prob_mass_threshold,
         config.get("lookahead"),
         config.get("prefetch_budget"),
+        config.get("predictor_stride"),
         config.get("mode_perplexity"),
         config.get("mode_generate"),
     )
@@ -1101,16 +1316,26 @@ def execute_comprehensive_run(
     prob_mass_threshold = config.get("prob_mass_threshold", config.get("forced_top_p", -1.0))
     lookahead = config.get("lookahead")
     budget = config.get("prefetch_budget")
+    predictor_stride = config.get("predictor_stride")
     predictor_tag = config.get("predictor_tag", "")
     pm_str = f" PM={prob_mass_threshold}" if prob_mass_threshold >= 0.0 else ""
     tag_str = f" predictor={predictor_tag}" if predictor_tag else ""
+    stride_str = ""
+    if predictor_stride is not None and lookahead is not None and int(predictor_stride) != int(lookahead):
+        stride_str = f" stride={predictor_stride}"
     print(
         f"\n{'=' * 18} {config['question']} | {config['label']} | "
         f"C={cache_size} λ={lambda_val} FN={forced_top_n}{pm_str}"
-        f"{f' LA={lookahead} B={budget}' if lookahead is not None else ''}{tag_str} "
+        f"{f' LA={lookahead}{stride_str} B={budget}' if lookahead is not None else ''}{tag_str} "
         f"[{run_idx + 1}/{total_runs}] {'=' * 18}",
         flush=True,
     )
+    if run_idx == 0:
+        print(
+            "[sweep] Each config is a **new** Qwen subprocess (full MoE load + kernels). "
+            "Long silence after startup logs is often weight load / compile, not a hang.",
+            flush=True,
+        )
 
     # Use per-config predictor_base_dir override if present (multi-predictor comparison)
     effective_predictor_base_dir = config.get("predictor_base_dir", args.predictor_base_dir)
@@ -1140,6 +1365,7 @@ def execute_comprehensive_run(
             mode_generation_perplexity=mode_perplexity,
             predictor_device=args.predictor_device,
             expert_weights_dir=getattr(args, "expert_weights_dir", None),
+            predictor_stride=predictor_stride,
         )
         out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
         if out is None:
@@ -1180,9 +1406,14 @@ def execute_comprehensive_run(
                 merged[key] = value
 
     if not args.cold_per_prompt:
-        if config.get("mode_perplexity", False):
+        want_ppl = config.get("mode_perplexity", False)
+        want_gen = config.get("mode_generate", False)
+        # One subprocess: gen-PPL needs generation; merge PPL+TPS from the same decode when both requested.
+        if want_ppl and want_gen:
+            merge_metrics(run_pass(mode_perplexity=True, mode_generate=True, one_prompt_path=prompts_file))
+        elif want_ppl:
             merge_metrics(run_pass(mode_perplexity=True, mode_generate=False, one_prompt_path=prompts_file))
-        if config.get("mode_generate", False):
+        elif want_gen:
             merge_metrics(run_pass(mode_perplexity=False, mode_generate=True, one_prompt_path=prompts_file))
     else:
         if config.get("mode_perplexity", False):
@@ -1210,10 +1441,11 @@ def execute_comprehensive_run(
                         top_p=args.top_p,
                         top_k=args.top_k,
                         max_new_tokens=args.max_new_tokens,
-                        mode_generate=False,
+                        mode_generate=True,
                         mode_generation_perplexity=True,
                         predictor_device=args.predictor_device,
                         expert_weights_dir=getattr(args, "expert_weights_dir", None),
+                        predictor_stride=predictor_stride,
                     )
                     out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
                     if out:
@@ -1225,7 +1457,7 @@ def execute_comprehensive_run(
                         pass
             merge_metrics(aggregate_cold_prompt_metrics(outputs))
 
-        if config.get("mode_generate", False):
+        if config.get("mode_generate", False) and not config.get("mode_perplexity", False):
             outputs = []
             for prompt in prompts:
                 if args.drop_page_cache_between_prompts:
@@ -1254,6 +1486,7 @@ def execute_comprehensive_run(
                         mode_generation_perplexity=False,
                         predictor_device=args.predictor_device,
                         expert_weights_dir=getattr(args, "expert_weights_dir", None),
+                        predictor_stride=predictor_stride,
                     )
                     out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
                     if out:
@@ -1276,6 +1509,7 @@ def execute_comprehensive_run(
         # Keep legacy column for downstream scripts.
         "forced_top_p": prob_mass_threshold,
         "lookahead": lookahead,
+        "predictor_stride": predictor_stride if predictor_stride is not None else lookahead,
         "prefetch_budget": budget,
         "predictor_tag": predictor_tag,
         "mode_perplexity": config.get("mode_perplexity", False),
@@ -1330,12 +1564,172 @@ def base_lookup(df_base: Optional[pd.DataFrame], metric: str) -> Dict[int, float
     return result
 
 
-def save_plot(fig: plt.Figure, out_dir: str, filename: str) -> None:
+# Set in generate_all_plots(); used by save_plot() for figure footers.
+_current_plot_command: Optional[str] = None
+
+
+def format_plot_command_caption(command: str, max_width: int = 132) -> str:
+    cmd = " ".join(str(command).split())
+    if len(cmd) > 800:
+        cmd = cmd[:797] + "..."
+    return "\n".join(textwrap.wrap(f"CMD: {cmd}", width=max_width))
+
+
+def read_plot_command(out_dir: str) -> Optional[str]:
+    for name in ("command.txt", "sweep_command.txt"):
+        path = os.path.join(out_dir, name)
+        if os.path.isfile(path):
+            with open(path, encoding="utf-8") as f:
+                text = f.read().strip()
+            if text:
+                return text
+    return None
+
+
+def write_plot_command_file(out_dir: str, command: str, *, overwrite: bool = False) -> None:
+    """Persist the launcher command for plot footers (see read_plot_command)."""
     os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, "command.txt")
+    if not overwrite and os.path.isfile(path):
+        return
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(command.strip() + "\n")
+    sweep_path = os.path.join(out_dir, "sweep_command.txt")
+    with open(sweep_path, "w", encoding="utf-8") as f:
+        f.write(command.strip() + "\n")
+
+
+def add_plot_command_footer(fig: plt.Figure, command: Optional[str]) -> None:
+    if not command:
+        return
+    caption = format_plot_command_caption(command)
+    n_lines = caption.count("\n") + 1
+    fig.subplots_adjust(bottom=min(0.38, 0.05 + 0.017 * n_lines))
+    fig.text(
+        0.5,
+        0.006,
+        caption,
+        ha="center",
+        va="bottom",
+        fontsize=5.5,
+        family="monospace",
+        color="#9aa0b5",
+        transform=fig.transFigure,
+    )
+
+
+def save_plot(fig: plt.Figure, out_dir: str, filename: str, *, command_caption: Optional[str] = None) -> None:
+    os.makedirs(out_dir, exist_ok=True)
+    cmd = command_caption
+    if cmd is None:
+        cmd = _current_plot_command or read_plot_command(out_dir)
+    add_plot_command_footer(fig, cmd)
     path = os.path.join(out_dir, filename)
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     print(f"[plot] Saved {path}", flush=True)
+
+
+def _recall_metric_name(df: pd.DataFrame) -> str:
+    if "pred_hit_rate_routed_topk_pct" in df.columns and df["pred_hit_rate_routed_topk_pct"].notna().any():
+        return "pred_hit_rate_routed_topk_pct"
+    return "pred_hit_rate_pct"
+
+
+def _draw_prefetch_lookahead_panel(
+    ax: plt.Axes,
+    sub: pd.DataFrame,
+    cache_size: int,
+    *,
+    metric_col: str,
+    ylabel: str,
+    lookaheads_sub: List[float],
+    pref_mask: pd.Series,
+    budgets: List[float],
+    n_budgets: int,
+    lru_reference_by_la: Optional[Dict[float, float]] = None,
+    annotate_speedup: bool = False,
+) -> None:
+    """Shared lookahead x-axis panel for prefetch curves (+ optional LRU reference)."""
+    budget_cmap = plt.cm.Blues
+    lru_hr_by_la: Dict[float, float] = dict(lru_reference_by_la or {})
+
+    if metric_col == "_tps_speedup":
+        ax.axhline(1.0, **LRU_STYLE, label="LRU (1.00×)")
+    elif metric_col in ("hit_rate_pct", "tokens_per_second"):
+        lru_sub = (
+            sub[sub["label"] == "Neither (LRU)"]
+            .dropna(subset=[metric_col, "lookahead"])
+            .sort_values("lookahead")
+        )
+        if not lru_sub.empty:
+            ax.plot(
+                lru_sub["lookahead"],
+                lru_sub[metric_col],
+                marker="D",
+                **LRU_STYLE,
+                label="LRU Baseline",
+            )
+            for _, r in lru_sub.iterrows():
+                lru_hr_by_la[float(r["lookahead"])] = float(r[metric_col])
+
+    for b_idx, budget in enumerate(budgets):
+        frac = budget / cache_size if cache_size else 0
+        color = budget_cmap(0.3 + 0.6 * b_idx / (n_budgets - 1) if n_budgets > 1 else 0.7)
+        s_b = (
+            sub[pref_mask & (sub["prefetch_budget"] == budget)]
+            .dropna(subset=[metric_col])
+            .sort_values("lookahead")
+        )
+        if s_b.empty:
+            continue
+        ax.plot(
+            s_b["lookahead"],
+            s_b[metric_col],
+            marker="^",
+            color=color,
+            linewidth=2,
+            label=f"Prefetch B={int(budget)} ({frac:.0%})",
+        )
+        if annotate_speedup and metric_col == "_tps_speedup":
+            for _, r in s_b.iterrows():
+                val = float(r[metric_col])
+                ax.annotate(
+                    f"×{val:.2f}",
+                    xy=(float(r["lookahead"]), val),
+                    xytext=(0, 8),
+                    textcoords="offset points",
+                    ha="center",
+                    va="bottom",
+                    fontsize=6,
+                    color=color,
+                    fontweight="bold",
+                    alpha=0.9,
+                )
+        elif metric_col == "hit_rate_pct" and lru_hr_by_la:
+            for _, r in s_b.iterrows():
+                la = float(r["lookahead"])
+                val = float(r[metric_col])
+                lru = lru_hr_by_la.get(la)
+                if lru is not None:
+                    ax.annotate(
+                        f"{val - lru:+.1f}pp",
+                        xy=(la, val),
+                        xytext=(0, 8),
+                        textcoords="offset points",
+                        ha="center",
+                        va="bottom",
+                        fontsize=6,
+                        color=color,
+                        fontweight="bold",
+                        alpha=0.9,
+                    )
+
+    ax.set_xticks(lookaheads_sub)
+    ax.set_ylim(bottom=max(0.0, ax.get_ylim()[0]))
+    if metric_col == "hit_rate_pct":
+        ax.set_ylim(top=min(100.0, max(ax.get_ylim()[1], 1.0) + 5))
+    style_ax(ax, ylabel, "Lookahead Depth (Tokens)", ylabel)
 
 
 def have_plot_deps() -> bool:
@@ -1781,7 +2175,12 @@ def plot_probability_mass_calibration(df_cal: pd.DataFrame, out_dir: str, ts: st
             base_ppl = float(base_rows["gen_perplexity"].mean())
 
             # Threshold lines
-            for pct, style, color in ((1, ":", "#a5d6a7"), (2, "--", "#ffcc80"), (5, "-.", "#ef9a9a")):
+            for pct, style, color in (
+                (1, ":", "#a5d6a7"),
+                (2, "--", "#ffcc80"),
+                (5, "-.", "#ef9a9a"),
+                (10, (0, (3, 3)), "#ce93d8"),
+            ):
                 ax.axhline(pct, linestyle=style, color=color, linewidth=1.2, alpha=0.8, label=f"{pct}% threshold")
             ax.axhline(0, color=LRU_COLOR, linewidth=1, alpha=0.3, label="LRU baseline (0%)")
 
@@ -1813,20 +2212,7 @@ def plot_probability_mass_calibration(df_cal: pd.DataFrame, out_dir: str, ts: st
 
 
 def plot_hit_rates(df_custom: pd.DataFrame, out_dir: str, ts: str) -> None:
-    """Plot cache/predictor rates vs lookahead depth.
-
-    For each (cache_size, budget), shows:
-      - Cache Hit Rate % (hit_rate_pct): how often the expert is already resident
-        in VRAM — this should be *higher* with the predictor than with LRU.
-      - Predictor RoutedTopK Hit Rate % (pred_hit_rate_routed_topk_pct):
-        recall-like metric: among routed experts, fraction found in predictions.
-      - Predicted RequestedByRouterTopK % (pred_requested_rate_topk_pct):
-        precision-like metric: among predicted experts, fraction requested by router.
-      - A dashed reference line for the LRU cache hit rate so the prefetch
-        improvement (Δpp) is immediately visible.
-
-    One figure is saved per cache_size.
-    """
+    """Plot cache/predictor rates vs lookahead depth (one figure per cache size)."""
     df = df_custom.copy()
     if df.empty:
         return
@@ -1839,22 +2225,20 @@ def plot_hit_rates(df_custom: pd.DataFrame, out_dir: str, ts: str) -> None:
         return
 
     cache_sizes = sorted(df["cache_size"].dropna().unique(), key=int)
+    recall_col = _recall_metric_name(df)
 
     for cache_size in cache_sizes:
         sub = df[df["cache_size"] == cache_size]
         lookaheads_sub = sorted(sub["lookahead"].dropna().unique())
-
         pref_mask = sub["label"].str.startswith("Prefetch Only", na=False)
         budgets = sorted(sub.loc[pref_mask, "prefetch_budget"].dropna().unique(), key=float)
         n_budgets = max(len(budgets), 1)
 
-        # Number of sub-panels: cache hit + predictor recall + predictor precision (if available)
         hr_metrics: List[Tuple[str, str]] = []
         if has_cache_hr:
             hr_metrics.append(("hit_rate_pct", "Cache Hit Rate (%)"))
         if has_pred_hr:
-            metric_name = "pred_hit_rate_routed_topk_pct" if sub["pred_hit_rate_routed_topk_pct"].notna().any() else "pred_hit_rate_pct"
-            hr_metrics.append((metric_name, "Predictor Recall on Routed Top-K (%)"))
+            hr_metrics.append((recall_col, "Predictor Recall on Routed Top-K (%)"))
         if has_pred_precision:
             hr_metrics.append(("pred_requested_rate_topk_pct", "Predicted Experts Requested by Router (%)"))
 
@@ -1863,67 +2247,305 @@ def plot_hit_rates(df_custom: pd.DataFrame, out_dir: str, ts: str) -> None:
             fig, axes = plt.subplots(1, ncols, figsize=(6 * ncols, 5), squeeze=False)
             fig.suptitle(
                 f"Hit Rates vs Lookahead Depth — Cache = {cache_size} Experts/Layer",
-                fontsize=13, fontweight="bold", y=1.03,
+                fontsize=13,
+                fontweight="bold",
+                y=1.03,
             )
-
-            for col, (metric_col, ylabel) in enumerate(hr_metrics):
-                ax = axes[0][col]
-                budget_cmap = plt.cm.Blues
-
-                # LRU baseline cache hit rate (from cached backend, label "Neither (LRU)")
-                lru_sub = (
-                    sub[sub["label"] == "Neither (LRU)"]
-                    .dropna(subset=[metric_col])
-                    .sort_values("lookahead")
+            for col, (metric_col, panel_ylabel) in enumerate(hr_metrics):
+                _draw_prefetch_lookahead_panel(
+                    axes[0][col],
+                    sub,
+                    int(cache_size),
+                    metric_col=metric_col,
+                    ylabel=panel_ylabel,
+                    lookaheads_sub=lookaheads_sub,
+                    pref_mask=pref_mask,
+                    budgets=budgets,
+                    n_budgets=n_budgets,
                 )
-                lru_hr_by_la: Dict[float, float] = {}
-                if not lru_sub.empty:
-                    ax.plot(
-                        lru_sub["lookahead"], lru_sub[metric_col],
-                        marker="D", **LRU_STYLE, label="LRU Baseline",
-                    )
-                    for _, r in lru_sub.iterrows():
-                        lru_hr_by_la[float(r["lookahead"])] = float(r[metric_col])
-
-                # Prefetch Only lines — light→dark blue gradient per budget
-                for b_idx, budget in enumerate(budgets):
-                    frac = budget / cache_size if cache_size else 0
-                    color = budget_cmap(0.3 + 0.6 * b_idx / (n_budgets - 1) if n_budgets > 1 else 0.7)
-                    s_b = (
-                        sub[pref_mask & (sub["prefetch_budget"] == budget)]
-                        .dropna(subset=[metric_col])
-                        .sort_values("lookahead")
-                    )
-                    if s_b.empty:
-                        continue
-                    ax.plot(
-                        s_b["lookahead"], s_b[metric_col],
-                        marker="^", color=color, linewidth=2,
-                        label=f"Prefetch B={int(budget)} ({frac:.0%})",
-                    )
-                    # Annotate Δpp vs LRU for cache hit rate
-                    if metric_col == "hit_rate_pct" and lru_hr_by_la:
-                        for _, r in s_b.iterrows():
-                            la = float(r["lookahead"])
-                            val = float(r[metric_col])
-                            lru = lru_hr_by_la.get(la)
-                            if lru is not None:
-                                ax.annotate(
-                                    f"{val - lru:+.1f}pp",
-                                    xy=(la, val), xytext=(0, 8),
-                                    textcoords="offset points",
-                                    ha="center", va="bottom",
-                                    fontsize=6, color=color, fontweight="bold", alpha=0.9,
-                                )
-
-                ax.set_xticks(lookaheads_sub)
-                ax.set_ylim(bottom=max(0.0, ax.get_ylim()[0]))
-                top_cap = 100.0 if metric_col == "hit_rate_pct" else ax.get_ylim()[1]
-                ax.set_ylim(top=min(top_cap, ax.get_ylim()[1] + 5))
-                style_ax(ax, ylabel, "Lookahead Depth (Tokens)", ylabel)
-
             plt.tight_layout()
             save_plot(fig, out_dir, f"hit_rates_C{cache_size}_{ts}.png")
+
+
+def plot_april_4way_coupled(df_april: pd.DataFrame, out_dir: str, ts: str) -> None:
+    """April-style coupled grid: one figure each for TPS / cache hit / recall / precision vs lookahead."""
+    df = df_april.copy()
+    if df.empty:
+        return
+    df = df.sort_values("lookahead")
+    recall_col = _recall_metric_name(df)
+    pref_mask = df["label"].str.startswith("Prefetch Only", na=False)
+
+    metrics: List[Tuple[str, str]] = []
+    if df["tokens_per_second"].notna().any():
+        metrics.append(("tokens_per_second", "Tokens / Second"))
+    if df["hit_rate_pct"].notna().any():
+        metrics.append(("hit_rate_pct", "Cache Hit Rate (%)"))
+    if recall_col in df.columns and df[recall_col].notna().any():
+        metrics.append((recall_col, "Predictor Recall (%)"))
+    if "pred_requested_rate_topk_pct" in df.columns and df["pred_requested_rate_topk_pct"].notna().any():
+        metrics.append(("pred_requested_rate_topk_pct", "Precision (%)"))
+    if not metrics:
+        return
+
+    lookaheads = sorted(df["lookahead"].dropna().unique(), key=int)
+
+    def _annotate_tps(s: pd.DataFrame, lru_by_la: Dict[float, float]) -> None:
+        for _, r in s.iterrows():
+            la = float(r["lookahead"])
+            val = float(r["tokens_per_second"])
+            base = lru_by_la.get(la)
+            if base and base > 0:
+                txt = f"×{val/base:.2f}"
+            else:
+                txt = f"C={int(r['cache_size'])}"
+            ax.annotate(
+                txt,
+                xy=(la, val),
+                xytext=(0, 8),
+                textcoords="offset points",
+                ha="center",
+                fontsize=7,
+                color="#81d4fa",
+                fontweight="bold",
+            )
+
+    with plt.style.context(PLOT_STYLE):
+        ncols = len(metrics)
+        fig, axes = plt.subplots(1, ncols, figsize=(5.5 * ncols, 5.2), squeeze=False)
+        fig.suptitle(
+            "April 4-Way Coupled Grid (C, LA, B matched per point)",
+            fontsize=13,
+            fontweight="bold",
+            y=1.03,
+        )
+        for col, (metric_col, ylabel) in enumerate(metrics):
+            ax = axes[0][col]
+            s_lru = (
+                df[~pref_mask]
+                .dropna(subset=[metric_col])
+                .sort_values("lookahead")
+            )
+            lru_by_la: Dict[float, float] = {}
+            if not s_lru.empty:
+                ax.plot(s_lru["lookahead"], s_lru[metric_col], marker="D", **LRU_STYLE, label="LRU")
+                for _, r in s_lru.iterrows():
+                    lru_by_la[float(r["lookahead"])] = float(r[metric_col])
+                    ax.annotate(
+                        f"C={int(r['cache_size'])}",
+                        xy=(float(r["lookahead"]), float(r[metric_col])),
+                        xytext=(0, -10),
+                        textcoords="offset points",
+                        ha="center",
+                        fontsize=6,
+                        color=LRU_COLOR,
+                    )
+            s_pref = df[pref_mask].dropna(subset=[metric_col]).sort_values("lookahead")
+            if not s_pref.empty:
+                ax.plot(
+                    s_pref["lookahead"],
+                    s_pref[metric_col],
+                    marker="^",
+                    color="#4fc3f7",
+                    linewidth=2,
+                    label="Prefetch",
+                )
+                if metric_col == "tokens_per_second":
+                    _annotate_tps(s_pref, lru_by_la)
+                else:
+                    for _, r in s_pref.iterrows():
+                        ax.annotate(
+                            f"C={int(r['cache_size'])}",
+                            xy=(float(r["lookahead"]), float(r[metric_col])),
+                            xytext=(0, 8),
+                            textcoords="offset points",
+                            ha="center",
+                            fontsize=6,
+                            color="#4fc3f7",
+                        )
+            ax.set_xticks(lookaheads)
+            style_ax(ax, "", "Lookahead (tokens)", ylabel)
+        plt.tight_layout()
+        save_plot(fig, out_dir, f"april_4way_dashboard_{ts}.png")
+
+    # Combined precision–recall frontier (all coupled points on one chart).
+    pred = df[pref_mask].dropna(subset=["pred_requested_rate_topk_pct", recall_col])
+    if pred.empty:
+        return
+    with plt.style.context(PLOT_STYLE):
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+        cvals = pred["tokens_per_second"].astype(float)
+        sc = ax.scatter(
+            pred["pred_requested_rate_topk_pct"],
+            pred[recall_col],
+            c=cvals,
+            cmap=plt.cm.viridis,
+            s=90,
+            edgecolors="#111111",
+            linewidths=0.5,
+        )
+        fig.colorbar(sc, ax=ax, label="Tokens / second")
+        for _, r in pred.iterrows():
+            ax.annotate(
+                f"LA{int(r['lookahead'])}/C{int(r['cache_size'])}",
+                (float(r["pred_requested_rate_topk_pct"]), float(r[recall_col])),
+                textcoords="offset points",
+                xytext=(4, 4),
+                fontsize=7,
+            )
+        style_ax(
+            ax,
+            "Precision vs Recall — April Coupled Grid",
+            "Precision: predicted experts requested by router (%)",
+            "Recall: routed experts found in predictions (%)",
+        )
+        ax.grid(True, alpha=0.5)
+        plt.tight_layout()
+        save_plot(fig, out_dir, f"april_4way_precision_recall_{ts}.png")
+
+
+def plot_advisor_dashboard(df_custom: pd.DataFrame, out_dir: str, ts: str) -> None:
+    """Single figure: raw TPS, recall, cache hit rate, and precision vs lookahead."""
+    df = df_custom.copy()
+    if df.empty:
+        return
+    df = df.sort_values("lookahead")
+
+    has_tps = df["tokens_per_second"].notna().any()
+    recall_col = _recall_metric_name(df)
+    has_recall = df[recall_col].notna().any() if recall_col in df.columns else False
+    has_cache_hr = df["hit_rate_pct"].notna().any()
+    has_precision = df["pred_requested_rate_topk_pct"].notna().any()
+    if not (has_tps or has_recall or has_cache_hr or has_precision):
+        return
+
+    metrics: List[Tuple[str, str]] = []
+    if has_tps:
+        metrics.append(("tokens_per_second", "Tokens / Second"))
+    if has_cache_hr:
+        metrics.append(("hit_rate_pct", "Cache Hit Rate (%)"))
+    if has_recall:
+        metrics.append((recall_col, "Predictor Recall (%)"))
+    if has_precision:
+        metrics.append(("pred_requested_rate_topk_pct", "Precision (%)"))
+
+    cache_sizes = sorted(df["cache_size"].dropna().unique(), key=int)
+    for cache_size in cache_sizes:
+        sub = df[df["cache_size"] == cache_size].copy()
+        lookaheads_sub = sorted(sub["lookahead"].dropna().unique())
+        pref_mask = sub["label"].str.startswith("Prefetch Only", na=False)
+        budgets = sorted(sub.loc[pref_mask, "prefetch_budget"].dropna().unique(), key=float)
+        n_budgets = max(len(budgets), 1)
+
+        ncols = len(metrics)
+        with plt.style.context(PLOT_STYLE):
+            fig, axes = plt.subplots(1, ncols, figsize=(5.5 * ncols, 5.2), squeeze=False)
+            fig.suptitle(
+                f"Prefetch Advisor Dashboard — Cache = {cache_size} Experts/Layer",
+                fontsize=13,
+                fontweight="bold",
+                y=1.03,
+            )
+            for col, (metric_col, panel_ylabel) in enumerate(metrics):
+                _draw_prefetch_lookahead_panel(
+                    axes[0][col],
+                    sub,
+                    int(cache_size),
+                    metric_col=metric_col,
+                    ylabel=panel_ylabel,
+                    lookaheads_sub=lookaheads_sub,
+                    pref_mask=pref_mask,
+                    budgets=budgets,
+                    n_budgets=n_budgets,
+                )
+            plt.tight_layout()
+            save_plot(fig, out_dir, f"advisor_dashboard_C{cache_size}_{ts}.png")
+
+
+def plot_precision_recall_frontier(df_custom: pd.DataFrame, out_dir: str, ts: str) -> None:
+    """Plot predictor precision-recall tradeoff for each cache size.
+
+    X-axis: predicted experts requested by router (precision-like)
+    Y-axis: routed experts found in predictions (recall-like)
+    Color: tokens/sec (performance overlay)
+    """
+    df = df_custom.copy()
+    if df.empty:
+        return
+
+    # Prefer the explicit top-k metrics; fallback to legacy predictor hit rate if needed.
+    if "pred_hit_rate_routed_topk_pct" not in df.columns or df["pred_hit_rate_routed_topk_pct"].isna().all():
+        df["pred_hit_rate_routed_topk_pct"] = df.get("pred_hit_rate_pct")
+    if "pred_requested_rate_topk_pct" not in df.columns:
+        df["pred_requested_rate_topk_pct"] = np.nan
+
+    # Frontier only meaningful on predictor rows with both metrics present.
+    pred_mask = df["backend"] == "predict"
+    need_cols = ["pred_requested_rate_topk_pct", "pred_hit_rate_routed_topk_pct"]
+    df = df[pred_mask].dropna(subset=need_cols)
+    if df.empty:
+        return
+
+    cache_sizes = sorted(df["cache_size"].dropna().unique(), key=int)
+    for cache_size in cache_sizes:
+        sub = df[df["cache_size"] == cache_size].copy()
+        if sub.empty:
+            continue
+
+        with plt.style.context(PLOT_STYLE):
+            fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+            cmap = plt.cm.viridis
+            has_tps = sub["tokens_per_second"].notna().any()
+            if has_tps:
+                cvals = sub["tokens_per_second"].astype(float)
+                sc = ax.scatter(
+                    sub["pred_requested_rate_topk_pct"],
+                    sub["pred_hit_rate_routed_topk_pct"],
+                    c=cvals,
+                    cmap=cmap,
+                    s=70,
+                    alpha=0.9,
+                    edgecolors="#111111",
+                    linewidths=0.5,
+                )
+                cbar = fig.colorbar(sc, ax=ax)
+                cbar.set_label("Tokens / second (↑ better)")
+            else:
+                ax.scatter(
+                    sub["pred_requested_rate_topk_pct"],
+                    sub["pred_hit_rate_routed_topk_pct"],
+                    color="#4fc3f7",
+                    s=70,
+                    alpha=0.9,
+                    edgecolors="#111111",
+                    linewidths=0.5,
+                )
+
+            # Annotate each point with lookahead / budget for quick filtering.
+            for _, r in sub.iterrows():
+                la = int(r["lookahead"]) if pd.notna(r.get("lookahead")) else -1
+                b = int(r["prefetch_budget"]) if pd.notna(r.get("prefetch_budget")) else -1
+                label = f"LA{la}/B{b}"
+                ax.annotate(
+                    label,
+                    (float(r["pred_requested_rate_topk_pct"]), float(r["pred_hit_rate_routed_topk_pct"])),
+                    textcoords="offset points",
+                    xytext=(4, 4),
+                    fontsize=7,
+                    alpha=0.9,
+                )
+
+            ax.set_xlim(left=max(0.0, ax.get_xlim()[0]), right=min(100.0, max(100.0, ax.get_xlim()[1])))
+            ax.set_ylim(bottom=max(0.0, ax.get_ylim()[0]), top=min(100.0, max(100.0, ax.get_ylim()[1])))
+            style_ax(
+                ax,
+                f"Precision vs Recall Frontier — Cache = {cache_size}",
+                "Predicted Experts Requested by Router (%)  [precision-like]",
+                "Routed Experts Found in Predictions (%)  [recall-like]",
+            )
+            ax.grid(True, alpha=0.5)
+            plt.tight_layout()
+            save_plot(fig, out_dir, f"precision_recall_frontier_C{cache_size}_{ts}.png")
 
 
 def plot_predictor_comparison(df: pd.DataFrame, out_dir: str, ts: str) -> None:
@@ -2148,10 +2770,212 @@ def plot_lambda_fn_sweep(df_in: pd.DataFrame, out_dir: str, ts: str) -> None:
             save_plot(fig2, out_dir, f"lambda_fn_sweep_ppl_vs_tps_{ts}.png")
 
 
-def generate_all_plots(df: pd.DataFrame, out_dir: str, ts: str) -> None:
+def plot_prefetch_speedup_attribution(df_custom: pd.DataFrame, out_dir: str, ts: str) -> None:
+    """Prefetch-only rows: relate decode TPS to stall loads and predictor recall/precision.
+
+    Recall-like: ``pred_hit_rate_routed_topk_pct`` (else ``pred_hit_rate_pct``): routed experts
+    covered by the predictor prefetch set.
+
+    Precision-like: ``pred_requested_rate_topk_pct``: predicted experts that the router actually
+    requested (when the model prints that line).
+
+    Lower ``stall_loads`` with higher TPS indicates speedup from hiding expert-load latency.
+    """
+    lam = pd.to_numeric(df_custom.get("lambda_val", 0), errors="coerce").fillna(0.0)
+    lab = df_custom["label"].astype(str)
+    mask = (
+        (df_custom.get("backend", "").astype(str) == "predict")
+        & (lam == 0.0)
+        & lab.str.startswith("Prefetch Only", na=False)
+    )
+    sub = df_custom.loc[mask].copy()
+    if sub.empty:
+        return
+
+    sub["tokens_per_second"] = pd.to_numeric(sub["tokens_per_second"], errors="coerce")
+    sub["stall_loads"] = pd.to_numeric(sub["stall_loads"], errors="coerce")
+    sub["prefetch_loads"] = pd.to_numeric(sub["prefetch_loads"], errors="coerce")
+    sub["lookahead"] = pd.to_numeric(sub["lookahead"], errors="coerce")
+
+    recall = pd.to_numeric(sub.get("pred_hit_rate_routed_topk_pct"), errors="coerce")
+    if recall.isna().all():
+        recall = pd.to_numeric(sub.get("pred_hit_rate_pct"), errors="coerce")
+    precision = pd.to_numeric(sub.get("pred_requested_rate_topk_pct"), errors="coerce")
+
+    plot_df = sub.assign(_recall=recall, _precision=precision).dropna(subset=["tokens_per_second", "stall_loads"])
+    if plot_df.empty:
+        return
+
+    with plt.style.context(PLOT_STYLE):
+        fig, axes = plt.subplots(1, 2, figsize=(12.5, 5), squeeze=False)
+        ax0, ax1 = axes[0]
+
+        r0 = plot_df["_recall"].dropna()
+        if len(r0) > 0:
+            sc0 = ax0.scatter(
+                plot_df["stall_loads"],
+                plot_df["tokens_per_second"],
+                c=plot_df["_recall"],
+                cmap="viridis",
+                s=np.clip(plot_df["prefetch_budget"].fillna(8) * 2.5, 25, 120),
+                alpha=0.88,
+                edgecolors="#e0e4f0",
+                linewidths=0.25,
+                vmin=float(r0.min()),
+                vmax=float(r0.max()),
+            )
+            ax0.set_xlabel("Stall loads (blocking on-demand expert loads)")
+            ax0.set_ylabel("Tokens / second")
+            ax0.set_title("Decode TPS vs stalls\ncolour = predictor recall (%)", fontsize=11, fontweight="bold")
+            ax0.grid(True, alpha=0.45)
+            fig.colorbar(sc0, ax=ax0, shrink=0.82, label="Recall (%)")
+        else:
+            ax0.scatter(
+                plot_df["stall_loads"],
+                plot_df["tokens_per_second"],
+                c="#4fc3f7",
+                s=np.clip(plot_df["prefetch_budget"].fillna(8) * 2.5, 25, 120),
+                alpha=0.88,
+                edgecolors="#e0e4f0",
+                linewidths=0.25,
+            )
+            ax0.set_xlabel("Stall loads (blocking on-demand expert loads)")
+            ax0.set_ylabel("Tokens / second")
+            ax0.set_title("Decode TPS vs stalls\n(recall metrics missing in CSV)", fontsize=11, fontweight="bold")
+            ax0.grid(True, alpha=0.45)
+
+        p1 = plot_df["_precision"].dropna()
+        if p1.empty:
+            ax1.text(0.5, 0.5, "No precision metric\n(pred_requested_rate_topk_pct)", ha="center", va="center", transform=ax1.transAxes, fontsize=11)
+            ax1.set_axis_off()
+        else:
+            sc1 = ax1.scatter(
+                plot_df["stall_loads"],
+                plot_df["tokens_per_second"],
+                c=plot_df["_precision"],
+                cmap="magma",
+                s=np.clip(plot_df["prefetch_budget"].fillna(8) * 2.5, 25, 120),
+                alpha=0.88,
+                edgecolors="#e0e4f0",
+                linewidths=0.25,
+                vmin=p1.min(),
+                vmax=p1.max(),
+            )
+            ax1.set_xlabel("Stall loads (blocking on-demand expert loads)")
+            ax1.set_ylabel("Tokens / second")
+            ax1.set_title("Decode TPS vs stalls\ncolour = predictor precision (%)", fontsize=11, fontweight="bold")
+            ax1.grid(True, alpha=0.45)
+            fig.colorbar(sc1, ax=ax1, shrink=0.82, label="Precision (%)")
+
+        handles = [
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                markerfacecolor="#4fc3f7",
+                markersize=6,
+                linestyle="None",
+                label="marker size ∝ prefetch B",
+            ),
+        ]
+        ax0.legend(handles=handles, loc="lower right", fontsize=7, framealpha=0.35)
+        if not p1.empty:
+            ax1.legend(handles=handles, loc="lower right", fontsize=7, framealpha=0.35)
+
+        fig.suptitle("Where does prefetch speedup come from? (λ=0 prefetch-only)", fontsize=13, fontweight="bold", y=1.02)
+        plt.tight_layout()
+        save_plot(fig, out_dir, f"prefetch_speedup_attribution_{ts}.png")
+
+
+def plot_stride_sweep(df_stride: pd.DataFrame, out_dir: str, ts: str) -> None:
+    """Cache hit rate / TPS vs invoke stride, one panel per model checkpoint depth (fN)."""
+    df = df_stride[df_stride["backend"] == "predict"].copy()
+    if df.empty:
+        return
+    df["predictor_stride"] = pd.to_numeric(df["predictor_stride"], errors="coerce")
+    df["lookahead"] = pd.to_numeric(df["lookahead"], errors="coerce")
+    model_depths = sorted(df["lookahead"].dropna().unique(), key=int)
+    cache_sizes = sorted(df["cache_size"].dropna().unique(), key=int)
+    metrics: List[Tuple[str, str]] = []
+    if df["hit_rate_pct"].notna().any():
+        metrics.append(("hit_rate_pct", "Cache Hit Rate (%)"))
+    if df["tokens_per_second"].notna().any():
+        metrics.append(("tokens_per_second", "Tokens per Second"))
+    if df["pred_hit_rate_routed_topk_pct"].notna().any():
+        metrics.append(("pred_hit_rate_routed_topk_pct", "Predictor Recall on Routed Top-K (%)"))
+    if not metrics:
+        return
+
+    df_lru = df_stride[df_stride["label"] == "LRU Baseline"]
+    for cache_size in cache_sizes:
+        sub_all = df[df["cache_size"] == cache_size]
+        lru_row = df_lru[df_lru["cache_size"] == cache_size]
+        ncols = min(len(model_depths), 2)
+        nrows = math.ceil(len(model_depths) / ncols)
+        with plt.style.context(PLOT_STYLE):
+            fig, axes = plt.subplots(
+                len(metrics), nrows * ncols,
+                figsize=(5.5 * ncols, 4 * len(metrics) * nrows),
+                squeeze=False,
+            )
+            fig.suptitle(
+                f"Predictor invoke stride vs steady-state metrics (cache={cache_size})",
+                fontsize=13,
+                fontweight="bold",
+                y=1.02,
+            )
+            for m_idx, (metric_col, ylabel) in enumerate(metrics):
+                for d_idx, model_depth in enumerate(model_depths):
+                    ax_row = m_idx
+                    ax_col = d_idx
+                    ax = axes[ax_row][ax_col]
+                    sub = sub_all[sub_all["lookahead"] == model_depth].sort_values("predictor_stride")
+                    if sub.empty:
+                        ax.set_visible(False)
+                        continue
+                    if not lru_row.empty and lru_row[metric_col].notna().any():
+                        ax.axhline(float(lru_row[metric_col].mean()), **LRU_STYLE, label="LRU Baseline")
+                    xs = sub["predictor_stride"].astype(int).tolist()
+                    ys = sub[metric_col].astype(float).tolist()
+                    ax.plot(xs, ys, color="#80cbc4", linewidth=1.5, alpha=0.6, zorder=1)
+                    for _, row in sub.iterrows():
+                        stride = int(row["predictor_stride"])
+                        matched = stride == int(model_depth)
+                        ax.scatter(
+                            stride,
+                            row[metric_col],
+                            marker="o" if matched else "s",
+                            color=lookahead_color(stride),
+                            s=70,
+                            zorder=3,
+                            label=f"stride={stride}" + (" (matched)" if matched else ""),
+                        )
+                    style_ax(
+                        ax,
+                        f"Checkpoint f{int(model_depth)}",
+                        "Invoke stride (tokens)",
+                        ylabel,
+                    )
+            for idx in range(len(model_depths), nrows * ncols):
+                for m_idx in range(len(metrics)):
+                    axes[m_idx][idx].set_visible(False)
+            plt.tight_layout()
+            save_plot(fig, out_dir, f"stride_sweep_C{cache_size}_{ts}.png")
+
+
+def generate_all_plots(
+    df: pd.DataFrame,
+    out_dir: str,
+    ts: str,
+    *,
+    plot_command: Optional[str] = None,
+) -> None:
+    global _current_plot_command
     if not have_plot_deps():
         raise RuntimeError("Plot dependencies are unavailable. Install matplotlib and numpy to generate plots.")
     os.makedirs(out_dir, exist_ok=True)
+    _current_plot_command = plot_command or read_plot_command(out_dir)
     df_lambda_fn = df[df["question"] == "LAMBDA_FN_SWEEP"].copy()
     if not df_lambda_fn.empty:
         plot_lambda_fn_sweep(df, out_dir, ts)
@@ -2160,7 +2984,9 @@ def generate_all_plots(df: pd.DataFrame, out_dir: str, ts: str) -> None:
     df_cache_cond = df[df["question"] == "CACHE_COND"].copy()
     df_forced_n = df[df["question"] == "FORCED_N"].copy()
     df_custom = df[df["question"].isin(["CUSTOM_1_16", "CUSTOM_1_16_NO_PPL", "CUSTOM_1_16_PPL_ONLY"])].copy()
+    df_april = df[df["question"] == "APRIL_4WAY_NO_PPL"].copy()
     df_top_p_cal = df[df["question"].isin(["TOP_P_CALIBRATION", "PROBABILITY_MASS_CALIBRATION"])].copy()
+    df_stride = df[df["question"] == "STRIDE_SWEEP"].copy()
     base_arg = df_base if not df_base.empty else None
     if not df_base.empty:
         plot_baseline(df_base, out_dir, ts)
@@ -2173,12 +2999,20 @@ def generate_all_plots(df: pd.DataFrame, out_dir: str, ts: str) -> None:
         plot_cache_cond(df_cache_cond, base_arg, out_dir, ts)
     if not df_forced_n.empty:
         plot_forced_n(df_forced_n, base_arg, out_dir, ts)
+    if not df_april.empty:
+        plot_april_4way_coupled(df_april, out_dir, ts)
+        plot_prefetch_speedup_attribution(df_april, out_dir, ts)
     if not df_custom.empty:
         plot_custom_1_16(df_custom, out_dir, ts)
+        plot_advisor_dashboard(df_custom, out_dir, ts)
         plot_hit_rates(df_custom, out_dir, ts)
+        plot_prefetch_speedup_attribution(df_custom, out_dir, ts)
+        plot_precision_recall_frontier(df_custom, out_dir, ts)
         plot_predictor_comparison(df_custom, out_dir, ts)
     if not df_top_p_cal.empty:
         plot_probability_mass_calibration(df_top_p_cal, out_dir, ts)
+    if not df_stride.empty:
+        plot_stride_sweep(df_stride, out_dir, ts)
 
 
 def run_simple_mode(args: argparse.Namespace) -> int:
@@ -2343,10 +3177,12 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             print(f"Error: CSV not found: {csv_file}", flush=True)
             return 1
         df = pd.read_csv(csv_file)
-        generate_all_plots(df, plot_dir, TS)
+        plot_cmd = read_plot_command(plot_dir) or " ".join(sys.argv)
+        generate_all_plots(df, plot_dir, TS, plot_command=plot_cmd)
         return 0
 
     os.makedirs(plot_dir, exist_ok=True)
+    write_plot_command_file(plot_dir, " ".join(sys.argv))
     csv_parent = os.path.dirname(os.path.abspath(csv_file))
     if csv_parent:
         os.makedirs(csv_parent, exist_ok=True)
@@ -2385,9 +3221,16 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
         "forced_n": lambda: forced_n_configs(args),
         "custom_1_16": lambda: _make_custom_configs(custom_1_16_configs, "CUSTOM_1_16"),
         "custom_1_16_no_ppl": lambda: _make_custom_configs(custom_1_16_no_ppl_configs, "CUSTOM_1_16_NO_PPL"),
+        "april_4way_no_ppl": lambda: _make_custom_configs(
+            lambda a, predictor_base_dir=None, predictor_tag="": april_4way_no_ppl_configs(
+                a, min_cache_map, predictor_base_dir=predictor_base_dir, predictor_tag=predictor_tag
+            ),
+            "APRIL_4WAY_NO_PPL",
+        ),
         "custom_1_16_ppl_only": lambda: _make_custom_configs(custom_1_16_ppl_only_configs, "CUSTOM_1_16_PPL_ONLY"),
         "lambda_fn_sweep": lambda: lambda_fn_sweep_configs(args),
         "probability_mass_calibration": lambda: probability_mass_calibration_configs(args),
+        "stride_sweep": lambda: stride_sweep_configs(args, min_cache_map),
         # Backward-compatible alias.
         "top_p_calibration": lambda: probability_mass_calibration_configs(args),
     }
@@ -2413,6 +3256,7 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
                         int(row["forced_top_n"]),
                         row.get("lookahead"),
                         row.get("prefetch_budget"),
+                        row.get("predictor_stride"),
                         row.get("mode_perplexity"),
                         row.get("mode_generate"),
                     )
@@ -2474,7 +3318,8 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
     print(f"[sweep] Runs with data: {ok_count} / {len(results)}", flush=True)
     print("\n[sweep] Generating plots...", flush=True)
     try:
-        generate_all_plots(df, plot_dir, TS)
+        plot_cmd = read_plot_command(plot_dir) or " ".join(sys.argv)
+        generate_all_plots(df, plot_dir, TS, plot_command=plot_cmd)
     except Exception as e:
         if not have_plot_deps():
             print("[sweep] Skipping plots because matplotlib/numpy are unavailable in this Python.", flush=True)
@@ -2500,10 +3345,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "forced_n",
             "custom_1_16",
             "custom_1_16_no_ppl",
+            "april_4way_no_ppl",
             "custom_1_16_ppl_only",
             "lambda_fn_sweep",
             "probability_mass_calibration",
             "top_p_calibration",
+            "stride_sweep",
             "all",
         ],
         default="simple",
@@ -2518,11 +3365,36 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--budget-fractions", type=float, nargs="+", default=[0.25, 0.5, 0.75, 1.0],
                    help="Budget as a fraction of cache size for custom_1_16/lambda_fn/top_p sweeps. "
                         "Sweeps the sweet spot between cache thrashing (high fraction) and under-utilisation (low fraction).")
+    p.add_argument(
+        "--custom-explicit-prefetch-budgets",
+        action="store_true",
+        help="CUSTOM_1_16 family: use --prefetch-budgets values (clamped to 1..cache_size) instead of --budget-fractions.",
+    )
+    p.add_argument(
+        "--prefetch-from-budget-fractions",
+        action="store_true",
+        help="CUSTOM_1_16 family: use --budget-fractions × cache_size even if --custom-explicit-prefetch-budgets "
+        "was set earlier (pass after forwarded args from finals_experiment_runner).",
+    )
     p.add_argument("--budget-equals-cache-size", action="store_true", help="Use budget=cache_size in comprehensive predict sweeps.")
     p.add_argument("--lambda-val", type=float, default=0.0, help="Single lambda value for simple mode.")
     p.add_argument("--lambdas", type=float, nargs="+", default=[0.0, 0.5, 1.0], help="Lambda sweep for comprehensive mode.")
     p.add_argument("--cache-cond-lambdas", type=float, nargs="+", default=[0.5, 1.0])
     p.add_argument("--lookaheads", type=int, nargs="+", default=None, help="Lookahead depths for comprehensive mode.")
+    p.add_argument(
+        "--predictor-strides",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Invoke strides for stride_sweep (--predictor-lookahead). Decoupled from checkpoint fN.",
+    )
+    p.add_argument(
+        "--stride-sweep-model-depths",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Checkpoint depths (eh1_h32_fN) for stride_sweep. Defaults to --lookaheads or [4, 8].",
+    )
     p.add_argument("--predictor-path", type=str, default="", help="Required for simple predict backend.")
     p.add_argument(
         "--predictor-base-dir",
@@ -2608,6 +3480,21 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--expert-weights-dir", type=str, default=None,
         help="Override expert weight directory for MoE layers. Supports packed (EXPK, 1 "
              "file/expert) and unpacked (9 files/expert) layouts — auto-detected at runtime.",
+    )
+    p.add_argument(
+        "--prefetch-forced-top-ns",
+        type=int,
+        nargs="*",
+        default=None,
+        help="CUSTOM_1_16 family only: emit extra Prefetch-Only rows with --forced-top-n J per J "
+             "in this list (0 = default unbiased prefetch line). Use e.g. `0 2 3 4 5 6 7 8` to compare "
+             "predictor+top-J vs plain prefetch at the same budget.",
+    )
+    p.add_argument(
+        "--april-forced-top-n",
+        type=int,
+        default=6,
+        help="april_4way_no_ppl: forced_top_n on predict rows (April 2026 sweep used 6).",
     )
     return p
 

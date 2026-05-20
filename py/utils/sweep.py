@@ -277,7 +277,18 @@ def build_cmd(args, model_script, backend, cache_size, lambda_val,
     ])
 
     if phase == "perplexity":
-        cmd += ["--generation-perplexity", "--no-generate"]
+        cmd += [
+            "--generation-perplexity",
+            "--generate",
+            "--max-new-tokens",
+            str(args.max_new_tokens),
+            "--temperature",
+            str(getattr(args, "temperature", 0.0)),
+            "--top-p",
+            str(getattr(args, "top_p", 0.9)),
+            "--top-k",
+            str(getattr(args, "top_k", 50)),
+        ]
     else:
         cmd += ["--generate", "--max-new-tokens", str(args.max_new_tokens)]
 
