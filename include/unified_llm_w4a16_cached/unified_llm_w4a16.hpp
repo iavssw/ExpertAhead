@@ -214,6 +214,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     // Cache State
     std::vector<int64_t> expert_slots_indices; // Maps Slot ID [0..max_cached] -> Global Expert ID. -1 if empty.
     std::vector<int64_t> locked_experts_;      // Experts that are locked in the cache by the PREFILL policy
+    std::vector<int64_t> currently_selected_experts_; // Experts currently selected to prevent their eviction
     
     struct ExpertSlotMeta {
         int64_t expert_id = -1;    // global expert in this slot (-1 = empty)
@@ -280,7 +281,6 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                            int64_t top_k = 50, int64_t eos_token_id = -1);
 
     // Calculate generation perplexity (NLL) by simulating sequential token generation (step-by-step)
-    double calculate_generation_perplexity(torch::Tensor input_ids);
 
     // Load quantized weights from safetensors file
     void load_quantized_weights_from_safetensors(const std::string &filename);

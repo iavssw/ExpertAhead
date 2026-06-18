@@ -15,6 +15,15 @@ inline void print_moe_stall_bandwidth(std::ostream& os, int64_t stall_loads, int
        << ", AvgLoadTime=" << std::fixed << std::setprecision(2) << avg_load_time_ms << "ms\n";
 }
 
+inline void print_moe_prefetch_overlap(std::ostream& os, int64_t prefetch_hidden_ready, int64_t prefetch_hidden_wait,
+                                       int64_t prefetch_ticks_skipped) {
+    if (prefetch_hidden_ready + prefetch_hidden_wait + prefetch_ticks_skipped <= 0) {
+        return;
+    }
+    os << "    PrefetchOverlap: HiddenReady=" << prefetch_hidden_ready << ", HiddenWait=" << prefetch_hidden_wait
+       << ", TicksSkipped=" << prefetch_ticks_skipped << "\n";
+}
+
 inline void print_moe_miss_bandwidth(std::ostream& os, int64_t miss_loads, double avg_load_time_ms) {
     if (miss_loads <= 0) {
         return;

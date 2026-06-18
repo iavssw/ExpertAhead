@@ -11,9 +11,14 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <sys/stat.h>
 #include <unistd.h>
 
 namespace unified_llm_w4a16_common {
+
+inline size_t align_up(size_t n, size_t align = 512) {
+    return (n + align - 1) / align * align;
+}
 
 // Set HETEROPREDICT_SEQUENTIAL_EXPERT_IO=1 to disable parallel pread dispatches inside
 // each expert load (packed + unpacked). For A/B testing LRU TPS vs parallel I/O.
@@ -29,6 +34,30 @@ inline void log_sequential_expert_io_once() {
         std::cout << "[MoE I/O] HETEROPREDICT_SEQUENTIAL_EXPERT_IO=1: sequential pread per tensor "
                      "(no std::async dispatches within expert load)."
                   << std::endl;
+    }
+}
+
+// Set HETEROPREDICT_SEQUENTIAL_INTER_EXPERT_IO=1 to load predicted / on-demand experts
+// one-at-a-time instead of dispatching parallel load_expert_weights() calls.
+// Default (unset): parallel inter-expert loads (SSD queue depth).
+inline bool parallel_inter_expert_loads() {
+    const char* v = std::getenv("HETEROPREDICT_SEQUENTIAL_INTER_EXPERT_IO");
+    return !(v && (v[0] == '1' || v[0] == 'y' || v[0] == 'Y'));
+}
+
+inline void log_parallel_inter_expert_io_once() {
+    static bool logged = false;
+    if (!logged) {
+        logged = true;
+        if (parallel_inter_expert_loads()) {
+            std::cout << "[MoE I/O] parallel inter-expert loads enabled (default). "
+                         "Set HETEROPREDICT_SEQUENTIAL_INTER_EXPERT_IO=1 for sequential."
+                      << std::endl;
+        } else {
+            std::cout << "[MoE I/O] HETEROPREDICT_SEQUENTIAL_INTER_EXPERT_IO=1: sequential "
+                         "load_expert_weights per batch (no parallel across experts)."
+                      << std::endl;
+        }
     }
 }
 
@@ -59,6 +88,7 @@ inline void read_bin_tensor_pread(const std::string& path, void* dest_ptr, size_
     char* ptr = static_cast<char*>(dest_ptr);
 
     if (is_direct && (((uintptr_t)ptr % 512) != 0 || (copy_size % 512) != 0)) {
+        std::cout << "[WARNING] O_DIRECT stripped for " << path << " due to alignment. ptr=" << (uintptr_t)ptr << ", copy_size=" << copy_size << std::endl;
         int current_flags = fcntl(fd, F_GETFL);
         fcntl(fd, F_SETFL, current_flags & ~O_DIRECT);
     }

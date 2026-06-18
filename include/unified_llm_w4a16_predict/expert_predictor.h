@@ -64,6 +64,7 @@ public:
     virtual std::vector<int64_t> get_prediction() = 0;
     virtual std::vector<int64_t> try_get_prediction() = 0;
     virtual double get_prediction_time_ms() = 0;
+    virtual int get_history_length() { return 1; }
 };
 
 // ============================================================================
@@ -187,6 +188,46 @@ public:
         
         // Load the model
         try {
+            // Attempt to read best.json for history length.
+            // The model path is like ".../layer_X/best_jit.pt", but the config is
+            // ".../layer_X/best.json" — so look in the same directory.
+            {
+                std::string dir_path = model_path;
+                size_t last_sep = dir_path.find_last_of("/\\");
+                if (last_sep != std::string::npos) {
+                    dir_path = dir_path.substr(0, last_sep);
+                } else {
+                    dir_path = ".";
+                }
+                // Try best.json first, then training_metrics.json
+                std::vector<std::string> json_candidates = {
+                    dir_path + "/best.json",
+                    dir_path + "/training_metrics.json",
+                };
+                for (const auto& json_path : json_candidates) {
+                    std::ifstream ifs(json_path);
+                    if (!ifs.is_open()) continue;
+                    std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+                    size_t pos = content.find("\"history\"");
+                    if (pos != std::string::npos) {
+                        pos = content.find(":", pos);
+                        if (pos != std::string::npos) {
+                            pos++;
+                            while (pos < content.length() && (content[pos] == ' ' || content[pos] == '\t')) pos++;
+                            size_t end_pos = pos;
+                            while (end_pos < content.length() && std::isdigit(content[end_pos])) end_pos++;
+                            if (end_pos > pos) {
+                                history_length_ = std::stoi(content.substr(pos, end_pos - pos));
+                                std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+                                          << "] Detected history_length=" << history_length_ 
+                                          << " from " << json_path << std::endl;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             // Attempt to load on the specified device
             if (device_.type() != torch::kCPU) {
                  std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
@@ -290,6 +331,10 @@ public:
     double get_prediction_time_ms() override {
         return prediction_time_ms_;
     }
+
+    int get_history_length() override {
+        return history_length_;
+    }
     
 private:
     void worker_loop() {
@@ -336,10 +381,29 @@ private:
         }
         
         try {
-            // Prepare input
             torch::Tensor input = embedding.to(torch::kFloat32).to(device_);
             if (input.dim() == 1) {
                 input = input.unsqueeze(0); 
+            }
+            if (input.dim() == 2) {
+                input = input.unsqueeze(1);
+            }
+            
+            if (history_length_ > 1) {
+                emb_history_.push_back(input);
+                while (emb_history_.size() > history_length_) {
+                    emb_history_.pop_front();
+                }
+                
+                std::vector<torch::Tensor> to_concat;
+                int pad_count = history_length_ - emb_history_.size();
+                for (int i = 0; i < pad_count; ++i) {
+                    to_concat.push_back(emb_history_.front());
+                }
+                for (const auto& t : emb_history_) {
+                    to_concat.push_back(t);
+                }
+                input = torch::cat(to_concat, 1);
             }
             
             std::vector<torch::jit::IValue> inputs;
@@ -355,6 +419,7 @@ private:
                 if (prev_expert_onehot.has_value()) {
                     torch::Tensor prev_exp = prev_expert_onehot.value().to(torch::kFloat32).to(device_);
                     if (prev_exp.dim() == 1) prev_exp = prev_exp.unsqueeze(0);
+                    // Do NOT add history buffering here. The model expects [batch, experts], not [batch, history, experts]
                     inputs.push_back(prev_exp);
                 }
             }
@@ -433,6 +498,10 @@ private:
     std::condition_variable result_cv_;
     
     double delta_avg_ = 0.0;
+    int history_length_ = 1;
+    
+    std::deque<torch::Tensor> emb_history_;
+    std::deque<torch::Tensor> prev_expert_history_;
     
     std::atomic<int64_t> next_job_id_{0};
 };

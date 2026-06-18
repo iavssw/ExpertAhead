@@ -4,7 +4,11 @@
 {
     std::string path = weights_dir + "/layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx) + ".bin";
 
-    int fd = open(path.c_str(), O_RDONLY);
+    int fd = open(path.c_str(), O_RDONLY | O_DIRECT);
+    if (fd == -1) {
+        // Fallback to normal open if O_DIRECT is not supported or if the file format is old/unaligned
+        fd = open(path.c_str(), O_RDONLY);
+    }
     if (fd == -1) {
         throw std::runtime_error("Cannot open packed expert: " + path + " (" + strerror(errno) + ")");
     }
@@ -20,8 +24,8 @@
         uint64_t size;
     };
 
-    alignas(8) char header_buf[kExpkHeaderSize];
-    if (pread(fd, header_buf, kExpkHeaderSize, 0) != static_cast<ssize_t>(kExpkHeaderSize)) {
+    alignas(512) char header_buf[512];
+    if (pread(fd, header_buf, 512, 0) < static_cast<ssize_t>(kExpkHeaderSize)) {
         close(fd);
         throw std::runtime_error("Short header read for packed expert: " + path);
     }

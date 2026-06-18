@@ -9,6 +9,7 @@
 #include <deque>
 #include <mutex>
 #include <future>
+#include <unordered_set>
 #include <unified_llm_w4a16_predict/expert_predictor.h>
 
 // Attention mechanism default (can be overridden at runtime by heterogeneity config):
@@ -161,7 +162,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void set_mass_threshold_substitution_p(double p) { mass_threshold_substitution_p_ = p; }
     double get_mass_threshold_substitution_p() const { return mass_threshold_substitution_p_; }
 
-    enum class CachePolicy { LRU, PREFILL };
+    enum class CachePolicy { LRU, MRU, LFU, MFU, CLOCK, RANDOM, LFRU, PREFILL };
     void set_cache_policy(CachePolicy policy) { cache_policy_ = policy; }
     
     // Number of top experts to lock into cache during prefill.
@@ -196,6 +197,10 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
         pred_requested_total_forced_n_ = 0;
         pred_requested_hits_topk_ = 0;
         pred_requested_total_topk_ = 0;
+        pred_hits_window_recall_ = 0;
+        pred_total_window_recall_ = 0;
+        pred_hits_window_precision_ = 0;
+        pred_total_window_precision_ = 0;
         last_true_top1_expert_ = -1;  // Reset so first token doesn't count
         decode_token_count_ = 0;      // Reset stride counter for new generation
         decode_step_counter_ = 0;
@@ -287,14 +292,25 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     bool random_fill_mode_ = false;               // Experiment: substitute non-top-N slots with random experts
 
     CachePolicy cache_policy_ = CachePolicy::LRU;
-    std::vector<int64_t> locked_experts_;        // Experts that are locked in the cache by the PREFILL policy
+    std::vector<int64_t> locked_experts_;        // Experts locked by the PREFILL policy
+    std::vector<int64_t> currently_selected_experts_; // Experts currently selected to prevent their eviction
 
     // Prefill distribution tracking
     torch::Tensor prefill_expert_counts_;
 
     // Cache State
     std::vector<int64_t> expert_slots_indices; // Maps Slot ID [0..max_cached] -> Global Expert ID. -1 if empty.
-    std::vector<size_t> expert_lru_order_;       // List of Slot IDs, ordered by usage (LRU at front, MRU at back).
+
+    struct ExpertSlotMeta {
+        int64_t expert_id = -1;    // global expert in this slot (-1 = empty)
+        uint64_t access_count = 0; // for LFU/MFU/LFRU
+        uint64_t last_access = 0;  // for LRU/MRU/LFRU
+        uint8_t clock_bit = 0;     // for CLOCK algorithm
+    };
+
+    std::vector<ExpertSlotMeta> slot_meta_; // Per-slot metadata (matches cached backend)
+    uint64_t access_clock_ = 0;             // global logical clock for recency
+    size_t clock_hand_ = 0;                 // clock hand for CLOCK eviction
     
     int64_t cache_hits_ = 0;
     int64_t cache_misses_ = 0;
@@ -307,7 +323,16 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t total_steps_gt1_loaded_ = 0;
 
     int64_t stall_loads_ = 0;
+    /** SSD reads started on the speculative prefetch path (issued, not necessarily hidden). */
     int64_t prefetch_loads_ = 0;
+    /** Router access: expert was prefetched and slot was ready (no wait) — maps to M_prefetch hides. */
+    int64_t prefetch_hits_ready_ = 0;
+    /** Router access: expert was prefetched but decode waited on in-flight load — overlap/M_cap limited. */
+    int64_t prefetch_hits_wait_ = 0;
+    /** Predictor tick skipped because previous async prefetch batch still running. */
+    int64_t prefetch_ticks_skipped_ = 0;
+    // Per-slot provenance: 0=unknown/prewarm, 1=prefetch, 2=stall (main-thread miss).
+    std::vector<uint8_t> slot_load_origin_;
 
     // Tracker for how many of the prefetched experts were correctly in the actual Top-K chosen
     int64_t pred_match_0_ = 0;
@@ -331,7 +356,23 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t pred_requested_total_forced_n_ = 0;
     int64_t pred_requested_hits_topk_ = 0;
     int64_t pred_requested_total_topk_ = 0;
+    // Window-aware precision/recall: evaluate predicted set against the UNION of
+    // actual routed experts across all tokens in the lookahead window [t+1, t+N].
+    int64_t pred_hits_window_recall_    = 0;  // |pred_set ∩ actual_window|
+    int64_t pred_total_window_recall_   = 0;  // |actual_window|
+    int64_t pred_hits_window_precision_ = 0;  // |pred_set ∩ actual_window|
+    int64_t pred_total_window_precision_= 0;  // |pred_set|
     int64_t last_true_top1_expert_ = -1; // unbiased top-1 from previous token (ground truth for predictor stat)
+
+    // Pending prediction queue entry: accumulates the actual expert union over the
+    // lookahead window so precision/recall can be evaluated against the full window.
+    struct PendingPrediction {
+        int64_t target_step;                        // decode step at which to finalize (= source + lookahead_stride_)
+        std::vector<int64_t> pred_set;              // predicted expert IDs (top-B)
+        std::unordered_set<int64_t> actual_union;   // union of actual routed experts accumulated so far
+    };
+    std::deque<PendingPrediction> pending_predictions_;
+    std::mutex pending_predictions_mutex_;
     
     // Sequential top1 tracking
     int64_t sequential_top1_hits_ = 0;
@@ -342,8 +383,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::vector<int64_t> last_pred_no_bias_;
     std::mutex pred_results_mutex_;
     std::atomic<bool> pred_results_ready_{false};
-    std::deque<std::pair<int64_t, std::vector<int64_t>>> pending_predictions_;
-    std::mutex pending_predictions_mutex_;
+    // (replaced by PendingPrediction deque above)
     
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
@@ -361,6 +401,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     // Prediction & Speculative Loading
     std::unique_ptr<IExpertPredictor> predictor_;
     std::vector<int64_t> recent_token_ids_;
+    std::deque<torch::Tensor> recent_embeddings_;
     std::future<void> speculative_load_future_;
     bool in_generation_mode_ = false;
     std::mutex expert_slots_mutex_;  // For thread safety during loading
@@ -377,6 +418,15 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
+    size_t pick_victim_ready();
+    size_t pick_lru_ready();
+    size_t pick_mru_ready();
+    size_t pick_lfu_ready();
+    size_t pick_mfu_ready();
+    size_t pick_clock_ready();
+    size_t pick_random_ready();
+    size_t pick_lfru_ready();
+    void update_cache_bitmask_locked();
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);
@@ -435,7 +485,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void set_mass_threshold_substitution_p(double p);
     void set_random_fill_mode(bool on);
     void set_prefill_top_n(int64_t n);
-    void set_cache_policy(std::string policy_name, int64_t layer_idx = -1);
+    void set_cache_policy(const std::string& policy_name, int64_t layer_idx = -1);
 
     // Move model to device
     // Move model to device
@@ -452,6 +502,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Each element: (hits, total) for that layer
     std::vector<std::tuple<int64_t, int64_t>> get_predictor_stats() const;
     void reset_predictor_stats();
+    void set_suppress_predictor_stats(bool v);
 
     // Set how often the predictor fires: every `stride` decode tokens.
     // Call this after construction with stride = lookahead depth (fN from predictor path).
@@ -493,6 +544,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     
     // Training data collection
     bool collect_training_data_ = false;
+    bool measurement_suppressed_globally_ = false;
     std::vector<std::pair<torch::Tensor, torch::Tensor>> training_data_;  // [(post_attn_norm_embeddings, router_logits), ...]
     int attention_mode_; // 0=manual matmul, 1=PyTorch SDPA, 2=Custom HIP kernel
     bool multi_gpu_enabled_ = false;
