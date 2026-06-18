@@ -1,95 +1,109 @@
 #!/usr/bin/env python3
 """
-Final-results experiment launcher — **nine** GPU sweeps (+ optional ``final_analysis_readme``).
+Thesis results launcher — GPU sweeps for all five results sections.
 
-Expert-reuse / motivation figures come from ``py/expert_predictor/analyze_expert_reuse.py``, not here.
+Each experiment writes under ``final_results_runs/<key>/<timestamp>/`` with a
+``command.txt`` log. Sections 2–5 use ``sweep_predict_cached_cache_metrics.py`` and
+write ``sweep.csv`` incrementally (resume with ``--retry-failed``). Section 1 uses
+``sweep_cache_policy.py`` and writes ``sweep.csv`` after each config (plus policy plots at the end).
 
-Invokes ``sweep_predict_cached_cache_metrics.py`` with fixed argument bundles.
-Comprehensive sweeps write ``sweep.csv`` after each **config row**; use ``--retry-failed``
-with a stable ``--csv-file`` to resume.
+Experiments:
 
-GPU experiments (sweeps)
-------------------------
-1. ``predictor_architecture_ablation`` — multi-predictor A/B (needs ``--predictor-base-dirs``).
-2. ``decode_throughput_and_pareto`` — LRU vs prefetch-only + gen PPL + TPS; same CSV also
-   yields ``precision_recall_frontier_*`` plots (Pareto-style overlay).
-2b. ``decode_throughput_and_pareto_advisor`` — same decode grid as (2) but **no gen PPL pass**;
-   CSV still has **predictor recall/precision** and **stall/prefetch load** stats for advisor-facing
-   speedup attribution (see ``analyze_predictor_speedup_attribution.py``).
-3. ``all_methods_decode`` — LRU + prefetch + cache-cond + hybrid, gen PPL.
-4. ``routing_topj_vs_probability_mass`` — ``lambda_fn_sweep`` (top-j vs PM vs LRU, TPS+PPL).
-5. ``predictor_on_topj_prefetch`` — predict + prefetch-only, sweep ``J`` in ``{0,2..8}``.
-6. ``probability_mass_calibration_ppl`` — PPL-only vs PM (``probability_mass_calibration``).
-7. ``cache_budget_tradeoff`` — dense explicit prefetch budgets × cache sizes × lookaheads (λ=0);
-   post-process with ``analyze_cache_prefetch_tradeoff.py`` for Pareto picks.
-8. ``precision_recall_cache_lookahead_prefetch`` — same **grid** as (7) but ``custom_1_16_no_ppl``
-9. ``april_4way_replication`` — April 2026 coupled (C, LA, B) grid + combined PR/TPS/hit plots
-   (decode only, no gen-PPL pass). CSV includes ``pred_hit_rate_routed_topk_pct`` (recall-like) and
-   ``pred_requested_rate_topk_pct`` (precision-like); plots include ``advisor_dashboard_C*.png``
-   (raw TPS, recall, cache hit, precision), ``precision_recall_frontier_C*.png``, and
-   ``hit_rates_C*.png`` per cache size. Figures embed the launcher command from ``command.txt``.
+``sec1_cache_policy``
+    Section 1. Eviction policies (LRU, MRU, LFU, …) × cache size × λ on the
+    **cached** Qwen backend (no predictor). Generation only (TPS + hit rate).
 
-(Experiments 1–7 are the original numbered set; (2b) is the fast decode variant; (8) is the PR-focused
-decode-only grid matching (7) without gen PPL.)
+``sec2_predictor_effectiveness``
+    Sections 2 and 3. Predict vs LRU, lookahead × budget, lossless (no PPL).
+    Run before sec4/sec5 so the precision/recall frontier picks ideal (N, B).
 
-Slide-style Pareto (precision/recall frontier) is produced for CUSTOM_1_16 family sweeps; experiment **(2)**
-also includes gen PPL in the CSV when ``--custom-include-ppl`` is on.
+``sec4_routing_topj_vs_pm``
+    Section 4. Forced top-J vs probability-mass threshold (λ=1, cached).
 
-Optional (no sweep): ``final_analysis_readme`` — writes ``FINAL_ANALYSIS.md``.
+``sec5_all_methods``
+    Section 5. LRU vs Prefetch vs Cache-Cond vs Hybrid (λ∈{0,1}), with PPL.
+
+``final_results_collection``
+    Full thesis sweep: C∈{8,16,24,32,40,48,56,64}, all valid lookaheads × budget
+    fractions, 10-prompt TPS for all four policies, then a second pass that runs wikitext
+    PPL on LRU + best Cache-Cond + Hybrid at each cache size (same selection as the
+    unified LFRU plot). Uses LFRU eviction + page-cache drops.
+
+``random_baseline_collection``
+    Append-only: one Neither (RANDOM) cached λ=0 row per C (same prompts as the collection).
+    Merge into an existing ``sweep.csv`` via ``--csv-file`` / ``--run-dir``.
 """
 
 from __future__ import annotations
 
 import argparse
 import os
+import re
 import subprocess
 import sys
-import textwrap
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SWEEP_SCRIPT = os.path.join(SCRIPT_DIR, "sweep_predict_cached_cache_metrics.py")
+METRICS_SWEEP_SCRIPT = os.path.join(SCRIPT_DIR, "sweep_predict_cached_cache_metrics.py")
+CACHE_POLICY_SCRIPT = os.path.join(SCRIPT_DIR, "sweep_cache_policy.py")
+ROOT_PY = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 
 DEFAULT_PREDICTOR_BASE = (
-    "/home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model"
+    "/home/michael/heteroPredict/trainingData/qwen3_30b/final_predictor"
 )
-ROOT_PY = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 DEFAULT_REUSE_CSV = os.path.join(ROOT_PY, "expert_predictor", "expert_reuse_qwen3_30b.csv")
 
-FINALS_LOOKAHEADS = [1, 2, 3, 4, 6, 8, 10, 12, 16]
-# Subset for advisor-style decode+PPL runs (~12–16h vs multi-day full grid).
-ADVISOR_DECODE_LOOKAHEADS = [1, 2, 4, 8, 16]
-FINALS_CACHE_SIZES = [24, 32, 48]
-FINALS_TOP_J = [2, 3, 4, 5, 6, 7, 8]
-FINALS_PM = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+FINALS_LOOKAHEADS = [1]
+# sec2: only lookaheads for which final_predictor checkpoints exist.
+SEC2_LOOKAHEADS = [1, 2, 3, 4, 6, 8, 10, 12, 16]
+ROUTING_LOOKAHEADS = [1, 4, 8, 16]
+FINALS_CACHE_SIZES = [24, 32]
+FINAL_COLLECTION_CACHE_SIZES = [8, 16, 24, 32, 40, 48, 56, 64]
+FINAL_COLLECTION_NUM_PROMPTS = 10
+# sec2: sweep several cache sizes to assess predictor effectiveness.
+# SEC2_CACHE_SIZES = [8, 16, 24, 32, 40, 48, 56, 68]
+SEC2_CACHE_SIZES = [8, 16, 32, 48, 64]
+# Section 1: sweep several cache sizes to compare eviction policies.
+SEC1_CACHE_SIZES = [8, 16, 32, 48, 64]
+SEC1_POLICIES = ["LRU", "MRU", "LFU", "MFU", "RANDOM", "LFRU", "PREFILL"]
+SEC1_LAMBDAS = [0.0]
 FINALS_BUDGET_FRACTIONS = [0.25, 0.5, 0.75, 1.0]
-PREFETCH_J_SWEEP = [0, 2, 3, 4, 5, 6, 7, 8]
-
-# Wider cache grid + explicit prefetch B list for cache–budget tradeoff / Pareto analysis.
-CACHE_BUDGET_TRADEOFF_CACHE = [16, 20, 24, 28, 32, 36, 40, 48]
-CACHE_BUDGET_TRADEOFF_LOOKAHEADS = [1, 2, 4, 8, 16]
-CACHE_BUDGET_TRADEOFF_PREFETCH = [4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48]
+FINALS_ROUTING_BIAS_TOP_N = 5
+ROUTING_FORCED_TOP_NS = [3, 4, 5, 6, 7]
+ROUTING_PM_THRESHOLDS = [0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9]
 
 
-def _shared_sweep_args(lookaheads: Optional[List[int]] = None) -> List[str]:
-    las = lookaheads if lookaheads is not None else FINALS_LOOKAHEADS
+def _predictor_lookaheads(base_dir: str) -> List[int]:
+    """Lookahead depths with a checkpoint directory under *base_dir*."""
+    las: List[int] = []
+    try:
+        for entry in os.scandir(base_dir):
+            if not entry.is_dir():
+                continue
+            m = re.search(r"_f(\d+)$", entry.name)
+            if m:
+                las.append(int(m.group(1)))
+    except OSError:
+        pass
+    return sorted(set(las))
+
+
+def _collection_lookaheads(predictor_base_dir: str) -> List[int]:
+    available = set(_predictor_lookaheads(predictor_base_dir))
+    return [la for la in FINALS_LOOKAHEADS if la in available] or list(FINALS_LOOKAHEADS)
+
+
+def _common_sweep_args(lookaheads: List[int]) -> List[str]:
     return [
-        "--model",
-        "qwen",
-        "--dataset",
-        "wikitext",
-        "--cache-sizes",
-        *[str(x) for x in FINALS_CACHE_SIZES],
-        "--lookaheads",
-        *[str(x) for x in las],
-        "--constraint-expert-reuse-csv",
-        DEFAULT_REUSE_CSV,
-        "--routing-bias-top-n",
-        "8",
-        "--budget-fractions",
-        *[str(x) for x in FINALS_BUDGET_FRACTIONS],
+        "--model", "qwen",
+        "--dataset", "wikitext",
+        "--cache-sizes", *[str(x) for x in FINALS_CACHE_SIZES],
+        "--lookaheads", *[str(x) for x in lookaheads],
+        "--budget-fractions", *[str(x) for x in FINALS_BUDGET_FRACTIONS],
+        "--routing-bias-top-n", str(FINALS_ROUTING_BIAS_TOP_N),
+        "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
     ]
 
 
@@ -97,245 +111,188 @@ def _shared_sweep_args(lookaheads: Optional[List[int]] = None) -> List[str]:
 class Experiment:
     key: str
     description: str
-    sweep_question: str
-    extra_args: List[str]
-    # When set, run_one uses these instead of CLI --num-prompts / --max-new-tokens / --prompt-max-chars.
-    pinned_num_prompts: Optional[int] = None
-    pinned_max_new_tokens: Optional[int] = None
-    pinned_prompt_max_chars: Optional[int] = None
+    script: str
+    extra_args: List[str] = field(default_factory=list)
+    uses_predictor: bool = True
+    sweep_question: str = ""  # informational only (metrics sweeps)
 
 
 def _experiment_defs() -> Dict[str, Experiment]:
-    sh = _shared_sweep_args()
     return {
-        "predictor_architecture_ablation": Experiment(
-            key="predictor_architecture_ablation",
-            description="(1) Optional A/B: ``--predictor-base-dirs`` (≥2) + CUSTOM_1_16 + gen PPL.",
-            sweep_question="custom_1_16",
+        "sec1_cache_policy": Experiment(
+            key="sec1_cache_policy",
+            description="(sec 1) Expert cache eviction policies × cache size — TPS + hit rate (cached Qwen, λ=0).",
+            script=CACHE_POLICY_SCRIPT,
+            uses_predictor=False,
             extra_args=[
-                *sh,
-                "--sweep-question",
-                "custom_1_16",
-                "--lambdas",
-                "0",
-                "1",
-                "--custom-include-ppl",
+                "--model", "qwen",
+                "--backend", "cached",
+                "--dataset", "wikitext",
+                "--policies", *SEC1_POLICIES,
+                "--cache-sizes", *[str(x) for x in SEC1_CACHE_SIZES],
+                "--lambdas", *[str(x) for x in SEC1_LAMBDAS],
+                "--mode", "generation",
             ],
         ),
-        "decode_throughput_and_pareto": Experiment(
-            key="decode_throughput_and_pareto",
-            description="(2) LRU vs prefetch-only + gen PPL/TPS; PR frontier plots from same CSV.",
-            sweep_question="custom_1_16",
-            extra_args=[
-                *sh,
-                "--sweep-question",
-                "custom_1_16",
-                "--lambdas",
-                "0",
-                "--custom-include-ppl",
-            ],
-        ),
-        "decode_throughput_and_pareto_advisor": Experiment(
-            key="decode_throughput_and_pareto_advisor",
-            description="(2b) LRU vs prefetch-only (λ=0), decode TPS + predictor **recall/precision** "
-            "columns and **stall/prefetch load** counters (no gen PPL pass). Post-run: "
-            "``python py/utils/analyze_predictor_speedup_attribution.py --csv …/sweep.csv``. "
-            "Plots include ``prefetch_speedup_attribution_*.png`` (TPS vs stalls). "
-            "Pinned: 6 prompts, 128 max-new-tokens, 2048 prompt chars; fewer lookaheads than (2).",
+        "sec2_predictor_effectiveness": Experiment(
+            key="sec2_predictor_effectiveness",
+            description="(sec 2+3) Predict vs LRU, lookahead × budget, lossless (no PPL).",
+            script=METRICS_SWEEP_SCRIPT,
             sweep_question="custom_1_16_no_ppl",
             extra_args=[
-                *_shared_sweep_args(ADVISOR_DECODE_LOOKAHEADS),
-                "--sweep-question",
-                "custom_1_16_no_ppl",
-                "--lambdas",
-                "0",
-            ],
-            pinned_num_prompts=6,
-            pinned_max_new_tokens=128,
-            pinned_prompt_max_chars=2048,
-        ),
-        "all_methods_decode": Experiment(
-            key="all_methods_decode",
-            description="(3) LRU + prefetch + cache-cond + hybrid (λ∈{0,1}), gen PPL.",
-            sweep_question="custom_1_16",
-            extra_args=[
-                *sh,
-                "--sweep-question",
-                "custom_1_16",
-                "--lambdas",
-                "0",
-                "1",
-                "--custom-include-ppl",
+                *_common_sweep_args(SEC2_LOOKAHEADS),
+                "--cache-sizes", *[str(x) for x in SEC2_CACHE_SIZES],
+                "--sweep-question", "custom_1_16_no_ppl",
+                "--lambdas", "0",
+                "--num-prompts", "8"
             ],
         ),
-        "routing_topj_vs_probability_mass": Experiment(
-            key="routing_topj_vs_probability_mass",
-            description="(4) lambda_fn_sweep: top-j (2..8) vs PM (0.2..0.9) vs LRU; TPS + gen PPL.",
+        "sec4_routing_topj_vs_pm": Experiment(
+            key="sec4_routing_topj_vs_pm",
+            description="(sec 4) Cache-conditional routing: forced top-J vs probability mass.",
+            script=METRICS_SWEEP_SCRIPT,
             sweep_question="lambda_fn_sweep",
             extra_args=[
-                *sh,
-                "--sweep-question",
-                "lambda_fn_sweep",
-                "--lambdas",
-                "1",
-                "--budget-fractions",
-                "1.0",
-                "--cache-cond-forced-top-ns",
-                *[str(x) for x in FINALS_TOP_J],
-                "--probability-mass-thresholds",
-                *[str(x) for x in FINALS_PM],
+                *_common_sweep_args(ROUTING_LOOKAHEADS),
+                "--sweep-question", "lambda_fn_sweep",
+                "--lambdas", "1",
+                "--cache-cond-forced-top-ns", *[str(x) for x in ROUTING_FORCED_TOP_NS],
+                "--probability-mass-thresholds", *[str(x) for x in ROUTING_PM_THRESHOLDS],
             ],
         ),
-        "predictor_on_topj_prefetch": Experiment(
-            key="predictor_on_topj_prefetch",
-            description="(5) Predict + prefetch-only: sweep J in {0,2..8} via --prefetch-forced-top-ns.",
-            sweep_question="custom_1_16",
-            extra_args=[
-                *sh,
-                "--sweep-question",
-                "custom_1_16",
-                "--lambdas",
-                "0",
-                "--custom-include-ppl",
-                "--prefetch-forced-top-ns",
-                *[str(x) for x in PREFETCH_J_SWEEP],
-            ],
-        ),
-        "probability_mass_calibration_ppl": Experiment(
-            key="probability_mass_calibration_ppl",
-            description="(6) PPL-only vs PM (probability_mass_calibration); pairs with routing_topj_vs_probability_mass.",
-            sweep_question="probability_mass_calibration",
-            extra_args=[
-                *sh,
-                "--sweep-question",
-                "probability_mass_calibration",
-                "--lambdas",
-                "1",
-                "--budget-fractions",
-                "1.0",
-                "--probability-mass-thresholds",
-                *[str(x) for x in FINALS_PM],
-            ],
-        ),
-        "cache_budget_tradeoff": Experiment(
-            key="cache_budget_tradeoff",
-            description="(7) Explicit prefetch B grid × cache sizes × lookaheads (λ=0 prefetch-only + PPL).",
-            sweep_question="custom_1_16",
-            extra_args=[
-                "--model",
-                "qwen",
-                "--dataset",
-                "wikitext",
-                "--cache-sizes",
-                *[str(x) for x in CACHE_BUDGET_TRADEOFF_CACHE],
-                "--lookaheads",
-                *[str(x) for x in CACHE_BUDGET_TRADEOFF_LOOKAHEADS],
-                "--constraint-expert-reuse-csv",
-                DEFAULT_REUSE_CSV,
-                "--routing-bias-top-n",
-                "8",
-                "--custom-explicit-prefetch-budgets",
-                "--prefetch-budgets",
-                *[str(x) for x in CACHE_BUDGET_TRADEOFF_PREFETCH],
-                "--sweep-question",
-                "custom_1_16",
-                "--lambdas",
-                "0",
-                "--custom-include-ppl",
-            ],
-        ),
-        "precision_recall_cache_lookahead_prefetch": Experiment(
-            key="precision_recall_cache_lookahead_prefetch",
-            description="(8) Same explicit B×cache×lookahead grid as (7), decode-only (no gen PPL). "
-            "Best for ``advisor_dashboard_C*.png`` (raw TPS, recall, cache hit, precision), "
-            "``precision_recall_frontier_C*.png``, and ``hit_rates_C*.png``; use (7) if you also "
-            "need gen perplexity per row.",
+        "sec5_all_methods": Experiment(
+            key="sec5_all_methods",
+            description="(sec 5) Four-way LRU / Prefetch / Cache-Cond / Hybrid without PPL.",
+            script=METRICS_SWEEP_SCRIPT,
             sweep_question="custom_1_16_no_ppl",
             extra_args=[
-                "--model",
-                "qwen",
-                "--dataset",
-                "wikitext",
-                "--cache-sizes",
-                *[str(x) for x in CACHE_BUDGET_TRADEOFF_CACHE],
-                "--lookaheads",
-                *[str(x) for x in CACHE_BUDGET_TRADEOFF_LOOKAHEADS],
-                "--constraint-expert-reuse-csv",
-                DEFAULT_REUSE_CSV,
-                "--routing-bias-top-n",
-                "8",
-                "--custom-explicit-prefetch-budgets",
-                "--prefetch-budgets",
-                *[str(x) for x in CACHE_BUDGET_TRADEOFF_PREFETCH],
-                "--sweep-question",
-                "custom_1_16_no_ppl",
-                "--lambdas",
-                "0",
+                *_common_sweep_args(FINALS_LOOKAHEADS),
+                "--sweep-question", "custom_1_16_no_ppl",
+                "--lambdas", "0", "1",
+                "--cache-cond-forced-top-ns", "5",
             ],
         ),
-        "april_4way_replication": Experiment(
-            key="april_4way_replication",
-            description="(9) April ``lookahead_4way_20prompts`` coupled grid: "
-            "(C,LA,B) = (9,1,8)…(50,16,42), forced_top_n=6, 20 prompts. "
-            "Plots: ``april_4way_dashboard_*.png``, ``april_4way_precision_recall_*.png``, "
-            "``predictor_speedup_attribution.csv``.",
-            sweep_question="april_4way_no_ppl",
+        "final_results_collection": Experiment(
+            key="final_results_collection",
+            description=(
+                "Full four-policy TPS sweep across C={8..64}, then wikitext PPL: LRU+Cache-Cond "
+                "on cached backend (sec4), Hybrid on predict (LFRU, winner LA/B)."
+            ),
+            script=METRICS_SWEEP_SCRIPT,
+            sweep_question="custom_1_16_no_ppl",
             extra_args=[
-                "--model",
-                "qwen",
-                "--dataset",
-                "wikitext",
-                "--constraint-expert-reuse-csv",
-                DEFAULT_REUSE_CSV,
-                "--april-forced-top-n",
-                "6",
-                "--sweep-question",
-                "april_4way_no_ppl",
+                "--model", "qwen",
+                "--dataset", "wikitext",
+                "--cache-sizes", *[str(x) for x in FINAL_COLLECTION_CACHE_SIZES],
+                "--budget-fractions", *[str(x) for x in FINALS_BUDGET_FRACTIONS],
+                "--routing-bias-top-n", str(FINALS_ROUTING_BIAS_TOP_N),
+                "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+                "--cache-lookahead-slack", "5",
+                "--cache-grouped-bookends",
+                "--sweep-question", "custom_1_16_no_ppl",
+                "--lambdas", "1",
+                "--non-baseline-cache-policy", "LFRU",
+                "--disable-measurement",
+                "--drop-page-cache-before-first-run",
+                "--drop-page-cache-between-runs",
             ],
-            pinned_num_prompts=20,
-            pinned_max_new_tokens=128,
-            pinned_prompt_max_chars=4096,
+        ),
+        "random_baseline_collection": Experiment(
+            key="random_baseline_collection",
+            description=(
+                "RANDOM eviction baseline (λ=0, cached) at each C={8..64}; appends to an "
+                "existing collection sweep.csv (8 runs, same wikitext prompts)."
+            ),
+            script=METRICS_SWEEP_SCRIPT,
+            uses_predictor=False,
+            sweep_question="custom_1_16_no_ppl",
+            extra_args=[
+                "--model", "qwen",
+                "--dataset", "wikitext",
+                "--cache-sizes", *[str(x) for x in FINAL_COLLECTION_CACHE_SIZES],
+                "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+                "--cache-lookahead-slack", "5",
+                "--random-baseline-only",
+                "--disable-measurement",
+                "--drop-page-cache-before-first-run",
+                "--drop-page-cache-between-runs",
+            ],
         ),
     }
 
 
+def _sweep_python() -> str:
+    """Python for sweep subprocesses — prefer active venv (rocmPytorch) over system python3."""
+    venv = os.environ.get("VIRTUAL_ENV")
+    if venv:
+        candidate = os.path.join(venv, "bin", "python3")
+        if os.path.isfile(candidate):
+            return candidate
+    return sys.executable
+
+
 def list_experiments() -> None:
-    print("GPU sweeps (motivation / expert reuse: use py/expert_predictor/analyze_expert_reuse.py):\n")
+    print("Thesis GPU sweeps:\n")
     for e in _experiment_defs().values():
-        print(f"{e.key}\n  {e.description}\n  sweep_question={e.sweep_question}\n")
-    print(
-        "final_analysis_readme\n"
-        "  Optional: write FINAL_ANALYSIS.md (select best point at 1/2/5/10% degradation).\n"
-        "  (no sweep)\n"
-    )
+        q = f"  sweep_question={e.sweep_question}\n" if e.sweep_question else ""
+        print(f"{e.key}\n  {e.description}\n  script={os.path.basename(e.script)}\n{q}")
 
 
-def _write_final_analysis_readme(run_dir: str) -> None:
-    path = os.path.join(run_dir, "FINAL_ANALYSIS.md")
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(
-            textwrap.dedent(
-                """\
-                # Final analysis (per cache size C, degradation budget Y)
-
-                For Y ∈ {1, 2, 5, 10}% relative increase in ``gen_perplexity`` vs LRU at the same C:
-
-                1. Fix a baseline LRU row (same ``prompt_hash``, same decode settings).
-                2. For each candidate row: ``pct = 100 * (ppl - ppl_LRU) / ppl_LRU``.
-                3. Among rows with ``pct <= Y``, maximize ``tokens_per_second`` (tie-break: lower
-                   prefetch budget, then lower lookahead).
-
-                Map C to approximate RAM using measured bytes per expert × experts cached × layers.
-                """
-            )
-        )
+def _metrics_sweep_cmd(
+    exp: Experiment,
+    *,
+    extra_args: List[str],
+    run_dir: str,
+    csv_path: str,
+    log_path: str,
+    predictor_base_dir: str,
+    num_prompts: int,
+    prompt_max_chars: int,
+    max_new_tokens: int,
+    temperature: float,
+    subprocess_timeout: Optional[int],
+    retry_failed: bool,
+    plot_only: bool,
+    disable_measurement: bool,
+    ppl_winners_only: bool,
+    ppl_overwrite: bool,
+    ppl_policies: Optional[List[str]],
+    extra_forward: List[str],
+) -> List[str]:
+    cmd: List[str] = [_sweep_python(), exp.script, *extra_args]
+    cmd.extend([
+        "--num-prompts", str(num_prompts),
+        "--prompt-max-chars", str(prompt_max_chars),
+        "--max-new-tokens", str(max_new_tokens),
+        "--temperature", str(temperature),
+        "--out-dir", run_dir,
+        "--csv-file", csv_path,
+        "--log-file", log_path,
+    ])
+    if exp.uses_predictor:
+        cmd.extend(["--predictor-base-dir", predictor_base_dir])
+    if subprocess_timeout is not None:
+        cmd.extend(["--subprocess-timeout", str(subprocess_timeout)])
+    if retry_failed:
+        cmd.append("--retry-failed")
+    if plot_only:
+        cmd.append("--plot-only")
+    if disable_measurement:
+        cmd.append("--disable-measurement")
+    if ppl_winners_only:
+        cmd.append("--ppl-winners-only")
+    if ppl_overwrite:
+        cmd.append("--ppl-overwrite")
+    if ppl_policies:
+        cmd.extend(["--ppl-policies", *ppl_policies])
+    cmd.extend(extra_forward)
+    return cmd
 
 
 def run_one(
     exp_key: str,
     *,
     predictor_base_dir: str,
-    predictor_base_dirs: Optional[List[str]],
     out_root: str,
     num_prompts: int,
     prompt_max_chars: int,
@@ -345,89 +302,144 @@ def run_one(
     dry_run: bool,
     retry_failed: bool,
     plot_only: bool,
+    disable_measurement: bool,
     extra_forward: List[str],
+    skip_ppl_phase: bool = False,
+    ppl_winners_only: bool = False,
+    ppl_overwrite: bool = False,
+    ppl_policies: Optional[List[str]] = None,
+    run_dir_override: Optional[str] = None,
+    csv_file_override: Optional[str] = None,
 ) -> int:
-    if exp_key == "final_analysis_readme":
-        ts = time.strftime("%Y%m%d_%H%M%S")
-        run_dir = os.path.join(out_root, exp_key, ts)
-        os.makedirs(run_dir, exist_ok=True)
-        _write_final_analysis_readme(run_dir)
-        print("Wrote", os.path.join(run_dir, "FINAL_ANALYSIS.md"))
-        return 0
-
     defs = _experiment_defs()
     if exp_key not in defs:
         print(f"Unknown experiment {exp_key!r}. Use --list.", file=sys.stderr)
         return 2
 
-    if exp_key == "predictor_architecture_ablation":
-        if not predictor_base_dirs or len(predictor_base_dirs) < 2:
-            print(
-                "predictor_architecture_ablation needs:\n"
-                "  --predictor-base-dirs /path/A /path/B",
-                file=sys.stderr,
-            )
-            return 2
-
     exp = defs[exp_key]
-    ts = time.strftime("%Y%m%d_%H%M%S")
-    run_dir = os.path.join(out_root, exp_key, ts)
-    os.makedirs(run_dir, exist_ok=True)
-    csv_path = os.path.join(run_dir, "sweep.csv")
+    two_phase = exp_key == "final_results_collection"
+    collection_family = exp_key in ("final_results_collection", "random_baseline_collection")
 
-    extra = list(exp.extra_args)
-    if exp_key == "predictor_architecture_ablation":
-        extra.extend(["--predictor-base-dirs", *predictor_base_dirs])
+    extra_args = list(exp.extra_args)
+    if exp_key == "final_results_collection":
+        las = _collection_lookaheads(predictor_base_dir)
+        extra_args = ["--lookaheads", *[str(x) for x in las], *extra_args]
+    if collection_family and num_prompts == 100:
+        num_prompts = FINAL_COLLECTION_NUM_PROMPTS
+
+    if run_dir_override:
+        run_dir = run_dir_override
+    elif ppl_winners_only and csv_file_override:
+        run_dir = os.path.dirname(os.path.abspath(csv_file_override))
     else:
-        extra.extend(["--predictor-base-dir", predictor_base_dir])
+        ts = time.strftime("%Y%m%d_%H%M%S")
+        run_dir = os.path.join(out_root, exp_key, ts)
+    os.makedirs(run_dir, exist_ok=True)
 
-    num_p = exp.pinned_num_prompts if exp.pinned_num_prompts is not None else num_prompts
-    max_nt = exp.pinned_max_new_tokens if exp.pinned_max_new_tokens is not None else max_new_tokens
-    pmc = exp.pinned_prompt_max_chars if exp.pinned_prompt_max_chars is not None else prompt_max_chars
-    if exp.pinned_num_prompts is not None:
-        print(
-            f"[finals] Pinned workload for {exp_key!r}: "
-            f"--num-prompts {num_p} --max-new-tokens {max_nt} --prompt-max-chars {pmc}",
-            flush=True,
+    env = os.environ.copy()
+    env["HETEROPREDICT_SEQUENTIAL_EXPERT_IO"] = "1"
+
+    if exp.script == CACHE_POLICY_SCRIPT:
+        prefix = os.path.join(run_dir, "sweep")
+        cmd: List[str] = [_sweep_python(), exp.script, *exp.extra_args]
+        cmd.extend([
+            "--num-prompts", str(num_prompts),
+            "--max-new-tokens", str(max_new_tokens),
+            "--output-prefix", prefix,
+        ])
+        if subprocess_timeout is not None:
+            cmd.extend(["--subprocess-timeout", str(subprocess_timeout)])
+        else:
+            auto = max(900, num_prompts * max_new_tokens * 2 + 600)
+            cmd.extend(["--subprocess-timeout", str(auto)])
+        cmd.extend(extra_forward)
+        with open(os.path.join(run_dir, "command.txt"), "w", encoding="utf-8") as f:
+            f.write(" ".join(cmd) + "\n")
+        print("RUN_DIR:", run_dir)
+        print("CMD:", " ".join(cmd))
+        if dry_run:
+            return 0
+        return subprocess.call(cmd, env=env)
+
+    csv_path = csv_file_override or os.path.join(run_dir, "sweep.csv")
+    log_path = os.path.join(run_dir, "run.log")
+
+    phase1_cmd: Optional[List[str]] = None
+    if not ppl_winners_only and not (two_phase and skip_ppl_phase):
+        phase1_cmd = _metrics_sweep_cmd(
+            exp,
+            extra_args=extra_args,
+            run_dir=run_dir,
+            csv_path=csv_path,
+            log_path=log_path,
+            predictor_base_dir=predictor_base_dir,
+            num_prompts=num_prompts,
+            prompt_max_chars=prompt_max_chars,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+            subprocess_timeout=subprocess_timeout,
+            retry_failed=retry_failed,
+            plot_only=plot_only,
+            disable_measurement=disable_measurement,
+            ppl_winners_only=False,
+            ppl_overwrite=False,
+            ppl_policies=None,
+            extra_forward=extra_forward,
         )
 
-    cmd: List[str] = [
-        sys.executable,
-        SWEEP_SCRIPT,
-        *extra,
-        "--num-prompts",
-        str(num_p),
-        "--prompt-max-chars",
-        str(pmc),
-        "--max-new-tokens",
-        str(max_nt),
-        "--temperature",
-        str(temperature),
-        "--out-dir",
-        run_dir,
-        "--csv-file",
-        csv_path,
-    ]
-    if subprocess_timeout is not None:
-        cmd.extend(["--subprocess-timeout", str(subprocess_timeout)])
-    if retry_failed:
-        cmd.append("--retry-failed")
-    if plot_only:
-        cmd.append("--plot-only")
-    cmd.extend(extra_forward)
+    phase2_cmd: Optional[List[str]] = None
+    if two_phase and (ppl_winners_only or not skip_ppl_phase):
+        phase2_cmd = _metrics_sweep_cmd(
+            exp,
+            extra_args=extra_args,
+            run_dir=run_dir,
+            csv_path=csv_path,
+            log_path=log_path,
+            predictor_base_dir=predictor_base_dir,
+            num_prompts=num_prompts,
+            prompt_max_chars=prompt_max_chars,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+            subprocess_timeout=subprocess_timeout,
+            retry_failed=retry_failed,
+            plot_only=False,
+            disable_measurement=disable_measurement,
+            ppl_winners_only=True,
+            ppl_overwrite=ppl_overwrite,
+            ppl_policies=ppl_policies,
+            extra_forward=extra_forward,
+        )
 
     with open(os.path.join(run_dir, "command.txt"), "w", encoding="utf-8") as f:
-        f.write(" ".join(cmd) + "\n")
+        if phase1_cmd:
+            f.write("# Phase 1 — TPS sweep\n")
+            f.write(" ".join(phase1_cmd) + "\n")
+        if phase2_cmd:
+            f.write("# Phase 2 — PPL on LRU + best Cache-Cond/Hybrid per cache size\n")
+            f.write(" ".join(phase2_cmd) + "\n")
 
     print("RUN_DIR:", run_dir)
-    print("CMD:", " ".join(cmd))
+    if phase1_cmd:
+        print("PHASE 1 (TPS):", " ".join(phase1_cmd))
+    if phase2_cmd:
+        print("PHASE 2 (PPL LRU + winners):", " ".join(phase2_cmd))
     if dry_run:
         return 0
-    return subprocess.call(cmd)
+
+    if phase1_cmd:
+        rc = subprocess.call(phase1_cmd, env=env)
+        if rc != 0:
+            return rc
+    if phase2_cmd:
+        if not os.path.isfile(csv_path):
+            print(f"Phase 2 skipped: CSV not found at {csv_path}", file=sys.stderr)
+            return 1
+        return subprocess.call(phase2_cmd, env=env)
+    return 0
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description=__doc__)
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--list", action="store_true")
     p.add_argument("--experiment", type=str, default=None)
     p.add_argument(
@@ -436,14 +448,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=os.path.join(SCRIPT_DIR, "final_results_runs"),
     )
     p.add_argument("--predictor-base-dir", type=str, default=DEFAULT_PREDICTOR_BASE)
-    p.add_argument(
-        "--predictor-base-dirs",
-        type=str,
-        nargs="+",
-        default=None,
-        help="For predictor_architecture_ablation only (≥2 directories).",
-    )
-    p.add_argument("--num-prompts", type=int, default=100)
+    p.add_argument("--num-prompts", type=int, default=10)
     p.add_argument("--prompt-max-chars", type=int, default=4096)
     p.add_argument("--max-new-tokens", type=int, default=256)
     p.add_argument("--temperature", type=float, default=0.0)
@@ -451,6 +456,43 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--retry-failed", action="store_true")
     p.add_argument("--plot-only", action="store_true")
+    p.add_argument("--disable-measurement", action="store_true", help="Pass --disable-measurement to the sweep script.")
+    p.add_argument(
+        "--skip-ppl-phase",
+        action="store_true",
+        help="final_results_collection: run TPS sweep only (skip phase-2 PPL on winners).",
+    )
+    p.add_argument(
+        "--ppl-winners-only",
+        action="store_true",
+        help="final_results_collection: run only phase-2 PPL on LRU + best Cache-Cond/Hybrid "
+             "per C (requires --csv-file).",
+    )
+    p.add_argument(
+        "--ppl-overwrite",
+        action="store_true",
+        help="With --ppl-winners-only, re-measure PPL even when gen_perplexity is already set.",
+    )
+    p.add_argument(
+        "--ppl-policies",
+        nargs="+",
+        default=None,
+        metavar="POLICY",
+        help="With --ppl-winners-only, limit to lru, cache-cond, and/or hybrid "
+             "(e.g. --ppl-policies hybrid --ppl-overwrite).",
+    )
+    p.add_argument(
+        "--csv-file",
+        type=str,
+        default=None,
+        help="Existing sweep.csv for --ppl-winners-only, random_baseline_collection append, or resume.",
+    )
+    p.add_argument(
+        "--run-dir",
+        type=str,
+        default=None,
+        help="Existing run directory (defaults to parent of --csv-file).",
+    )
     p.add_argument("forwarded", nargs="*", help="Extra args for the sweep script.")
     return p
 
@@ -466,7 +508,6 @@ def main() -> int:
     return run_one(
         args.experiment,
         predictor_base_dir=args.predictor_base_dir,
-        predictor_base_dirs=args.predictor_base_dirs,
         out_root=args.out_root,
         num_prompts=args.num_prompts,
         prompt_max_chars=args.prompt_max_chars,
@@ -476,7 +517,14 @@ def main() -> int:
         dry_run=args.dry_run,
         retry_failed=args.retry_failed,
         plot_only=args.plot_only,
+        disable_measurement=args.disable_measurement,
         extra_forward=list(args.forwarded),
+        skip_ppl_phase=args.skip_ppl_phase,
+        ppl_winners_only=args.ppl_winners_only,
+        ppl_overwrite=args.ppl_overwrite,
+        ppl_policies=args.ppl_policies,
+        run_dir_override=args.run_dir,
+        csv_file_override=args.csv_file,
     )
 
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Join LRU vs prefetch-only rows and summarize predictor recall/precision + load stats.
 
-Reads ``sweep.csv`` from ``sweep_predict_cached_cache_metrics`` / finals runs. Writes:
+Post-processes a ``sweep.csv`` from the ``sec2_predictor_effectiveness`` experiment
+(``finals_experiment_runner.py``), backing the section-3 predictor-vs-LRU story. Writes:
 
 - ``predictor_speedup_attribution.csv`` — one row per prefetch config with baseline TPS /
   cache hit rate for the same (cache_size, lookahead, prompt_hash).
@@ -39,6 +40,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--csv", required=True)
     ap.add_argument("--out-dir", default=None)
+    ap.add_argument("--baseline-policy", default="LRU", help="Policy to normalize against (LRU or RANDOM)")
     args = ap.parse_args()
 
     path = os.path.abspath(args.csv)
@@ -53,7 +55,12 @@ def main() -> int:
     df = df.assign(_lam=lam)
 
     lab = df["label"].astype(str) if "label" in df.columns else pd.Series("", index=df.index)
-    is_lru = (df.get("backend", "").astype(str) == "cached") & lab.str.contains("LRU|Neither", case=False, na=False) & (df["_lam"] == 0.0)
+    if args.baseline_policy.upper() == "RANDOM":
+        is_base = (df.get("backend", "").astype(str) == "cached") & lab.str.contains("RANDOM", case=False, na=False) & (df["_lam"] == 0.0)
+    else:
+        # Default to LRU
+        is_base = (df.get("backend", "").astype(str) == "cached") & lab.str.contains("LRU", case=False, na=False) & (df["_lam"] == 0.0)
+        
     is_pref = (
         (df.get("backend", "").astype(str) == "predict")
         & lab.str.startswith("Prefetch Only", na=False)
@@ -64,11 +71,11 @@ def main() -> int:
     if "prompt_hash" in df.columns:
         merge_keys.append("prompt_hash")
 
-    base = df.loc[is_lru, merge_keys + ["tokens_per_second", "hit_rate_pct"]].copy()
+    base = df.loc[is_base, merge_keys + ["tokens_per_second", "hit_rate_pct"]].copy()
     for c in ("tokens_per_second", "hit_rate_pct"):
         if c in base.columns:
             base[c] = pd.to_numeric(base[c], errors="coerce")
-    base = base.rename(columns={"tokens_per_second": "lru_tps", "hit_rate_pct": "lru_cache_hit_pct"})
+    base = base.rename(columns={"tokens_per_second": "base_tps", "hit_rate_pct": "base_cache_hit_pct"})
 
     pref = df.loc[is_pref].copy()
     if pref.empty:
@@ -88,7 +95,7 @@ def main() -> int:
     )
 
     merged = pref.merge(base, on=merge_keys, how="left", suffixes=("", "_dup"))
-    merged["tps_speedup_vs_lru"] = merged["tps"] / merged["lru_tps"]
+    merged["tps_speedup_vs_base"] = merged["tps"] / merged["base_tps"]
 
     cols = [
         "question",
@@ -97,9 +104,9 @@ def main() -> int:
         "lookahead",
         "prefetch_budget",
         "tps",
-        "lru_tps",
-        "tps_speedup_vs_lru",
-        "lru_cache_hit_pct",
+        "base_tps",
+        "tps_speedup_vs_base",
+        "base_cache_hit_pct",
         "hit_rate_pct",
         "pred_recall_pct",
         "pred_precision_pct",

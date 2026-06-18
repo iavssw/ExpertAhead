@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Pareto-optimal (cache_size, prefetch_budget) points per lookahead from a sweep CSV.
 
+Post-processes a ``sweep.csv`` from the ``sec2_predictor_effectiveness`` experiment
+to pick the ideal (lookahead, budget) configs reused by later sections.
+
 A prefetch row is *dominated* if another row has >= TPS, <= cache_size, <= prefetch_budget,
 with at least one strict inequality. Non-dominated rows form the tradeoff frontier.
 
