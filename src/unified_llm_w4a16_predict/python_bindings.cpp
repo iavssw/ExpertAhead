@@ -176,6 +176,7 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
         .def("get_cache_stats", &UnifiedLLMW4A16Impl::get_cache_stats)
         .def("get_predictor_stats", &UnifiedLLMW4A16Impl::get_predictor_stats)
         .def("reset_predictor_stats", &UnifiedLLMW4A16Impl::reset_predictor_stats)
+        .def("set_suppress_predictor_stats", &UnifiedLLMW4A16Impl::set_suppress_predictor_stats, py::arg("v"))
         .def("set_predictor_lookahead", &UnifiedLLMW4A16Impl::set_predictor_lookahead, py::arg("stride"),
              "Fire the predictor every `stride` decode tokens (set to lookahead depth fN).")
         .def("get_sequential_top1_stats", &UnifiedLLMW4A16Impl::get_sequential_top1_stats)

@@ -22,8 +22,12 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_set>
+#include <random>
+#include <limits>
 
 namespace {
+
+constexpr size_t kNoVictimSlot = static_cast<size_t>(-1);
 
 struct GpuVramInfo {
     int index = -1;
@@ -143,13 +147,27 @@ static std::string find_predictor_model_path(const std::string& base_dir, int64_
     
     std::vector<std::string> model_files = {"best_jit.pt", "best_jit.pth"};
 
+    // 1. Flat: base/layer_X/best_jit.pt(h)
     for (const auto& kModelFile : model_files) {
-        // 1. Flat: base/layer_X/best_jit.pt(h)
         fs::path direct = layer_dir / kModelFile;
         if (fs::exists(direct)) {
             return direct.string();
         }
+    }
 
+    // 2. One level deep: base/*/layer_X/best_jit.pt(h)
+    if (fs::exists(base_dir) && fs::is_directory(base_dir)) {
+        for (const auto& entry : fs::directory_iterator(base_dir)) {
+            if (fs::is_directory(entry.status())) {
+                fs::path nested_layer_dir = entry.path() / ("layer_" + std::to_string(layer_idx));
+                for (const auto& kModelFile : model_files) {
+                    fs::path nested_model = nested_layer_dir / kModelFile;
+                    if (fs::exists(nested_model)) {
+                        return nested_model.string();
+                    }
+                }
+            }
+        }
     }
 
     return "";  // Not found
@@ -649,9 +667,10 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     // Initialize slot ready state
     expert_slot_ready_.assign(max_cached_experts_, true);
     
-    // Initialize LRU order (initially 0, 1, 2, ..., max-1)
+    // Initialize slot meta for timestamps
+    slot_meta_.resize(max_cached_experts_);
     for (size_t i = 0; i < max_cached_experts_; ++i) {
-        expert_lru_order_.push_back(i);
+        slot_meta_[i].expert_id = -1;
     }
 
     gate_up_experts.reserve(max_cached_experts_);
@@ -835,11 +854,9 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
     // important expert arrives in VRAM as early as possible, minimising the chance the
     // main inference thread blocks on it.
     //
-    // A separate LRU-promotion pass at the end (iterating in reverse) then marks the
-    // most confident expert as MRU so it is least likely to be evicted.  Previously a
-    // single reverse-iteration loop tried to serve both goals but achieved neither: the
-    // most confident expert both arrived last AND the LRU promotion was the same either
-    // way (each loaded slot is push_back-ed to lru_order_ at slot-claim time).
+    // Each claimed slot is marked MRU immediately (before disk I/O) so later evictions in
+    // this batch do not throw away experts that were just prefetched.  A final reverse-
+    // confidence pass then orders the batch so the highest-confidence expert is MRU.
     for (auto pred_it = predicted_expert_ids.begin(); pred_it != predicted_expert_ids.end(); ++pred_it) {
         int64_t eid = *pred_it;
         std::unique_lock<std::mutex> lock(expert_slots_mutex_);
@@ -859,27 +876,10 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
             if (empty_it != expert_slots_indices.end()) {
                 // Use empty slot
                 slot_to_use = std::distance(expert_slots_indices.begin(), empty_it);
-                
-                // Remove from LRU list wherever it is (it's initialized there)
-                for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
-                    if (*lit == slot_to_use) {
-                        expert_lru_order_.erase(lit);
-                        break;
-                    }
-                }
             } else {
-                // All slots full - evict LRU (front of vector)
-                // BUT we must find an LRU slot that is actually ready!
-                // Skip slots that are currently being loaded by another thread.
-                bool found = false;
-                for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
-                    if (expert_slot_ready_[*lit]) {
-                        slot_to_use = *lit;
-                        expert_lru_order_.erase(lit);
-                        found = true;
-                        break;
-                    }
-                }
+                // All slots full - evict per cache policy (respects currently_selected_experts_)
+                slot_to_use = pick_victim_ready();
+                bool found = (slot_to_use != kNoVictimSlot);
                 
                 if (!found) {
                      // All slots are currently busy being loaded. Don't prefetch this expert.
@@ -892,11 +892,14 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
                 }
             }
             
-            // Mark slot as busy and update indices
+            // Mark slot as busy and update indices (MRU immediately, like old lru_order push_back)
             expert_slot_ready_[slot_to_use] = false;
             expert_slots_indices[slot_to_use] = eid;
-            expert_lru_order_.push_back(slot_to_use);
-            
+            slot_meta_[slot_to_use].expert_id = eid;
+            slot_meta_[slot_to_use].access_count = 1;
+            slot_meta_[slot_to_use].last_access = ++access_clock_;
+            slot_meta_[slot_to_use].clock_bit = 1;
+
             // Update cache bitmask early so main thread routing knows it's eventually coming
             if (expert_cache_bitmask_.size() == num_experts_) {
                 std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
@@ -923,11 +926,12 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
             } catch (...) {
                 lock.lock();
                 expert_slot_ready_[slot_to_use] = true;
-                expert_slots_indices[slot_to_use] = -1; // Reset it so it can be used again
+                expert_slots_indices[slot_to_use] = -1;
+                slot_meta_[slot_to_use].expert_id = -1;
                 expert_slots_cv_.notify_all();
                 throw;
             }
-            
+
             // Re-acquire lock to mark as ready and notify waiting inference threads
             lock.lock();
             expert_slot_ready_[slot_to_use] = true;
@@ -935,8 +939,8 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
         }
     }
 
-    // LRU promotion pass: iterate in reverse confidence order (least confident first) so
-    // that the most confident expert ends up at the back of lru_order_ (MRU position),
+    // Confidence ordering pass: iterate in reverse confidence order (least confident first) so
+    // that the most confident expert receives the highest timestamp (MRU position),
     // making it the last to be evicted if the cache fills up.
     {
         std::lock_guard<std::mutex> lock(expert_slots_mutex_);
@@ -945,19 +949,222 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
             auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
             if (it == expert_slots_indices.end()) continue;
             size_t slot_idx = std::distance(expert_slots_indices.begin(), it);
-            for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
-                if (*lit == slot_idx) {
-                    expert_lru_order_.erase(lit);
-                    expert_lru_order_.push_back(slot_idx);
-                    break;
-                }
-            }
+            slot_meta_[slot_idx].last_access = ++access_clock_;
         }
     }
 }
 
+size_t MixtureOfExpertsImpl::pick_victim_ready() {
+    for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
+        if (expert_slot_ready_[s] && expert_slots_indices[s] == -1) {
+            return s;
+        }
+    }
+
+    switch (cache_policy_) {
+        case CachePolicy::LRU:     return pick_lru_ready();
+        case CachePolicy::MRU:     return pick_mru_ready();
+        case CachePolicy::LFU:     return pick_lfu_ready();
+        case CachePolicy::MFU:     return pick_mfu_ready();
+        case CachePolicy::CLOCK:   return pick_clock_ready();
+        case CachePolicy::RANDOM:  return pick_random_ready();
+        case CachePolicy::LFRU:    return pick_lfru_ready();
+        case CachePolicy::PREFILL: return pick_lru_ready();
+        default:                   return pick_lru_ready();
+    }
+}
+
+size_t MixtureOfExpertsImpl::pick_lru_ready() {
+    size_t victim = 0;
+    uint64_t oldest = std::numeric_limits<uint64_t>::max();
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (!expert_slot_ready_[i] || slot_meta_[i].expert_id == -1) {
+            continue;
+        }
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) !=
+            currently_selected_experts_.end()) {
+            continue;
+        }
+        if (cache_policy_ == CachePolicy::PREFILL) {
+            if (std::find(locked_experts_.begin(), locked_experts_.end(), slot_meta_[i].expert_id) != locked_experts_.end()) {
+                continue;
+            }
+        }
+        if (slot_meta_[i].last_access < oldest) {
+            oldest = slot_meta_[i].last_access;
+            victim = i;
+            found = true;
+        }
+    }
+    if (!found) {
+        oldest = std::numeric_limits<uint64_t>::max();
+        for (size_t i = 0; i < slot_meta_.size(); ++i) {
+            if (!expert_slot_ready_[i] || slot_meta_[i].expert_id == -1) {
+                continue;
+            }
+            if (slot_meta_[i].last_access < oldest) {
+                oldest = slot_meta_[i].last_access;
+                victim = i;
+                found = true;
+            }
+        }
+    }
+    return found ? victim : kNoVictimSlot;
+}
+
+size_t MixtureOfExpertsImpl::pick_mru_ready() {
+    size_t victim = kNoVictimSlot;
+    uint64_t newest = 0;
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (!expert_slot_ready_[i] || slot_meta_[i].expert_id == -1) {
+            continue;
+        }
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) !=
+            currently_selected_experts_.end()) {
+            continue;
+        }
+        if (slot_meta_[i].last_access >= newest) {
+            newest = slot_meta_[i].last_access;
+            victim = i;
+            found = true;
+        }
+    }
+    return found ? victim : kNoVictimSlot;
+}
+
+size_t MixtureOfExpertsImpl::pick_lfu_ready() {
+    size_t victim = kNoVictimSlot;
+    uint64_t least = std::numeric_limits<uint64_t>::max();
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (!expert_slot_ready_[i] || slot_meta_[i].expert_id == -1) {
+            continue;
+        }
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) !=
+            currently_selected_experts_.end()) {
+            continue;
+        }
+        if (slot_meta_[i].access_count < least) {
+            least = slot_meta_[i].access_count;
+            victim = i;
+            found = true;
+        }
+    }
+    return found ? victim : kNoVictimSlot;
+}
+
+size_t MixtureOfExpertsImpl::pick_mfu_ready() {
+    size_t victim = kNoVictimSlot;
+    uint64_t most = 0;
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (!expert_slot_ready_[i] || slot_meta_[i].expert_id == -1) {
+            continue;
+        }
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) !=
+            currently_selected_experts_.end()) {
+            continue;
+        }
+        if (slot_meta_[i].access_count >= most) {
+            most = slot_meta_[i].access_count;
+            victim = i;
+            found = true;
+        }
+    }
+    return found ? victim : kNoVictimSlot;
+}
+
+size_t MixtureOfExpertsImpl::pick_clock_ready() {
+    if (slot_meta_.empty()) {
+        return kNoVictimSlot;
+    }
+    for (size_t tries = 0; tries < slot_meta_.size() * 2; ++tries) {
+        size_t s = clock_hand_;
+        clock_hand_ = (clock_hand_ + 1) % slot_meta_.size();
+        if (!expert_slot_ready_[s]) {
+            continue;
+        }
+        if (slot_meta_[s].expert_id == -1) {
+            return s;
+        }
+        auto &m = slot_meta_[s];
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), m.expert_id) !=
+            currently_selected_experts_.end()) {
+            continue;
+        }
+        if (m.clock_bit == 0) {
+            return s;
+        }
+        m.clock_bit = 0;
+    }
+    return kNoVictimSlot;
+}
+
+size_t MixtureOfExpertsImpl::pick_random_ready() {
+    thread_local std::mt19937 rng(std::random_device{}());
+    std::vector<size_t> candidates;
+    candidates.reserve(slot_meta_.size());
+    for (size_t s = 0; s < slot_meta_.size(); ++s) {
+        if (!expert_slot_ready_[s]) {
+            continue;
+        }
+        if (expert_slots_indices[s] == -1) {
+            candidates.push_back(s);
+            continue;
+        }
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[s].expert_id) ==
+            currently_selected_experts_.end()) {
+            if (cache_policy_ == CachePolicy::PREFILL) {
+                if (std::find(locked_experts_.begin(), locked_experts_.end(), slot_meta_[s].expert_id) !=
+                    locked_experts_.end()) {
+                    continue;
+                }
+            }
+            candidates.push_back(s);
+        }
+    }
+    if (candidates.empty()) {
+        for (size_t s = 0; s < slot_meta_.size(); ++s) {
+            if (expert_slot_ready_[s] && expert_slots_indices[s] != -1) {
+                candidates.push_back(s);
+            }
+        }
+        if (candidates.empty()) {
+            return kNoVictimSlot;
+        }
+    }
+    std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
+    return candidates[dist(rng)];
+}
+
+size_t MixtureOfExpertsImpl::pick_lfru_ready() {
+    size_t victim = kNoVictimSlot;
+    double min_score = std::numeric_limits<double>::max();
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (!expert_slot_ready_[i] || slot_meta_[i].expert_id == -1) {
+            continue;
+        }
+        const auto &a = slot_meta_[i];
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), a.expert_id) !=
+            currently_selected_experts_.end()) {
+            continue;
+        }
+        double score = static_cast<double>(a.access_count) / (access_clock_ - a.last_access + 1);
+        if (score < min_score) {
+            min_score = score;
+            victim = i;
+            found = true;
+        }
+    }
+    return found ? victim : kNoVictimSlot;
+}
+
 int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
     std::unique_lock<std::mutex> lock(expert_slots_mutex_);
+    ++access_clock_;
 
     for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
         if (expert_slots_indices[s] == global_expert_idx) {
@@ -967,56 +1174,39 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
             
             if (update_stats) {
                 cache_hits_++;
-            }
-            
-            // Move slot 's' to the back of the LRU vector (Mark as MRU)
-            for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
-                if (*it == s) {
-                    expert_lru_order_.erase(it);
-                    expert_lru_order_.push_back(s);
-                    break;
-                }
+                slot_meta_[s].access_count++;
+                slot_meta_[s].last_access = access_clock_;
+                slot_meta_[s].clock_bit = 1;
             }
             return s;
         }
     }
     
-    // Miss: Evict the Least Recently Used slot (front of the vector)
+    // Miss: Evict
     if (update_stats) {
         cache_misses_++;
     }
     
-    // Find an LRU slot that isn't currently being overwritten by the predictor
-    size_t lru_slot = -1;
-    for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
-        if (expert_slot_ready_[*lit]) {
-            lru_slot = *lit;
-            expert_lru_order_.erase(lit);
-            break;
-        }
-    }
-    
-    // If somehow all slots are being loaded by predictor right now, wait for one to finish
-    if (lru_slot == size_t(-1)) {
+    size_t victim_slot = pick_victim_ready();
+    while (victim_slot == kNoVictimSlot) {
         expert_slots_cv_.wait(lock, [this]() {
-            for (auto r : expert_slot_ready_) if (r) return true;
+            for (bool ready : expert_slot_ready_) {
+                if (ready) {
+                    return true;
+                }
+            }
             return false;
         });
-        
-        // Re-find the free slot now that we woke up
-        for (auto lit = expert_lru_order_.begin(); lit != expert_lru_order_.end(); ++lit) {
-            if (expert_slot_ready_[*lit]) {
-                lru_slot = *lit;
-                expert_lru_order_.erase(lit);
-                break;
-            }
-        }
+        victim_slot = pick_victim_ready();
     }
     
     // Mark as busy
-    expert_slot_ready_[lru_slot] = false;
-    expert_slots_indices[lru_slot] = global_expert_idx;
-    expert_lru_order_.push_back(lru_slot);
+    expert_slot_ready_[victim_slot] = false;
+    expert_slots_indices[victim_slot] = global_expert_idx;
+    slot_meta_[victim_slot].expert_id = global_expert_idx;
+    slot_meta_[victim_slot].access_count = 1;
+    slot_meta_[victim_slot].last_access = access_clock_;
+    slot_meta_[victim_slot].clock_bit = 1;
     
     // Update cache bitmask tracking
     if (expert_cache_bitmask_.size() == num_experts_) {
@@ -1034,11 +1224,12 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
     stall_loads_++;
     // Load new expert into the evicted slot
     try {
-        load_expert_weights(lru_slot, global_expert_idx, weights_dir_);
+        load_expert_weights(victim_slot, global_expert_idx, weights_dir_);
     } catch (...) {
         lock.lock();
-        expert_slot_ready_[lru_slot] = true;
-        expert_slots_indices[lru_slot] = -1; // Reset it so it can be used again
+        expert_slot_ready_[victim_slot] = true;
+        expert_slots_indices[victim_slot] = -1; // Reset it so it can be used again
+        slot_meta_[victim_slot].expert_id = -1;
         expert_slots_cv_.notify_all();
         throw;
     }
@@ -1048,10 +1239,10 @@ int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bo
     
     // Lock, mark exactly one ready, wake any waiting thread
     lock.lock();
-    expert_slot_ready_[lru_slot] = true;
+    expert_slot_ready_[victim_slot] = true;
     expert_slots_cv_.notify_all();
     
-    return lru_slot;
+    return victim_slot;
 }
 
 torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
@@ -1059,6 +1250,13 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
     bool update_stats = (x_flat.size(0) == 1);
     for (int64_t t = 0; t < x_flat.size(0); ++t) {
         auto token_input = x_flat.narrow(0, t, 1);
+        {
+            std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+            currently_selected_experts_.clear();
+            for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
+                currently_selected_experts_.push_back(topk_idx[t][k].item<int64_t>());
+            }
+        }
         for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
             int64_t global_e = topk_idx[t][k].item<int64_t>();
             int64_t e = ensure_expert_cached(global_e, update_stats);
@@ -1073,6 +1271,10 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
             auto down_out = down_experts[e]->forward(gate_buf, "moe_down");
             down_out.mul_(weight);
             output.narrow(0, t, 1).add_(down_out);
+        }
+        {
+            std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+            currently_selected_experts_.clear();
         }
     }
     return output;
@@ -1128,6 +1330,14 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     auto topk_cpu = topk_idx[0].to(torch::kCPU, torch::kInt64, /*non_blocking=*/false, /*copy=*/true);
     auto topk_accessor = topk_cpu.accessor<int64_t, 1>();
 
+    {
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        currently_selected_experts_.clear();
+        for (int64_t k = 0; k < active_experts; ++k) {
+            currently_selected_experts_.push_back(topk_accessor[k]);
+        }
+    }
+
     for (int64_t k = 0; k < active_experts; ++k) {
         int64_t global_e = topk_accessor[k];
         int64_t e = ensure_expert_cached(global_e);
@@ -1138,6 +1348,23 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
         down_qw_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_quantized_weights().data_ptr<uint8_t>());
         down_s_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_scales().data_ptr<at::BFloat16>());
         down_z_ptrs[k] = reinterpret_cast<int64_t>(down_experts[e]->get_zeros().data_ptr<int8_t>());
+    }
+
+    // Router-selected experts are protected only while being resident-loaded; promote them
+    // to MRU and release so prefetch can evict other victims per cache policy during GEMMs.
+    {
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        for (int64_t k = 0; k < active_experts; ++k) {
+            int64_t global_e = topk_accessor[k];
+            for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
+                if (expert_slots_indices[s] == global_e) {
+                    slot_meta_[s].last_access = ++access_clock_;
+                    slot_meta_[s].clock_bit = 1;
+                    break;
+                }
+            }
+        }
+        currently_selected_experts_.clear();
     }
 
     int64_t group_size = hidden_size_;
@@ -1180,12 +1407,12 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
         std::vector<int64_t> pred_set;
         {
             std::lock_guard<std::mutex> qlock(pending_predictions_mutex_);
-            while (!pending_predictions_.empty() && pending_predictions_.front().first < current_decode_step) {
+            while (!pending_predictions_.empty() && pending_predictions_.front().target_step < current_decode_step) {
                 // Prediction arrived too late to evaluate at its intended horizon.
                 pending_predictions_.pop_front();
             }
-            if (!pending_predictions_.empty() && pending_predictions_.front().first == current_decode_step) {
-                pred_set = pending_predictions_.front().second;
+            if (!pending_predictions_.empty() && pending_predictions_.front().target_step == current_decode_step) {
+                pred_set = pending_predictions_.front().pred_set;
                 pending_predictions_.pop_front();
             }
         }
@@ -1282,7 +1509,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     if (loaded > 6) {
         std::cout << "[WARNING] Layer " << layer_idx_ << " loaded " << loaded << " experts in a single generation step!" << std::endl;
     }
-    
+
     return output;
 }
 
@@ -1313,10 +1540,38 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
     for (const auto& [eid, tokens] : expert_to_tokens) {
         experts_to_process.push_back(eid);
     }
+
+    // PREFILL cache policy: lock top-N most-used experts before processing
+    if (cache_policy_ == CachePolicy::PREFILL) {
+        std::vector<std::pair<int64_t, int64_t>> expert_counts;
+        for (const auto& [eid, tokens] : expert_to_tokens) {
+            expert_counts.push_back({eid, static_cast<int64_t>(tokens.size())});
+        }
+        std::sort(expert_counts.begin(), expert_counts.end(), [](const auto& a, const auto& b) {
+            if (a.second != b.second) return a.second > b.second;
+            return a.first < b.first;
+        });
+
+        locked_experts_.clear();
+        int64_t n_lock = prefill_top_n_ > 0 ? prefill_top_n_ : max_cached_experts_;
+        for (size_t i = 0; i < std::min(static_cast<size_t>(n_lock), expert_counts.size()); ++i) {
+            locked_experts_.push_back(expert_counts[i].first);
+            {
+                std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+                currently_selected_experts_ = {expert_counts[i].first};
+            }
+            ensure_expert_cached(expert_counts[i].first, false);
+        }
+    }
+
     std::sort(experts_to_process.begin(), experts_to_process.end());
     
     // Process expert-by-expert (like mixtral_torch), but batch tokens for each expert
     for (int64_t expert_id : experts_to_process) {
+        {
+            std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+            currently_selected_experts_ = {expert_id};
+        }
         // Load expert into cache slot
         int64_t slot = ensure_expert_cached(expert_id, false);
         
@@ -1358,6 +1613,11 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
         for (size_t i = 0; i < token_indices.size(); ++i) {
             output[token_indices[i]].add_(down_out[i]);
         }
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        currently_selected_experts_.clear();
     }
     
     return output;
@@ -3154,11 +3414,20 @@ void UnifiedLLMW4A16Impl::set_prefill_top_n(int64_t n) {
     }
 }
 
-void UnifiedLLMW4A16Impl::set_cache_policy(std::string policy_name, int64_t layer_idx) {
-    MixtureOfExpertsImpl::CachePolicy policy = MixtureOfExpertsImpl::CachePolicy::LRU;
-    std::string p = policy_name;
-    std::transform(p.begin(), p.end(), p.begin(), ::tolower);
-    if (p == "prefill") policy = MixtureOfExpertsImpl::CachePolicy::PREFILL;
+void UnifiedLLMW4A16Impl::set_cache_policy(const std::string& policy_name, int64_t layer_idx) {
+    MixtureOfExpertsImpl::CachePolicy policy;
+    std::string upper_name = policy_name;
+    std::transform(upper_name.begin(), upper_name.end(), upper_name.begin(), ::toupper);
+
+    if (upper_name == "LRU") policy = MixtureOfExpertsImpl::CachePolicy::LRU;
+    else if (upper_name == "MRU") policy = MixtureOfExpertsImpl::CachePolicy::MRU;
+    else if (upper_name == "LFU") policy = MixtureOfExpertsImpl::CachePolicy::LFU;
+    else if (upper_name == "MFU") policy = MixtureOfExpertsImpl::CachePolicy::MFU;
+    else if (upper_name == "CLOCK") policy = MixtureOfExpertsImpl::CachePolicy::CLOCK;
+    else if (upper_name == "RANDOM") policy = MixtureOfExpertsImpl::CachePolicy::RANDOM;
+    else if (upper_name == "LFRU") policy = MixtureOfExpertsImpl::CachePolicy::LFRU;
+    else if (upper_name == "PREFILL") policy = MixtureOfExpertsImpl::CachePolicy::PREFILL;
+    else throw std::invalid_argument("Unknown cache policy: " + policy_name);
 
     if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         if (layer_idx >= 0 && layer_idx < static_cast<int64_t>(moe_layers.size())) {
@@ -3263,6 +3532,12 @@ void UnifiedLLMW4A16Impl::reset_sequential_top1_stats() {
 }
 
 // Training data collection methods
+void UnifiedLLMW4A16Impl::set_suppress_predictor_stats(bool v) {
+    for (auto& layer : moe_layers) {
+        layer->set_suppress_predictor_stats(v);
+    }
+}
+
 std::vector<std::pair<torch::Tensor, torch::Tensor>> UnifiedLLMW4A16Impl::get_training_data() {
     // Return a copy of the training data
     return training_data_;

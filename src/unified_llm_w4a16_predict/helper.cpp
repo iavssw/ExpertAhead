@@ -1190,6 +1190,17 @@ void MixtureOfExpertsImpl::print_cache_stats() const {
             std::cout << "    Predicted RequestedByRouterTopK Rate=" << p_topk
                       << "% (" << pred_requested_hits_topk_ << "/" << pred_requested_total_topk_ << ")\n";
         }
+        // Window-aware metrics (denominator = union of experts across the full lookahead window)
+        if (pred_total_window_recall_ > 0) {
+            double wr = 100.0 * pred_hits_window_recall_ / pred_total_window_recall_;
+            std::cout << "    Predictor WindowRecall Rate=" << wr
+                      << "% (" << pred_hits_window_recall_ << "/" << pred_total_window_recall_ << ")\n";
+        }
+        if (pred_total_window_precision_ > 0) {
+            double wp = 100.0 * pred_hits_window_precision_ / pred_total_window_precision_;
+            std::cout << "    Predictor WindowPrecision Rate=" << wp
+                      << "% (" << pred_hits_window_precision_ << "/" << pred_total_window_precision_ << ")\n";
+        }
     } else {
         std::cout << "N/A\n";
     }
@@ -1201,6 +1212,8 @@ void MixtureOfExpertsImpl::print_cache_stats() const {
               << ", 1Load=" << total_steps_1_loaded_
               << ", >1Load=" << total_steps_gt1_loaded_ << "\n";
     unified_llm_w4a16_common::print_moe_stall_bandwidth(std::cout, stall_loads_, prefetch_loads_, avg_load_time);
+    unified_llm_w4a16_common::print_moe_prefetch_overlap(
+        std::cout, prefetch_hits_ready_, prefetch_hits_wait_, prefetch_ticks_skipped_);
     std::cout
               << "    Predictor TopK matches: 0=" << pred_match_0_
               << " 1=" << pred_match_1_
@@ -1222,12 +1235,19 @@ void MixtureOfExpertsImpl::reset_cache_stats() {
     pred_requested_total_forced_n_ = 0;
     pred_requested_hits_topk_ = 0;
     pred_requested_total_topk_ = 0;
+    pred_hits_window_recall_    = 0;
+    pred_total_window_recall_   = 0;
+    pred_hits_window_precision_ = 0;
+    pred_total_window_precision_= 0;
     last_true_top1_expert_ = -1;
     total_steps_0_loaded_ = 0;
     total_steps_1_loaded_ = 0;
     total_steps_gt1_loaded_ = 0;
     stall_loads_ = 0;
     prefetch_loads_ = 0;
+    prefetch_hits_ready_ = 0;
+    prefetch_hits_wait_ = 0;
+    prefetch_ticks_skipped_ = 0;
     pred_match_0_ = 0;
     pred_match_1_ = 0;
     pred_match_2_ = 0;
@@ -1246,28 +1266,20 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
     }
 
     for (int64_t i = 0; i < num_to_warm; ++i) {
-        // Load global expert i into slot i
         load_expert_weights(i, i, weights_dir_);
         expert_slots_indices[i] = i;
-        
-        // Ensure slot i is in LRU order (as MRU)
-        bool found = false;
-        for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
-            if (*it == (size_t)i) {
-                expert_lru_order_.erase(it);
-                found = true;
-                break;
-            }
-        }
-        expert_lru_order_.push_back(i);
+        slot_meta_[i].expert_id = i;
+        slot_meta_[i].access_count = 1;
+        slot_meta_[i].last_access = ++access_clock_;
+        slot_meta_[i].clock_bit = 1;
     }
 
-    // Update cache bitmask so the main thread routing knows these experts are loaded
-    if (expert_cache_bitmask_.size() == num_experts_) {
+    if (expert_cache_bitmask_.size() == static_cast<size_t>(num_experts_)) {
         std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
-        for (auto current_eid : expert_slots_indices) {
-            if (current_eid >= 0 && current_eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
-                expert_cache_bitmask_[current_eid] = 1;
+        for (size_t s = 0; s < slot_meta_.size(); ++s) {
+            int64_t eid = slot_meta_[s].expert_id;
+            if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
+                expert_cache_bitmask_[eid] = 1;
             }
         }
     }

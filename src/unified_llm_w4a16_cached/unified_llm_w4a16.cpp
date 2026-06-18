@@ -692,62 +692,143 @@ size_t MixtureOfExpertsImpl::pick_victim() {
 size_t MixtureOfExpertsImpl::pick_lru() {
     size_t victim = 0;
     uint64_t oldest = std::numeric_limits<uint64_t>::max();
+    bool found = false;
     for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) != currently_selected_experts_.end()) {
+            continue;
+        }
         if (cache_policy_ == CachePolicy::PREFILL) {
             if (std::find(locked_experts_.begin(), locked_experts_.end(), slot_meta_[i].expert_id) != locked_experts_.end()) continue;
         }
         if (slot_meta_[i].last_access < oldest) {
             oldest = slot_meta_[i].last_access;
             victim = i;
+            found = true;
+        }
+    }
+    if (!found) { // Fallback
+        oldest = std::numeric_limits<uint64_t>::max();
+        for (size_t i = 0; i < slot_meta_.size(); ++i) {
+            if (slot_meta_[i].last_access < oldest) {
+                oldest = slot_meta_[i].last_access;
+                victim = i;
+            }
         }
     }
     return victim;
 }
 
 size_t MixtureOfExpertsImpl::pick_mru() {
-    return std::max_element(slot_meta_.begin(), slot_meta_.end(),
-        [](const auto& a, const auto& b){ return a.last_access < b.last_access; })
-        - slot_meta_.begin();
+    size_t victim = 0;
+    uint64_t newest = 0;
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) != currently_selected_experts_.end()) {
+            continue;
+        }
+        if (slot_meta_[i].last_access >= newest) {
+            newest = slot_meta_[i].last_access;
+            victim = i;
+            found = true;
+        }
+    }
+    if (!found) return 0;
+    return victim;
 }
 
 size_t MixtureOfExpertsImpl::pick_lfu() {
-    return std::min_element(slot_meta_.begin(), slot_meta_.end(),
-        [](const auto& a, const auto& b){ return a.access_count < b.access_count; })
-        - slot_meta_.begin();
+    size_t victim = 0;
+    uint64_t least = std::numeric_limits<uint64_t>::max();
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) != currently_selected_experts_.end()) {
+            continue;
+        }
+        if (slot_meta_[i].access_count < least) {
+            least = slot_meta_[i].access_count;
+            victim = i;
+            found = true;
+        }
+    }
+    if (!found) return 0;
+    return victim;
 }
 
 size_t MixtureOfExpertsImpl::pick_mfu() {
-    return std::max_element(slot_meta_.begin(), slot_meta_.end(),
-        [](const auto& a, const auto& b){ return a.access_count < b.access_count; })
-        - slot_meta_.begin();
+    size_t victim = 0;
+    uint64_t most = 0;
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) != currently_selected_experts_.end()) {
+            continue;
+        }
+        if (slot_meta_[i].access_count >= most) {
+            most = slot_meta_[i].access_count;
+            victim = i;
+            found = true;
+        }
+    }
+    if (!found) return 0;
+    return victim;
 }
 
 size_t MixtureOfExpertsImpl::pick_clock() {
-    while (true) {
-        auto& m = slot_meta_[clock_hand_];
+    for (size_t tries = 0; tries < slot_meta_.size() * 2; ++tries) {
+        size_t s = clock_hand_;
+        auto& m = slot_meta_[s];
+        clock_hand_ = (clock_hand_ + 1) % slot_meta_.size();
+        
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), m.expert_id) != currently_selected_experts_.end()) {
+            continue;
+        }
+        
         if (m.clock_bit == 0) {
-            size_t victim = clock_hand_;
-            clock_hand_ = (clock_hand_ + 1) % slot_meta_.size();
-            return victim;
+            return s;
         }
         m.clock_bit = 0;  // give a second chance
-        clock_hand_ = (clock_hand_ + 1) % slot_meta_.size();
     }
+    // Fallback
+    return 0;
 }
 
 size_t MixtureOfExpertsImpl::pick_random() {
     thread_local std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<size_t> dist(0, slot_meta_.size() - 1);
-    return dist(rng);
+    std::vector<size_t> candidates;
+    candidates.reserve(slot_meta_.size());
+    for (size_t s = 0; s < slot_meta_.size(); ++s) {
+        if (slot_meta_[s].expert_id == -1) {
+            candidates.push_back(s);
+            continue;
+        }
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[s].expert_id) == currently_selected_experts_.end()) {
+            candidates.push_back(s);
+        }
+    }
+    if (candidates.empty()) {
+        std::uniform_int_distribution<size_t> dist(0, slot_meta_.size() - 1);
+        return dist(rng);
+    }
+    std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
+    return candidates[dist(rng)];
 }
 
 size_t MixtureOfExpertsImpl::pick_lfru() {
-    return std::min_element(slot_meta_.begin(), slot_meta_.end(),
-        [&](const auto& a, const auto& b) {
-            double score_a = (double)a.access_count / (access_clock_ - a.last_access + 1);
-            double score_b = (double)b.access_count / (access_clock_ - b.last_access + 1);
-            return score_a < score_b;
-        }) - slot_meta_.begin();
+    size_t victim = 0;
+    double min_score = std::numeric_limits<double>::max();
+    bool found = false;
+    for (size_t i = 0; i < slot_meta_.size(); ++i) {
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) != currently_selected_experts_.end()) {
+            continue;
+        }
+        double score = (double)slot_meta_[i].access_count / (access_clock_ - slot_meta_[i].last_access + 1);
+        if (score < min_score) {
+            min_score = score;
+            victim = i;
+            found = true;
+        }
+    }
+    if (!found) return 0;
+    return victim;
 }
 
 torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
@@ -755,6 +836,10 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
     bool update_stats = (x_flat.size(0) == 1);
     for (int64_t t = 0; t < x_flat.size(0); ++t) {
         auto token_input = x_flat.narrow(0, t, 1);
+        currently_selected_experts_.clear();
+        for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
+            currently_selected_experts_.push_back(topk_idx[t][k].item<int64_t>());
+        }
         for (int64_t k = 0; k < num_experts_per_tok_; ++k) {
             int64_t global_e = topk_idx[t][k].item<int64_t>();
             int64_t e = ensure_expert_cached(global_e, update_stats);
@@ -771,6 +856,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
             output.narrow(0, t, 1).add_(down_out);
         }
     }
+    currently_selected_experts_.clear();
     return output;
 }
 
@@ -815,6 +901,11 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     // Optimization: Move indices to CPU contiguously to avoid per-element synchronization
     auto topk_cpu = topk_idx[0].to(torch::kCPU, torch::kInt64, /*non_blocking=*/false, /*copy=*/true);
     auto topk_accessor = topk_cpu.accessor<int64_t, 1>();
+
+    currently_selected_experts_.clear();
+    for (int64_t k = 0; k < active_experts; ++k) {
+        currently_selected_experts_.push_back(topk_accessor[k]);
+    }
 
     for (int64_t k = 0; k < active_experts; ++k) {
         int64_t global_e = topk_accessor[k];
@@ -862,6 +953,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     // std::cout << "weights: " << weights << std::endl;
     down_batched.mul_(weights);
     output.add_(down_batched.sum(0, true));
+    currently_selected_experts_.clear();
     return output;
 }
 
@@ -908,6 +1000,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
         int64_t n_lock = prefill_top_n_ > 0 ? prefill_top_n_ : max_cached_experts_;
         for (size_t i = 0; i < std::min((size_t)n_lock, expert_counts.size()); ++i) {
             locked_experts_.push_back(expert_counts[i].first);
+            currently_selected_experts_ = {expert_counts[i].first};
             ensure_expert_cached(expert_counts[i].first, false);
         }
     }
@@ -916,6 +1009,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
     
     // Process expert-by-expert (like mixtral_torch), but batch tokens for each expert
     for (int64_t expert_id : experts_to_process) {
+        currently_selected_experts_ = {expert_id};
         // Load expert into cache slot
         int64_t slot = ensure_expert_cached(expert_id, false);
         
@@ -959,6 +1053,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_prefill(const torch::Tensor &x_flat,
         }
     }
     
+    currently_selected_experts_.clear();
     return output;
 }
 
@@ -1040,72 +1135,50 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x) {
         const int64_t num_tokens = x_flat.size(0);
         const bool use_pm_lambda_mask = mass_threshold_substitution_p_ > 0.0;
 
-        torch::Tensor cache_mask;
-        if (use_pm_lambda_mask) {
-            cache_mask = torch::tensor(expert_cache_bitmask_, router_out.options().dtype(torch::kFloat32))
-                             .unsqueeze(0)
-                             .expand({num_tokens, num_experts_})
-                             .clone();
-        } else {
-            cache_mask = torch::tensor(expert_cache_bitmask_, router_out.options().dtype(torch::kFloat32));
-        }
+        // ALWAYS use a 2D cache_mask [num_tokens, num_experts] to avoid cross-token leakage during chunked prefill.
+        torch::Tensor cache_mask = torch::tensor(expert_cache_bitmask_, router_out.options().dtype(torch::kFloat32))
+                                       .unsqueeze(0)
+                                       .expand({num_tokens, num_experts_})
+                                       .clone();
 
-        // Force top forced_top_n_ unbiased experts into the cache mask so they are always
-        // available (and thus preferred under the lambda bias).
+        // Force top forced_top_n_ unbiased experts into the cache mask per-token
         if (forced_top_n_ > 0 && has_cached) {
             int64_t n_force = std::min(forced_top_n_, num_experts_per_tok_);
             auto topn_result = router_out.topk(n_force, /*dim=*/-1);
             auto topn_idx    = std::get<1>(topn_result);  // [num_tokens, n_force]
-            if (use_pm_lambda_mask) {
-                cache_mask.scatter_(1, topn_idx, torch::ones_like(topn_idx, cache_mask.dtype()));
-            } else {
-                auto top_expert_mask = torch::zeros({num_experts_}, cache_mask.options());
-                for (int64_t ti = 0; ti < topn_idx.size(0); ti++) {
-                    top_expert_mask.index_put_({topn_idx[ti]}, 1.0);
-                }
-                cache_mask = torch::maximum(cache_mask, top_expert_mask);
-            }
+            cache_mask.scatter_(1, topn_idx, torch::ones_like(topn_idx, cache_mask.dtype()));
         }
 
         // Force the minimum set of experts whose cumulative softmax probability >= forced_top_p_.
-        // Adapts to routing confidence: a peaked distribution forces fewer experts than a flat one.
+        // Normalized over the top `num_experts_per_tok_` weights only.
         if (forced_top_p_ > 0.0 && has_cached) {
-            auto probs = torch::softmax(router_out.to(torch::kFloat32), -1);  // [num_tokens, num_experts]
-            auto mean_probs = probs.mean(0);                                   // [num_experts]
-            auto sort_result = torch::sort(mean_probs, -1, /*descending=*/true);
-            auto sorted_vals = std::get<0>(sort_result);                       // [num_experts]
-            auto sorted_idx  = std::get<1>(sort_result);                       // [num_experts]
-            auto cumsum = torch::cumsum(sorted_vals, -1);                      // [num_experts]
-            // Include expert i when the cumulative mass before it is still below the threshold.
-            auto pre_cumsum = cumsum - sorted_vals;
+            auto topk_res = router_out.topk(num_experts_per_tok_, /*dim=*/-1);
+            auto topk_logits = std::get<0>(topk_res);
+            auto topk_idx = std::get<1>(topk_res);
+            
+            auto probs = torch::softmax(topk_logits.to(torch::kFloat32), -1);
+            auto cumsum = torch::cumsum(probs, -1);
+            auto pre_cumsum = cumsum - probs;
             auto include_sorted = pre_cumsum.lt(static_cast<float>(forced_top_p_)).to(torch::kFloat32);
-            auto top_p_mask = torch::zeros({num_experts_}, cache_mask.options());
-            top_p_mask.scatter_(-1, sorted_idx, include_sorted);
-            if (use_pm_lambda_mask) {
-                cache_mask = torch::maximum(cache_mask, top_p_mask.unsqueeze(0).expand({num_tokens, num_experts_}));
-            } else {
-                cache_mask = torch::maximum(cache_mask, top_p_mask);
-            }
+            auto top_p_mask = torch::zeros_like(cache_mask);
+            top_p_mask.scatter_(1, topk_idx, include_sorted);
+            cache_mask = torch::maximum(cache_mask, top_p_mask);
         }
 
-        // Per-token PM prefix: smallest sorted-probability prefix with cumulative mass >= p (adaptive
-        // vs fixed FN). OR into mask; lambda bias then prefers resident experts for other top-k slots.
+        // Per-token PM prefix: smallest sorted-probability prefix with cumulative mass >= p.
+        // Normalized over the top `num_experts_per_tok_` weights only.
         if (use_pm_lambda_mask) {
             const float pm_thresh = static_cast<float>(mass_threshold_substitution_p_);
-            auto probs_pm = torch::softmax(router_out.to(torch::kFloat32), -1);
-            auto pm_sort = torch::sort(probs_pm, -1, /*descending=*/true);
-            auto sorted_probs_pm = std::get<0>(pm_sort);
-            auto sorted_idx_pm = std::get<1>(pm_sort);
-            auto cumsum_pm = sorted_probs_pm.cumsum(-1);
-            auto reached_pm = cumsum_pm >= static_cast<double>(pm_thresh);
-            auto first_ge_pm = reached_pm.to(torch::kFloat32).argmax(-1, /*keepdim=*/true);
-            auto positions_pm =
-                torch::arange(num_experts_, torch::TensorOptions().device(router_out.device()).dtype(torch::kLong))
-                    .unsqueeze(0)
-                    .expand({num_tokens, num_experts_});
-            auto in_prefix_sorted = positions_pm <= first_ge_pm;
-            auto pm_row_mask = torch::zeros_like(probs_pm);
-            pm_row_mask.scatter_(1, sorted_idx_pm, in_prefix_sorted.to(torch::kFloat32));
+            auto topk_res = router_out.topk(num_experts_per_tok_, /*dim=*/-1);
+            auto topk_logits = std::get<0>(topk_res);
+            auto topk_idx = std::get<1>(topk_res);
+            
+            auto probs_pm = torch::softmax(topk_logits.to(torch::kFloat32), -1);
+            auto cumsum_pm = torch::cumsum(probs_pm, -1);
+            auto pre_cumsum_pm = cumsum_pm - probs_pm;
+            auto include_sorted_pm = pre_cumsum_pm.lt(pm_thresh).to(torch::kFloat32);
+            auto pm_row_mask = torch::zeros_like(cache_mask);
+            pm_row_mask.scatter_(1, topk_idx, include_sorted_pm);
             cache_mask = torch::maximum(cache_mask, pm_row_mask);
         }
         
@@ -2405,88 +2478,6 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     return input_tensor.narrow(1, 0, token_len);
 }
 
-double UnifiedLLMW4A16Impl::calculate_generation_perplexity(torch::Tensor input_ids) {
-    if (input_ids.size(0) != 1) {
-        throw std::runtime_error("PPL calculation requires batch size 1");
-    }
-    
-    int64_t seq_len = input_ids.size(1);
-    if (seq_len < 2) return 0.0;
-    
-    // Ensure eval mode
-    this->eval();
-    torch::NoGradGuard no_grad;
-    
-    // Warmup could be done, but let's just proceed
-    
-    double total_nll = 0.0;
-    int64_t tokens_counted = 0;
-    
-    // We process token i to predict token i+1.
-    // However, the first token has no context.
-    // The loop iterates from 0 to N-2.
-    //   Pass token[0] -> predict token[1]
-    //   Pass token[1] -> predict token[2]
-    //   ...
-    
-    auto start_time = std::chrono::high_resolution_clock::now();
-    
-    // Reset cache stats before calculating perplexity to ensure accurate measurements
-    reset_cache_stats();
-    
-    for (int64_t i = 0; i < seq_len - 1; ++i) {
-        // Prepare input token [1, 1]
-        auto input_token = input_ids.slice(1, i, i + 1); 
-        auto target_token = input_ids.slice(1, i + 1, i + 2).item<int64_t>();
-        
-        // Forward pass (single token -> routed through M=1 generation path)
-        // start_pos = i ensures correct KV cache slot usage
-        auto logits = forward(input_token, /*start_pos=*/i); // [1, 1, vocab]
-        
-        // Extract logits for the last token (which is the only token)
-        auto next_token_logits = logits.squeeze(0).squeeze(0); // [vocab]
-        
-        // Compute Cross Entropy Loss (NLL)
-        // standard NLL: -log(softmax(logits)[target])
-        // torch::nll_loss expects log_softmax input.
-        // torch::cross_entropy takes raw logits.
-        
-        auto nll = torch::nn::functional::cross_entropy(
-            next_token_logits.unsqueeze(0), 
-            torch::tensor({target_token}, torch::TensorOptions().dtype(torch::kLong).device(logits.device())),
-            torch::nn::functional::CrossEntropyFuncOptions().reduction(torch::kSum)
-        );
-        
-        total_nll += nll.item<double>();
-        tokens_counted++;
-        
-        if (i % 10 == 0) {
-             std::cout << "." << std::flush;
-        }
-    }
-    std::cout << std::endl;
-    
-    auto end_time = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end_time - start_time;
-    
-    if (tokens_counted > 0) {
-        double avg_nll = total_nll / tokens_counted;
-        double ppl = std::exp(avg_nll);
-        double tps = tokens_counted / elapsed.count();
-        
-        std::cout << "PPL Calculation: " << tokens_counted << " tokens." << std::endl;
-        std::cout << "Total Time: " << elapsed.count() << " s (TPS: " << tps << ")" << std::endl;
-        std::cout << "Average NLL: " << avg_nll << std::endl;
-        std::cout << "Generation Perplexity: " << ppl << std::endl;
-        
-        // For compatibility with the python regex parser in sweep script
-        std::cout << "Average Time per Token: " << (1.0/tps) << " seconds" << std::endl;
-        
-        return ppl;
-    }
-    
-    return 0.0;
-}
 
 // Lambda parameter control methods
 void UnifiedLLMW4A16Impl::set_lambda(double lambda, int64_t layer_idx) {
