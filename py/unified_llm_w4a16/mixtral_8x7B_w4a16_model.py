@@ -194,6 +194,7 @@ class Mixtral8x7BW4A16Model:
         predict_layers: Optional[List[int]] = None,
         per_layer_cache_sizes: Optional[List[int]] = None,
         expert_reuse_csv: Optional[str] = None,
+        prewarm_experts: bool = True,
     ):
         """
         Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
@@ -330,10 +331,12 @@ class Mixtral8x7BW4A16Model:
         elif model_path:
             self._load_quantized_weights(model_path, weights_folder="model_weights")
 
-        if backend in ["cached", "predict"]:
+        if backend in ["cached", "predict"] and prewarm_experts:
             num_to_warm = max(per_layer_cache_sizes) if per_layer_cache_sizes else max_cached_experts_per_layer
             print(f"Pre-warming expert cache with {num_to_warm} experts...")
             self.model.prewarm_experts(num_to_warm)
+        elif backend in ["cached", "predict"]:
+            print("Skipping expert prewarm (--no-prewarm); experts load on first use.")
 
         tokenizer_path = tokenizer_path or model_path
         if tokenizer_path:
@@ -992,46 +995,35 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
     return 0
 
 
-def _load_wikitext2_raw_text(model_weights_dir: Path, split: str = "test") -> str:
+def _load_wikitext103_raw_text(model_weights_dir: Path, split: str = "test") -> str:
     """
-    Load WikiText-2 raw split and cache the plain text under model_weights_dir.
-    Tries Hugging Face datasets first, then falls back to raw text URL.
+    Load WikiText-103 raw split and cache the plain text under model_weights_dir.
+    Tries Hugging Face datasets first.
     """
     model_weights_dir.mkdir(parents=True, exist_ok=True)
-    text_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}.txt"
+    text_cache_path = model_weights_dir / f"wikitext-103-raw-v1_{split}.txt"
 
     if text_cache_path.exists():
-        print(f"Using cached WikiText-2 text: {text_cache_path}")
+        print(f"Using cached WikiText-103 text: {text_cache_path}")
         return text_cache_path.read_text(encoding="utf-8")
 
     text = None
     try:
         from datasets import load_dataset
-        ds = load_dataset("wikitext", "wikitext-2-raw-v1", split=split)
+        ds = load_dataset("wikitext", "wikitext-103-raw-v1", split=split)
         lines = [line for line in ds["text"] if line and line.strip()]
         text = "\n\n".join(lines)
-        print(f"Downloaded WikiText-2 via datasets ({split} split).")
+        print(f"Downloaded WikiText-103 via datasets ({split} split).")
     except Exception as e:
-        print(f"Could not load WikiText-2 via datasets ({e}). Falling back to raw text URL.")
-        fallback_urls = {
-            "train": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/train.txt",
-            "validation": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
-            "valid": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
-            "test": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/test.txt",
-        }
-        if split not in fallback_urls:
-            raise ValueError(f"Unsupported WikiText-2 split '{split}'. Use one of train/valid/validation/test.")
-        with urlopen(fallback_urls[split]) as resp:
-            text = resp.read().decode("utf-8")
-        text = "\n\n".join([line for line in text.splitlines() if line.strip()])
-        print(f"Downloaded WikiText-2 from fallback URL ({split} split).")
+        print(f"Could not load WikiText-103 via datasets ({e}).")
+        raise RuntimeError("Failed to load WikiText-103 dataset.")
 
     text_cache_path.write_text(text, encoding="utf-8")
-    print(f"Saved WikiText-2 text cache: {text_cache_path}")
+    print(f"Saved WikiText-103 text cache: {text_cache_path}")
     return text
 
 
-def run_wikitext2_perplexity(
+def run_wikitext103_perplexity(
     model_path=None,
     tokenizer_path=None,
     device="cuda",
@@ -1042,7 +1034,7 @@ def run_wikitext2_perplexity(
     stride: int = 2048,
 ):
     """
-    Evaluate perplexity on WikiText-2 with sliding-window evaluation.
+    Evaluate perplexity on WikiText-103 with sliding-window evaluation.
     Saves fetched text and tokenized IDs under model_weights.
     """
     if max_length < 2:
@@ -1055,10 +1047,10 @@ def run_wikitext2_perplexity(
     model_weights_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 60)
-    print(f"WIKITEXT-2 PERPLEXITY ({split} split)")
+    print(f"WIKITEXT-103 PERPLEXITY ({split} split)")
     print("=" * 60 + "\n")
 
-    text = _load_wikitext2_raw_text(model_weights_dir, split=split)
+    text = _load_wikitext103_raw_text(model_weights_dir, split=split)
 
     if model_path is None:
         model_path = "TheBloke/mixtral-8x7b-v0.1-AWQ"
@@ -1080,19 +1072,19 @@ def run_wikitext2_perplexity(
         return 1
 
     if model.tokenizer is None:
-        print("Error: tokenizer is required for WikiText-2 perplexity.")
+        print("Error: tokenizer is required for WikiText-103 perplexity.")
         return 1
 
-    print("Tokenizing WikiText-2 corpus...")
+    print("Tokenizing WikiText-103 corpus...")
     encoded = model.tokenizer(text, return_tensors="pt", add_special_tokens=False)
     input_ids_full = encoded["input_ids"]
     if input_ids_full.size(1) < 2:
-        print("Error: tokenized WikiText-2 corpus is too short.")
+        print("Error: tokenized WikiText-103 corpus is too short.")
         return 1
 
-    token_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}_tokens.pt"
+    token_cache_path = model_weights_dir / f"wikitext-103-raw-v1_{split}_tokens.pt"
     torch.save(input_ids_full.cpu(), token_cache_path)
-    print(f"Saved tokenized WikiText-2 tensor: {token_cache_path}")
+    print(f"Saved tokenized WikiText-103 tensor: {token_cache_path}")
     print(f"Total tokens: {input_ids_full.size(1)}")
     print(f"Eval max_length: {max_length}, stride: {stride}")
     backend_prefill_chunk = None
@@ -1259,6 +1251,11 @@ def main():
         help="Maximum number of cached experts per layer (for cached backend)"
     )
     parser.add_argument(
+        "--no-prewarm",
+        action="store_true",
+        help="Skip loading experts into cache slots at init (cached/predict; lowers peak VRAM)",
+    )
+    parser.add_argument(
         "--config-path",
         type=str,
         default=os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5")),
@@ -1332,41 +1329,28 @@ def main():
         default=None,
         help="Path to CSV containing layer correlation multipliers."
     )
-    parser.add_argument(
-        "--perplexity",
+        "--wikitext103-perplexity",
         action="store_true",
-        default=False,
-        help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
+        help="Compute perplexity on WikiText-103 and save downloaded/tokenized files under model_weights."
     )
     parser.add_argument(
-        "--wikitext2-perplexity",
-        action="store_true",
-        help="Compute perplexity on WikiText-2 and save downloaded/tokenized files under model_weights."
-    )
-    parser.add_argument(
-        "--wikitext2-split",
+        "--wikitext103-split",
         type=str,
         default="test",
         choices=["train", "valid", "validation", "test"],
-        help="WikiText-2 split to evaluate."
+        help="WikiText-103 split to evaluate."
     )
     parser.add_argument(
-        "--wikitext2-max-length",
+        "--wikitext103-max-length",
         type=int,
         default=2048,
-        help="Max context length per evaluation window for WikiText-2 perplexity."
+        help="Max context length per evaluation window for WikiText-103 perplexity."
     )
     parser.add_argument(
-        "--wikitext2-stride",
+        "--wikitext103-stride",
         type=int,
         default=2048,
-        help="Stride for sliding-window WikiText-2 perplexity."
-    )
-    parser.add_argument(
-        "--generation-perplexity",
-        action="store_true",
-        default=False,
-        help="Calculate generation-time perplexity (slower, token-by-token)"
+        help="Stride for sliding-window WikiText-103 perplexity."
     )
     parser.add_argument(
         "--benchmark-prompts",
@@ -1412,16 +1396,16 @@ def main():
     
     args = parser.parse_args()
 
-    if args.wikitext2_perplexity:
-        return run_wikitext2_perplexity(
+    if args.wikitext103_perplexity:
+        return run_wikitext103_perplexity(
             model_path=args.model_path,
             tokenizer_path=args.tokenizer_path,
             device=args.device,
             backend=args.backend,
             config_path=args.config_path,
-            split=args.wikitext2_split,
-            max_length=args.wikitext2_max_length,
-            stride=args.wikitext2_stride,
+            split=args.wikitext103_split,
+            max_length=args.wikitext103_max_length,
+            stride=args.wikitext103_stride,
         )
 
     if args.prompt_test is not None:
@@ -1436,7 +1420,6 @@ def main():
             top_p=args.top_p,
             top_k=args.top_k,
             generate=args.generate,
-            perplexity=args.perplexity,
             config_path=args.config_path
         )
 
@@ -1456,6 +1439,7 @@ def main():
             predictor_device=args.predictor_device,
             prefetch_experts_count=args.prefetch_experts_count,
             predict_layers=args.predict_layers,
+            prewarm_experts=not args.no_prewarm,
         )
         print("Model initialized successfully!")
 
@@ -1794,5 +1778,5 @@ def main():
 if __name__ == "__main__":
     exit(main())
 
-    # Perplexity test for wikitext2
-    # python3 mixtral_8x7B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
+    # Perplexity test for wikitext103
+    # python3 mixtral_8x7B_w4a16_model.py   --wikitext103-perplexity   --wikitext103-split test   --wikitext103-max-length 4096   --wikitext103-stride 2048

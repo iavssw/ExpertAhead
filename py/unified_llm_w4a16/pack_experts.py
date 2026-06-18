@@ -12,7 +12,8 @@ Packed file format  (layer_{L}_expert_{E}.bin):
                -  8 bytes  uint64  offset into file (from byte 0)
                -  8 bytes  uint64  byte length
 ─────────────────────────────────────────────────────────────────
-  440+   raw tensor data, concatenated in descriptor order
+  440+   raw tensor data; each tensor starts at a 512-byte-aligned offset
+         (padding bytes between tensors are ignored by readers)
 ─────────────────────────────────────────────────────────────────
 
 Tensor order (fixed):
@@ -39,7 +40,13 @@ from pathlib import Path
 MAGIC = b"EXPK"
 NUM_TENSORS = 9
 DESC_ENTRY_SIZE = 48       # 32 (name) + 8 (offset) + 8 (size)
-HEADER_SIZE = 8 + NUM_TENSORS * DESC_ENTRY_SIZE   # magic(4)+ntensors(4) + table
+TABLE_SIZE = 8 + NUM_TENSORS * DESC_ENTRY_SIZE
+HEADER_SIZE = 512   # Pad to 512 for O_DIRECT alignment
+TENSOR_ALIGN = 512  # Each tensor body starts on a 512-byte boundary (O_DIRECT)
+
+
+def align_up(n: int, align: int = TENSOR_ALIGN) -> int:
+    return ((n + align - 1) // align) * align
 
 # Fixed order of the 9 tensors inside the packed file
 TENSOR_NAMES = [
@@ -62,6 +69,7 @@ def _src_name(tensor_name: str, layer: int, expert: int) -> str:
 
 def pack_expert(src_dir: Path, dst_dir: Path, layer: int, expert: int) -> None:
     """Pack the 9 files for one expert into a single file."""
+    dst_dir.mkdir(parents=True, exist_ok=True)
     out_path = dst_dir / f"layer_{layer}_expert_{expert}.bin"
 
     # Collect raw bytes for each tensor
@@ -70,10 +78,11 @@ def pack_expert(src_dir: Path, dst_dir: Path, layer: int, expert: int) -> None:
         src = src_dir / _src_name(name, layer, expert)
         blobs.append(src.read_bytes())
 
-    # Build descriptor table
+    # Build descriptor table — align each tensor start for O_DIRECT pread
     offsets: list[int] = []
     cursor = HEADER_SIZE
     for blob in blobs:
+        cursor = align_up(cursor)
         offsets.append(cursor)
         cursor += len(blob)
 
@@ -81,18 +90,24 @@ def pack_expert(src_dir: Path, dst_dir: Path, layer: int, expert: int) -> None:
     header = bytearray()
     header += MAGIC
     header += struct.pack("<I", NUM_TENSORS)
-    for i, (name, blob, offset) in enumerate(zip(TENSOR_NAMES, blobs, offsets)):
+    for name, blob, offset in zip(TENSOR_NAMES, blobs, offsets):
         name_bytes = name.encode("ascii")
         name_bytes = name_bytes[:32].ljust(32, b"\x00")
         header += name_bytes
         header += struct.pack("<QQ", offset, len(blob))
 
-    assert len(header) == HEADER_SIZE, f"Header size mismatch: {len(header)} != {HEADER_SIZE}"
+    header += b"\x00" * (HEADER_SIZE - len(header))
+    assert len(header) == HEADER_SIZE, f"Header size mismatch"
 
     with out_path.open("wb") as f:
         f.write(header)
+        cursor = HEADER_SIZE
         for blob in blobs:
+            cursor = align_up(cursor)
+            if f.tell() < cursor:
+                f.write(b"\x00" * (cursor - f.tell()))
             f.write(blob)
+            cursor += len(blob)
 
 
 def pack_all(

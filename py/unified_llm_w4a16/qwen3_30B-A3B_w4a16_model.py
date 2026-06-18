@@ -66,6 +66,13 @@ def _apply_routing_and_cache_cli(model: Any, args: Any) -> None:
         model.set_cache_policy(args.cache_policy)
         print(f"Set expert cache policy to {args.cache_policy}.")
 
+    if getattr(args, "suppress_predictor_stats", False):
+        if hasattr(model, "set_suppress_predictor_stats"):
+            model.set_suppress_predictor_stats(True)
+            print("Suppressing predictor stats.")
+        else:
+            print("Warning: --suppress-predictor-stats ignored (backend has no set_suppress_predictor_stats).")
+
 
 def load_config_with_comments(path: str) -> dict:
     """Load JSON/JSON5-like config with // and /* */ comments stripped."""
@@ -784,97 +791,11 @@ class Qwen3_30BA3BW4A16Model:
         """Experiment mode: keep top forced_top_n correct experts; fill remaining with random experts."""
         if hasattr(self.model, "set_random_fill_mode"):
             self.model.set_random_fill_mode(on)
-    def perplexity(self, input_ids: Union[str, torch.Tensor]) -> dict:
-        """
-        Compute causal-LM perplexity for the provided sequence(s).
-        Returns: loss, perplexity, num_tokens.
-        """
-        if isinstance(input_ids, str):
-            input_ids = self.tokenize(input_ids)
 
-        if input_ids.dim() != 2:
-            raise ValueError(f"Expected input_ids with shape [batch, seq_len], got {tuple(input_ids.shape)}")
-        if input_ids.size(1) < 2:
-            raise ValueError("Need at least 2 tokens to compute perplexity.")
-
-        with torch.no_grad():
-            logits = self.model.forward(input_ids, 0)
-
-        shift_logits = logits[:, :-1, :].float().contiguous()
-        shift_labels = input_ids[:, 1:].to(shift_logits.device).contiguous()
-        vocab_size = shift_logits.size(-1)
-
-        pad_token_id = self.tokenizer.pad_token_id if self.tokenizer is not None else None
-        if pad_token_id is not None:
-            valid_mask = shift_labels.ne(pad_token_id)
-            num_tokens = int(valid_mask.sum().item())
-            if num_tokens == 0:
-                raise ValueError("No non-pad tokens available for perplexity computation.")
-            labels_for_loss = shift_labels.masked_fill(~valid_mask, -100)
-            loss = F.cross_entropy(
-                shift_logits.view(-1, vocab_size),
-                labels_for_loss.view(-1),
-                ignore_index=-100,
-                reduction="mean",
-            )
-        else:
-            num_tokens = int(shift_labels.numel())
-            loss = F.cross_entropy(
-                shift_logits.view(-1, vocab_size),
-                shift_labels.view(-1),
-                reduction="mean",
-            )
-
-        ppl = torch.exp(loss)
-        return {
-            "loss": float(loss.item()),
-            "perplexity": float(ppl.item()),
-            "num_tokens": num_tokens,
-        }
-
-    def generation_perplexity(self, prompt_ids: torch.Tensor, full_ids: torch.Tensor) -> dict:
-        """Perplexity of the generated continuation only (not the prompt).
-
-        For each generated position t in [P, T-1], computes -log p(full_ids[t] | full_ids[:t])
-        using a single teacher-forced forward on ``full_ids`` (same routing as standard ``forward``).
-
-        Pool multiple prompts with token weighting: sum_nll / sum(num_gen_tokens), then exp.
-
-        Returns keys: perplexity, mean_nll, sum_nll, num_gen_tokens.
-        """
-        if prompt_ids.dim() != 2 or full_ids.dim() != 2:
-            raise ValueError("Expected prompt_ids and full_ids shaped [batch, seq].")
-        if prompt_ids.size(0) != 1 or full_ids.size(0) != 1:
-            raise ValueError("generation_perplexity currently supports batch size 1.")
-        P = int(prompt_ids.size(1))
-        T = int(full_ids.size(1))
-        if T <= P:
-            return {
-                "perplexity": float("inf"),
-                "mean_nll": float("inf"),
-                "sum_nll": 0.0,
-                "num_gen_tokens": 0,
-            }
-
-        with torch.no_grad():
-            logits = self.model.forward(full_ids, 0)
-
-        logits = logits[:, :-1, :].float().contiguous()
-        vocab_size = logits.size(-1)
-        # logits[:, i, :] predicts token at index i+1
-        gen_logits = logits[0, P - 1 : T - 1, :]
-        gen_targets = full_ids[0, P:T].to(logits.device).long()
-        loss_vec = F.cross_entropy(gen_logits, gen_targets, reduction="none")
-        sum_nll = float(loss_vec.sum().item())
-        n_gen = int(gen_targets.numel())
-        mean_nll = sum_nll / max(n_gen, 1)
-        return {
-            "perplexity": float(math.exp(mean_nll)),
-            "mean_nll": float(mean_nll),
-            "sum_nll": sum_nll,
-            "num_gen_tokens": n_gen,
-        }
-
+    def set_suppress_predictor_stats(self, v: bool) -> None:
+        """Disable predictor/prefetch measurement (predict backend only)."""
+        if hasattr(self.model, "set_suppress_predictor_stats"):
+            self.model.set_suppress_predictor_stats(v)
 
 def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
                     max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50,
@@ -1056,46 +977,35 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
     return 0
 
 
-def _load_wikitext2_raw_text(model_weights_dir: Path, split: str = "test") -> str:
+def _load_wikitext103_raw_text(model_weights_dir: Path, split: str = "test") -> str:
     """
-    Load WikiText-2 raw split and cache the plain text under model_weights_dir.
-    Tries Hugging Face datasets first, then falls back to raw text URL.
+    Load WikiText-103 raw split and cache the plain text under model_weights_dir.
+    Tries Hugging Face datasets first.
     """
     model_weights_dir.mkdir(parents=True, exist_ok=True)
-    text_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}.txt"
+    text_cache_path = model_weights_dir / f"wikitext-103-raw-v1_{split}.txt"
 
     if text_cache_path.exists():
-        print(f"Using cached WikiText-2 text: {text_cache_path}")
+        print(f"Using cached WikiText-103 text: {text_cache_path}")
         return text_cache_path.read_text(encoding="utf-8")
 
     text = None
     try:
         from datasets import load_dataset
-        ds = load_dataset("wikitext", "wikitext-2-raw-v1", split=split)
+        ds = load_dataset("wikitext", "wikitext-103-raw-v1", split=split)
         lines = [line for line in ds["text"] if line and line.strip()]
         text = "\n\n".join(lines)
-        print(f"Downloaded WikiText-2 via datasets ({split} split).")
+        print(f"Downloaded WikiText-103 via datasets ({split} split).")
     except Exception as e:
-        print(f"Could not load WikiText-2 via datasets ({e}). Falling back to raw text URL.")
-        fallback_urls = {
-            "train": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/train.txt",
-            "validation": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
-            "valid": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
-            "test": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/test.txt",
-        }
-        if split not in fallback_urls:
-            raise ValueError(f"Unsupported WikiText-2 split '{split}'. Use one of train/valid/validation/test.")
-        with urlopen(fallback_urls[split]) as resp:
-            text = resp.read().decode("utf-8")
-        text = "\n\n".join([line for line in text.splitlines() if line.strip()])
-        print(f"Downloaded WikiText-2 from fallback URL ({split} split).")
+        print(f"Could not load WikiText-103 via datasets ({e}).")
+        raise RuntimeError("Failed to load WikiText-103 dataset.")
 
     text_cache_path.write_text(text, encoding="utf-8")
-    print(f"Saved WikiText-2 text cache: {text_cache_path}")
+    print(f"Saved WikiText-103 text cache: {text_cache_path}")
     return text
 
 
-def run_wikitext2_perplexity(
+def run_wikitext103_perplexity(
     model_path=None,
     tokenizer_path=None,
     device="cuda",
@@ -1108,7 +1018,7 @@ def run_wikitext2_perplexity(
     cli_args: Any = None,
 ):
     """
-    Evaluate perplexity on WikiText-2 with sliding-window evaluation.
+    Evaluate perplexity on WikiText-103 with sliding-window evaluation.
     Saves fetched text and tokenized IDs under model_weights.
 
     If *cli_args* is set (typically ``argparse.Namespace`` from ``main``), the model is
@@ -1127,10 +1037,10 @@ def run_wikitext2_perplexity(
     model_weights_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 60)
-    print(f"WIKITEXT-2 PERPLEXITY ({split} split)")
+    print(f"WIKITEXT-103 PERPLEXITY ({split} split)")
     print("=" * 60 + "\n")
 
-    text = _load_wikitext2_raw_text(model_weights_dir, split=split)
+    text = _load_wikitext103_raw_text(model_weights_dir, split=split)
 
     if model_path is None:
         model_path = "QuixiAI/Qwen3-30B-A3B-AWQ"
@@ -1180,7 +1090,7 @@ def run_wikitext2_perplexity(
         print("Error: tokenized WikiText-2 corpus is too short.")
         return 1
 
-    token_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}_tokens.pt"
+    token_cache_path = model_weights_dir / f"wikitext-103-raw-v1_{split}_tokens.pt"
     torch.save(input_ids_full.cpu(), token_cache_path)
     print(f"Saved tokenized WikiText-2 tensor: {token_cache_path}")
     print(f"Total tokens: {input_ids_full.size(1)}")
@@ -1412,31 +1322,32 @@ def main():
         help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
     )
     parser.add_argument(
-        "--wikitext2-perplexity",
+        "--wikitext103-perplexity",
         action="store_true",
-        help="Compute perplexity on WikiText-2 and save downloaded/tokenized files under model_weights."
+        default=False,
+        help="Compute perplexity on WikiText-103 and save downloaded/tokenized files under model_weights."
     )
     parser.add_argument(
-        "--wikitext2-split",
+        "--wikitext103-split",
         type=str,
         default="test",
         choices=["train", "valid", "validation", "test"],
-        help="WikiText-2 split to evaluate."
+        help="WikiText-103 split to evaluate."
     )
     parser.add_argument(
-        "--wikitext2-max-length",
+        "--wikitext103-max-length",
         type=int,
         default=2048,
-        help="Max context length per evaluation window for WikiText-2 perplexity."
+        help="Max context length per evaluation window for WikiText-103 perplexity."
     )
     parser.add_argument(
-        "--wikitext2-stride",
+        "--wikitext103-stride",
         type=int,
         default=2048,
-        help="Stride for sliding-window WikiText-2 perplexity."
+        help="Stride for sliding-window WikiText-103 perplexity."
     )
     parser.add_argument(
-        "--wikitext2-max-windows",
+        "--wikitext103-max-windows",
         type=int,
         default=0,
         help="If > 0, only evaluate this many sliding windows (smoke test / cheap run). 0 = full split.",
@@ -1493,20 +1404,24 @@ def main():
         "--prefill-top-n", type=int, default=0,
         help="(cached backend) Under PREFILL policy, lock the top-N experts from prefill into the cache."
     )
+    parser.add_argument(
+        "--suppress-predictor-stats", action="store_true", default=False,
+        help="Disable measurement for runtime performance evaluation."
+    )
 
     args = parser.parse_args()
 
-    if args.wikitext2_perplexity:
-        return run_wikitext2_perplexity(
+    if args.wikitext103_perplexity:
+        return run_wikitext103_perplexity(
             model_path=args.model_path,
             tokenizer_path=args.tokenizer_path,
             device=args.device,
             backend=args.backend,
             config_path=args.config_path,
-            split=args.wikitext2_split,
-            max_length=args.wikitext2_max_length,
-            stride=args.wikitext2_stride,
-            max_windows=args.wikitext2_max_windows,
+            split=args.wikitext103_split,
+            max_length=args.wikitext103_max_length,
+            stride=args.wikitext103_stride,
+            max_windows=args.wikitext103_max_windows,
             cli_args=args,
         )
 
@@ -1575,6 +1490,8 @@ def main():
         prompts_with_gen = 0
         total_time = 0.0
         total_generated_tokens = 0
+        prompt_tps_list = []
+        prompt_ppl_list = []
         
         model.reset_cache_stats()
 
@@ -1599,9 +1516,12 @@ def main():
                         total_nll_sum += gp["sum_nll"]
                         total_gen_toks_for_ppl += gp["num_gen_tokens"]
                         prompts_with_gen += 1
+                        prompt_ppl = math.exp(gp["sum_nll"] / gp["num_gen_tokens"])
+                        prompt_ppl_list.append(prompt_ppl)
                         if args.generate:
                             total_time += elapsed
                             total_generated_tokens += num_generated
+                            prompt_tps_list.append(num_generated / elapsed)
                 elif args.generate:
                     start_time = time.time()
                     generated = model.generate(
@@ -1616,6 +1536,7 @@ def main():
                     if num_generated > 0:
                         total_time += elapsed
                         total_generated_tokens += num_generated
+                        prompt_tps_list.append(num_generated / elapsed)
 
             except Exception as e:
                 print(f"  Error on prompt {i+1}: {e}")
@@ -1631,11 +1552,19 @@ def main():
                 f"(token-weighted over {total_gen_toks_for_ppl} generated tokens, "
                 f"{prompts_with_gen}/{len(prompts)} prompts with ≥1 new token)"
             )
+            if len(prompt_ppl_list) > 1:
+                import statistics
+                ppl_std = statistics.stdev(prompt_ppl_list)
+                print(f"Generation Perplexity StdDev: {ppl_std:.4f}")
             
         if args.generate and total_generated_tokens > 0:
             avg_tps = total_generated_tokens / total_time
             print(f"Average Time per Token: {1.0 / avg_tps:.6f}") # Output inverse since parser expects time per token
             print(f"End-to-End TPS: {avg_tps:.4f}")
+            if len(prompt_tps_list) > 1:
+                import statistics
+                tps_std = statistics.stdev(prompt_tps_list)
+                print(f"TPS StdDev: {tps_std:.4f}")
 
         # Get and print cache stats for entire sweep
         hits, misses = model.get_cache_stats()
@@ -1667,6 +1596,7 @@ def main():
             print(f"Tokens evaluated: {metrics['num_tokens']}")
             print(f"Cross-entropy loss: {metrics['loss']:.6f}")
             print(f"Perplexity: {metrics['perplexity']:.6f}")
+            return 0
         except Exception as e:
             print(f"Error during perplexity evaluation: {e}")
             import traceback
@@ -1703,72 +1633,20 @@ def main():
                 print(f"{'='*60}")
             else:
                 print(f"\nGenerated token IDs: {generated}")
+            if hasattr(model, "print_cache_stats"):
+                model.print_cache_stats()
+            return 0
         except Exception as e:
             print(f"Error during generation: {e}")
             import traceback
             traceback.print_exc()
             return 1
-    print(f"Running {len(prompts)} prompt(s) from {prompts_file if prompts_file.exists() else '--text'}...\n")
-
-    for prompt_idx, prompt_text in enumerate(prompts):
-        print(f"\n{'='*60}")
-        print(f"PROMPT {prompt_idx + 1}/{len(prompts)}: {prompt_text[:80]}{'...' if len(prompt_text) > 80 else ''}")
-        print(f"{'='*60}")
-
-        if args.generate:
-            try:
-                input_ids = model.tokenize(prompt_text)
-
-                generated = model.generate(
-                    input_ids,
-                    max_new_tokens=args.max_new_tokens,
-                    temperature=args.temperature,
-                    top_p=args.top_p,
-                    top_k=args.top_k
-                )
-
-                if model.tokenizer is not None:
-                    prompt_len = input_ids.size(1)
-                    generated_tokens = generated[0, prompt_len:].tolist()
-                    decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
-
-                    print("Generated text:")
-                    print(f"{'='*60}")
-                    print(decoded_generated)
-                    print(f"{'='*60}")
-                else:
-                    print(f"Generated token IDs: {generated}")
-            except Exception as e:
-                print(f"Error during generation for prompt {prompt_idx + 1}: {e}")
-                import traceback
-                traceback.print_exc()
-        else:
-            try:
-                start_time = time.time()
-                logits = model(prompt_text)
-                end_time = time.time()
-                print(f"Prefill time: {end_time - start_time:.4f} seconds")
-                print(f"Logits shape: {logits.shape}, dtype: {logits.dtype}")
-                print(f"Logits stats — min: {logits.min().item():.4f}, max: {logits.max().item():.4f}, "
-                      f"mean: {logits.mean().item():.4f}")
-            except Exception as e:
-                print(f"Error during forward pass for prompt {prompt_idx + 1}: {e}")
-                import traceback
-                traceback.print_exc()
-
-    print(f"\n{'=' * 60}")
-    if hasattr(model, "load_time"):
-        print(f"Weight loading time: {model.load_time:.2f} seconds")
-    if hasattr(model, "print_cache_stats"):
-        model.print_cache_stats()
-    print("Done!")
-    print(f"{'=' * 60}\n")
     return 0
 
 
 if __name__ == "__main__":
     exit(main())
 
-    # WikiText-2 (full): --wikitext2-perplexity --wikitext2-split test --wikitext2-max-length 4096 --wikitext2-stride 2048
-    # Quick cached smoke: --backend cached --max-cached-experts 36 --lambda-val 1.0 --forced-top-n 4 \
-    #   --wikitext2-perplexity --wikitext2-max-windows 2 --wikitext2-max-length 512 --wikitext2-stride 512
+    # WikiText-103 (full): --wikitext103-perplexity --wikitext103-split test --wikitext103-max-length 4096 --wikitext103-stride 2048
+    # Examples of limited runs:
+    #   --wikitext103-perplexity --wikitext103-max-windows 2 --wikitext103-max-length 512 --wikitext103-stride 512
