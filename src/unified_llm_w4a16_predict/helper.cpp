@@ -1285,15 +1285,20 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
     }
 }
 
-void MixtureOfExpertsImpl::load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx,
-                                                      const std::string& weights_dir) {
+void MixtureOfExpertsImpl::load_experts_weights_packed(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts,
+                                                       const std::string& weights_dir) {
 #include "unified_llm_w4a16_common/moe_expert_load_packed.inl"
 }
 
-void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
+void MixtureOfExpertsImpl::load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx,
+                                                      const std::string& weights_dir) {
+    load_experts_weights_packed({{slot_idx, expert_idx}}, weights_dir);
+}
+
+void MixtureOfExpertsImpl::load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir) {
     auto start_time = std::chrono::high_resolution_clock::now();
     
-    experts_loaded_this_step_++;
+    experts_loaded_this_step_ += slots_and_experts.size();
 
     if (weights_dir.empty()) {
         throw std::runtime_error("Weights directory not set for MoE layer " + std::to_string(layer_idx_));
@@ -1301,7 +1306,7 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
 
     if (weights_dir == "DUMMY") {
         if (debug_verbosity >= 2)
-            std::cout << "DUMMY load for expert " << expert_idx << " into slot " << slot_idx << std::endl;
+            std::cout << "DUMMY load for " << slots_and_experts.size() << " experts." << std::endl;
         return;
     }
 
@@ -1316,7 +1321,7 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
     }
 
     if (expert_format_ == ExpertFormat::PACKED) {
-        load_expert_weights_packed(slot_idx, expert_idx, weights_dir);
+        load_experts_weights_packed(slots_and_experts, weights_dir);
         auto end_time = std::chrono::high_resolution_clock::now();
         double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
         double current_time = total_expert_load_time_ms_.load();
@@ -1324,12 +1329,16 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
         return;
     }
 
-    const std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
-    const std::string gate_prefix = expert_prefix + "_gate";
-    const std::string up_prefix = expert_prefix + "_up";
-    const std::string down_prefix = expert_prefix + "_down";
+    for (const auto& se : slots_and_experts) {
+        int64_t slot_idx = se.first;
+        int64_t expert_idx = se.second;
+        const std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
+        const std::string gate_prefix = expert_prefix + "_gate";
+        const std::string up_prefix = expert_prefix + "_up";
+        const std::string down_prefix = expert_prefix + "_down";
 
 #include "unified_llm_w4a16_common/moe_expert_load_unpacked.inl"
+    }
 
     auto end_time = std::chrono::high_resolution_clock::now();
     double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
@@ -1339,4 +1348,8 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
     while(!total_expert_load_time_ms_.compare_exchange_weak(current_time, current_time + ms)) {
         // loop until successful
     }
+}
+
+void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
+    load_experts_weights({{slot_idx, expert_idx}}, weights_dir);
 }

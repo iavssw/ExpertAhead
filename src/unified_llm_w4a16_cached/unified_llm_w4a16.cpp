@@ -614,60 +614,89 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     }
 }
 
-int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
+std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats) {
     ++access_clock_;
+    std::vector<int64_t> result_slots(global_expert_indices.size(), -1);
+    std::vector<std::pair<int64_t, int64_t>> slots_and_experts_to_load;
 
-    // Check if we should force a cache miss
     static const char* force_miss_env = std::getenv("FORCE_EXPERT_MISS");
     static bool force_miss = force_miss_env && std::string(force_miss_env) == "1";
 
-    if (!force_miss) {
-        // Linear scan of slots to find if expert is already loaded
-        for (size_t s = 0; s < slot_meta_.size(); ++s) {
-            if (slot_meta_[s].expert_id == global_expert_idx) {
-                if (update_stats) cache_hits_++;
-                slot_meta_[s].access_count++;
-                slot_meta_[s].last_access = access_clock_;
-                slot_meta_[s].clock_bit = 1;  // used recently (CLOCK)
-                return s;
-            }
-        }
-    }
-    
-    if (update_stats) cache_misses_++;
-    
     if (slot_meta_.empty()) {
         throw std::runtime_error(
             "MixtureOfExperts: cache miss on layer " + std::to_string(layer_idx_) +
             " but max_cached_experts_per_layer=0. Please pass a non-zero --max-cached-experts value.");
     }
 
-    size_t victim = pick_victim();
-    
-    // Load new expert into the evicted slot
-    load_expert_weights(victim, global_expert_idx, weights_dir_);
-    // Ensure weights are fully on device before usage (critical for cache=2 and generation perplexity)
-    (void)hipDeviceSynchronize();
-    
-    // Update slot metadata
-    slot_meta_[victim].expert_id = global_expert_idx;
-    slot_meta_[victim].access_count = 1;
-    slot_meta_[victim].last_access = access_clock_;
-    slot_meta_[victim].clock_bit = 1;
-    expert_slots_indices[victim] = global_expert_idx; // keep array in sync for legacy users
-    
-    // Update cache bitmask to reflect currently loaded experts
-    if (expert_cache_bitmask_.size() == num_experts_) {
-        std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
-        for (size_t i = 0; i < slot_meta_.size(); ++i) {
-            int64_t eid = slot_meta_[i].expert_id;
-            if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
-                expert_cache_bitmask_[eid] = 1;
+    // 1. Check hits
+    for (size_t i = 0; i < global_expert_indices.size(); ++i) {
+        int64_t global_e = global_expert_indices[i];
+        if (!force_miss) {
+            for (size_t s = 0; s < slot_meta_.size(); ++s) {
+                if (slot_meta_[s].expert_id == global_e) {
+                    if (update_stats) cache_hits_++;
+                    slot_meta_[s].access_count++;
+                    slot_meta_[s].last_access = access_clock_;
+                    slot_meta_[s].clock_bit = 1;
+                    result_slots[i] = s;
+                    // Protect this slot from being evicted during THIS batch
+                    currently_selected_experts_.push_back(global_e);
+                    break;
+                }
             }
         }
     }
-    
-    return victim;
+
+    // 2. Pick victims for misses
+    for (size_t i = 0; i < global_expert_indices.size(); ++i) {
+        if (result_slots[i] == -1) {
+            if (update_stats) cache_misses_++;
+            int64_t global_e = global_expert_indices[i];
+            size_t victim = pick_victim();
+            result_slots[i] = victim;
+            
+            // Mark the slot as temporarily busy so it isn't picked again
+            slot_meta_[victim].expert_id = global_e; 
+            expert_slots_indices[victim] = global_e;
+            
+            // Protect it
+            currently_selected_experts_.push_back(global_e);
+
+            slots_and_experts_to_load.push_back({victim, global_e});
+        }
+    }
+
+    // 3. Load all missing experts concurrently
+    if (!slots_and_experts_to_load.empty()) {
+        load_experts_weights(slots_and_experts_to_load, weights_dir_);
+        // Ensure weights are fully on device before usage
+        (void)hipDeviceSynchronize();
+        
+        // Update metadata for newly loaded experts
+        for (auto& p : slots_and_experts_to_load) {
+            size_t victim = p.first;
+            slot_meta_[victim].access_count = 1;
+            slot_meta_[victim].last_access = access_clock_;
+            slot_meta_[victim].clock_bit = 1;
+        }
+        
+        // Update cache bitmask
+        if (expert_cache_bitmask_.size() == num_experts_) {
+            std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
+            for (size_t i = 0; i < slot_meta_.size(); ++i) {
+                int64_t eid = slot_meta_[i].expert_id;
+                if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
+                    expert_cache_bitmask_[eid] = 1;
+                }
+            }
+        }
+    }
+
+    return result_slots;
+}
+
+int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
+    return ensure_experts_cached({global_expert_idx}, update_stats)[0];
 }
 
 size_t MixtureOfExpertsImpl::pick_victim() {
@@ -903,13 +932,15 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     auto topk_accessor = topk_cpu.accessor<int64_t, 1>();
 
     currently_selected_experts_.clear();
+    
+    std::vector<int64_t> missing_experts(active_experts);
     for (int64_t k = 0; k < active_experts; ++k) {
-        currently_selected_experts_.push_back(topk_accessor[k]);
+        missing_experts[k] = topk_accessor[k];
     }
+    std::vector<int64_t> slots = ensure_experts_cached(missing_experts);
 
     for (int64_t k = 0; k < active_experts; ++k) {
-        int64_t global_e = topk_accessor[k];
-        int64_t e = ensure_expert_cached(global_e);
+        int64_t e = slots[k];
         expert_ids[k] = e;
         gate_up_qw_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_quantized_weights().data_ptr<uint8_t>());
         gate_up_s_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_scales().data_ptr<at::BFloat16>());

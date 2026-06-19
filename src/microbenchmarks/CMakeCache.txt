@@ -697,9 +697,9 @@ HIP_RUNTIME-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: HIP_VERSION
 HIP_VERSION-ADVANCED:INTERNAL=1
 //Location of 
-HIP_run_hipcc:INTERNAL=/opt/rocm/lib/cmake/hip/FindHIP/run_hipcc.cmake
+HIP_run_hipcc:INTERNAL=/opt/rocm-7.1.1/lib/cmake/hip/FindHIP/run_hipcc.cmake
 //Location of 
-HIP_run_make2cmake:INTERNAL=/opt/rocm/lib/cmake/hip/FindHIP/run_make2cmake.cmake
+HIP_run_make2cmake:INTERNAL=/opt/rocm-7.1.1/lib/cmake/hip/FindHIP/run_make2cmake.cmake
 //Result of TRY_COMPILE
 OpenMP_COMPILE_RESULT_CXX_fopenmp:INTERNAL=TRUE
 //Result of TRY_COMPILE

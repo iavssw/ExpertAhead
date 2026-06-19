@@ -2060,3 +2060,481 @@ events:
         
       exitCode: 2
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:221 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "CMakeLists.txt:51 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_outer_vec"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_278f5/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_278f5.dir/build.make CMakeFiles/cmTC_278f5.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_278f5.dir/hipblaslt_test_outer_vec.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include  -o CMakeFiles/cmTC_278f5.dir/hipblaslt_test_outer_vec.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_outer_vec.cc
+        Linking CXX executable cmTC_278f5
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_278f5.dir/link.txt --verbose=1
+        /usr/bin/c++ CMakeFiles/cmTC_278f5.dir/hipblaslt_test_outer_vec.cc.o -o cmTC_278f5 
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:236 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "CMakeLists.txt:51 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_vec_ext"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_5c15b/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_5c15b.dir/build.make CMakeFiles/cmTC_5c15b.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_5c15b.dir/hipblaslt_test_vec_ext.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include  -o CMakeFiles/cmTC_5c15b.dir/hipblaslt_test_vec_ext.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc
+        In file included from /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:2:
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc: In function ‘int main()’:
+        /opt/rocm/include/hipblaslt/hipblaslt.h:78:5: error: expected primary-expression before ‘static_assert’
+           78 |     static_assert(false, "HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT is deprecated and not supported. Please set HIPBLASLT_MATMUL_DESC_A_SCALE_MODE as HIPBLASLT_MATMUL_MATRIX_SCALE_OUTER_VEC_32F instead.")
+              |     ^~~~~~~~~~~~~
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:4:44: note: in expansion of macro ‘HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT’
+            4 |     hipblasLtMatmulDescAttributes_t attr = HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT;
+              |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        gmake[2]: *** [CMakeFiles/cmTC_5c15b.dir/build.make:78: CMakeFiles/cmTC_5c15b.dir/hipblaslt_test_vec_ext.cc.o] Error 1
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: *** [Makefile:127: cmTC_5c15b/fast] Error 2
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:221 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/hipkernels/CMakeLists.txt:5 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_outer_vec"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_a9b13/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_a9b13.dir/build.make CMakeFiles/cmTC_a9b13.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_a9b13.dir/hipblaslt_test_outer_vec.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include  -o CMakeFiles/cmTC_a9b13.dir/hipblaslt_test_outer_vec.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_outer_vec.cc
+        Linking CXX executable cmTC_a9b13
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a9b13.dir/link.txt --verbose=1
+        /usr/bin/c++ CMakeFiles/cmTC_a9b13.dir/hipblaslt_test_outer_vec.cc.o -o cmTC_a9b13 
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:236 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/hipkernels/CMakeLists.txt:5 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_vec_ext"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_48004/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_48004.dir/build.make CMakeFiles/cmTC_48004.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_48004.dir/hipblaslt_test_vec_ext.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include  -o CMakeFiles/cmTC_48004.dir/hipblaslt_test_vec_ext.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc
+        In file included from /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:2:
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc: In function ‘int main()’:
+        /opt/rocm/include/hipblaslt/hipblaslt.h:78:5: error: expected primary-expression before ‘static_assert’
+           78 |     static_assert(false, "HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT is deprecated and not supported. Please set HIPBLASLT_MATMUL_DESC_A_SCALE_MODE as HIPBLASLT_MATMUL_MATRIX_SCALE_OUTER_VEC_32F instead.")
+              |     ^~~~~~~~~~~~~
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:4:44: note: in expansion of macro ‘HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT’
+            4 |     hipblasLtMatmulDescAttributes_t attr = HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT;
+              |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        gmake[2]: *** [CMakeFiles/cmTC_48004.dir/build.make:78: CMakeFiles/cmTC_48004.dir/hipblaslt_test_vec_ext.cc.o] Error 1
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: *** [Makefile:127: cmTC_48004/fast] Error 2
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:221 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/microbenchmarks/CMakeLists.txt:6 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_outer_vec"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_bc3b1/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_bc3b1.dir/build.make CMakeFiles/cmTC_bc3b1.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_bc3b1.dir/hipblaslt_test_outer_vec.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include  -o CMakeFiles/cmTC_bc3b1.dir/hipblaslt_test_outer_vec.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_outer_vec.cc
+        Linking CXX executable cmTC_bc3b1
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bc3b1.dir/link.txt --verbose=1
+        /usr/bin/c++ CMakeFiles/cmTC_bc3b1.dir/hipblaslt_test_outer_vec.cc.o -o cmTC_bc3b1 
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:236 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/microbenchmarks/CMakeLists.txt:6 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_vec_ext"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_74d61/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_74d61.dir/build.make CMakeFiles/cmTC_74d61.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_74d61.dir/hipblaslt_test_vec_ext.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include  -o CMakeFiles/cmTC_74d61.dir/hipblaslt_test_vec_ext.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc
+        In file included from /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:2:
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc: In function ‘int main()’:
+        /opt/rocm/include/hipblaslt/hipblaslt.h:78:5: error: expected primary-expression before ‘static_assert’
+           78 |     static_assert(false, "HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT is deprecated and not supported. Please set HIPBLASLT_MATMUL_DESC_A_SCALE_MODE as HIPBLASLT_MATMUL_MATRIX_SCALE_OUTER_VEC_32F instead.")
+              |     ^~~~~~~~~~~~~
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:4:44: note: in expansion of macro ‘HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT’
+            4 |     hipblasLtMatmulDescAttributes_t attr = HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT;
+              |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        gmake[2]: *** [CMakeFiles/cmTC_74d61.dir/build.make:78: CMakeFiles/cmTC_74d61.dir/hipblaslt_test_vec_ext.cc.o] Error 1
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: *** [Makefile:127: cmTC_74d61/fast] Error 2
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:221 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/unified_llm_w4a16_predict/CMakeLists.txt:81 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -I/opt/rocm-7.1.1/include"
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_outer_vec"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_f5bcb/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_f5bcb.dir/build.make CMakeFiles/cmTC_f5bcb.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_f5bcb.dir/hipblaslt_test_outer_vec.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include -I/opt/rocm-7.1.1/include  -o CMakeFiles/cmTC_f5bcb.dir/hipblaslt_test_outer_vec.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_outer_vec.cc
+        Linking CXX executable cmTC_f5bcb
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f5bcb.dir/link.txt --verbose=1
+        /usr/bin/c++  -I/opt/rocm-7.1.1/include  CMakeFiles/cmTC_f5bcb.dir/hipblaslt_test_outer_vec.cc.o -o cmTC_f5bcb 
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:236 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/unified_llm_w4a16_predict/CMakeLists.txt:81 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -I/opt/rocm-7.1.1/include"
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_vec_ext"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4122a/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_4122a.dir/build.make CMakeFiles/cmTC_4122a.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_4122a.dir/hipblaslt_test_vec_ext.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include -I/opt/rocm-7.1.1/include  -o CMakeFiles/cmTC_4122a.dir/hipblaslt_test_vec_ext.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc
+        In file included from /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:2:
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc: In function ‘int main()’:
+        /opt/rocm/include/hipblaslt/hipblaslt.h:78:5: error: expected primary-expression before ‘static_assert’
+           78 |     static_assert(false, "HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT is deprecated and not supported. Please set HIPBLASLT_MATMUL_DESC_A_SCALE_MODE as HIPBLASLT_MATMUL_MATRIX_SCALE_OUTER_VEC_32F instead.")
+              |     ^~~~~~~~~~~~~
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:4:44: note: in expansion of macro ‘HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT’
+            4 |     hipblasLtMatmulDescAttributes_t attr = HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT;
+              |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        gmake[2]: *** [CMakeFiles/cmTC_4122a.dir/build.make:78: CMakeFiles/cmTC_4122a.dir/hipblaslt_test_vec_ext.cc.o] Error 1
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: *** [Makefile:127: cmTC_4122a/fast] Error 2
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:221 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/unified_llm_w4a16_base/CMakeLists.txt:80 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -I/opt/rocm-7.1.1/include"
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_outer_vec"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_03c6b/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_03c6b.dir/build.make CMakeFiles/cmTC_03c6b.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_03c6b.dir/hipblaslt_test_outer_vec.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include -I/opt/rocm-7.1.1/include  -o CMakeFiles/cmTC_03c6b.dir/hipblaslt_test_outer_vec.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_outer_vec.cc
+        Linking CXX executable cmTC_03c6b
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_03c6b.dir/link.txt --verbose=1
+        /usr/bin/c++  -I/opt/rocm-7.1.1/include  CMakeFiles/cmTC_03c6b.dir/hipblaslt_test_outer_vec.cc.o -o cmTC_03c6b 
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:236 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/unified_llm_w4a16_base/CMakeLists.txt:80 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -I/opt/rocm-7.1.1/include"
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_vec_ext"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_1ec75/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_1ec75.dir/build.make CMakeFiles/cmTC_1ec75.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_1ec75.dir/hipblaslt_test_vec_ext.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include -I/opt/rocm-7.1.1/include  -o CMakeFiles/cmTC_1ec75.dir/hipblaslt_test_vec_ext.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc
+        In file included from /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:2:
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc: In function ‘int main()’:
+        /opt/rocm/include/hipblaslt/hipblaslt.h:78:5: error: expected primary-expression before ‘static_assert’
+           78 |     static_assert(false, "HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT is deprecated and not supported. Please set HIPBLASLT_MATMUL_DESC_A_SCALE_MODE as HIPBLASLT_MATMUL_MATRIX_SCALE_OUTER_VEC_32F instead.")
+              |     ^~~~~~~~~~~~~
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:4:44: note: in expansion of macro ‘HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT’
+            4 |     hipblasLtMatmulDescAttributes_t attr = HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT;
+              |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        gmake[2]: *** [CMakeFiles/cmTC_1ec75.dir/build.make:78: CMakeFiles/cmTC_1ec75.dir/hipblaslt_test_vec_ext.cc.o] Error 1
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: *** [Makefile:127: cmTC_1ec75/fast] Error 2
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:221 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/unified_llm_w4a16_cached/CMakeLists.txt:80 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -I/opt/rocm-7.1.1/include"
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_outer_vec"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_a19fa/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_a19fa.dir/build.make CMakeFiles/cmTC_a19fa.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_a19fa.dir/hipblaslt_test_outer_vec.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include -I/opt/rocm-7.1.1/include  -o CMakeFiles/cmTC_a19fa.dir/hipblaslt_test_outer_vec.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_outer_vec.cc
+        Linking CXX executable cmTC_a19fa
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a19fa.dir/link.txt --verbose=1
+        /usr/bin/c++  -I/opt/rocm-7.1.1/include  CMakeFiles/cmTC_a19fa.dir/hipblaslt_test_outer_vec.cc.o -o cmTC_a19fa 
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/public/LoadHIP.cmake:236 (try_compile)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Caffe2/Caffe2Config.cmake:74 (include)"
+      - "/home/michael/libraries/libtorch_7.1.0/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "src/unified_llm_w4a16_cached/CMakeLists.txt:80 (find_package)"
+    directories:
+      source: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+      binary: "/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -I/opt/rocm-7.1.1/include"
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_HIP_ARCHITECTURES: "gfx1151"
+      CMAKE_HIP_PLATFORM: "amd"
+      CMAKE_MODULE_PATH: "/opt/rocm-7.1.1/lib/cmake/hip;/opt/rocm-7.1.1/lib/cmake/hip"
+    buildResult:
+      variable: "hipblaslt_compile_result_vec_ext"
+      cached: true
+      stdout: |
+        Change Dir: '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_5c981/fast
+        gmake[1]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        /usr/bin/gmake  -f CMakeFiles/cmTC_5c981.dir/build.make CMakeFiles/cmTC_5c981.dir/build
+        gmake[2]: Entering directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        Building CXX object CMakeFiles/cmTC_5c981.dir/hipblaslt_test_vec_ext.cc.o
+        /usr/bin/c++ -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_HCC__ -I/opt/rocm/include -I/opt/rocm-7.2.0/include -I/opt/rocm-7.1.1/include  -o CMakeFiles/cmTC_5c981.dir/hipblaslt_test_vec_ext.cc.o -c /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc
+        In file included from /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:2:
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc: In function ‘int main()’:
+        /opt/rocm/include/hipblaslt/hipblaslt.h:78:5: error: expected primary-expression before ‘static_assert’
+           78 |     static_assert(false, "HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT is deprecated and not supported. Please set HIPBLASLT_MATMUL_DESC_A_SCALE_MODE as HIPBLASLT_MATMUL_MATRIX_SCALE_OUTER_VEC_32F instead.")
+              |     ^~~~~~~~~~~~~
+        /home/michael/heteroPredict/src/microbenchmarks/hipblaslt_test_vec_ext.cc:4:44: note: in expansion of macro ‘HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT’
+            4 |     hipblasLtMatmulDescAttributes_t attr = HIPBLASLT_MATMUL_DESC_A_SCALE_POINTER_VEC_EXT;
+              |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        gmake[2]: *** [CMakeFiles/cmTC_5c981.dir/build.make:78: CMakeFiles/cmTC_5c981.dir/hipblaslt_test_vec_ext.cc.o] Error 1
+        gmake[2]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        gmake[1]: *** [Makefile:127: cmTC_5c981/fast] Error 2
+        gmake[1]: Leaving directory '/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles/CMakeTmp'
+        
+      exitCode: 2
+...

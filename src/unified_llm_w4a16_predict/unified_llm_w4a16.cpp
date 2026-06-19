@@ -850,57 +850,38 @@ void MixtureOfExpertsImpl::run_predictor_prefill_warmup(const torch::Tensor& emb
 
 
 void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids) {
-    // Load experts in confidence order (index 0 = highest confidence first) so the most
-    // important expert arrives in VRAM as early as possible, minimising the chance the
-    // main inference thread blocks on it.
-    //
-    // Each claimed slot is marked MRU immediately (before disk I/O) so later evictions in
-    // this batch do not throw away experts that were just prefetched.  A final reverse-
-    // confidence pass then orders the batch so the highest-confidence expert is MRU.
-    for (auto pred_it = predicted_expert_ids.begin(); pred_it != predicted_expert_ids.end(); ++pred_it) {
-        int64_t eid = *pred_it;
+    if (!in_generation_mode_) return;
+
+    std::vector<std::pair<int64_t, int64_t>> slots_and_experts_to_load;
+
+    {
         std::unique_lock<std::mutex> lock(expert_slots_mutex_);
         
-        // Check if expert is already loaded or being loaded
-        auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
-        
-        if (it != expert_slots_indices.end()) {
-            // Already loaded - LRU promotion handled in the post-load pass below.
-            (void)it;
-        } else {
-            // Not loaded - need to load it
-            size_t slot_to_use;
-            
-            // Find an empty slot or use LRU
-            auto empty_it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), -1);
-            if (empty_it != expert_slots_indices.end()) {
-                // Use empty slot
-                slot_to_use = std::distance(expert_slots_indices.begin(), empty_it);
-            } else {
-                // All slots full - evict per cache policy (respects currently_selected_experts_)
-                slot_to_use = pick_victim_ready();
-                bool found = (slot_to_use != kNoVictimSlot);
-                
-                if (!found) {
-                     // All slots are currently busy being loaded. Don't prefetch this expert.
-                     continue;
-                }
-                
-                if (debug_verbosity >= 2) {
-                     std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Evicting expert " 
-                               << expert_slots_indices[slot_to_use] << " from slot " << slot_to_use << std::endl;
+        for (int64_t global_e : predicted_expert_ids) {
+            bool hit = false;
+            for (size_t s = 0; s < slot_meta_.size(); ++s) {
+                if (slot_meta_[s].expert_id == global_e) {
+                    hit = true;
+                    break;
                 }
             }
-            
-            // Mark slot as busy and update indices (MRU immediately, like old lru_order push_back)
-            expert_slot_ready_[slot_to_use] = false;
-            expert_slots_indices[slot_to_use] = eid;
-            slot_meta_[slot_to_use].expert_id = eid;
-            slot_meta_[slot_to_use].access_count = 1;
-            slot_meta_[slot_to_use].last_access = ++access_clock_;
-            slot_meta_[slot_to_use].clock_bit = 1;
+            if (hit) continue;
 
-            // Update cache bitmask early so main thread routing knows it's eventually coming
+            size_t victim = pick_victim_ready();
+            if (victim == kNoVictimSlot) continue; // All busy
+
+            if (debug_verbosity >= 2) {
+                std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Evicting expert " 
+                          << expert_slots_indices[victim] << " from slot " << victim << std::endl;
+            }
+
+            expert_slot_ready_[victim] = false;
+            expert_slots_indices[victim] = global_e;
+            slot_meta_[victim].expert_id = global_e;
+            slot_meta_[victim].access_count = 1;
+            slot_meta_[victim].last_access = ++access_clock_;
+            slot_meta_[victim].clock_bit = 1;
+
             if (expert_cache_bitmask_.size() == num_experts_) {
                 std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
                 for (auto current_eid : expert_slots_indices) {
@@ -909,34 +890,46 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
                     }
                 }
             }
-            
-            // Release the lock BEFORE the slow disk I/O!
-            lock.unlock();
-            
-            if (debug_verbosity >= 2) {
-                std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Loading predicted expert " << eid << " into slot " << slot_to_use << std::endl;
-            }
-            
-            if (!suppress_predictor_stats_) {
-                prefetch_loads_++;
-            }
-            // Perform the slow disk read
-            try {
-                load_expert_weights(slot_to_use, eid, weights_dir_);
-            } catch (...) {
-                lock.lock();
-                expert_slot_ready_[slot_to_use] = true;
-                expert_slots_indices[slot_to_use] = -1;
-                slot_meta_[slot_to_use].expert_id = -1;
-                expert_slots_cv_.notify_all();
-                throw;
-            }
 
-            // Re-acquire lock to mark as ready and notify waiting inference threads
-            lock.lock();
-            expert_slot_ready_[slot_to_use] = true;
-            expert_slots_cv_.notify_all();
+            slots_and_experts_to_load.push_back({victim, global_e});
+            
+            // Mark it temporarily in currently_selected_experts_ to protect it within THIS batch
+            currently_selected_experts_.push_back(global_e);
         }
+        
+        // Remove the newly loading experts from currently_selected_experts_ so they are not protected AFTER we are done scheduling
+        for (auto& p : slots_and_experts_to_load) {
+            auto it = std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), p.second);
+            if (it != currently_selected_experts_.end()) {
+                currently_selected_experts_.erase(it);
+            }
+        }
+    }
+
+    if (!slots_and_experts_to_load.empty()) {
+        if (!suppress_predictor_stats_) {
+            prefetch_loads_ += slots_and_experts_to_load.size();
+        }
+
+        try {
+            load_experts_weights(slots_and_experts_to_load, weights_dir_);
+        } catch (...) {
+            std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+            for (auto& p : slots_and_experts_to_load) {
+                size_t victim = p.first;
+                expert_slot_ready_[victim] = true;
+                expert_slots_indices[victim] = -1;
+                slot_meta_[victim].expert_id = -1;
+            }
+            expert_slots_cv_.notify_all();
+            throw;
+        }
+
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        for (auto& p : slots_and_experts_to_load) {
+            expert_slot_ready_[p.first] = true;
+        }
+        expert_slots_cv_.notify_all();
     }
 
     // Confidence ordering pass: iterate in reverse confidence order (least confident first) so
@@ -948,8 +941,9 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
             int64_t eid = *pred_it;
             auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
             if (it == expert_slots_indices.end()) continue;
-            size_t slot_idx = std::distance(expert_slots_indices.begin(), it);
-            slot_meta_[slot_idx].last_access = ++access_clock_;
+            size_t slot = std::distance(expert_slots_indices.begin(), it);
+            slot_meta_[slot].last_access = ++access_clock_;
+            slot_meta_[slot].clock_bit = 1;
         }
     }
 }
@@ -1162,87 +1156,110 @@ size_t MixtureOfExpertsImpl::pick_lfru_ready() {
     return found ? victim : kNoVictimSlot;
 }
 
-int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
+std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats) {
+    std::vector<int64_t> result_slots(global_expert_indices.size(), -1);
+    std::vector<std::pair<int64_t, int64_t>> slots_and_experts_to_load;
+
     std::unique_lock<std::mutex> lock(expert_slots_mutex_);
     ++access_clock_;
 
-    for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
-        if (expert_slots_indices[s] == global_expert_idx) {
-            
-            // If it's already here but the predictive thread is currently loading it, sleep until it finishes
-            expert_slots_cv_.wait(lock, [this, s]() { return expert_slot_ready_[s]; });
-            
-            if (update_stats) {
-                cache_hits_++;
-                slot_meta_[s].access_count++;
-                slot_meta_[s].last_access = access_clock_;
-                slot_meta_[s].clock_bit = 1;
+    // 1. Check hits or waits
+    for (size_t i = 0; i < global_expert_indices.size(); ++i) {
+        int64_t global_e = global_expert_indices[i];
+        for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
+            if (expert_slots_indices[s] == global_e) {
+                // If it's already here but the predictive thread is currently loading it, sleep until it finishes
+                expert_slots_cv_.wait(lock, [this, s]() { return expert_slot_ready_[s]; });
+                
+                if (update_stats) {
+                    cache_hits_++;
+                    slot_meta_[s].access_count++;
+                    slot_meta_[s].last_access = access_clock_;
+                    slot_meta_[s].clock_bit = 1;
+                }
+                result_slots[i] = s;
+                break;
             }
-            return s;
         }
     }
-    
-    // Miss: Evict
-    if (update_stats) {
-        cache_misses_++;
+
+    // 2. Pick victims for misses
+    for (size_t i = 0; i < global_expert_indices.size(); ++i) {
+        if (result_slots[i] == -1) {
+            if (update_stats) cache_misses_++;
+            int64_t global_e = global_expert_indices[i];
+
+            size_t victim_slot = pick_victim_ready();
+            while (victim_slot == kNoVictimSlot) {
+                expert_slots_cv_.wait(lock, [this]() {
+                    for (bool ready : expert_slot_ready_) {
+                        if (ready) return true;
+                    }
+                    return false;
+                });
+                victim_slot = pick_victim_ready();
+            }
+
+            // Mark as busy immediately
+            expert_slot_ready_[victim_slot] = false;
+            expert_slots_indices[victim_slot] = global_e;
+            slot_meta_[victim_slot].expert_id = global_e;
+            slot_meta_[victim_slot].access_count = 1;
+            slot_meta_[victim_slot].last_access = access_clock_;
+            slot_meta_[victim_slot].clock_bit = 1;
+            
+            result_slots[i] = victim_slot;
+            slots_and_experts_to_load.push_back({victim_slot, global_e});
+        }
     }
-    
-    size_t victim_slot = pick_victim_ready();
-    while (victim_slot == kNoVictimSlot) {
-        expert_slots_cv_.wait(lock, [this]() {
-            for (bool ready : expert_slot_ready_) {
-                if (ready) {
-                    return true;
+
+    // Update bitmask
+    if (!slots_and_experts_to_load.empty()) {
+        if (expert_cache_bitmask_.size() == num_experts_) {
+            std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
+            for (auto eid : expert_slots_indices) {
+                if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
+                    expert_cache_bitmask_[eid] = 1;
                 }
             }
-            return false;
-        });
-        victim_slot = pick_victim_ready();
-    }
-    
-    // Mark as busy
-    expert_slot_ready_[victim_slot] = false;
-    expert_slots_indices[victim_slot] = global_expert_idx;
-    slot_meta_[victim_slot].expert_id = global_expert_idx;
-    slot_meta_[victim_slot].access_count = 1;
-    slot_meta_[victim_slot].last_access = access_clock_;
-    slot_meta_[victim_slot].clock_bit = 1;
-    
-    // Update cache bitmask tracking
-    if (expert_cache_bitmask_.size() == num_experts_) {
-        std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
-        for (auto eid : expert_slots_indices) {
-            if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
-                expert_cache_bitmask_[eid] = 1;
-            }
         }
     }
-    
-    // Unlock during slow disk I/O!
-    lock.unlock();
-    
-    stall_loads_++;
-    // Load new expert into the evicted slot
-    try {
-        load_expert_weights(victim_slot, global_expert_idx, weights_dir_);
-    } catch (...) {
+
+    // 3. Load if needed
+    if (!slots_and_experts_to_load.empty()) {
+        lock.unlock(); // Unlock during slow disk I/O!
+        
+        stall_loads_ += slots_and_experts_to_load.size();
+
+        try {
+            load_experts_weights(slots_and_experts_to_load, weights_dir_);
+        } catch (...) {
+            lock.lock();
+            for (auto& p : slots_and_experts_to_load) {
+                size_t v = p.first;
+                expert_slot_ready_[v] = true;
+                expert_slots_indices[v] = -1;
+                slot_meta_[v].expert_id = -1;
+            }
+            expert_slots_cv_.notify_all();
+            throw;
+        }
+
+        // Ensure weights are fully on device before usage
+        (void)hipDeviceSynchronize();
+
         lock.lock();
-        expert_slot_ready_[victim_slot] = true;
-        expert_slots_indices[victim_slot] = -1; // Reset it so it can be used again
-        slot_meta_[victim_slot].expert_id = -1;
+        for (auto& p : slots_and_experts_to_load) {
+            expert_slot_ready_[p.first] = true;
+        }
         expert_slots_cv_.notify_all();
-        throw;
     }
-    
-    // Ensure weights are fully on device before usage
-    (void)hipDeviceSynchronize();
-    
-    // Lock, mark exactly one ready, wake any waiting thread
-    lock.lock();
-    expert_slot_ready_[victim_slot] = true;
-    expert_slots_cv_.notify_all();
-    
-    return victim_slot;
+
+    return result_slots;
+}
+
+int64_t MixtureOfExpertsImpl::ensure_expert_cached(int64_t global_expert_idx, bool update_stats) {
+    return ensure_experts_cached({global_expert_idx}, update_stats)[0];
 }
 
 torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
@@ -1338,9 +1355,14 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
         }
     }
 
+    std::vector<int64_t> missing_experts(active_experts);
     for (int64_t k = 0; k < active_experts; ++k) {
-        int64_t global_e = topk_accessor[k];
-        int64_t e = ensure_expert_cached(global_e);
+        missing_experts[k] = topk_accessor[k];
+    }
+    std::vector<int64_t> slots = ensure_experts_cached(missing_experts);
+
+    for (int64_t k = 0; k < active_experts; ++k) {
+        int64_t e = slots[k];
         expert_ids[k] = e;
         gate_up_qw_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_quantized_weights().data_ptr<uint8_t>());
         gate_up_s_ptrs[k] = reinterpret_cast<int64_t>(gate_up_experts[e]->get_scales().data_ptr<at::BFloat16>());
@@ -3265,6 +3287,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     std::cout << "Total Generation Time: " << generation_time.count() << " seconds" << std::endl;
     if (actual_generated > 0) {
         double time_per_token = generation_time.count() / actual_generated;
+        std::cout << std::defaultfloat << std::setprecision(6);
         std::cout << "Average Time per Token: " << time_per_token << " seconds" << std::endl;
     }
 

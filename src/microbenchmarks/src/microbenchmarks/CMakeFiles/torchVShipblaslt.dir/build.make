@@ -98,19 +98,19 @@ bin/torchVShipblaslt: /home/michael/libraries/libtorch_7.1.0/lib/libkineto.a
 bin/torchVShipblaslt: /opt/rocm/lib/libhipblaslt.so
 bin/torchVShipblaslt: /home/michael/libraries/libtorch_7.1.0/lib/libc10_hip.so
 bin/torchVShipblaslt: /home/michael/libraries/libtorch_7.1.0/lib/libc10.so
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/libMIOpen.so.1.0.70101
-bin/torchVShipblaslt: /opt/rocm/lib/libhiprtc.so.7.1.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/libhipblas.so.3.1.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/libhipfft.so.0.1.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/libhiprand.so.1.1.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/librocrand.so.1.1.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/libhipsparse.so.4.1.0.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/libhipsolver.so.1.0.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/librocsolver.so.0.7.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/librocblas.so.5.1.70101
-bin/torchVShipblaslt: /opt/rocm/lib/libhipblaslt.so.1.1.70101
-bin/torchVShipblaslt: /opt/rocm/lib/libamdhip64.so.7.1.70101
-bin/torchVShipblaslt: /opt/rocm-7.1.1/lib/libhipsparselt.so.0.2.70101
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/libMIOpen.so.1.0.70200
+bin/torchVShipblaslt: /opt/rocm/lib/libhiprtc.so.7.2.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/libhipblas.so.3.2.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/libhipfft.so.0.1.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/libhiprand.so.1.1.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/librocrand.so.1.1.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/libhipsparse.so.4.2.0.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/libhipsolver.so.1.0.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/librocsolver.so.0.7.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/librocblas.so.5.2.70200
+bin/torchVShipblaslt: /opt/rocm/lib/libhipblaslt.so.1.2.70200
+bin/torchVShipblaslt: /opt/rocm/lib/libamdhip64.so.7.2.70200
+bin/torchVShipblaslt: /opt/rocm-7.2.0/lib/libhipsparselt.so.0.2.70200
 bin/torchVShipblaslt: src/microbenchmarks/CMakeFiles/torchVShipblaslt.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/michael/heteroPredict/src/microbenchmarks/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable ../../bin/torchVShipblaslt"
 	cd /home/michael/heteroPredict/src/microbenchmarks/src/microbenchmarks && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/torchVShipblaslt.dir/link.txt --verbose=$(VERBOSE)
