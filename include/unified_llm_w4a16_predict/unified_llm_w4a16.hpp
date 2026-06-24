@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <future>
 #include <string>
 #include <torch/torch.h>
@@ -128,7 +129,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
                          int64_t max_cached_experts, int64_t layer_idx, 
                          int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false,
                          double lambda = 0.0, const std::string& predictor_model_path = "", torch::Device predictor_device = torch::kCPU,
-                         int64_t prefetch_experts_count = 1);
+                         int64_t prefetch_experts_count = 1, const std::string& oracle_trace_path = "", int64_t oracle_lookahead = 0,
+                         bool oracle_full_union = false);
 
     torch::Tensor forward(const torch::Tensor &x, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
     void set_weights_dir(const std::string& dir) { weights_dir_ = dir; }
@@ -237,7 +239,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     /// One-shot predictor + prefetch after prefill (uses last / prev-prefill-token routing; does not use decode prev_token state).
     void run_predictor_prefill_warmup(const torch::Tensor& embedding, const torch::Tensor& prefill_dist_row,
                                     const torch::Tensor& prev_expert_mh_row, c10::optional<torch::Tensor> prev_layers_feat);
-    void load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids);
+    void load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids, bool prefill_end_warmup = false);
 
     bool has_predictor() const { return predictor_ != nullptr; }
     void set_suppress_predictor_stats(bool v) { suppress_predictor_stats_ = v; }
@@ -246,6 +248,10 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
             speculative_load_future_.wait();
         }
     }
+    void set_oracle_capture_callback(std::function<void(const std::vector<int64_t>&)> cb) {
+        oracle_capture_callback_ = std::move(cb);
+    }
+    void clear_oracle_capture_callback() { oracle_capture_callback_ = nullptr; }
     torch::Tensor get_prefill_expert_counts() const { return prefill_expert_counts_; }
 
     torch::Tensor routing_mh_current_token_cpu() const { return routing_mh_current_token_; }
@@ -415,6 +421,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     torch::Tensor expert_staging_buf_;
     ExpertFormat  expert_format_ = ExpertFormat::UNKNOWN;
 
+    std::function<void(const std::vector<int64_t>&)> oracle_capture_callback_;
+
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     void load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir);
@@ -422,6 +430,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
     std::vector<int64_t> ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats = true);
     size_t pick_victim_ready();
+    std::vector<int64_t> experts_to_prefetch(const std::vector<int64_t>& pred_result) const;
     size_t pick_lru_ready();
     size_t pick_mru_ready();
     size_t pick_lfu_ready();
@@ -453,7 +462,9 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                         const std::string& predictor_model_path = "", int64_t prefetch_experts_count = 1,
                         const std::vector<int>& predict_layers = {},
                         const std::vector<int64_t>& per_layer_cache_sizes = {},
-                        const std::vector<int64_t>& per_layer_prefetch_counts = {});
+                        const std::vector<int64_t>& per_layer_prefetch_counts = {},
+                        const std::string& oracle_trace_path = "", int64_t oracle_lookahead = 0,
+                        bool oracle_full_union = false);
 
     // Forward pass: takes token IDs and returns logits
     torch::Tensor forward(torch::Tensor input_ids, int64_t start_pos = 0);
@@ -519,6 +530,13 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void disable_training_data_collection() { collect_training_data_ = false; }
     std::vector<std::pair<torch::Tensor, torch::Tensor>> get_training_data(); // Returns [(embeddings, router_logits), ...]
     void clear_training_data();
+
+    // Record routed experts during generate() for exact oracle trace replay.
+    void begin_oracle_trace_capture();
+    void cancel_oracle_trace_capture();
+    bool write_oracle_trace_file(const std::string& path, torch::Tensor prompt_ids, torch::Tensor output_ids,
+                                 const std::string& prompt_text = "", const std::string& generated_text = "",
+                                 const std::string& model_name = "qwen3_30b");
 
     // NPU Helper functions
     // We declare them as friends or static/global if they are not members
@@ -617,8 +635,18 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     /// After a multi-token prefill, run each layer predictor once to prefetch experts for the first decode step.
     void warm_predictor_caches_after_prefill(int64_t prompt_len);
 
+    void begin_oracle_trace_decode_step();
+    void record_oracle_trace_layer(int64_t layer_idx, const std::vector<int64_t>& experts);
+    void install_oracle_capture_callbacks();
+    void clear_oracle_capture_callbacks();
+
     // Last-token MoE inputs from the most recent forward (for prefill warmup); [hidden_size] per layer, CPU.
     std::vector<torch::Tensor> prefill_last_moe_inputs_cpu_;
+
+    bool oracle_trace_capture_active_ = false;
+    bool oracle_capture_armed_ = false;
+    int64_t oracle_capture_row_ = -1;
+    std::vector<std::vector<std::vector<int64_t>>> oracle_captured_trace_;
 
     // Activation functions
     torch::Tensor silu(const torch::Tensor &x);

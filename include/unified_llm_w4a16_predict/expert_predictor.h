@@ -15,6 +15,9 @@
 #include <random>
 #include <numeric>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
+#include <unordered_map>
 #include <torch/script.h>
 
 // ============================================================================
@@ -58,13 +61,15 @@ class IExpertPredictor {
 public:
     virtual ~IExpertPredictor() = default;
     
-    virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) = 0;
-    virtual std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) = 0;
+    virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) = 0;
+    virtual std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) = 0;
     virtual bool is_ready() = 0;
     virtual std::vector<int64_t> get_prediction() = 0;
     virtual std::vector<int64_t> try_get_prediction() = 0;
     virtual double get_prediction_time_ms() = 0;
     virtual int get_history_length() { return 1; }
+    /// When true, callers should load every expert ID returned (full lookahead union), not top-B.
+    virtual bool prefetch_full_union() const { return false; }
 };
 
 // ============================================================================
@@ -113,7 +118,7 @@ public:
         shm_unlink(shm_name_.c_str());
     }
     
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
         response_->reset();
         
         request_->token_id = 0; // Deprecated
@@ -123,8 +128,8 @@ public:
         request_->ready.store(true);
     }
     
-    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) override {
-        predict_async(embedding, prefill_dist, prev_expert_onehot, prev_layers_feat);
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
+        predict_async(embedding, prefill_dist, prev_expert_onehot, prev_layers_feat, source_decode_step);
         return get_prediction();
     }
 
@@ -180,6 +185,7 @@ public:
         c10::optional<torch::Tensor> prefill_dist;
         c10::optional<torch::Tensor> prev_expert_onehot;
         c10::optional<torch::Tensor> prev_layers_feat;
+        int64_t source_decode_step;
         int64_t job_id;
     };
     
@@ -285,12 +291,13 @@ public:
                   << "] Shutdown complete" << std::endl;
     }
     
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) override {
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
         PredictionJob job;
         job.embedding = embedding;
         job.prefill_dist = prefill_dist;
         job.prev_expert_onehot = prev_expert_onehot;
         job.prev_layers_feat = prev_layers_feat;
+        job.source_decode_step = source_decode_step;
         job.job_id = next_job_id_++;
         
         {
@@ -300,7 +307,7 @@ public:
         queue_cv_.notify_one();
     }
 
-    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt) override {
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
         return internal_predict(embedding, prefill_dist, prev_expert_onehot, prev_layers_feat);
     }
     
@@ -384,9 +391,6 @@ private:
             torch::Tensor input = embedding.to(torch::kFloat32).to(device_);
             if (input.dim() == 1) {
                 input = input.unsqueeze(0); 
-            }
-            if (input.dim() == 2) {
-                input = input.unsqueeze(1);
             }
             
             if (history_length_ > 1) {
@@ -504,4 +508,126 @@ private:
     std::deque<torch::Tensor> prev_expert_history_;
     
     std::atomic<int64_t> next_job_id_{0};
+};
+
+// ============================================================================
+// Oracle Trace Predictor
+// ============================================================================
+
+class OracleTracePredictor : public IExpertPredictor {
+public:
+    OracleTracePredictor(const std::string& trace_path, int layer_idx, int lookahead, int budget,
+                         bool full_union = false)
+        : layer_idx_(layer_idx), lookahead_(lookahead), budget_(budget), full_union_(full_union) {
+        
+        std::ifstream ifs(trace_path);
+        if (!ifs.is_open()) {
+            std::cerr << "Failed to open oracle trace file: " << trace_path << std::endl;
+            return;
+        }
+
+        std::string line;
+        bool in_trace = false;
+        while (std::getline(ifs, line)) {
+            if (line.find("EXPERT TRACE") != std::string::npos) {
+                in_trace = true;
+                std::getline(ifs, line); // Skip the '===' line
+                continue;
+            }
+            if (!in_trace) continue;
+
+            if (line.find("Token") == 0) {
+                size_t colon = line.find(':');
+                if (colon == std::string::npos) continue;
+
+                std::string experts_str = line.substr(colon + 1);
+                
+                int current_layer = 0;
+                size_t pos = 0;
+                while ((pos = experts_str.find('[', pos)) != std::string::npos) {
+                    size_t end_pos = experts_str.find(']', pos);
+                    if (current_layer == layer_idx_) {
+                        std::string layer_experts = experts_str.substr(pos + 1, end_pos - pos - 1);
+                        std::vector<int64_t> experts;
+                        std::stringstream ss(layer_experts);
+                        std::string token;
+                        while (std::getline(ss, token, ',')) {
+                            experts.push_back(std::stoll(token));
+                        }
+                        token_experts_.push_back(experts);
+                        break;
+                    }
+                    current_layer++;
+                    pos = end_pos;
+                }
+            }
+        }
+        std::cout << "[OracleTracePredictor Layer " << layer_idx_ << "] Loaded " << token_experts_.size() << " tokens from " << trace_path << std::endl;
+    }
+
+    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
+        // Not used
+    }
+
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
+        (void)embedding;
+        (void)prefill_dist;
+        (void)prev_expert_onehot;
+        (void)prev_layers_feat;
+
+        int token_idx = 0;
+        if (source_decode_step >= 0) {
+            token_idx = static_cast<int>(source_decode_step);
+            current_token_idx_ = token_idx;
+        }
+
+        const int horizon = std::max(lookahead_, 1);
+        // Prefill-end warmup: decode step 0 is next; during decode at step t prefetch t+1..t+horizon.
+        const int start_i = (source_decode_step < 0) ? 0 : 1;
+
+        std::unordered_map<int64_t, int> expert_counts;
+        for (int i = start_i; i <= horizon; ++i) {
+            const int future_idx = token_idx + i;
+            if (future_idx < 0 || future_idx >= static_cast<int>(token_experts_.size())) {
+                continue;
+            }
+            for (int64_t expert : token_experts_[static_cast<size_t>(future_idx)]) {
+                expert_counts[expert]++;
+            }
+        }
+
+        std::vector<std::pair<int64_t, int>> sorted_experts(expert_counts.begin(), expert_counts.end());
+        std::sort(sorted_experts.begin(), sorted_experts.end(),
+                  [](const std::pair<int64_t, int>& a, const std::pair<int64_t, int>& b) {
+                      if (a.second != b.second) {
+                          return a.second > b.second;
+                      }
+                      return a.first < b.first;
+                  });
+
+        std::vector<int64_t> predicted_experts;
+        predicted_experts.reserve(sorted_experts.size());
+        for (const auto& pair : sorted_experts) {
+            predicted_experts.push_back(pair.first);
+        }
+
+        prediction_time_ms_ = 0.0;
+        return predicted_experts;
+    }
+
+    bool prefetch_full_union() const override { return full_union_; }
+
+    bool is_ready() override { return true; }
+    std::vector<int64_t> get_prediction() override { return {}; }
+    std::vector<int64_t> try_get_prediction() override { return {}; }
+    double get_prediction_time_ms() override { return prediction_time_ms_; }
+
+private:
+    int layer_idx_;
+    int lookahead_;
+    int budget_;
+    bool full_union_;
+    std::vector<std::vector<int64_t>> token_experts_;
+    std::atomic<int> current_token_idx_{0};
+    double prediction_time_ms_ = 0.0;
 };
