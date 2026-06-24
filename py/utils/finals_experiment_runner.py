@@ -56,15 +56,14 @@ DEFAULT_PREDICTOR_BASE = (
 DEFAULT_REUSE_CSV = os.path.join(ROOT_PY, "expert_predictor", "expert_reuse_qwen3_30b.csv")
 
 FINALS_LOOKAHEADS = [1]
-# sec2: only lookaheads for which final_predictor checkpoints exist.
-SEC2_LOOKAHEADS = [1, 2, 3, 4, 6, 8, 10, 12, 16]
+# sec2: lookaheads with final_predictor checkpoints (skip 5, 8+ for grid size).
+SEC2_LOOKAHEADS = [1, 2, 3, 4, 6]
 ROUTING_LOOKAHEADS = [1, 4, 8, 16]
 FINALS_CACHE_SIZES = [24, 32]
 FINAL_COLLECTION_CACHE_SIZES = [8, 16, 24, 32, 40, 48, 56, 64]
 FINAL_COLLECTION_NUM_PROMPTS = 10
-# sec2: sweep several cache sizes to assess predictor effectiveness.
-# SEC2_CACHE_SIZES = [8, 16, 24, 32, 40, 48, 56, 68]
-SEC2_CACHE_SIZES = [8, 16, 32, 48, 64]
+# sec2: sweep cache sizes to assess predictor effectiveness.
+SEC2_CACHE_SIZES = [8, 16, 24, 32, 40, 48]
 # Section 1: sweep several cache sizes to compare eviction policies.
 SEC1_CACHE_SIZES = [8, 16, 32, 48, 64]
 SEC1_POLICIES = ["LRU", "MRU", "LFU", "MFU", "RANDOM", "LFRU", "PREFILL"]
@@ -95,15 +94,17 @@ def _collection_lookaheads(predictor_base_dir: str) -> List[int]:
     return [la for la in FINALS_LOOKAHEADS if la in available] or list(FINALS_LOOKAHEADS)
 
 
-def _common_sweep_args(lookaheads: List[int]) -> List[str]:
+def _common_sweep_args(lookaheads: List[int], cache_sizes: Optional[List[int]] = None) -> List[str]:
+    sizes = cache_sizes if cache_sizes is not None else FINALS_CACHE_SIZES
     return [
         "--model", "qwen",
         "--dataset", "wikitext",
-        "--cache-sizes", *[str(x) for x in FINALS_CACHE_SIZES],
+        "--cache-sizes", *[str(x) for x in sizes],
         "--lookaheads", *[str(x) for x in lookaheads],
         "--budget-fractions", *[str(x) for x in FINALS_BUDGET_FRACTIONS],
         "--routing-bias-top-n", str(FINALS_ROUTING_BIAS_TOP_N),
         "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+        "--expert-weights-dir", "/home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed",
     ]
 
 
@@ -140,8 +141,7 @@ def _experiment_defs() -> Dict[str, Experiment]:
             script=METRICS_SWEEP_SCRIPT,
             sweep_question="custom_1_16_no_ppl",
             extra_args=[
-                *_common_sweep_args(SEC2_LOOKAHEADS),
-                "--cache-sizes", *[str(x) for x in SEC2_CACHE_SIZES],
+                *_common_sweep_args(SEC2_LOOKAHEADS, SEC2_CACHE_SIZES),
                 "--sweep-question", "custom_1_16_no_ppl",
                 "--lambdas", "0",
                 "--num-prompts", "8"
@@ -170,6 +170,27 @@ def _experiment_defs() -> Dict[str, Experiment]:
                 "--sweep-question", "custom_1_16_no_ppl",
                 "--lambdas", "0", "1",
                 "--cache-cond-forced-top-ns", "5",
+            ],
+        ),
+        "sec5_perplexity_drop": Experiment(
+            key="sec5_perplexity_drop",
+            description="(sec 5) Qualify perplexity drop on specific custom prompts (requires sec5_ppl_prompts.txt).",
+            script=METRICS_SWEEP_SCRIPT,
+            sweep_question="lambda_fn_sweep",
+            extra_args=[
+                "--model", "qwen",
+                "--dataset", "txt",
+                "--prompts-txt", os.path.join(ROOT_PY, "sec5_ppl_prompts.txt"),
+                "--cache-sizes", "8", "24", "40", "56",
+                "--lookaheads", "1",
+                "--budget-fractions", "1.0",
+                "--routing-bias-top-n", "5",
+                "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+                "--sweep-question", "lambda_fn_sweep",
+                "--lambdas", "1",
+                "--cache-cond-forced-top-ns", "5", "8",
+                "--ppl-on-lambda-policies",
+                "--disable-measurement"
             ],
         ),
         "final_results_collection": Experiment(
@@ -337,7 +358,8 @@ def run_one(
     os.makedirs(run_dir, exist_ok=True)
 
     env = os.environ.copy()
-    env["HETEROPREDICT_SEQUENTIAL_EXPERT_IO"] = "1"
+    # Respect caller env (e.g. bash A/B for parallel vs sequential expert pread).
+    env.setdefault("HETEROPREDICT_SEQUENTIAL_EXPERT_IO", "0")
 
     if exp.script == CACHE_POLICY_SCRIPT:
         prefix = os.path.join(run_dir, "sweep")
