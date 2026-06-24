@@ -413,6 +413,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::mutex expert_slots_mutex_;  // For thread safety during loading
     std::vector<bool> expert_slot_ready_; // For condition variable, size max_cached_experts_
     std::condition_variable expert_slots_cv_; // To wait for background loading
+    std::unique_ptr<std::atomic<uint64_t>[]> slot_load_id_; // Logical abort ID per slot
     
     // Expert file format (auto-detected on first load)
     enum class ExpertFormat { UNKNOWN, UNPACKED, PACKED };

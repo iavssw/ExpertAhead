@@ -17,3 +17,6 @@
 
 trainingData/**/*.pt
 trainingData/
+
+**/*.png
+**/*.csv

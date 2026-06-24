@@ -2,6 +2,10 @@
 // Expects: expert_prefix, gate_prefix, up_prefix, down_prefix, slot_idx, weights_dir.
 
 {
+#ifndef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
+    uint64_t load_id = 0;
+#endif
+
     auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot, const std::vector<int64_t>& shape,
                                   torch::ScalarType dtype) {
         if (static_cast<size_t>(slot) >= bufs.size()) {
@@ -52,27 +56,38 @@
     char* ptr_s = static_cast<char*>(dest_s.data_ptr());
     char* ptr_z = static_cast<char*>(dest_z.data_ptr());
 
+#ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
+    auto pread_abortable = [this, slot_idx, load_id](const std::string& path, void* dest_ptr, size_t copy_size) {
+        if (this->slot_load_id_[slot_idx].load(std::memory_order_relaxed) != load_id) return;
+        unified_llm_w4a16_common::read_bin_tensor_pread(path, dest_ptr, copy_size);
+    };
+#else
+    auto pread_abortable = [slot_idx, load_id](const std::string& path, void* dest_ptr, size_t copy_size) {
+        unified_llm_w4a16_common::read_bin_tensor_pread(path, dest_ptr, copy_size);
+    };
+#endif
+
     unified_llm_w4a16_common::log_sequential_expert_io_once();
     if (unified_llm_w4a16_common::sequential_expert_io_loads()) {
-        unified_llm_w4a16_common::read_bin_tensor_pread(gq, ptr_q, expected_q);
-        unified_llm_w4a16_common::read_bin_tensor_pread(uq, ptr_q + expected_q, expected_q);
-        unified_llm_w4a16_common::read_bin_tensor_pread(gs, ptr_s, expected_s);
-        unified_llm_w4a16_common::read_bin_tensor_pread(us, ptr_s + expected_s, expected_s);
-        unified_llm_w4a16_common::read_bin_tensor_pread(gz, ptr_z, expected_z);
-        unified_llm_w4a16_common::read_bin_tensor_pread(uz, ptr_z + expected_z, expected_z);
+        pread_abortable(gq, ptr_q, expected_q);
+        pread_abortable(uq, ptr_q + expected_q, expected_q);
+        pread_abortable(gs, ptr_s, expected_s);
+        pread_abortable(us, ptr_s + expected_s, expected_s);
+        pread_abortable(gz, ptr_z, expected_z);
+        pread_abortable(uz, ptr_z + expected_z, expected_z);
     } else {
         std::vector<std::future<void>> futures;
         futures.push_back(
-            std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, gq, ptr_q, expected_q));
-        futures.push_back(std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, uq,
+            std::async(std::launch::async, pread_abortable, gq, ptr_q, expected_q));
+        futures.push_back(std::async(std::launch::async, pread_abortable, uq,
                                      ptr_q + expected_q, expected_q));
         futures.push_back(
-            std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, gs, ptr_s, expected_s));
-        futures.push_back(std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, us,
+            std::async(std::launch::async, pread_abortable, gs, ptr_s, expected_s));
+        futures.push_back(std::async(std::launch::async, pread_abortable, us,
                                      ptr_s + expected_s, expected_s));
         futures.push_back(
-            std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, gz, ptr_z, expected_z));
-        futures.push_back(std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, uz,
+            std::async(std::launch::async, pread_abortable, gz, ptr_z, expected_z));
+        futures.push_back(std::async(std::launch::async, pread_abortable, uz,
                                      ptr_z + expected_z, expected_z));
 
         for (auto& f : futures) {
@@ -80,7 +95,16 @@
         }
     }
 
+#ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
+    {
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        if (slot_load_id_[slot_idx].load(std::memory_order_relaxed) == load_id) {
+            gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+        }
+    }
+#else
     gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+#endif
   }
 
   {
@@ -112,17 +136,28 @@
     const size_t expected_s = static_cast<size_t>(s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t));
     const size_t expected_z = static_cast<size_t>(z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t));
 
+#ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
+    auto pread_abortable_down = [this, slot_idx, load_id](const std::string& path, void* dest_ptr, size_t copy_size) {
+        if (this->slot_load_id_[slot_idx].load(std::memory_order_relaxed) != load_id) return;
+        unified_llm_w4a16_common::read_bin_tensor_pread(path, dest_ptr, copy_size);
+    };
+#else
+    auto pread_abortable_down = [slot_idx, load_id](const std::string& path, void* dest_ptr, size_t copy_size) {
+        unified_llm_w4a16_common::read_bin_tensor_pread(path, dest_ptr, copy_size);
+    };
+#endif
+
     if (unified_llm_w4a16_common::sequential_expert_io_loads()) {
-        unified_llm_w4a16_common::read_bin_tensor_pread(dq, dest_q.data_ptr(), expected_q);
-        unified_llm_w4a16_common::read_bin_tensor_pread(ds, dest_s.data_ptr(), expected_s);
-        unified_llm_w4a16_common::read_bin_tensor_pread(dz, dest_z.data_ptr(), expected_z);
+        pread_abortable_down(dq, dest_q.data_ptr(), expected_q);
+        pread_abortable_down(ds, dest_s.data_ptr(), expected_s);
+        pread_abortable_down(dz, dest_z.data_ptr(), expected_z);
     } else {
         std::vector<std::future<void>> futures;
-        futures.push_back(std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, dq,
+        futures.push_back(std::async(std::launch::async, pread_abortable_down, dq,
                                      dest_q.data_ptr(), expected_q));
-        futures.push_back(std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, ds,
+        futures.push_back(std::async(std::launch::async, pread_abortable_down, ds,
                                      dest_s.data_ptr(), expected_s));
-        futures.push_back(std::async(std::launch::async, unified_llm_w4a16_common::read_bin_tensor_pread, dz,
+        futures.push_back(std::async(std::launch::async, pread_abortable_down, dz,
                                      dest_z.data_ptr(), expected_z));
 
         for (auto& f : futures) {
@@ -130,6 +165,15 @@
         }
     }
 
+#ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
+    {
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        if (slot_load_id_[slot_idx].load(std::memory_order_relaxed) == load_id) {
+            down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
+        }
+    }
+#else
     down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
+#endif
   }
 }

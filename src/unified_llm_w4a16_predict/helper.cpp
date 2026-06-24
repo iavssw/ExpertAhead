@@ -1,6 +1,7 @@
 #include "unified_llm_w4a16_predict/helper.hpp"
 #include "unified_llm_w4a16_predict/npuSetup.hpp"
 #include "unified_llm_w4a16_predict/unified_llm_w4a16.hpp"
+#define HETEROPREDICT_SUPPORT_LOGICAL_ABORT 1
 #include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 
 #include <algorithm>
@@ -1266,7 +1267,8 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
     }
 
     for (int64_t i = 0; i < num_to_warm; ++i) {
-        load_expert_weights(i, i, weights_dir_);
+        uint64_t new_load_id = slot_load_id_[i].fetch_add(1, std::memory_order_relaxed) + 1;
+        load_expert_weights(i, i, new_load_id, weights_dir_);
         expert_slots_indices[i] = i;
         slot_meta_[i].expert_id = i;
         slot_meta_[i].access_count = 1;
@@ -1285,17 +1287,17 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
     }
 }
 
-void MixtureOfExpertsImpl::load_experts_weights_packed(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts,
+void MixtureOfExpertsImpl::load_experts_weights_packed(const std::vector<ExpertLoadRequest>& slots_and_experts,
                                                        const std::string& weights_dir) {
 #include "unified_llm_w4a16_common/moe_expert_load_packed.inl"
 }
 
-void MixtureOfExpertsImpl::load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx,
+void MixtureOfExpertsImpl::load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, uint64_t load_id,
                                                       const std::string& weights_dir) {
-    load_experts_weights_packed({{slot_idx, expert_idx}}, weights_dir);
+    load_experts_weights_packed({{slot_idx, expert_idx, load_id}}, weights_dir);
 }
 
-void MixtureOfExpertsImpl::load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir) {
+void MixtureOfExpertsImpl::load_experts_weights(const std::vector<ExpertLoadRequest>& slots_and_experts, const std::string& weights_dir) {
     auto start_time = std::chrono::high_resolution_clock::now();
     
     experts_loaded_this_step_ += slots_and_experts.size();
@@ -1330,8 +1332,9 @@ void MixtureOfExpertsImpl::load_experts_weights(const std::vector<std::pair<int6
     }
 
     for (const auto& se : slots_and_experts) {
-        int64_t slot_idx = se.first;
-        int64_t expert_idx = se.second;
+        int64_t slot_idx = se.slot_idx;
+        int64_t expert_idx = se.expert_idx;
+        uint64_t load_id = se.load_id;
         const std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
         const std::string gate_prefix = expert_prefix + "_gate";
         const std::string up_prefix = expert_prefix + "_up";
@@ -1350,6 +1353,6 @@ void MixtureOfExpertsImpl::load_experts_weights(const std::vector<std::pair<int6
     }
 }
 
-void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
-    load_experts_weights({{slot_idx, expert_idx}}, weights_dir);
+void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, uint64_t load_id, const std::string& weights_dir) {
+    load_experts_weights({{slot_idx, expert_idx, load_id}}, weights_dir);
 }

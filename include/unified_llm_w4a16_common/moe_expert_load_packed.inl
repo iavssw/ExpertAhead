@@ -26,14 +26,22 @@
         char* ptr_q; char* ptr_s; char* ptr_z;
         torch::Tensor dest_dq, dest_ds, dest_dz;
         char* ptr_dq; char* ptr_ds; char* ptr_dz;
+        uint64_t load_id = 0;
     };
 
     std::vector<ExpertLoadState> states;
     states.reserve(slots_and_experts.size());
 
     for (const auto& se : slots_and_experts) {
+#ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
+        int64_t slot_idx = se.slot_idx;
+        int64_t expert_idx = se.expert_idx;
+        uint64_t load_id = se.load_id;
+#else
         int64_t slot_idx = se.first;
         int64_t expert_idx = se.second;
+        uint64_t load_id = 0;
+#endif
         std::string path = weights_dir + "/layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx) + ".bin";
 
         const int fd = unified_llm_w4a16_common::open_odirect_or_throw(path);
@@ -74,6 +82,7 @@
         state.expert_idx = expert_idx;
         state.path = path;
         state.fd = fd;
+        state.load_id = load_id;
         state.gate_qw = require("gate.qweight");
         state.gate_sc = require("gate.scales");
         state.gate_zr = require("gate.zeros");
@@ -145,7 +154,10 @@
         states.push_back(std::move(state));
     }
 
-    auto pread_exact = [](int fd_, char* dest, size_t size, off_t offset, const std::string& path) {
+    auto pread_abortable = [this](int fd_, char* dest, size_t size, off_t offset, const std::string& path, int64_t slot, uint64_t load_id) {
+#ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
+        if (this->slot_load_id_[slot].load(std::memory_order_relaxed) != load_id) return;
+#endif
         unified_llm_w4a16_common::pread_odirect_region(fd_, dest, size, offset, path);
     };
 
@@ -153,28 +165,28 @@
     unified_llm_w4a16_common::log_sequential_expert_io_once();
     if (unified_llm_w4a16_common::sequential_expert_io_loads()) {
         for (const auto& state : states) {
-            pread_exact(state.fd, state.ptr_q, state.gate_qw.size, static_cast<off_t>(state.gate_qw.offset), state.path);
-            pread_exact(state.fd, state.ptr_q + state.gate_qw.size, state.up_qw.size, static_cast<off_t>(state.up_qw.offset), state.path);
-            pread_exact(state.fd, state.ptr_s, state.gate_sc.size, static_cast<off_t>(state.gate_sc.offset), state.path);
-            pread_exact(state.fd, state.ptr_s + state.gate_sc.size, state.up_sc.size, static_cast<off_t>(state.up_sc.offset), state.path);
-            pread_exact(state.fd, state.ptr_z, state.gate_zr.size, static_cast<off_t>(state.gate_zr.offset), state.path);
-            pread_exact(state.fd, state.ptr_z + state.gate_zr.size, state.up_zr.size, static_cast<off_t>(state.up_zr.offset), state.path);
-            pread_exact(state.fd, state.ptr_dq, state.down_qw.size, static_cast<off_t>(state.down_qw.offset), state.path);
-            pread_exact(state.fd, state.ptr_ds, state.down_sc.size, static_cast<off_t>(state.down_sc.offset), state.path);
-            pread_exact(state.fd, state.ptr_dz, state.down_zr.size, static_cast<off_t>(state.down_zr.offset), state.path);
+            pread_abortable(state.fd, state.ptr_q, state.gate_qw.size, static_cast<off_t>(state.gate_qw.offset), state.path, state.slot_idx, state.load_id);
+            pread_abortable(state.fd, state.ptr_q + state.gate_qw.size, state.up_qw.size, static_cast<off_t>(state.up_qw.offset), state.path, state.slot_idx, state.load_id);
+            pread_abortable(state.fd, state.ptr_s, state.gate_sc.size, static_cast<off_t>(state.gate_sc.offset), state.path, state.slot_idx, state.load_id);
+            pread_abortable(state.fd, state.ptr_s + state.gate_sc.size, state.up_sc.size, static_cast<off_t>(state.up_sc.offset), state.path, state.slot_idx, state.load_id);
+            pread_abortable(state.fd, state.ptr_z, state.gate_zr.size, static_cast<off_t>(state.gate_zr.offset), state.path, state.slot_idx, state.load_id);
+            pread_abortable(state.fd, state.ptr_z + state.gate_zr.size, state.up_zr.size, static_cast<off_t>(state.up_zr.offset), state.path, state.slot_idx, state.load_id);
+            pread_abortable(state.fd, state.ptr_dq, state.down_qw.size, static_cast<off_t>(state.down_qw.offset), state.path, state.slot_idx, state.load_id);
+            pread_abortable(state.fd, state.ptr_ds, state.down_sc.size, static_cast<off_t>(state.down_sc.offset), state.path, state.slot_idx, state.load_id);
+            pread_abortable(state.fd, state.ptr_dz, state.down_zr.size, static_cast<off_t>(state.down_zr.offset), state.path, state.slot_idx, state.load_id);
         }
     } else {
         std::vector<std::future<void>> futures;
         for (const auto& state : states) {
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_q, state.gate_qw.size, static_cast<off_t>(state.gate_qw.offset), state.path));
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_q + state.gate_qw.size, state.up_qw.size, static_cast<off_t>(state.up_qw.offset), state.path));
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_s, state.gate_sc.size, static_cast<off_t>(state.gate_sc.offset), state.path));
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_s + state.gate_sc.size, state.up_sc.size, static_cast<off_t>(state.up_sc.offset), state.path));
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_z, state.gate_zr.size, static_cast<off_t>(state.gate_zr.offset), state.path));
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_z + state.gate_zr.size, state.up_zr.size, static_cast<off_t>(state.up_zr.offset), state.path));
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_dq, state.down_qw.size, static_cast<off_t>(state.down_qw.offset), state.path));
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_ds, state.down_sc.size, static_cast<off_t>(state.down_sc.offset), state.path));
-            futures.push_back(std::async(std::launch::async, pread_exact, state.fd, state.ptr_dz, state.down_zr.size, static_cast<off_t>(state.down_zr.offset), state.path));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_q, state.gate_qw.size, static_cast<off_t>(state.gate_qw.offset), state.path, state.slot_idx, state.load_id));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_q + state.gate_qw.size, state.up_qw.size, static_cast<off_t>(state.up_qw.offset), state.path, state.slot_idx, state.load_id));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_s, state.gate_sc.size, static_cast<off_t>(state.gate_sc.offset), state.path, state.slot_idx, state.load_id));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_s + state.gate_sc.size, state.up_sc.size, static_cast<off_t>(state.up_sc.offset), state.path, state.slot_idx, state.load_id));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_z, state.gate_zr.size, static_cast<off_t>(state.gate_zr.offset), state.path, state.slot_idx, state.load_id));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_z + state.gate_zr.size, state.up_zr.size, static_cast<off_t>(state.up_zr.offset), state.path, state.slot_idx, state.load_id));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_dq, state.down_qw.size, static_cast<off_t>(state.down_qw.offset), state.path, state.slot_idx, state.load_id));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_ds, state.down_sc.size, static_cast<off_t>(state.down_sc.offset), state.path, state.slot_idx, state.load_id));
+            futures.push_back(std::async(std::launch::async, pread_abortable, state.fd, state.ptr_dz, state.down_zr.size, static_cast<off_t>(state.down_zr.offset), state.path, state.slot_idx, state.load_id));
         }
 
         try {
@@ -193,7 +205,16 @@
     for (const auto& state : states) {
         posix_fadvise(state.fd, 0, 0, POSIX_FADV_DONTNEED);
         close(state.fd);
+        
+#ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        if (slot_load_id_[state.slot_idx].load(std::memory_order_relaxed) == state.load_id) {
+            gate_up_experts[state.slot_idx]->set_unpacked_params(state.dest_q, state.dest_s, state.dest_z);
+            down_experts[state.slot_idx]->set_unpacked_params(state.dest_dq, state.dest_ds, state.dest_dz);
+        }
+#else
         gate_up_experts[state.slot_idx]->set_unpacked_params(state.dest_q, state.dest_s, state.dest_z);
         down_experts[state.slot_idx]->set_unpacked_params(state.dest_dq, state.dest_ds, state.dest_dz);
+#endif
     }
 }

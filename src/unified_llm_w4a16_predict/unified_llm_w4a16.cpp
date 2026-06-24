@@ -673,6 +673,13 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     // Initialize slot ready state
     expert_slot_ready_.assign(max_cached_experts_, true);
     
+    if (max_cached_experts_ > 0) {
+        slot_load_id_ = std::make_unique<std::atomic<uint64_t>[]>(max_cached_experts_);
+        for (size_t i = 0; i < max_cached_experts_; ++i) {
+            slot_load_id_[i].store(0, std::memory_order_relaxed);
+        }
+    }
+    
     // Initialize slot meta for timestamps
     slot_meta_.resize(max_cached_experts_);
     for (size_t i = 0; i < max_cached_experts_; ++i) {
@@ -857,10 +864,17 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
         return;
     }
 
-    std::vector<std::pair<int64_t, int64_t>> slots_and_experts_to_load;
+    std::vector<ExpertLoadRequest> slots_and_experts_to_load;
 
     {
         std::unique_lock<std::mutex> lock(expert_slots_mutex_);
+        
+        // Protect all predicted experts from being evicted while we schedule this batch.
+        // This prevents the predictor from picking its own "hits" as victims for its "misses".
+        for (int64_t eid : predicted_expert_ids) {
+            currently_selected_experts_.push_back(eid);
+        }
+
         
         // Protect all predicted experts from being evicted while we schedule this batch.
         // This prevents the predictor from picking its own "hits" as victims for its "misses".
@@ -937,10 +951,12 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
         } catch (...) {
             std::lock_guard<std::mutex> lock(expert_slots_mutex_);
             for (auto& p : slots_and_experts_to_load) {
-                size_t victim = p.first;
-                expert_slot_ready_[victim] = true;
-                expert_slots_indices[victim] = -1;
-                slot_meta_[victim].expert_id = -1;
+                size_t victim = p.slot_idx;
+                if (slot_load_id_[victim].load(std::memory_order_relaxed) == p.load_id) {
+                    expert_slot_ready_[victim] = true;
+                    expert_slots_indices[victim] = -1;
+                    slot_meta_[victim].expert_id = -1;
+                }
             }
             expert_slots_cv_.notify_all();
             throw;
@@ -948,7 +964,9 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
 
         std::lock_guard<std::mutex> lock(expert_slots_mutex_);
         for (auto& p : slots_and_experts_to_load) {
-            expert_slot_ready_[p.first] = true;
+            if (slot_load_id_[p.slot_idx].load(std::memory_order_relaxed) == p.load_id) {
+                expert_slot_ready_[p.slot_idx] = true;
+            }
         }
         expert_slots_cv_.notify_all();
     }
@@ -1176,7 +1194,7 @@ size_t MixtureOfExpertsImpl::pick_lfru_ready() {
 
 std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats) {
     std::vector<int64_t> result_slots(global_expert_indices.size(), -1);
-    std::vector<std::pair<int64_t, int64_t>> slots_and_experts_to_load;
+    std::vector<ExpertLoadRequest> slots_and_experts_to_load;
 
     std::unique_lock<std::mutex> lock(expert_slots_mutex_);
     ++access_clock_;
@@ -1208,6 +1226,28 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
             int64_t global_e = global_expert_indices[i];
 
             size_t victim_slot = pick_victim_ready();
+            if (victim_slot == kNoVictimSlot) {
+                for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
+                    if (!expert_slot_ready_[s]) {
+                        int64_t current_expert = expert_slots_indices[s];
+                        bool needed = false;
+                        for (int64_t e : global_expert_indices) {
+                            if (e == current_expert) { needed = true; break; }
+                        }
+                        if (!needed) {
+                            victim_slot = s;
+                            gate_up_q_pinned_[s] = torch::Tensor();
+                            gate_up_s_pinned_[s] = torch::Tensor();
+                            gate_up_z_pinned_[s] = torch::Tensor();
+                            down_q_pinned_[s] = torch::Tensor();
+                            down_s_pinned_[s] = torch::Tensor();
+                            down_z_pinned_[s] = torch::Tensor();
+                            break;
+                        }
+                    }
+                }
+            }
+
             while (victim_slot == kNoVictimSlot) {
                 expert_slots_cv_.wait(lock, [this]() {
                     for (bool ready : expert_slot_ready_) {
@@ -1227,7 +1267,8 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
             slot_meta_[victim_slot].clock_bit = 1;
             
             result_slots[i] = victim_slot;
-            slots_and_experts_to_load.push_back({victim_slot, global_e});
+            uint64_t new_load_id = slot_load_id_[victim_slot].fetch_add(1, std::memory_order_relaxed) + 1;
+            slots_and_experts_to_load.push_back({static_cast<int64_t>(victim_slot), global_e, new_load_id});
         }
     }
 
@@ -1254,10 +1295,12 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
         } catch (...) {
             lock.lock();
             for (auto& p : slots_and_experts_to_load) {
-                size_t v = p.first;
-                expert_slot_ready_[v] = true;
-                expert_slots_indices[v] = -1;
-                slot_meta_[v].expert_id = -1;
+                size_t v = p.slot_idx;
+                if (slot_load_id_[v].load(std::memory_order_relaxed) == p.load_id) {
+                    expert_slot_ready_[v] = true;
+                    expert_slots_indices[v] = -1;
+                    slot_meta_[v].expert_id = -1;
+                }
             }
             expert_slots_cv_.notify_all();
             throw;
@@ -1268,7 +1311,9 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
 
         lock.lock();
         for (auto& p : slots_and_experts_to_load) {
-            expert_slot_ready_[p.first] = true;
+            if (slot_load_id_[p.slot_idx].load(std::memory_order_relaxed) == p.load_id) {
+                expert_slot_ready_[p.slot_idx] = true;
+            }
         }
         expert_slots_cv_.notify_all();
     }
