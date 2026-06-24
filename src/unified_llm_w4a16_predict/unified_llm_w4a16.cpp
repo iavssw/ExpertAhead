@@ -635,13 +635,19 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 
 MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                                            int64_t max_cached_experts, int64_t layer_idx,
-                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device, int64_t prefetch_experts_count)
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device, int64_t prefetch_experts_count, const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), max_cached_experts_(max_cached_experts), layer_idx_(layer_idx),
       prefetch_experts_count_(prefetch_experts_count),
       use_softmax_before_topk_(use_softmax_before_topk), normalize_topk_prob_(normalize_topk_prob), lambda_(lambda) {
 
-    if (!predictor_model_path.empty()) {
+    if (!oracle_trace_path.empty()) {
+        try {
+            predictor_ = std::make_unique<OracleTracePredictor>(oracle_trace_path, layer_idx_, oracle_lookahead, prefetch_experts_count_, oracle_full_union);
+        } catch (const std::exception& e) {
+            std::cerr << "Failed to initialize oracle predictor: " << e.what() << std::endl;
+        }
+    } else if (!predictor_model_path.empty()) {
         try {
             predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
         } catch (const std::exception& e) {
@@ -777,7 +783,7 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
     
     speculative_load_future_ = std::async(std::launch::async,
         [this, embedding_copy, pdist_opt, prev_expert_opt, prev_layers_copy, source_decode_step]() {
-            std::vector<int64_t> pred_result = predictor_->predict_sync(embedding_copy, pdist_opt, prev_expert_opt, prev_layers_copy);
+            std::vector<int64_t> pred_result = predictor_->predict_sync(embedding_copy, pdist_opt, prev_expert_opt, prev_layers_copy, source_decode_step);
 
             // Store rankings safely for forward_generation to compare
             {
@@ -789,8 +795,7 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
             // Queue this prediction for horizon-aware evaluation:
             // prediction emitted at step t is evaluated at step t + lookahead_stride_.
             if (!pred_result.empty()) {
-                int limit = std::min((int)pred_result.size(), (int)prefetch_experts_count_);
-                std::vector<int64_t> top_experts(pred_result.begin(), pred_result.begin() + limit);
+                std::vector<int64_t> top_experts = experts_to_prefetch(pred_result);
                 {
                     std::lock_guard<std::mutex> qlock(pending_predictions_mutex_);
                     pending_predictions_.push_back({source_decode_step + lookahead_stride_, top_experts});
@@ -798,8 +803,7 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
             }
             
             if (!pred_result.empty()) {
-                int limit = std::min((int)pred_result.size(), (int)prefetch_experts_count_);
-                std::vector<int64_t> top_experts(pred_result.begin(), pred_result.begin() + limit);
+                std::vector<int64_t> top_experts = experts_to_prefetch(pred_result);
                 
                 if (debug_verbosity >= 2) {
                     std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Predicted experts: ";
@@ -840,23 +844,30 @@ void MixtureOfExpertsImpl::run_predictor_prefill_warmup(const torch::Tensor& emb
         }
     }
 
-    std::vector<int64_t> pred_result = predictor_->predict_sync(emb, pd, pe, pl_opt);
+    std::vector<int64_t> pred_result = predictor_->predict_sync(emb, pd, pe, pl_opt, /*source_decode_step=*/-1);
     if (!pred_result.empty()) {
-        int limit = std::min((int)pred_result.size(), (int)prefetch_experts_count_);
-        std::vector<int64_t> top_experts(pred_result.begin(), pred_result.begin() + limit);
-        load_predicted_experts(top_experts);
+        load_predicted_experts(experts_to_prefetch(pred_result), /*prefill_end_warmup=*/true);
     }
 }
 
 
-void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids) {
-    if (!in_generation_mode_) return;
+void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids,
+                                                    bool prefill_end_warmup) {
+    if (!in_generation_mode_ && !prefill_end_warmup) {
+        return;
+    }
 
     std::vector<std::pair<int64_t, int64_t>> slots_and_experts_to_load;
 
     {
         std::unique_lock<std::mutex> lock(expert_slots_mutex_);
         
+        // Protect all predicted experts from being evicted while we schedule this batch.
+        // This prevents the predictor from picking its own "hits" as victims for its "misses".
+        for (int64_t eid : predicted_expert_ids) {
+            currently_selected_experts_.push_back(eid);
+        }
+
         for (int64_t global_e : predicted_expert_ids) {
             bool hit = false;
             for (size_t s = 0; s < slot_meta_.size(); ++s) {
@@ -892,14 +903,24 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
             }
 
             slots_and_experts_to_load.push_back({victim, global_e});
-            
-            // Mark it temporarily in currently_selected_experts_ to protect it within THIS batch
-            currently_selected_experts_.push_back(global_e);
         }
         
-        // Remove the newly loading experts from currently_selected_experts_ so they are not protected AFTER we are done scheduling
-        for (auto& p : slots_and_experts_to_load) {
-            auto it = std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), p.second);
+        // Confidence ordering pass: iterate in reverse confidence order (least confident first) so
+        // that the most confident expert receives the highest timestamp (MRU position),
+        // making it the last to be evicted if the cache fills up.
+        // Doing this BEFORE unlocking ensures "hits" are marked MRU during the slow I/O block.
+        for (auto pred_it = predicted_expert_ids.rbegin(); pred_it != predicted_expert_ids.rend(); ++pred_it) {
+            int64_t eid = *pred_it;
+            auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
+            if (it == expert_slots_indices.end()) continue;
+            size_t slot = std::distance(expert_slots_indices.begin(), it);
+            slot_meta_[slot].last_access = ++access_clock_;
+            slot_meta_[slot].clock_bit = 1;
+        }
+
+        // Remove the temporary protection for all predicted experts
+        for (int64_t eid : predicted_expert_ids) {
+            auto it = std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), eid);
             if (it != currently_selected_experts_.end()) {
                 currently_selected_experts_.erase(it);
             }
@@ -931,21 +952,18 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
         }
         expert_slots_cv_.notify_all();
     }
+}
 
-    // Confidence ordering pass: iterate in reverse confidence order (least confident first) so
-    // that the most confident expert receives the highest timestamp (MRU position),
-    // making it the last to be evicted if the cache fills up.
-    {
-        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
-        for (auto pred_it = predicted_expert_ids.rbegin(); pred_it != predicted_expert_ids.rend(); ++pred_it) {
-            int64_t eid = *pred_it;
-            auto it = std::find(expert_slots_indices.begin(), expert_slots_indices.end(), eid);
-            if (it == expert_slots_indices.end()) continue;
-            size_t slot = std::distance(expert_slots_indices.begin(), it);
-            slot_meta_[slot].last_access = ++access_clock_;
-            slot_meta_[slot].clock_bit = 1;
-        }
+std::vector<int64_t> MixtureOfExpertsImpl::experts_to_prefetch(const std::vector<int64_t>& pred_result) const {
+    if (predictor_ && predictor_->prefetch_full_union()) {
+        return pred_result;
     }
+    
+    std::vector<int64_t> result;
+    const int limit = std::min(static_cast<int>(pred_result.size()), static_cast<int>(prefetch_experts_count_));
+    result.insert(result.end(), pred_result.begin(), pred_result.begin() + limit);
+    
+    return result;
 }
 
 size_t MixtureOfExpertsImpl::pick_victim_ready() {
@@ -1427,14 +1445,29 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     // ── Predictor accuracy accounting (horizon-aware, routed-expert denominator) ─
     if (!suppress_predictor_stats_ && predictor_) {
         std::vector<int64_t> pred_set;
+        std::unordered_set<int64_t> actual_union;
         {
             std::lock_guard<std::mutex> qlock(pending_predictions_mutex_);
+
+            // Step 1: Accumulate this token's routed experts into every in-flight
+            // prediction whose window still includes the current decode step.
+            for (auto& pp : pending_predictions_) {
+                if (pp.target_step >= current_decode_step) {
+                    for (int64_t k = 0; k < active_experts; ++k) {
+                        pp.actual_union.insert(topk_accessor[k]);
+                    }
+                }
+            }
+
+            // Step 2: Discard predictions that expired before their target step.
             while (!pending_predictions_.empty() && pending_predictions_.front().target_step < current_decode_step) {
-                // Prediction arrived too late to evaluate at its intended horizon.
                 pending_predictions_.pop_front();
             }
+
+            // Step 3: Pop the prediction that matures exactly at this step.
             if (!pending_predictions_.empty() && pending_predictions_.front().target_step == current_decode_step) {
-                pred_set = pending_predictions_.front().pred_set;
+                pred_set    = pending_predictions_.front().pred_set;
+                actual_union = std::move(pending_predictions_.front().actual_union);
                 pending_predictions_.pop_front();
             }
         }
@@ -1500,6 +1533,22 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
                 if (routed_hits_forced_n == 0) pred_match_0_++;
                 else if (routed_hits_forced_n == 1) pred_match_1_++;
                 else pred_match_2_++;
+            }
+
+            // ── Window-aware recall & precision ──────────────────────────────────
+            // actual_union = union of experts routed across steps [t+1 .. t+N].
+            // For a perfect oracle: pred_set == actual_union → both 100%.
+            if (!actual_union.empty()) {
+                int64_t window_hits = 0;
+                for (int64_t eid : actual_union) {
+                    if (std::find(pred_set.begin(), pred_set.end(), eid) != pred_set.end()) {
+                        window_hits++;
+                    }
+                }
+                pred_hits_window_recall_    += window_hits;
+                pred_total_window_recall_   += static_cast<int64_t>(actual_union.size());
+                pred_hits_window_precision_ += window_hits;
+                pred_total_window_precision_+= static_cast<int64_t>(pred_set.size());
             }
         }
     }
@@ -1871,6 +1920,17 @@ torch::Tensor MixtureOfExpertsImpl::forward(const torch::Tensor &x, c10::optiona
 
     auto output = torch::zeros({x_flat.size(0), hidden_size_}, opts);
 
+    if (oracle_capture_callback_ && x_flat.size(0) == 1) {
+        auto topk_cpu = topk_idx[0].to(torch::kCPU, torch::kInt64);
+        auto acc = topk_cpu.accessor<int64_t, 1>();
+        std::vector<int64_t> experts;
+        experts.reserve(topk_cpu.size(0));
+        for (int i = 0; i < topk_cpu.size(0); ++i) {
+            experts.push_back(acc[i]);
+        }
+        oracle_capture_callback_(experts);
+    }
+
     if (!x_flat.is_cuda()) {
         forward_cpu(x_flat, topk_vals, topk_idx, output);
         return output.view({x.size(0), x.size(1), hidden_size_});
@@ -1895,7 +1955,8 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                                          const std::string& predictor_model_path, int64_t prefetch_experts_count,
                                          const std::vector<int>& predict_layers,
                                          const std::vector<int64_t>& per_layer_cache_sizes,
-                                         const std::vector<int64_t>& per_layer_prefetch_counts)
+                                         const std::vector<int64_t>& per_layer_prefetch_counts,
+                                         const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union)
     : arch_type_(arch_type), vocab_size_(vocab_size), hidden_size_(hidden_size), intermediate_size_(intermediate_size),
       num_hidden_layers_(num_hidden_layers), num_attention_heads_(num_attention_heads), num_key_value_heads_(num_key_value_heads),
       head_dim_(head_dim), rms_norm_eps_(rms_norm_eps), rope_theta_(rope_theta), max_seq_len_(max_seq_len), max_batch_size_(max_batch_size),
@@ -2091,7 +2152,7 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
             moe_layers.push_back(register_module("moe_" + std::to_string(i),
                                                  MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
                                                                   layer_cache_size, i,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, pred_device, layer_prefetch_count)));
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, pred_device, layer_prefetch_count, oracle_trace_path, oracle_lookahead, oracle_full_union)));
         }
         if (arch_type_ == ArchitectureType::QWEN) {
             q_norms.push_back(register_module("q_norm_" + std::to_string(i), RMSNorm(head_dim_, rms_norm_eps_)));
@@ -2371,6 +2432,10 @@ torch::Tensor UnifiedLLMW4A16Impl::forward(torch::Tensor x, int64_t start_pos) {
         for (auto& moe_layer : moe_layers) {
             moe_layer->set_context_token_ids(token_ids);
         }
+    }
+
+    if (oracle_trace_capture_active_ && oracle_capture_armed_ && x.size(1) == 1) {
+        begin_oracle_trace_decode_step();
     }
 
     if (arch_type_ == ArchitectureType::MIXTRAL) {
@@ -3084,9 +3149,7 @@ torch::Tensor UnifiedLLMW4A16Impl::forward_qwen(torch::Tensor x, int64_t start_p
 }
 
 void UnifiedLLMW4A16Impl::warm_predictor_caches_after_prefill(int64_t prompt_len) {
-    if (prompt_len <= 1) {
-        return;
-    }
+    (void)prompt_len;
     if (arch_type_ != ArchitectureType::QWEN && arch_type_ != ArchitectureType::MIXTRAL) {
         return;
     }
@@ -3144,6 +3207,142 @@ void UnifiedLLMW4A16Impl::warm_predictor_caches_after_prefill(int64_t prompt_len
     }
 }
 
+void UnifiedLLMW4A16Impl::begin_oracle_trace_capture() {
+    oracle_trace_capture_active_ = true;
+    oracle_capture_armed_ = false;
+    oracle_capture_row_ = -1;
+    oracle_captured_trace_.clear();
+    install_oracle_capture_callbacks();
+}
+
+void UnifiedLLMW4A16Impl::cancel_oracle_trace_capture() {
+    oracle_trace_capture_active_ = false;
+    oracle_capture_armed_ = false;
+    oracle_capture_row_ = -1;
+    oracle_captured_trace_.clear();
+    clear_oracle_capture_callbacks();
+}
+
+void UnifiedLLMW4A16Impl::install_oracle_capture_callbacks() {
+    for (size_t i = 0; i < moe_layers.size(); ++i) {
+        const size_t layer_idx = i;
+        moe_layers[i]->set_oracle_capture_callback([this, layer_idx](const std::vector<int64_t>& experts) {
+            this->record_oracle_trace_layer(static_cast<int64_t>(layer_idx), experts);
+        });
+    }
+}
+
+void UnifiedLLMW4A16Impl::clear_oracle_capture_callbacks() {
+    for (auto& moe : moe_layers) {
+        moe->clear_oracle_capture_callback();
+    }
+}
+
+void UnifiedLLMW4A16Impl::begin_oracle_trace_decode_step() {
+    if (!oracle_trace_capture_active_ || !oracle_capture_armed_) {
+        return;
+    }
+    oracle_captured_trace_.emplace_back(num_hidden_layers_);
+    oracle_capture_row_ = static_cast<int64_t>(oracle_captured_trace_.size()) - 1;
+}
+
+void UnifiedLLMW4A16Impl::record_oracle_trace_layer(int64_t layer_idx, const std::vector<int64_t>& experts) {
+    if (!oracle_trace_capture_active_ || !oracle_capture_armed_ || oracle_capture_row_ < 0) {
+        return;
+    }
+    if (layer_idx < 0 || layer_idx >= num_hidden_layers_) {
+        return;
+    }
+    oracle_captured_trace_[static_cast<size_t>(oracle_capture_row_)][static_cast<size_t>(layer_idx)] = experts;
+}
+
+static std::string format_id_csv(const std::vector<int64_t>& ids) {
+    std::ostringstream oss;
+    for (size_t i = 0; i < ids.size(); ++i) {
+        if (i > 0) {
+            oss << ',';
+        }
+        oss << ids[i];
+    }
+    return oss.str();
+}
+
+static std::vector<int64_t> tensor_to_id_vector(torch::Tensor t) {
+    auto flat = t.detach().to(torch::kCPU, torch::kInt64).contiguous().view(-1);
+    auto acc = flat.accessor<int64_t, 1>();
+    std::vector<int64_t> out;
+    out.reserve(flat.size(0));
+    for (int i = 0; i < flat.size(0); ++i) {
+        out.push_back(acc[i]);
+    }
+    return out;
+}
+
+bool UnifiedLLMW4A16Impl::write_oracle_trace_file(const std::string& path, torch::Tensor prompt_ids,
+                                                  torch::Tensor output_ids, const std::string& prompt_text,
+                                                  const std::string& generated_text, const std::string& model_name) {
+    if (oracle_captured_trace_.empty()) {
+        std::cerr << "[OracleTrace] No captured decode steps to write." << std::endl;
+        return false;
+    }
+
+    auto prompt_vec = tensor_to_id_vector(prompt_ids);
+    auto output_vec = tensor_to_id_vector(output_ids);
+    if (output_vec.size() < prompt_vec.size()) {
+        std::cerr << "[OracleTrace] output_ids shorter than prompt_ids." << std::endl;
+        return false;
+    }
+    std::vector<int64_t> generated_vec(output_vec.begin() + static_cast<long>(prompt_vec.size()), output_vec.end());
+
+    std::ofstream ofs(path);
+    if (!ofs.is_open()) {
+        std::cerr << "[OracleTrace] Failed to open " << path << " for writing." << std::endl;
+        return false;
+    }
+
+    ofs << "MODEL: " << model_name << "\n";
+    ofs << "TOKEN_COUNT: " << oracle_captured_trace_.size() << "\n";
+    ofs << "ACTIVE_EXPERTS: " << num_experts_per_tok_ << "\n";
+    ofs << "================================================================================\n";
+    ofs << "PROMPT TOKEN IDS:\n";
+    ofs << format_id_csv(prompt_vec) << "\n";
+    ofs << "================================================================================\n";
+    ofs << "GENERATED TOKEN IDS:\n";
+    ofs << format_id_csv(generated_vec) << "\n";
+    ofs << "================================================================================\n";
+    ofs << "PROMPT TEXT:\n";
+    ofs << prompt_text << "\n";
+    ofs << "================================================================================\n";
+    ofs << "GENERATED TEXT:\n";
+    ofs << generated_text << "\n";
+    ofs << "================================================================================\n";
+    ofs << "EXPERT TRACE (Per token, list of layer expert IDs):\n";
+    ofs << "================================================================================\n";
+
+    for (size_t step = 0; step < oracle_captured_trace_.size(); ++step) {
+        ofs << "Token " << std::setw(3) << step << ": ";
+        const auto& layers = oracle_captured_trace_[step];
+        for (size_t layer = 0; layer < layers.size(); ++layer) {
+            ofs << "[";
+            for (size_t e = 0; e < layers[layer].size(); ++e) {
+                if (e > 0) {
+                    ofs << ',';
+                }
+                ofs << layers[layer][e];
+            }
+            ofs << "]";
+            if (layer + 1 < layers.size()) {
+                ofs << ' ';
+            }
+        }
+        ofs << "\n";
+    }
+
+    ofs.close();
+    std::cout << "[OracleTrace] Wrote " << oracle_captured_trace_.size() << " decode steps to " << path << std::endl;
+    return true;
+}
+
 torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max_new_tokens, float temperature, float top_p, int64_t top_k,
                                             int64_t eos_token_id) {
     std::cout << "Libtorch input_ids shape: " << input_ids.sizes() << std::endl;
@@ -3159,6 +3358,7 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     this->eval();
     torch::NoGradGuard no_grad;
     const bool should_sync_device = input_ids.is_cuda();
+    oracle_capture_armed_ = false;
 
     // Warmup cycle
     if (warmup_) {
@@ -3200,6 +3400,12 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     std::chrono::duration<double> elapsed_prefill = end_prefill - start_prefill;
     std::cout << "Prefill time: " << elapsed_prefill.count() << " seconds" << std::endl;
 
+    // Run predictor and prefetch decode-step-0 experts before the first decode forward pass.
+    warm_predictor_caches_after_prefill(prompt_len);
+    if (should_sync_device) {
+        torch::cuda::synchronize();
+    }
+
     // Get next token: implementation when temperature is 0
     last_token = output.index({torch::indexing::Slice(), -1, torch::indexing::Slice()});
     if (temperature < 0.01f) {
@@ -3225,10 +3431,8 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
 
     start_pos = token_len - 1;
 
-    warm_predictor_caches_after_prefill(prompt_len);
-    if (should_sync_device) {
-        torch::cuda::synchronize();
-    }
+    // Record routed experts for each decode forward (not prefill / warmup).
+    oracle_capture_armed_ = true;
 
     // Reset cache / predictor stats after predictor warmup so measurements exclude prefill-end prefetch.
     reset_cache_stats();
@@ -3290,6 +3494,8 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
         std::cout << std::defaultfloat << std::setprecision(6);
         std::cout << "Average Time per Token: " << time_per_token << " seconds" << std::endl;
     }
+
+    oracle_capture_armed_ = false;
 
     return input_tensor.narrow(1, 0, token_len);
 }
