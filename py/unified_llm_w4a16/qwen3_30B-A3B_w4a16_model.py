@@ -19,6 +19,7 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer
 
 _script_dir = Path(__file__).parent.resolve()
+DEFAULT_EXPERT_WEIGHTS_DIR = str(_script_dir / "model_weights" / "Qwen3-30B-A3B-AWQ_packed")
 _project_root = _script_dir.parent.parent
 _build_dir = _project_root / "build" / "py" / "unified_llm_w4a16"
 
@@ -232,7 +233,10 @@ class Qwen3_30BA3BW4A16Model:
         per_layer_cache_sizes: Optional[List[int]] = None,
         expert_reuse_csv: Optional[str] = None,
         predictor_lookahead: int = 1,
-        expert_weights_dir: Optional[str] = None,
+        expert_weights_dir: Optional[str] = DEFAULT_EXPERT_WEIGHTS_DIR,
+        oracle_trace_path: str = "",
+        oracle_lookahead: int = 0,
+        oracle_full_union: bool = False,
     ):
         """
         Initialize Qwen3 30B-A3B AWQ w4a16 quantized model.
@@ -240,6 +244,12 @@ class Qwen3_30BA3BW4A16Model:
 
         if backend not in ["base", "predict", "cached"]:
             raise ValueError(f"Invalid backend: {backend}. Choose from: base, predict, cached")
+
+        if not expert_weights_dir:
+            expert_weights_dir = None
+
+        if oracle_trace_path and oracle_lookahead <= 0:
+            oracle_lookahead = predictor_lookahead if predictor_lookahead > 0 else 1
 
         try:
             old_flags = sys.getdlopenflags()
@@ -329,13 +339,18 @@ class Qwen3_30BA3BW4A16Model:
             constructor_args.append(predict_layers if predict_layers is not None else [])
             constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
             constructor_args.append(per_layer_prefetch_counts)
+            constructor_args.append(oracle_trace_path)
+            constructor_args.append(oracle_lookahead)
+            constructor_args.append(oracle_full_union)
         else:
             constructor_args.append(config_path)
 
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
 
-        if backend == "predict" and predictor_lookahead > 1 and hasattr(self.model, "set_predictor_lookahead"):
-            self.model.set_predictor_lookahead(predictor_lookahead)
+        if backend == "predict" and hasattr(self.model, "set_predictor_lookahead"):
+            la = oracle_lookahead if oracle_trace_path else predictor_lookahead
+            if la > 0:
+                self.model.set_predictor_lookahead(la)
 
         # Clean up temp config
         if backend == "predict" and 'tmp' in dir() and hasattr(tmp, 'name'):
@@ -509,7 +524,7 @@ class Qwen3_30BA3BW4A16Model:
                 # Load non-MoE weights from safetensors, then set the expert
                 # directory so the C++ backend can load experts on demand.
                 presaved_dir = weights_dir / f"{model_name}_unpacked"
-                self._prepare_presaved_weights(saved_safetensors, presaved_dir)
+                self._prepare_presaved_weights(saved_safetensors, presaved_dir, attention_only=True)
 
                 t0 = time.time()
                 self.model.load_non_quantized_weights_from_safetensors(str(saved_safetensors))
@@ -545,7 +560,9 @@ class Qwen3_30BA3BW4A16Model:
             print("\nNote: Falling back to randomly initialized weights.")
             print("The model will not produce meaningful output without proper weights.")
 
-    def _prepare_presaved_weights(self, saved_safetensors: Path, presaved_dir: Path) -> None:
+    def _prepare_presaved_weights(
+        self, saved_safetensors: Path, presaved_dir: Path, *, attention_only: bool = False
+    ) -> None:
         manifest_path = presaved_dir / "manifest.json"
         model_name = saved_safetensors.stem
         hetero_mode = str(self.config.get("heterogeneity", "")).lower() if isinstance(self.config, dict) else ""
@@ -566,7 +583,7 @@ class Qwen3_30BA3BW4A16Model:
         }
         expected_manifest["unpacked_layout"] = "out_groups_v2"
 
-        def _bins_exist() -> bool:
+        def _attention_bins_exist() -> bool:
             if not presaved_dir.exists():
                 return False
             for layer_idx in range(self.num_hidden_layers):
@@ -577,6 +594,14 @@ class Qwen3_30BA3BW4A16Model:
                         return False
                     if not (presaved_dir / f"layer_{layer_idx}_{short_name}.zeros.bin").exists():
                         return False
+            return True
+
+        def _bins_exist() -> bool:
+            if not _attention_bins_exist():
+                return False
+            if attention_only:
+                return True
+            for layer_idx in range(self.num_hidden_layers):
                 for e in range(self.num_experts):
                     for short_name in ["gate", "up", "down"]:
                         if not (presaved_dir / f"layer_{layer_idx}_expert_{e}_{short_name}.qweight.bin").exists():
@@ -588,9 +613,17 @@ class Qwen3_30BA3BW4A16Model:
             return True
 
         if _bins_exist():
+            label = "attention" if attention_only else "pre-saved"
             if self.debug_verbosity >= 1:
-                print(f"Using existing pre-saved weights in {presaved_dir}")
+                print(f"Using existing {label} weights in {presaved_dir}")
             return
+
+        if attention_only:
+            raise FileNotFoundError(
+                f"Missing attention weight bins in {presaved_dir}. "
+                f"When using --expert-weights-dir (packed experts), the unpacked dir must "
+                f"contain layer_*_{{q,k,v,o}}.{{qweight,scales,zeros}}.bin for all layers."
+            )
 
         print(f"Preprocessing weights into bin files under {presaved_dir}...")
         from safetensors.torch import load_file
@@ -1388,10 +1421,10 @@ def main():
              "-1.0 = disabled (default)."
     )
     parser.add_argument(
-        "--expert-weights-dir", type=str, default=None,
-        help="Optional directory for MoE expert weight files. Supports both unpacked "
-             "(9 files/expert) and packed (1 file/expert, EXPK format) layouts — "
-             "auto-detected at runtime. When omitted, the standard presaved-bins path is used."
+        "--expert-weights-dir", type=str, default=DEFAULT_EXPERT_WEIGHTS_DIR,
+        help="Directory for MoE expert weight files (default: Qwen3-30B-A3B-AWQ_packed). "
+             "Supports unpacked (9 files/expert) and packed (1 file/expert, EXPK) layouts — "
+             "auto-detected at runtime. Pass an empty string to use the standard presaved-bins path."
     )
     parser.add_argument(
         "--cache-policy",
@@ -1409,7 +1442,25 @@ def main():
         help="Disable measurement for runtime performance evaluation."
     )
 
+    parser.add_argument(
+        "--oracle-trace", type=str, default="",
+        help="Path to oracle trace file"
+    )
+    parser.add_argument(
+        "--oracle-lookahead", type=int, default=0,
+        help="Lookahead tokens for oracle trace predictor"
+    )
+    parser.add_argument(
+        "--oracle-full-union", action="store_true", default=False,
+        help="Oracle prefetch: load full expert union in lookahead window (ignores top-B budget cap).",
+    )
+    parser.add_argument(
+        "--capture-oracle-trace", type=str, default="",
+        help="Capture an exact oracle trace (with PROMPT TOKEN IDS) to this path via generate(), then exit",
+    )
+
     args = parser.parse_args()
+    args.oracle_prompt_token_ids = None
 
     if args.wikitext103_perplexity:
         return run_wikitext103_perplexity(
@@ -1460,6 +1511,9 @@ def main():
             expert_reuse_csv=args.expert_reuse_csv,
             predictor_lookahead=args.predictor_lookahead,
             expert_weights_dir=args.expert_weights_dir,
+            oracle_trace_path=args.oracle_trace,
+            oracle_lookahead=args.oracle_lookahead,
+            oracle_full_union=args.oracle_full_union,
         )
 
         print("Model initialized successfully!")
@@ -1474,6 +1528,59 @@ def main():
         return 1
 
     _apply_routing_and_cache_cli(model, args)
+
+    if args.capture_oracle_trace:
+        oracle_bundle = None
+        if args.oracle_trace and os.path.exists(args.oracle_trace):
+            utils_dir = _script_dir.parent / "utils"
+            if str(utils_dir) not in sys.path:
+                sys.path.insert(0, str(utils_dir))
+            from oracle_trace import load_oracle_trace
+
+            oracle_bundle = load_oracle_trace(args.oracle_trace)
+            if oracle_bundle.prompt_token_ids:
+                input_ids = torch.tensor([oracle_bundle.prompt_token_ids], dtype=torch.long, device=args.device)
+                print(f"Capture prompt: {len(oracle_bundle.prompt_token_ids)} token IDs from {args.oracle_trace}")
+            elif oracle_bundle.prompt_text:
+                args.text = oracle_bundle.prompt_text
+                input_ids = model.tokenize(args.text)
+                print(f"Capture prompt: tokenized text from {args.oracle_trace} ({input_ids.size(1)} tokens)")
+            else:
+                input_ids = model.tokenize(args.text)
+        else:
+            input_ids = model.tokenize(args.text)
+
+        if not hasattr(model.model, "begin_oracle_trace_capture"):
+            print("Error: backend lacks oracle trace capture (rebuild predict libtorch).")
+            return 1
+
+        print(f"Capturing oracle trace -> {args.capture_oracle_trace}")
+        model.model.begin_oracle_trace_capture()
+        output = model.generate(
+            input_ids,
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+            top_p=args.top_p,
+            top_k=args.top_k,
+        )
+        prompt_len = input_ids.size(1)
+        gen_ids = output[0, prompt_len:].tolist()
+        prompt_text = args.text
+        if oracle_bundle and oracle_bundle.prompt_text:
+            prompt_text = oracle_bundle.prompt_text
+        generated_text = ""
+        if model.tokenizer is not None:
+            generated_text = model.tokenizer.decode(gen_ids, skip_special_tokens=False)
+        ok = model.model.write_oracle_trace_file(
+            args.capture_oracle_trace,
+            input_ids,
+            output,
+            prompt_text,
+            generated_text,
+            "qwen3_30b",
+        )
+        model.model.cancel_oracle_trace_capture()
+        return 0 if ok else 1
 
     if args.sweep_prompts_file:
         print(f"\nRunning sweep using prompts from JSON: {args.sweep_prompts_file}")
@@ -1583,7 +1690,30 @@ def main():
             model.print_cache_stats()
         return 0
 
-    print(f"Processing text: '{args.text}'")
+    if args.oracle_trace and os.path.exists(args.oracle_trace):
+        try:
+            utils_dir = _script_dir.parent / "utils"
+            if str(utils_dir) not in sys.path:
+                sys.path.insert(0, str(utils_dir))
+            from oracle_trace import load_oracle_trace
+
+            oracle_bundle = load_oracle_trace(args.oracle_trace)
+            if oracle_bundle.prompt_token_ids:
+                args.oracle_prompt_token_ids = oracle_bundle.prompt_token_ids
+                print(
+                    f"Loaded {len(oracle_bundle.prompt_token_ids)} prompt token IDs from oracle trace "
+                    f"({args.oracle_trace})"
+                )
+            elif oracle_bundle.prompt_text:
+                args.text = oracle_bundle.prompt_text.strip()
+                print(f"Loaded prompt text from oracle trace ({len(args.text)} chars, no token IDs — re-capture recommended)")
+        except Exception as e:
+            print(f"Warning: Failed to load prompt from oracle trace: {e}")
+
+    if getattr(args, "oracle_prompt_token_ids", None):
+        print("Replay uses exact PROMPT TOKEN IDS from oracle trace.")
+    else:
+        print(f"Processing text: '{args.text}'")
 
     if args.perplexity:
         print("\nRunning perplexity evaluation...")
@@ -1605,7 +1735,10 @@ def main():
     elif args.generate:
         print(f"Generating {args.max_new_tokens} tokens...\n")
         try:
-            input_ids = model.tokenize(args.text)
+            if getattr(args, "oracle_prompt_token_ids", None):
+                input_ids = torch.tensor([args.oracle_prompt_token_ids], dtype=torch.long, device=args.device)
+            else:
+                input_ids = model.tokenize(args.text)
 
             generated = model.generate(
                 input_ids,

@@ -112,19 +112,18 @@ def main():
     fig, axes = plt.subplots(2, 3, figsize=(24, 14))
     
     colors = {
-        "Unpacked Seq": "lightcoral",
-        "Unpacked Par": "red",
         "Packed Seq": "lightblue",
-        "Packed Par": "blue",
-        "Unpacked Speedup": "red",
-        "Packed Speedup": "blue"
+        "Packed Par": "blue"
     }
     
     markers = {
-        "Unpacked Seq": "o",
-        "Unpacked Par": "s",
         "Packed Seq": "^",
         "Packed Par": "D"
+    }
+    
+    labels = {
+        "Packed Seq": "Sequential",
+        "Packed Par": "Parallel"
     }
     
     for row_idx, model_name in enumerate(["Mixtral", "Qwen"]):
@@ -135,9 +134,10 @@ def main():
         ax_speedup = axes[row_idx, 2]
         
         # 1. Time per Expert
-        for key, series in data_series.items():
-            ax_time.plot(counts, series["time"], label=key, color=colors[key], 
-                         linestyle='-', marker=markers[key], markersize=6, linewidth=2, alpha=0.8)
+        for key in ["Packed Seq", "Packed Par"]:
+            if key in data_series:
+                ax_time.plot(counts, data_series[key]["time"], label=labels[key], color=colors[key], 
+                             linestyle='-', marker=markers[key], markersize=6, linewidth=2, alpha=0.8)
 
         ax_time.set_xscale('log', base=2)
         ax_time.set_xticks(counts)
@@ -149,9 +149,10 @@ def main():
         ax_time.legend(fontsize=9, loc='upper right', ncol=2)
 
         # 2. Bandwidth
-        for key, series in data_series.items():
-            ax_bw.plot(counts, series["bw"], label=key, color=colors[key], 
-                       linestyle='-', marker=markers[key], markersize=6, linewidth=2, alpha=0.8)
+        for key in ["Packed Seq", "Packed Par"]:
+            if key in data_series:
+                ax_bw.plot(counts, data_series[key]["bw"], label=labels[key], color=colors[key], 
+                           linestyle='-', marker=markers[key], markersize=6, linewidth=2, alpha=0.8)
 
         ax_bw.axhline(y=MAX_SSD_BW, color='green', linestyle='-', linewidth=2, label=f"Max SSD Bandwidth ({MAX_SSD_BW} GB/s)")
         
@@ -165,26 +166,16 @@ def main():
         ax_bw.legend(fontsize=9, loc='lower right', ncol=2)
         
         # 3. Speedup
-        packed_speedup = []
-        unpacked_speedup = []
+        speedup_vals = []
         for i in range(len(counts)):
             p_seq = data_series["Packed Seq"]["time"][i]
             p_par = data_series["Packed Par"]["time"][i]
             if p_seq and p_par and p_par > 0:
-                packed_speedup.append(p_seq / p_par)
+                speedup_vals.append(p_seq / p_par)
             else:
-                packed_speedup.append(None)
-                
-            u_seq = data_series["Unpacked Seq"]["time"][i]
-            u_par = data_series["Unpacked Par"]["time"][i]
-            if u_seq and u_par and u_par > 0:
-                unpacked_speedup.append(u_seq / u_par)
-            else:
-                unpacked_speedup.append(None)
+                speedup_vals.append(None)
         
-        ax_speedup.plot(counts, unpacked_speedup, label="Unpacked Speedup", color=colors["Unpacked Speedup"], 
-                 linestyle='-', marker='s', markersize=6, linewidth=2, alpha=0.8)
-        ax_speedup.plot(counts, packed_speedup, label="Packed Speedup", color=colors["Packed Speedup"], 
+        ax_speedup.plot(counts, speedup_vals, label="Speedup", color="purple", 
                  linestyle='-', marker='D', markersize=6, linewidth=2, alpha=0.8)
 
         ax_speedup.axhline(y=1.0, color='black', linestyle='-', linewidth=1, alpha=0.5)

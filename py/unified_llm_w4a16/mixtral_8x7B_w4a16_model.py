@@ -11,7 +11,7 @@ import re
 import math
 import subprocess
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Any
 from urllib.request import urlopen
 
 import torch
@@ -33,6 +33,45 @@ else:
         sys.path.insert(0, str(_local_build.resolve()))
 
 ArchitectureType = None
+
+
+def _apply_routing_and_cache_cli(model: Any, args: Any) -> None:
+    """Apply lambda / forced routing / cache policy from argparse (shared by main and WikiText eval)."""
+    if args.lambda_val != 0.0 and hasattr(model, "set_lambda"):
+        print(f"Setting lambda to {args.lambda_val}")
+        model.set_lambda(args.lambda_val)
+
+    if getattr(args, "forced_top_n", 0) > 0 and hasattr(model, "set_forced_top_n"):
+        model.set_forced_top_n(args.forced_top_n)
+        print(f"Forced top-{args.forced_top_n} experts into cache mask.")
+
+    if getattr(args, "forced_top_p", -1.0) >= 0.0 and hasattr(model, "set_forced_top_p"):
+        model.set_forced_top_p(args.forced_top_p)
+        print(f"Forced top-p={args.forced_top_p} experts into cache mask.")
+
+    if getattr(args, "mass_threshold_substitution_p", -1.0) >= 0.0 and hasattr(model, "set_mass_threshold_substitution_p"):
+        model.set_mass_threshold_substitution_p(args.mass_threshold_substitution_p)
+        print(
+            f"Probability-mass prefix p={args.mass_threshold_substitution_p} OR'd into cache mask "
+            f"(same λ-biased top-k as forced_top_n; use --lambda-val e.g. 1.0 for cache-conditional routing)."
+        )
+        if args.lambda_val == 0.0:
+            print("Warning: --mass-threshold-substitution-p has no effect while --lambda-val is 0.")
+
+    if getattr(args, "prefill_top_n", 0) > 0 and hasattr(model, "set_prefill_top_n"):
+        model.set_prefill_top_n(args.prefill_top_n)
+        print(f"Set prefill top-{args.prefill_top_n} locked experts.")
+
+    if hasattr(args, "cache_policy") and args.cache_policy and hasattr(model, "set_cache_policy"):
+        model.set_cache_policy(args.cache_policy)
+        print(f"Set expert cache policy to {args.cache_policy}.")
+
+    if getattr(args, "suppress_predictor_stats", False):
+        if hasattr(model, "set_suppress_predictor_stats"):
+            model.set_suppress_predictor_stats(True)
+            print("Suppressing predictor stats.")
+        else:
+            print("Warning: --suppress-predictor-stats ignored (backend has no set_suppress_predictor_stats).")
 
 
 def load_config_with_comments(path: str) -> dict:
@@ -194,7 +233,9 @@ class Mixtral8x7BW4A16Model:
         predict_layers: Optional[List[int]] = None,
         per_layer_cache_sizes: Optional[List[int]] = None,
         expert_reuse_csv: Optional[str] = None,
+        expert_weights_dir: Optional[str] = None,
         prewarm_experts: bool = True,
+        predictor_lookahead: int = 1,
     ):
         """
         Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
@@ -225,6 +266,7 @@ class Mixtral8x7BW4A16Model:
         self.device = device
         self.model_path = model_path
         self.vocab_size = vocab_size
+        self.expert_weights_dir = expert_weights_dir
         self.hidden_size = hidden_size
         self.intermediate_size = intermediate_size
         self.num_hidden_layers = num_hidden_layers
@@ -299,6 +341,9 @@ class Mixtral8x7BW4A16Model:
             
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
 
+        if backend == "predict" and predictor_lookahead > 1 and hasattr(self.model, "set_predictor_lookahead"):
+            self.model.set_predictor_lookahead(predictor_lookahead)
+
         # Clean up temp config after C++ has read it
         if _temp_config_path:
             import os as _os
@@ -329,7 +374,11 @@ class Mixtral8x7BW4A16Model:
             print("Initializing dummy weights...")
             self.model.initialize_dummy_weights()
         elif model_path:
-            self._load_quantized_weights(model_path, weights_folder="model_weights")
+            self._load_quantized_weights(
+                model_path,
+                weights_folder="model_weights",
+                expert_weights_dir=self.expert_weights_dir,
+            )
 
         if backend in ["cached", "predict"] and prewarm_experts:
             num_to_warm = max(per_layer_cache_sizes) if per_layer_cache_sizes else max_cached_experts_per_layer
@@ -397,7 +446,12 @@ class Mixtral8x7BW4A16Model:
         
         return cache_list, prefetch_list
 
-    def _load_quantized_weights(self, model_path: str, weights_folder: str = "model_weights"):
+    def _load_quantized_weights(
+        self,
+        model_path: str,
+        weights_folder: str = "model_weights",
+        expert_weights_dir: Optional[str] = None,
+    ):
         """Load quantized weights from safetensors and pass to the C++ backend."""
         print(f"Loading quantized weights from {model_path}...")
         try:
@@ -442,8 +496,27 @@ class Mixtral8x7BW4A16Model:
 
             use_presaved = self.use_pre_saved_weights
 
-            if use_presaved:
+            if expert_weights_dir is not None:
+                expert_path = Path(expert_weights_dir)
+                probe = expert_path / "layer_0_expert_0.bin"
+                fmt = "packed" if probe.exists() else "unpacked"
+                print(f"Expert weights dir: {expert_path}  (format: {fmt})")
+
                 presaved_dir = weights_dir / f"{model_name}_unpacked"
+                self._prepare_presaved_weights(saved_safetensors, presaved_dir, attention_only=True)
+
+                t0 = time.time()
+                self.model.load_non_quantized_weights_from_safetensors(str(saved_safetensors))
+                self.model.load_quantized_weights_from_bins(str(presaved_dir), str(expert_path))
+                t1 = time.time()
+                self.load_time = t1 - t0
+                print(f"Weights loaded (expert dir override) in {self.load_time:.2f} seconds")
+            elif use_presaved:
+                if self.expert_weights_dir is not None:
+                    presaved_dir = Path(self.expert_weights_dir)
+                else:
+                    presaved_dir = weights_dir / f"{model_name}_unpacked"
+                
                 self._prepare_presaved_weights(saved_safetensors, presaved_dir)
 
                 t0 = time.time()
@@ -466,7 +539,9 @@ class Mixtral8x7BW4A16Model:
             print("\nNote: Falling back to randomly initialized weights.")
             print("The model will not produce meaningful output without proper weights.")
 
-    def _prepare_presaved_weights(self, saved_safetensors: Path, presaved_dir: Path) -> None:
+    def _prepare_presaved_weights(
+        self, saved_safetensors: Path, presaved_dir: Path, *, attention_only: bool = False
+    ) -> None:
         manifest_path = presaved_dir / "manifest.json"
         model_name = saved_safetensors.stem
         hetero_mode = str(self.config.get("heterogeneity", "")).lower() if isinstance(self.config, dict) else ""
@@ -487,7 +562,7 @@ class Mixtral8x7BW4A16Model:
         }
         expected_manifest["unpacked_layout"] = "out_groups_v2"
 
-        def _bins_exist() -> bool:
+        def _attention_bins_exist() -> bool:
             if not presaved_dir.exists():
                 return False
             for layer_idx in range(self.num_hidden_layers):
@@ -498,6 +573,14 @@ class Mixtral8x7BW4A16Model:
                         return False
                     if not (presaved_dir / f"layer_{layer_idx}_{short_name}.zeros.bin").exists():
                         return False
+            return True
+
+        def _bins_exist() -> bool:
+            if not _attention_bins_exist():
+                return False
+            if attention_only:
+                return True
+            for layer_idx in range(self.num_hidden_layers):
                 for e in range(self.num_experts):
                     for short_name in ["gate", "up", "down"]:
                         if not (presaved_dir / f"layer_{layer_idx}_expert_{e}_{short_name}.qweight.bin").exists():
@@ -509,9 +592,17 @@ class Mixtral8x7BW4A16Model:
             return True
 
         if _bins_exist():
+            label = "attention" if attention_only else "pre-saved"
             if self.debug_verbosity >= 1:
-                print(f"Using existing pre-saved weights in {presaved_dir}")
+                print(f"Using existing {label} weights in {presaved_dir}")
             return
+
+        if attention_only:
+            raise FileNotFoundError(
+                f"Missing attention weight bins in {presaved_dir}. "
+                f"When using --expert-weights-dir (packed experts), the unpacked dir must "
+                f"contain layer_*_{{q,k,v,o}}.{{qweight,scales,zeros}}.bin for all layers."
+            )
 
         print(f"Preprocessing weights into bin files under {presaved_dir}...")
         from safetensors.torch import load_file
@@ -700,6 +791,14 @@ class Mixtral8x7BW4A16Model:
         if hasattr(self.model, "set_forced_top_n"):
             self.model.set_forced_top_n(n)
 
+    def set_forced_top_p(self, p: float):
+        if hasattr(self.model, "set_forced_top_p"):
+            self.model.set_forced_top_p(p)
+
+    def set_mass_threshold_substitution_p(self, p: float):
+        if hasattr(self.model, "set_mass_threshold_substitution_p"):
+            self.model.set_mass_threshold_substitution_p(p)
+
     def set_prefill_top_n(self, n: int):
         """Lock the top n most used experts from prefill into the cache under PREFILL policy."""
         if hasattr(self.model, "set_prefill_top_n"):
@@ -726,6 +825,10 @@ class Mixtral8x7BW4A16Model:
         """Reset predictor hit-rate counters across all layers."""
         if hasattr(self.model, "reset_predictor_stats"):
             self.model.reset_predictor_stats()
+
+    def set_suppress_predictor_stats(self, v: bool) -> None:
+        if hasattr(self.model, "set_suppress_predictor_stats"):
+            self.model.set_suppress_predictor_stats(v)
 
     def get_sequential_top1_stats(self):
         """Get sequential top1 expert hit stats across all layers."""
@@ -1329,6 +1432,16 @@ def main():
         default=None,
         help="Path to CSV containing layer correlation multipliers."
     )
+    parser.add_argument(
+        "--expert-weights-dir", type=str, default=None,
+        help="Optional directory for MoE expert weight files. Supports both unpacked and packed layouts."
+    )
+    parser.add_argument(
+        "--perplexity",
+        action="store_true",
+        help="Compute perplexity for the input text instead of generation."
+    )
+    parser.add_argument(
         "--wikitext103-perplexity",
         action="store_true",
         help="Compute perplexity on WikiText-103 and save downloaded/tokenized files under model_weights."
@@ -1384,10 +1497,46 @@ def main():
         help="Number of top experts for the predictor engine to proactively prefetch."
     )
     parser.add_argument(
+        "--forced-top-n",
+        type=int,
+        default=0,
+        help="Force the top-N unbiased router experts into the cache-conditional bias mask.",
+    )
+    parser.add_argument(
+        "--forced-top-p",
+        type=float,
+        default=-1.0,
+        help="Force experts whose cumulative softmax probability mass >= p into the cache mask.",
+    )
+    parser.add_argument(
+        "--mass-threshold-substitution-p",
+        type=float,
+        default=-1.0,
+        help="Alternate routing: smallest probability-mass prefix with sum >= p OR'd into cache mask.",
+    )
+    parser.add_argument(
+        "--predictor-lookahead",
+        type=int,
+        default=1,
+        help="Fire the predictor every N decode tokens (match fN in predictor path).",
+    )
+    parser.add_argument(
+        "--suppress-predictor-stats",
+        action="store_true",
+        default=False,
+        help="Disable predictor hit-rate accounting (measurement mode).",
+    )
+    parser.add_argument(
         "--sweep-prompts-file",
         type=str,
         default=None,
         help="Path to a JSON file containing a list of prompts. Runs all prompts sequentially without reloading."
+    )
+    parser.add_argument(
+        "--generation-perplexity",
+        action="store_true",
+        default=False,
+        help="Score generation perplexity during sweep runs (requires generation).",
     )
     parser.add_argument(
         "--prefill-top-n", type=int, default=0,
@@ -1439,7 +1588,9 @@ def main():
             predictor_device=args.predictor_device,
             prefetch_experts_count=args.prefetch_experts_count,
             predict_layers=args.predict_layers,
+            expert_weights_dir=args.expert_weights_dir,
             prewarm_experts=not args.no_prewarm,
+            predictor_lookahead=args.predictor_lookahead,
         )
         print("Model initialized successfully!")
 
@@ -1456,15 +1607,7 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
-    # Set lambda if specified
-    if args.lambda_val != 0.0:
-        print(f"Setting lambda to {args.lambda_val}")
-        model.set_lambda(args.lambda_val)
-
-    # Set cache policy if specified
-    if args.cache_policy:
-        print(f"Setting cache policy to {args.cache_policy}")
-        model.set_cache_policy(args.cache_policy)
+    _apply_routing_and_cache_cli(model, args)
 
     if args.expert_correlation_csv:
         print(f"Loading correlations from {args.expert_correlation_csv}")
