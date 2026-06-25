@@ -56,15 +56,14 @@ DEFAULT_PREDICTOR_BASE = (
 DEFAULT_REUSE_CSV = os.path.join(ROOT_PY, "expert_predictor", "expert_reuse_qwen3_30b.csv")
 
 FINALS_LOOKAHEADS = [1]
-# sec2: only lookaheads for which final_predictor checkpoints exist.
+# sec2: lookaheads with final_predictor checkpoints (skip 5, 8+ for grid size).
 SEC2_LOOKAHEADS = [1, 2, 3, 4, 6]
 ROUTING_LOOKAHEADS = [1, 4, 8, 16]
 FINALS_CACHE_SIZES = [24, 32]
 FINAL_COLLECTION_CACHE_SIZES = [8, 16, 24, 32, 40, 48, 56, 64]
 FINAL_COLLECTION_NUM_PROMPTS = 10
-# sec2: sweep several cache sizes to assess predictor effectiveness.
-# SEC2_CACHE_SIZES = [8, 16, 24, 32, 40, 48, 56, 68]
-SEC2_CACHE_SIZES = [8, 16, 24, 32, 40]
+# sec2: sweep cache sizes to assess predictor effectiveness.
+SEC2_CACHE_SIZES = [8, 16, 24, 32, 40, 48]
 # Section 1: sweep several cache sizes to compare eviction policies.
 SEC1_CACHE_SIZES = [8, 16, 32, 48, 64]
 SEC1_POLICIES = ["LRU", "MRU", "LFU", "MFU", "RANDOM", "LFRU", "PREFILL"]
@@ -145,8 +144,7 @@ def _experiment_defs() -> Dict[str, Experiment]:
                 *_common_sweep_args(SEC2_LOOKAHEADS, SEC2_CACHE_SIZES),
                 "--sweep-question", "custom_1_16_no_ppl",
                 "--lambdas", "0",
-                "--num-prompts", "8",
-                "--cache-lookahead-slack", "10"
+                "--num-prompts", "8"
             ],
         ),
         "sec4_routing_topj_vs_pm": Experiment(
@@ -192,7 +190,27 @@ def _experiment_defs() -> Dict[str, Experiment]:
                 "--lambdas", "1",
                 "--cache-cond-forced-top-ns", "5", "8",
                 "--ppl-on-lambda-policies",
-                "--disable-measurement"
+                "--disable-measurement",
+                "--temperature", "0.0",
+                "--top-k", "50",
+            ],
+        ),
+        "oracle_vs_actual": Experiment(
+            key="oracle_vs_actual",
+            description="(sec 5) Compare Oracle vs Actual Predictor vs LRU/RANDOM baseline.",
+            script=METRICS_SWEEP_SCRIPT,
+            uses_predictor=True,
+            sweep_question="oracle_baseline_sweep",
+            extra_args=[
+                "--model", "qwen",
+                "--dataset", "oracle",
+                "--cache-sizes", "8", "24", "40", "56",
+                "--lookaheads", "1", "5",
+                "--budget-fractions", "1.0",
+                "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+                "--sweep-question", "oracle_baseline_sweep",
+                "--disable-measurement",
+                "--temperature", "0.0",
             ],
         ),
         "final_results_collection": Experiment(
@@ -474,7 +492,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--predictor-base-dir", type=str, default=DEFAULT_PREDICTOR_BASE)
     p.add_argument("--num-prompts", type=int, default=10)
     p.add_argument("--prompt-max-chars", type=int, default=4096)
-    p.add_argument("--max-new-tokens", type=int, default=128)
+    p.add_argument("--max-new-tokens", type=int, default=256)
     p.add_argument("--temperature", type=float, default=0.0)
     p.add_argument("--subprocess-timeout", type=int, default=None)
     p.add_argument("--dry-run", action="store_true")
