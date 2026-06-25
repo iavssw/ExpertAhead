@@ -1,0 +1,1 @@
+py/utils/sweep_predict_cached_cache_metrics.py --sweep-question custom_1_16_no_ppl --model qwen --dataset oracle --num-prompts 1 --cache-sizes 8 --custom-explicit-prefetch-budgets --prefetch-budgets 4 --prefetch-forced-top-ns 2 --prefetch-only --include-oracle-baselines

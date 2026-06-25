@@ -18,5 +18,12 @@
 trainingData/**/*.pt
 trainingData/
 
+py/utils/final_results_runs/
+py/utils/final_results_runs_boyyyyyy/
+
 **/*.png
 **/*.csv
+**/*.log
+**/__pycache__/
+
+**/results/

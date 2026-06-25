@@ -20,6 +20,10 @@ fi
 # Uncomment the line below to enable it:
 export TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
 
+# Expert SSD loads: sequential pread per tensor (matches io_ab_v2_sequential / thesis numbers).
+# Parallel std::async dispatches inside each expert load are opt-in: export HETEROPREDICT_SEQUENTIAL_EXPERT_IO=0
+export HETEROPREDICT_SEQUENTIAL_EXPERT_IO="${HETEROPREDICT_SEQUENTIAL_EXPERT_IO:-1}"
+
 # Set repo root directory
 export HETEROMOSAIC_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 

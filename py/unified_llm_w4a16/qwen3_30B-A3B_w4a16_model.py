@@ -1629,6 +1629,16 @@ def main():
                             total_time += elapsed
                             total_generated_tokens += num_generated
                             prompt_tps_list.append(num_generated / elapsed)
+                            
+                            if model.tokenizer is not None:
+                                prompt_len = input_ids.size(1)
+                                generated_tokens = full_ids[0, prompt_len:].tolist()
+                                decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
+                                print(f"\n{'='*60}")
+                                print("Generated text only:")
+                                print(f"{'='*60}")
+                                print(decoded_generated)
+                                print(f"{'='*60}")
                 elif args.generate:
                     start_time = time.time()
                     generated = model.generate(
@@ -1644,6 +1654,16 @@ def main():
                         total_time += elapsed
                         total_generated_tokens += num_generated
                         prompt_tps_list.append(num_generated / elapsed)
+                        
+                        if model.tokenizer is not None:
+                            prompt_len = input_ids.size(1)
+                            generated_tokens = generated[0, prompt_len:].tolist()
+                            decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
+                            print(f"\n{'='*60}")
+                            print("Generated text only:")
+                            print(f"{'='*60}")
+                            print(decoded_generated)
+                            print(f"{'='*60}")
 
             except Exception as e:
                 print(f"  Error on prompt {i+1}: {e}")
