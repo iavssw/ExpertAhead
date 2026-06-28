@@ -8,6 +8,8 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_predict/helper.hpp"
 #include "unified_llm_w4a16_predict/npuSetup.hpp"
+#include "unified_llm_w4a16_common/io_thread_pool.hpp"
+#include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
 #include <chrono>
@@ -19,6 +21,7 @@
 #include <sstream>
 #include <torch/torch.h>
 #include <unistd.h>
+#include <sys/uio.h>
 #include <vector>
 #include <algorithm>
 #include <unordered_set>
@@ -635,7 +638,7 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 
 MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                                            int64_t max_cached_experts, int64_t layer_idx,
-                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device, int64_t prefetch_experts_count, const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union)
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device, int64_t prefetch_experts_count, const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union, float prefetch_threshold)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), max_cached_experts_(max_cached_experts), layer_idx_(layer_idx),
       prefetch_experts_count_(prefetch_experts_count),
@@ -649,7 +652,7 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
         }
     } else if (!predictor_model_path.empty()) {
         try {
-            predictor_ = std::make_unique<ThreadedTorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
+            predictor_ = std::make_unique<TorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
         } catch (const std::exception& e) {
             std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
         }
@@ -672,6 +675,8 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     
     // Initialize slot ready state
     expert_slot_ready_.assign(max_cached_experts_, true);
+    // Initialize slot load-origin tracking (0=prewarm, 1=prefetch, 2=stall/used)
+    slot_load_origin_.assign(max_cached_experts_, 0);
     
     if (max_cached_experts_ > 0) {
         slot_load_id_ = std::make_unique<std::atomic<uint64_t>[]>(max_cached_experts_);
@@ -753,6 +758,7 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
         if (debug_verbosity >= 2) {
             std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Skipping prefetch, previous still running." << std::endl;
         }
+        ++prefetch_ticks_skipped_;
         // Ensure ready flag is cleared if we skip, so we don't use STALE results on the next token
         pred_results_ready_.store(false); 
         return;
@@ -788,7 +794,7 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
     // Reset ready flag before launching new async work
     pred_results_ready_.store(false);
     
-    speculative_load_future_ = std::async(std::launch::async,
+    speculative_load_future_ = unified_llm_w4a16_common::SpeculativeLoadThreadPool::get_instance().enqueue(
         [this, embedding_copy, pdist_opt, prev_expert_opt, prev_layers_copy, source_decode_step]() {
             std::vector<int64_t> pred_result = predictor_->predict_sync(embedding_copy, pdist_opt, prev_expert_opt, prev_layers_copy, source_decode_step);
 
@@ -817,7 +823,12 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
                     for (auto e : top_experts) std::cout << e << " ";
                     std::cout << std::endl;
                 }
+                // Track global concurrency
+                int prev = global_active_speculative_loads().fetch_add(1, std::memory_order_relaxed) + 1;
+                int cur_max = global_max_active_speculative_loads().load(std::memory_order_relaxed);
+                while (prev > cur_max && !global_max_active_speculative_loads().compare_exchange_weak(cur_max, prev, std::memory_order_relaxed)) {}
                 load_predicted_experts(top_experts);
+                global_active_speculative_loads().fetch_sub(1, std::memory_order_relaxed);
             }
         });
 }
@@ -852,8 +863,19 @@ void MixtureOfExpertsImpl::run_predictor_prefill_warmup(const torch::Tensor& emb
     }
 
     std::vector<int64_t> pred_result = predictor_->predict_sync(emb, pd, pe, pl_opt, /*source_decode_step=*/-1);
+    if (layer_idx_ == 0) {
+        std::cout << "[Layer 0 Warmup Debug] predict_sync returned: ";
+        for (auto e : pred_result) std::cout << e << " ";
+        std::cout << "\n";
+    }
     if (!pred_result.empty()) {
-        load_predicted_experts(experts_to_prefetch(pred_result), /*prefill_end_warmup=*/true);
+        auto pf = experts_to_prefetch(pred_result);
+        if (layer_idx_ == 0) {
+            std::cout << "[Layer 0 Warmup Debug] experts_to_prefetch returned: ";
+            for (auto e : pf) std::cout << e << " ";
+            std::cout << "\n";
+        }
+        load_predicted_experts(pf, /*prefill_end_warmup=*/true);
     }
 }
 
@@ -875,13 +897,6 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
             currently_selected_experts_.push_back(eid);
         }
 
-        
-        // Protect all predicted experts from being evicted while we schedule this batch.
-        // This prevents the predictor from picking its own "hits" as victims for its "misses".
-        for (int64_t eid : predicted_expert_ids) {
-            currently_selected_experts_.push_back(eid);
-        }
-
         for (int64_t global_e : predicted_expert_ids) {
             bool hit = false;
             for (size_t s = 0; s < slot_meta_.size(); ++s) {
@@ -890,10 +905,16 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
                     break;
                 }
             }
-            if (hit) continue;
+            if (hit) {
+                ++prefetch_already_cached_;
+                continue;
+            }
 
             size_t victim = pick_victim_ready();
-            if (victim == kNoVictimSlot) continue; // All busy
+            if (victim == kNoVictimSlot) {
+                ++prefetch_dropped_no_victim_;
+                continue; // All busy
+            }
 
             if (debug_verbosity >= 2) {
                 std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Evicting expert " 
@@ -906,6 +927,9 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
             slot_meta_[victim].access_count = 1;
             slot_meta_[victim].last_access = ++access_clock_;
             slot_meta_[victim].clock_bit = 1;
+            if (static_cast<size_t>(victim) < slot_load_origin_.size()) {
+                slot_load_origin_[victim] = 1; // 1 = prefetch
+            }
 
             if (expert_cache_bitmask_.size() == num_experts_) {
                 std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
@@ -916,7 +940,8 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
                 }
             }
 
-            slots_and_experts_to_load.push_back({victim, global_e});
+            uint64_t new_load_id = slot_load_id_[victim].fetch_add(1, std::memory_order_relaxed) + 1;
+            slots_and_experts_to_load.push_back({static_cast<int64_t>(victim), global_e, new_load_id});
         }
         
         // Confidence ordering pass: iterate in reverse confidence order (least confident first) so
@@ -968,13 +993,28 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
                 expert_slot_ready_[p.slot_idx] = true;
             }
         }
+        // Pin all successfully loaded experts against eviction until the router uses them.
+        // Without this, the next token's prefetch (running concurrently) evicts them immediately.
+        for (auto& p : slots_and_experts_to_load) {
+            if (slot_load_id_[p.slot_idx].load(std::memory_order_relaxed) == p.load_id) {
+                prefetched_experts_.push_back(p.expert_idx);
+            }
+        }
         expert_slots_cv_.notify_all();
+    }
+    if (layer_idx_ == 0 && prefill_end_warmup) {
+        std::cout << "[Layer 0 Warmup Debug] After prefill-end warmup, slots are: ";
+        for (auto eid : expert_slots_indices) std::cout << eid << " ";
+        std::cout << "\n";
     }
 }
 
 std::vector<int64_t> MixtureOfExpertsImpl::experts_to_prefetch(const std::vector<int64_t>& pred_result) const {
     if (predictor_ && predictor_->prefetch_full_union()) {
-        return pred_result;
+        std::vector<int64_t> result;
+        const int limit = std::min(static_cast<int>(pred_result.size()), static_cast<int>(max_cached_experts_));
+        result.insert(result.end(), pred_result.begin(), pred_result.begin() + limit);
+        return result;
     }
     
     std::vector<int64_t> result;
@@ -991,17 +1031,39 @@ size_t MixtureOfExpertsImpl::pick_victim_ready() {
         }
     }
 
+    // Build the full set of protected experts: currently selected by router + pinned prefetch
+    // This prevents the next-token prefetch from evicting what we just loaded for the next token.
+    auto is_protected = [&](int64_t eid) -> bool {
+        if (eid < 0) return false;
+        for (int64_t e : currently_selected_experts_) { if (e == eid) return true; }
+        for (int64_t e : prefetched_experts_)         { if (e == eid) return true; }
+        return false;
+    };
+
+    size_t victim = kNoVictimSlot;
     switch (cache_policy_) {
-        case CachePolicy::LRU:     return pick_lru_ready();
-        case CachePolicy::MRU:     return pick_mru_ready();
-        case CachePolicy::LFU:     return pick_lfu_ready();
-        case CachePolicy::MFU:     return pick_mfu_ready();
-        case CachePolicy::CLOCK:   return pick_clock_ready();
-        case CachePolicy::RANDOM:  return pick_random_ready();
-        case CachePolicy::LFRU:    return pick_lfru_ready();
-        case CachePolicy::PREFILL: return pick_lru_ready();
-        default:                   return pick_lru_ready();
+        case CachePolicy::LRU:     victim = pick_lru_ready(); break;
+        case CachePolicy::MRU:     victim = pick_mru_ready(); break;
+        case CachePolicy::LFU:     victim = pick_lfu_ready(); break;
+        case CachePolicy::MFU:     victim = pick_mfu_ready(); break;
+        case CachePolicy::CLOCK:   victim = pick_clock_ready(); break;
+        case CachePolicy::RANDOM:  victim = pick_random_ready(); break;
+        case CachePolicy::LFRU:    victim = pick_lfru_ready(); break;
+        case CachePolicy::PREFILL: victim = pick_lru_ready(); break;
+        default:                   victim = pick_lru_ready(); break;
     }
+    // Track: was this slot prefetch-loaded but never actually used by the router?
+    if (victim != kNoVictimSlot &&
+        static_cast<size_t>(victim) < slot_load_origin_.size() &&
+        slot_load_origin_[victim] == 1) {
+        // Only count as wasted if the expert being evicted is also not in prefetched_experts_
+        // (i.e. it's truly being displaced, not just being re-pinned via a cache hit)
+        int64_t evicted_eid = expert_slots_indices[victim];
+        bool still_pinned = false;
+        for (int64_t e : prefetched_experts_) { if (e == evicted_eid) { still_pinned = true; break; } }
+        if (!still_pinned) ++prefetch_evicted_before_use_;
+    }
+    return victim;
 }
 
 size_t MixtureOfExpertsImpl::pick_lru_ready() {
@@ -1012,12 +1074,18 @@ size_t MixtureOfExpertsImpl::pick_lru_ready() {
         if (!expert_slot_ready_[i] || slot_meta_[i].expert_id == -1) {
             continue;
         }
-        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), slot_meta_[i].expert_id) !=
+        int64_t eid = slot_meta_[i].expert_id;
+        if (std::find(currently_selected_experts_.begin(), currently_selected_experts_.end(), eid) !=
             currently_selected_experts_.end()) {
             continue;
         }
+        // Don't evict experts we just prefetched for the next token (they're pinned until the router uses them)
+        if (std::find(prefetched_experts_.begin(), prefetched_experts_.end(), eid) !=
+            prefetched_experts_.end()) {
+            continue;
+        }
         if (cache_policy_ == CachePolicy::PREFILL) {
-            if (std::find(locked_experts_.begin(), locked_experts_.end(), slot_meta_[i].expert_id) != locked_experts_.end()) {
+            if (std::find(locked_experts_.begin(), locked_experts_.end(), eid) != locked_experts_.end()) {
                 continue;
             }
         }
@@ -1199,16 +1267,28 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
     std::unique_lock<std::mutex> lock(expert_slots_mutex_);
     ++access_clock_;
 
+    // Router has arrived — release the prefetch pin so victims are available again.
+    prefetched_experts_.clear();
     // 1. Check hits or waits
     for (size_t i = 0; i < global_expert_indices.size(); ++i) {
         int64_t global_e = global_expert_indices[i];
         for (size_t s = 0; s < expert_slots_indices.size(); ++s) {
             if (expert_slots_indices[s] == global_e) {
+                bool was_ready = expert_slot_ready_[s];
+                if (!was_ready) {
+                    // Expert is in-flight; must wait — classify as not-ready stall
+                    ++miss_not_ready_stall_;
+                }
                 // If it's already here but the predictive thread is currently loading it, sleep until it finishes
                 expert_slots_cv_.wait(lock, [this, s]() { return expert_slot_ready_[s]; });
                 
                 if (update_stats) {
                     cache_hits_++;
+                    // Track prefetch efficiency: if origin was prefetch and now router is using it
+                    if (static_cast<size_t>(s) < slot_load_origin_.size() && slot_load_origin_[s] == 1) {
+                        ++prefetch_used_before_eviction_;
+                        slot_load_origin_[s] = 2; // 2 = used (prevent double-count)
+                    }
                     slot_meta_[s].access_count++;
                     slot_meta_[s].last_access = access_clock_;
                     slot_meta_[s].clock_bit = 1;
@@ -1222,7 +1302,10 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
     // 2. Pick victims for misses
     for (size_t i = 0; i < global_expert_indices.size(); ++i) {
         if (result_slots[i] == -1) {
-            if (update_stats) cache_misses_++;
+            if (update_stats) {
+                cache_misses_++;
+                ++miss_not_present_;
+            }
             int64_t global_e = global_expert_indices[i];
 
             size_t victim_slot = pick_victim_ready();
@@ -1265,6 +1348,9 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
             slot_meta_[victim_slot].access_count = 1;
             slot_meta_[victim_slot].last_access = access_clock_;
             slot_meta_[victim_slot].clock_bit = 1;
+            if (static_cast<size_t>(victim_slot) < slot_load_origin_.size()) {
+                slot_load_origin_[victim_slot] = 2; // 2 = stall load (main thread)
+            }
             
             result_slots[i] = victim_slot;
             uint64_t new_load_id = slot_load_id_[victim_slot].fetch_add(1, std::memory_order_relaxed) + 1;
@@ -1396,6 +1482,19 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     experts_loaded_this_step_ = 0;
     const int64_t current_decode_step = decode_step_counter_++;
     
+    // Optimization: Move indices to CPU contiguously to avoid per-element synchronization
+    auto topk_cpu = topk_idx[0].to(torch::kCPU, torch::kInt64, /*non_blocking=*/false, /*copy=*/true);
+    auto topk_accessor = topk_cpu.accessor<int64_t, 1>();
+
+    if (layer_idx_ == 0 && current_decode_step == 0) {
+        std::lock_guard<std::mutex> lock(expert_slots_mutex_);
+        std::cout << "[Layer 0 Step 0 Debug] Slots before check: ";
+        for (auto eid : expert_slots_indices) std::cout << eid << " ";
+        std::cout << "\n[Layer 0 Step 0 Debug] Requested: ";
+        for (int k = 0; k < topk_cpu.size(0); ++k) std::cout << topk_accessor[k] << " ";
+        std::cout << "\n";
+    }
+
     // Speculative loading runs entirely in the background. The main thread will only wait 
     // dynamically inside `ensure_expert_cached` if it actually needs an expert that is currently streaming.
     auto opts = x_flat.options();
@@ -1405,10 +1504,6 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     std::vector<int64_t> gate_up_qw_ptrs(active_experts), gate_up_s_ptrs(active_experts), gate_up_z_ptrs(active_experts);
     std::vector<int64_t> down_qw_ptrs(active_experts), down_s_ptrs(active_experts), down_z_ptrs(active_experts);
     std::vector<int64_t> expert_ids(active_experts);
-
-    // Optimization: Move indices to CPU contiguously to avoid per-element synchronization
-    auto topk_cpu = topk_idx[0].to(torch::kCPU, torch::kInt64, /*non_blocking=*/false, /*copy=*/true);
-    auto topk_accessor = topk_cpu.accessor<int64_t, 1>();
 
     {
         std::lock_guard<std::mutex> lock(expert_slots_mutex_);
@@ -1601,15 +1696,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     // current_true_top1 was computed from router_out above, before lambda bias.
     last_true_top1_expert_ = current_true_top1;
 
-    // Sequential top1 expert tracking
-    int64_t top1_global_e = topk_accessor[0];
-    if (last_top1_expert_ != -1) {
-        sequential_top1_total_++;
-        if (last_top1_expert_ == top1_global_e) {
-            sequential_top1_hits_++;
-        }
-    }
-    last_top1_expert_ = top1_global_e;
+
 
     // Trigger speculative loading for the next token based on current embedding
     trigger_speculative_loading(x_flat, current_decode_step, prev_layers_feat);
@@ -1623,7 +1710,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     else total_steps_gt1_loaded_++;
     
     if (loaded > 6) {
-        std::cout << "[WARNING] Layer " << layer_idx_ << " loaded " << loaded << " experts in a single generation step!" << std::endl;
+        // std::cout << "[WARNING] Layer " << layer_idx_ << " loaded " << loaded << " experts in a single generation step!" << std::endl;
     }
 
     return output;
@@ -2001,7 +2088,7 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
                                          const std::vector<int>& predict_layers,
                                          const std::vector<int64_t>& per_layer_cache_sizes,
                                          const std::vector<int64_t>& per_layer_prefetch_counts,
-                                         const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union)
+                                         const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union, float prefetch_threshold)
     : arch_type_(arch_type), vocab_size_(vocab_size), hidden_size_(hidden_size), intermediate_size_(intermediate_size),
       num_hidden_layers_(num_hidden_layers), num_attention_heads_(num_attention_heads), num_key_value_heads_(num_key_value_heads),
       head_dim_(head_dim), rms_norm_eps_(rms_norm_eps), rope_theta_(rope_theta), max_seq_len_(max_seq_len), max_batch_size_(max_batch_size),
@@ -3784,25 +3871,6 @@ std::vector<std::tuple<int64_t, int64_t>> UnifiedLLMW4A16Impl::get_predictor_sta
         }
     }
     return result;
-}
-
-std::vector<std::tuple<int64_t, int64_t>> UnifiedLLMW4A16Impl::get_sequential_top1_stats() const {
-    std::vector<std::tuple<int64_t, int64_t>> result;
-    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-        result.reserve(moe_layers.size());
-        for (const auto& layer : moe_layers) {
-            result.push_back(layer->get_sequential_top1_stats());
-        }
-    }
-    return result;
-}
-
-void UnifiedLLMW4A16Impl::reset_sequential_top1_stats() {
-    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-        for (auto& layer : moe_layers) {
-            layer->reset_sequential_top1_stats();
-        }
-    }
 }
 
 // Training data collection methods

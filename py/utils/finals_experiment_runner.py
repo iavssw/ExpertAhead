@@ -63,7 +63,7 @@ FINALS_CACHE_SIZES = [24, 32]
 FINAL_COLLECTION_CACHE_SIZES = [8, 16, 24, 32, 40, 48, 56, 64]
 FINAL_COLLECTION_NUM_PROMPTS = 10
 # sec2: sweep cache sizes to assess predictor effectiveness.
-SEC2_CACHE_SIZES = [8, 16, 24, 32, 40, 48]
+SEC2_CACHE_SIZES = [8, 32]
 # Section 1: sweep several cache sizes to compare eviction policies.
 SEC1_CACHE_SIZES = [8, 16, 32, 48, 64]
 SEC1_POLICIES = ["LRU", "MRU", "LFU", "MFU", "RANDOM", "LFRU", "PREFILL"]

@@ -1,6 +1,7 @@
 #include "unified_llm_w4a16_cached/helper.hpp"
 #include "unified_llm_w4a16_cached/npuSetup.hpp"
 #include "unified_llm_w4a16_cached/unified_llm_w4a16.hpp"
+#include "unified_llm_w4a16_common/io_thread_pool.hpp"
 #include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 
 #include <algorithm>
@@ -19,6 +20,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/uio.h>
 #include <future>
 #include <vector>
 

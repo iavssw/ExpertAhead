@@ -77,18 +77,19 @@
         pread_abortable(uz, ptr_z + expected_z, expected_z);
     } else {
         std::vector<std::future<void>> futures;
+        auto& io_pool = unified_llm_w4a16_common::IOThreadPool::get_instance();
         futures.push_back(
-            std::async(std::launch::async, pread_abortable, gq, ptr_q, expected_q));
-        futures.push_back(std::async(std::launch::async, pread_abortable, uq,
-                                     ptr_q + expected_q, expected_q));
+            io_pool.enqueue(pread_abortable, gq, ptr_q, expected_q));
+        futures.push_back(io_pool.enqueue(pread_abortable, uq,
+                                          ptr_q + expected_q, expected_q));
         futures.push_back(
-            std::async(std::launch::async, pread_abortable, gs, ptr_s, expected_s));
-        futures.push_back(std::async(std::launch::async, pread_abortable, us,
-                                     ptr_s + expected_s, expected_s));
+            io_pool.enqueue(pread_abortable, gs, ptr_s, expected_s));
+        futures.push_back(io_pool.enqueue(pread_abortable, us,
+                                          ptr_s + expected_s, expected_s));
         futures.push_back(
-            std::async(std::launch::async, pread_abortable, gz, ptr_z, expected_z));
-        futures.push_back(std::async(std::launch::async, pread_abortable, uz,
-                                     ptr_z + expected_z, expected_z));
+            io_pool.enqueue(pread_abortable, gz, ptr_z, expected_z));
+        futures.push_back(io_pool.enqueue(pread_abortable, uz,
+                                          ptr_z + expected_z, expected_z));
 
         for (auto& f : futures) {
             f.get();
@@ -132,9 +133,13 @@
     auto dest_s = ensure_pinned_buffer(down_s_pinned_, slot_idx, s_shape, torch::kBFloat16);
     auto dest_z = ensure_pinned_buffer(down_z_pinned_, slot_idx, z_shape, torch::kInt8);
 
-    const size_t expected_q = static_cast<size_t>(out_feat * packed_in * sizeof(uint8_t));
-    const size_t expected_s = static_cast<size_t>(s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t));
-    const size_t expected_z = static_cast<size_t>(z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t));
+    const size_t expected_dq = static_cast<size_t>(out_feat * packed_in * sizeof(uint8_t));
+    const size_t expected_ds = static_cast<size_t>(s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t));
+    const size_t expected_dz = static_cast<size_t>(z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t));
+    
+    void* ptr_dq = dest_q.data_ptr();
+    void* ptr_ds = dest_s.data_ptr();
+    void* ptr_dz = dest_z.data_ptr();
 
 #ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
     auto pread_abortable_down = [this, slot_idx, load_id](const std::string& path, void* dest_ptr, size_t copy_size) {
@@ -148,17 +153,18 @@
 #endif
 
     if (unified_llm_w4a16_common::sequential_expert_io_loads()) {
-        pread_abortable_down(dq, dest_q.data_ptr(), expected_q);
-        pread_abortable_down(ds, dest_s.data_ptr(), expected_s);
-        pread_abortable_down(dz, dest_z.data_ptr(), expected_z);
+        pread_abortable_down(dq, ptr_dq, expected_dq);
+        pread_abortable_down(ds, ptr_ds, expected_ds);
+        pread_abortable_down(dz, ptr_dz, expected_dz);
     } else {
         std::vector<std::future<void>> futures;
-        futures.push_back(std::async(std::launch::async, pread_abortable_down, dq,
-                                     dest_q.data_ptr(), expected_q));
-        futures.push_back(std::async(std::launch::async, pread_abortable_down, ds,
-                                     dest_s.data_ptr(), expected_s));
-        futures.push_back(std::async(std::launch::async, pread_abortable_down, dz,
-                                     dest_z.data_ptr(), expected_z));
+        auto& io_pool = unified_llm_w4a16_common::IOThreadPool::get_instance();
+        futures.push_back(io_pool.enqueue(pread_abortable_down, dq,
+                                          ptr_dq, expected_dq));
+        futures.push_back(io_pool.enqueue(pread_abortable_down, ds,
+                                          ptr_ds, expected_ds));
+        futures.push_back(io_pool.enqueue(pread_abortable_down, dz,
+                                          ptr_dz, expected_dz));
 
         for (auto& f : futures) {
             f.get();

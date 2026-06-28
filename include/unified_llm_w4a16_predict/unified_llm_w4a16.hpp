@@ -130,7 +130,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
                          int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false,
                          double lambda = 0.0, const std::string& predictor_model_path = "", torch::Device predictor_device = torch::kCPU,
                          int64_t prefetch_experts_count = 1, const std::string& oracle_trace_path = "", int64_t oracle_lookahead = 0,
-                         bool oracle_full_union = false);
+                         bool oracle_full_union = false, float prefetch_threshold = 0.0f);
 
     torch::Tensor forward(const torch::Tensor &x, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
     void set_weights_dir(const std::string& dir) { weights_dir_ = dir; }
@@ -222,15 +222,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void set_lookahead_stride(int64_t stride) { lookahead_stride_ = std::max(int64_t(1), stride); }
     int64_t get_lookahead_stride() const { return lookahead_stride_; }
 
-    // Sequential top1 caching stats (generation only)
-    std::tuple<int64_t, int64_t> get_sequential_top1_stats() const {
-        return {sequential_top1_hits_, sequential_top1_total_};
-    }
-    void reset_sequential_top1_stats() {
-        sequential_top1_hits_ = 0;
-        sequential_top1_total_ = 0;
-        last_top1_expert_ = -1;
-    }
+
 
     // Prediction & Speculative Loading
     void set_context_token_ids(const std::vector<int64_t>& token_ids);
@@ -300,6 +292,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     CachePolicy cache_policy_ = CachePolicy::LRU;
     std::vector<int64_t> locked_experts_;        // Experts locked by the PREFILL policy
     std::vector<int64_t> currently_selected_experts_; // Experts currently selected to prevent their eviction
+    /** Experts loaded by the last speculative prefetch — pinned from eviction until the router claims them. */
+    std::vector<int64_t> prefetched_experts_;
 
     // Prefill distribution tracking
     torch::Tensor prefill_expert_counts_;
@@ -339,6 +333,32 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t prefetch_ticks_skipped_ = 0;
     // Per-slot provenance: 0=unknown/prewarm, 1=prefetch, 2=stall (main-thread miss).
     std::vector<uint8_t> slot_load_origin_;
+
+    // ── Miss-cause breakdown counters ──────────────────────────────────────────
+    /** Miss: expert simply not in cache (pure cold or evicted). */
+    int64_t miss_not_present_ = 0;
+    /** Miss: expert was in a slot but slot was not-ready (prefetch in-flight, had to wait → still a hit, but stall). */
+    int64_t miss_not_ready_stall_ = 0;
+    /** load_predicted_experts: expert not in cache and no victim available → silently dropped. */
+    int64_t prefetch_dropped_no_victim_ = 0;
+    /** load_predicted_experts: expert already in cache (speculative hit, no load needed). */
+    int64_t prefetch_already_cached_ = 0;
+
+    // ── Prefetch efficiency counters ───────────────────────────────────────────
+    /** Experts that were prefetched (origin=prefetch) and then successfully used by the router. */
+    int64_t prefetch_used_before_eviction_ = 0;
+    /** Experts that were prefetched (origin=prefetch) but evicted before the router used them. */
+    int64_t prefetch_evicted_before_use_ = 0;
+
+    // ── Global concurrency counters (static → shared across all layer instances) ──
+    static std::atomic<int>& global_active_speculative_loads() {
+        static std::atomic<int> counter{0};
+        return counter;
+    }
+    static std::atomic<int>& global_max_active_speculative_loads() {
+        static std::atomic<int> counter{0};
+        return counter;
+    }
 
     // Tracker for how many of the prefetched experts were correctly in the actual Top-K chosen
     int64_t pred_match_0_ = 0;
@@ -380,10 +400,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::deque<PendingPrediction> pending_predictions_;
     std::mutex pending_predictions_mutex_;
     
-    // Sequential top1 tracking
-    int64_t sequential_top1_hits_ = 0;
-    int64_t sequential_top1_total_ = 0;
-    int64_t last_top1_expert_ = -1;
+
     
     // Ranked predictions from the previous token (set in async lambda, read next token)
     std::vector<int64_t> last_pred_no_bias_;
@@ -424,10 +441,16 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
 
     std::function<void(const std::vector<int64_t>&)> oracle_capture_callback_;
 
-    void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
-    void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
-    void load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir);
-    void load_experts_weights_packed(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir);
+    struct ExpertLoadRequest {
+        int64_t slot_idx;
+        int64_t expert_idx;
+        uint64_t load_id;
+    };
+
+    void load_expert_weights(int64_t slot_idx, int64_t expert_idx, uint64_t load_id, const std::string& weights_dir);
+    void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, uint64_t load_id, const std::string& weights_dir);
+    void load_experts_weights(const std::vector<ExpertLoadRequest>& slots_and_experts, const std::string& weights_dir);
+    void load_experts_weights_packed(const std::vector<ExpertLoadRequest>& slots_and_experts, const std::string& weights_dir);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
     std::vector<int64_t> ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats = true);
     size_t pick_victim_ready();
@@ -465,7 +488,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                         const std::vector<int64_t>& per_layer_cache_sizes = {},
                         const std::vector<int64_t>& per_layer_prefetch_counts = {},
                         const std::string& oracle_trace_path = "", int64_t oracle_lookahead = 0,
-                        bool oracle_full_union = false);
+                        bool oracle_full_union = false, float prefetch_threshold = 0.0f);
 
     // Forward pass: takes token IDs and returns logits
     torch::Tensor forward(torch::Tensor input_ids, int64_t start_pos = 0);
@@ -523,8 +546,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Call this after construction with stride = lookahead depth (fN from predictor path).
     void set_predictor_lookahead(int64_t stride);
 
-    std::vector<std::tuple<int64_t, int64_t>> get_sequential_top1_stats() const;
-    void reset_sequential_top1_stats();
+
     
     // Training data collection
     void enable_training_data_collection() { collect_training_data_ = true; }

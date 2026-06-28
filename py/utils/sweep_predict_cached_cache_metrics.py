@@ -268,22 +268,40 @@ def parse_layer_cache_lines(text: str) -> Tuple[Optional[int], Optional[int], Op
 
 
 def parse_predict_bandwidth_lines(text: str) -> Tuple[int, int, Optional[float]]:
-    rows = re.findall(
+    # Try predictor format first: Bandwidth: StallLoads=..., PrefetchLoads=..., AvgLoadTime=...
+    rows_predict = re.findall(
         r"Bandwidth:\s*StallLoads=(\d+),\s*PrefetchLoads=(\d+),\s*AvgLoadTime=([\d.]+)ms",
         text,
     )
-    if not rows:
-        return 0, 0, None
-    stall = sum(int(r[0]) for r in rows)
-    pref = sum(int(r[1]) for r in rows)
-    num = 0.0
-    den = 0
-    for s, p, a in rows:
-        loads = int(s) + int(p)
-        den += loads
-        num += float(a) * loads
-    avg_ms = (num / den) if den > 0 else None
-    return stall, pref, avg_ms
+    if rows_predict:
+        stall = sum(int(r[0]) for r in rows_predict)
+        pref = sum(int(r[1]) for r in rows_predict)
+        num = 0.0
+        den = 0
+        for s, p, a in rows_predict:
+            loads = int(s) + int(p)
+            den += loads
+            num += float(a) * loads
+        avg_ms = (num / den) if den > 0 else None
+        return stall, pref, avg_ms
+
+    # Try cached format: Bandwidth: MissLoads=..., AvgLoadTime=...
+    rows_cached = re.findall(
+        r"Bandwidth:\s*MissLoads=(\d+),\s*AvgLoadTime=([\d.]+)ms",
+        text,
+    )
+    if rows_cached:
+        stall = sum(int(r[0]) for r in rows_cached)
+        num = 0.0
+        den = 0
+        for m, a in rows_cached:
+            loads = int(m)
+            den += loads
+            num += float(a) * loads
+        avg_ms = (num / den) if den > 0 else None
+        return stall, 0, avg_ms
+
+    return 0, 0, None
 
 
 def parse_prefetch_overlap_lines(text: str) -> Tuple[int, int, int]:
@@ -618,23 +636,13 @@ def resolve_oracle_trace_path(args: argparse.Namespace, batch_idx: int) -> str:
     alt = os.path.join(trace_dir, f"{prefix}_{batch_idx:05d}_exact.txt")
     if os.path.exists(alt):
         return alt
+    generic = os.path.join(trace_dir, f"trace_{batch_idx:05d}.txt")
+    if os.path.exists(generic):
+        return generic
     return primary
 
 
-def _append_oracle_cmd_flags(
-    cmd: List[str],
-    config: Dict[str, Any],
-    args: argparse.Namespace,
-    batch_idx: int,
-    lookahead: Optional[int],
-) -> None:
-    if config.get("backend") != "predict" or not config.get("is_oracle", False):
-        return
-    cmd.extend(["--oracle-trace", resolve_oracle_trace_path(args, batch_idx)])
-    if lookahead is not None:
-        cmd.extend(["--oracle-lookahead", str(lookahead)])
-    if config.get("oracle_full_union"):
-        cmd.append("--oracle-full-union")
+
 
 
 def iter_cache_lookahead_pairs(
@@ -683,6 +691,7 @@ def build_model_cmd(
     prompts_json: str,
     predictor_path: str = "",
     prefetch_count: Optional[int] = None,
+    prefetch_threshold: float = 0.0,
     predict_layers: Optional[List[int]] = None,
     forced_top_n: int = 0,
     prob_mass_threshold: float = -1.0,
@@ -700,91 +709,83 @@ def build_model_cmd(
     predictor_stride: Optional[int] = None,
     disable_measurement: bool = False,
     cache_policy: Optional[str] = None,
+    oracle_trace_path: Optional[str] = None,
+    oracle_lookahead: Optional[int] = None,
+    oracle_full_union: bool = False,
 ) -> List[str]:
     script = QWEN_MODEL_SCRIPT if model == "qwen" else MIXTRAL_MODEL_SCRIPT
-    cmd: List[str] = [
-        sys.executable,
-        script,
-        "--backend",
-        backend,
-        "--device",
-        "cuda",
-        "--lambda-val",
-        str(lambda_val),
-        "--sweep-prompts-file",
-        prompts_json,
-    ]
-    if predictor_device:
-        cmd.extend(["--predictor-device", predictor_device])
-
-    if mode_wikitext_perplexity:
-        cmd.extend([
-            "--wikitext103-perplexity",
-            "--wikitext103-split", "test",
-            "--wikitext103-max-length", "4096",
-            "--wikitext103-stride", "2048",
-            "--wikitext103-max-windows", "8"
-        ])
-    if mode_generate:
-        cmd.extend(
-            [
-                "--generate",
-                "--max-new-tokens",
-                str(max_new_tokens),
-                "--temperature",
-                str(temperature),
-                "--top-p",
-                str(top_p),
-                "--top-k",
-                str(top_k),
-            ]
-        )
-
-    if model == "qwen":
-        cmd.extend(["--max-cached-experts", str(cache_size)])
-    else:
-        cmd.extend(["--expert-cache", str(cache_size)])
-
-    if backend == "predict":
-        if prefetch_count is not None:
-            cmd.extend(["--prefetch-experts-count", str(prefetch_count)])
-        if predictor_path:
-            cmd.extend(["--predictor-model", predictor_path])
-            # Invoke stride (--predictor-lookahead): how often the predictor runs and the
-            # evaluation horizon for pending predictions. Defaults to fN from the path.
-            if predictor_stride is not None:
-                cmd.extend(["--predictor-lookahead", str(predictor_stride)])
-            else:
-                m_la = re.search(r"f(\d+)", os.path.basename(os.path.normpath(predictor_path)))
-                if m_la:
-                    cmd.extend(["--predictor-lookahead", m_la.group(1)])
-                else:
-                    fs = read_predictor_future_steps(predictor_path)
-                    if fs is not None:
-                        cmd.extend(["--predictor-lookahead", str(fs)])
-        if predict_layers is not None:
-            cmd.append("--predict-layers")
-            cmd.extend(str(x) for x in predict_layers)
-
-    if forced_top_n > 0:
-        cmd.extend(["--forced-top-n", str(forced_top_n)])
+    
     # Preferred interface: probability-mass routing threshold.
     # Backward compatibility: if legacy forced_top_p is set, treat it as the same threshold.
     effective_prob_mass = prob_mass_threshold if prob_mass_threshold >= 0.0 else forced_top_p
-    if effective_prob_mass >= 0.0:
-        cmd.extend(["--mass-threshold-substitution-p", str(effective_prob_mass)])
-    if config_path:
-        cmd.extend(["--config-path", config_path])
-    if expert_reuse_csv:
-        cmd.extend(["--expert-reuse-csv", expert_reuse_csv])
-    if expert_weights_dir is None and model == "qwen":
-        expert_weights_dir = DEFAULT_QWEN_EXPERT_WEIGHTS_DIR
-    if expert_weights_dir:
-        cmd.extend(["--expert-weights-dir", expert_weights_dir])
-    if disable_measurement and backend == "predict":
-        cmd.append("--suppress-predictor-stats")
-    if cache_policy:
-        cmd.extend(["--cache-policy", cache_policy])
+
+    run_config = {
+        "backend": backend,
+        "device": "cuda",
+        "lambda_val": lambda_val,
+        "sweep_prompts_file": prompts_json,
+        "predictor_device": predictor_device,
+        "generate": mode_generate,
+        "max_new_tokens": max_new_tokens,
+        "temperature": temperature,
+        "top_p": top_p,
+        "top_k": top_k,
+        "max_cached_experts": cache_size if model == "qwen" else 0,
+        "expert_cache": cache_size if model != "qwen" else 0,
+        "forced_top_n": forced_top_n,
+        "mass_threshold_substitution_p": effective_prob_mass if effective_prob_mass >= 0.0 else -1.0,
+        "config_path": config_path,
+        "expert_reuse_csv": expert_reuse_csv,
+        "expert_weights_dir": expert_weights_dir or (DEFAULT_QWEN_EXPERT_WEIGHTS_DIR if model == "qwen" else None),
+        "suppress_predictor_stats": disable_measurement,
+        "cache_policy": cache_policy,
+        "wikitext103_perplexity": mode_wikitext_perplexity,
+        "wikitext103_split": "test",
+        "wikitext103_max_length": 4096,
+        "wikitext103_stride": 2048,
+        "wikitext103_max_windows": 8,
+    }
+
+    if backend == "predict":
+        if prefetch_count is not None:
+            run_config["prefetch_experts_count"] = prefetch_count
+        if prefetch_threshold > 0.0:
+            run_config["prefetch_threshold"] = prefetch_threshold
+        if predictor_path:
+            run_config["predictor_model"] = predictor_path
+            
+            if predictor_stride is not None:
+                run_config["predictor_lookahead"] = predictor_stride
+            else:
+                m_la = re.search(r"f(\d+)", os.path.basename(os.path.normpath(predictor_path)))
+                if m_la:
+                    run_config["predictor_lookahead"] = int(m_la.group(1))
+                else:
+                    fs = read_predictor_future_steps(predictor_path)
+                    if fs is not None:
+                        run_config["predictor_lookahead"] = fs
+                        
+        if predict_layers is not None:
+            run_config["predict_layers"] = predict_layers
+
+    if oracle_trace_path:
+        run_config["oracle_trace_path"] = oracle_trace_path
+    if oracle_lookahead is not None:
+        run_config["oracle_lookahead"] = oracle_lookahead
+    if oracle_full_union:
+        run_config["oracle_full_union"] = True
+
+    # Create temporary JSON file for the run config
+    fd, temp_json_path = tempfile.mkstemp(suffix=".json", prefix="sweep_run_config_")
+    with os.fdopen(fd, "w") as f:
+        json.dump(run_config, f)
+
+    cmd: List[str] = [
+        sys.executable,
+        script,
+        "--run-config",
+        temp_json_path
+    ]
     return cmd
 
 
@@ -853,30 +854,25 @@ def load_prompts(args: argparse.Namespace) -> List[str]:
 
     if dataset == "oracle":
         prompts = []
-        trace_dir = "/home/michael/heteroPredict/trainingData/qwen_traces"
-        if args.model == "mixtral":
-            trace_dir = "/home/michael/heteroPredict/trainingData/mixtral_traces"
-        prefix = f"oracle_trace_{args.model}3_30b" if args.model == "qwen" else "oracle_trace_mixtral_8x7b"
-
         utils_dir = os.path.join(ROOT_DIR, "utils")
         if utils_dir not in sys.path:
             sys.path.insert(0, utils_dir)
         from oracle_trace import load_oracle_trace
 
         for i in range(n):
-            trace_file = os.path.join(trace_dir, f"{prefix}_{i:05d}.txt")
+            trace_file = resolve_oracle_trace_path(args, i)
             if not os.path.exists(trace_file):
                 print(f"[sweep] Oracle trace file not found: {trace_file}", flush=True)
                 break
             bundle = load_oracle_trace(trace_file)
-            if bundle.prompt_text:
-                prompts.append(bundle.prompt_text.strip())
-            elif bundle.prompt_token_ids:
-                prompts.append("")
+            if bundle.prompt_token_ids:
+                prompts.append({"text": bundle.prompt_text or "", "token_ids": bundle.prompt_token_ids})
                 print(
-                    f"[sweep] Oracle trace {trace_file}: using PROMPT TOKEN IDS via --oracle-trace at runtime.",
+                    f"[sweep] Oracle trace {trace_file}: using exact PROMPT TOKEN IDS for sweep.",
                     flush=True,
                 )
+            elif bundle.prompt_text:
+                prompts.append({"text": bundle.prompt_text.strip()})
             else:
                 print(f"[sweep] Oracle trace file empty: {trace_file}", flush=True)
                 break
@@ -1020,6 +1016,7 @@ def cfg(
     forced_top_p: float = -1.0,
     lookahead: Optional[int] = None,
     prefetch_budget: Optional[int] = None,
+    prefetch_threshold: float = 0.0,
     mode_perplexity: bool = True,
     mode_generate: bool = True,
 ) -> Dict[str, Any]:
@@ -1036,6 +1033,7 @@ def cfg(
         "forced_top_p": prob_mass_threshold if prob_mass_threshold >= 0.0 else forced_top_p,
         "lookahead": lookahead,
         "prefetch_budget": prefetch_budget,
+        "prefetch_threshold": prefetch_threshold,
         "mode_perplexity": mode_perplexity,
         "mode_generate": mode_generate,
     }
@@ -1172,7 +1170,7 @@ def _custom_1_16_configs_for_cache_grouped(
             c = cfg(
                 question, "Neither (LRU)", "cached",
                 cache_size, 0.0, 0,
-                lookahead=min(valid_las), prefetch_budget=None,
+                lookahead=min(valid_las), prefetch_budget=None, prefetch_threshold=0.0,
                 mode_perplexity=mode_perplexity_lru, mode_generate=True,
             )
             c["bookend_pass"] = bookend
@@ -1201,7 +1199,7 @@ def _custom_1_16_configs_for_cache_grouped(
                         question, f"Prefetch Only B={budget}{pj_label}{tag_suffix}",
                         "predict", cache_size, 0.0,
                         pj,
-                        lookahead=lookahead, prefetch_budget=budget,
+                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
                         mode_perplexity=_routing_policy_perplexity(0.0, args),
                         mode_generate=True,
                     )
@@ -1215,7 +1213,7 @@ def _custom_1_16_configs_for_cache_grouped(
                         question, f"Both λ={lambda_val} B={budget}{tag_suffix}",
                         "predict", cache_size, lambda_val,
                         args.routing_bias_top_n,
-                        lookahead=lookahead, prefetch_budget=budget,
+                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
                         mode_perplexity=_routing_policy_perplexity(lambda_val, args),
                         mode_generate=True,
                     )
@@ -1278,7 +1276,7 @@ def custom_1_16_configs(
                         "CUSTOM_1_16", f"Prefetch Only B={budget}{pj_label}{tag_suffix}",
                         "predict", cache_size, 0.0,
                         pj,
-                        lookahead=lookahead, prefetch_budget=budget,
+                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
                         mode_perplexity=_routing_policy_perplexity(0.0, args),
                         mode_generate=True,
                     )
@@ -1293,7 +1291,7 @@ def custom_1_16_configs(
                         "CUSTOM_1_16", f"Both λ={lambda_val} B={budget}{tag_suffix}",
                         "predict", cache_size, lambda_val,
                         args.routing_bias_top_n,
-                        lookahead=lookahead, prefetch_budget=budget,
+                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
                         mode_perplexity=_routing_policy_perplexity(lambda_val, args),
                         mode_generate=True,
                     )
@@ -1358,7 +1356,7 @@ def custom_1_16_no_ppl_configs(
                         "CUSTOM_1_16_NO_PPL", f"Prefetch Only B={budget}{pj_label}{tag_suffix}",
                         "predict", cache_size, 0.0,
                         pj,
-                        lookahead=lookahead, prefetch_budget=budget,
+                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
                         mode_perplexity=_routing_policy_perplexity(0.0, args),
                         mode_generate=True,
                     )
@@ -1375,7 +1373,7 @@ def custom_1_16_no_ppl_configs(
                         "CUSTOM_1_16_NO_PPL", f"Both λ={lambda_val} B={budget}{tag_suffix}",
                         "predict", cache_size, lambda_val,
                         args.routing_bias_top_n,
-                        lookahead=lookahead, prefetch_budget=budget,
+                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
                         mode_perplexity=_routing_policy_perplexity(lambda_val, args),
                         mode_generate=True,
                     )
@@ -1389,7 +1387,7 @@ def custom_1_16_no_ppl_configs(
                         "CUSTOM_1_16_NO_PPL", f"Oracle Prefetch B={budget}{tag_suffix}",
                         "predict", cache_size, 0.0,
                         0,
-                        lookahead=lookahead, prefetch_budget=budget,
+                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
                         mode_perplexity=_routing_policy_perplexity(0.0, args),
                         mode_generate=True,
                     )
@@ -1424,10 +1422,13 @@ def random_baseline_configs(
         valid = _valid_lookaheads_for_cache(cache_size, args, min_cache_map)
         if not valid:
             continue
+        import os
+        force_miss = os.environ.get("FORCE_EXPERT_MISS") == "1"
+        label = "Forced Miss Anchor (C=0)" if force_miss else "Neither (RANDOM)"
         c = cfg(
-            question, "Neither (RANDOM)", "cached",
+            question, label, "cached",
             cache_size, 0.0, 0,
-            lookahead=min(valid), prefetch_budget=None,
+            lookahead=min(valid), prefetch_budget=None, prefetch_threshold=0.0,
             mode_perplexity=False, mode_generate=True,
         )
         c["cache_policy"] = "RANDOM"
@@ -1444,59 +1445,64 @@ def oracle_baseline_sweep_configs(
     """Oracle vs LRU vs RANDOM over cache size, coupled lookahead, and prefetch budget B."""
     configs: List[Dict[str, Any]] = []
     question = "ORACLE_BASELINE_SWEEP"
+    seen_lru_cache_sizes = set()
+    full_union_only = getattr(args, "oracle_full_union_only", False)
     pair_iter = (
         iter_cache_lookahead_coupled_pairs(args, min_cache_map)
         if getattr(args, "couple_lookahead_to_cache", False)
         else iter_cache_lookahead_pairs(args, min_cache_map)
     )
     for cache_size, lookahead in pair_iter:
-        lru = cfg(
-            question, "Neither (LRU)", "cached",
-            cache_size, 0.0, 0,
-            lookahead=lookahead, prefetch_budget=None,
-            mode_perplexity=False, mode_generate=True,
-        )
-        lru["cache_policy"] = "LRU"
-        configs.append(lru)
-
-        rnd = cfg(
-            question, "Neither (RANDOM)", "cached",
-            cache_size, 0.0, 0,
-            lookahead=lookahead, prefetch_budget=None,
-            mode_perplexity=False, mode_generate=True,
-        )
-        rnd["cache_policy"] = "RANDOM"
-        configs.append(rnd)
-
-        for budget in iter_custom_prefetch_budgets(args, cache_size):
-            top_b = cfg(
-                question, f"Oracle Top-B B={budget}",
-                "predict", cache_size, 0.0, 0,
-                lookahead=lookahead, prefetch_budget=budget,
+        if not full_union_only and cache_size not in seen_lru_cache_sizes:
+            seen_lru_cache_sizes.add(cache_size)
+            lru = cfg(
+                question, "Neither (LRU)", "cached",
+                cache_size, 0.0, 0,
+                lookahead=lookahead, prefetch_budget=None, prefetch_threshold=0.0,
                 mode_perplexity=False, mode_generate=True,
             )
-            top_b["is_oracle"] = True
-            top_b["oracle_full_union"] = False
-            configs.append(top_b)
-            
-            pf = cfg(
-                question, f"Actual Predictor B={budget}",
-                "predict", cache_size, 0.0, 0,
-                lookahead=lookahead, prefetch_budget=budget,
+            lru["cache_policy"] = "LRU"
+            configs.append(lru)
+
+            rnd = cfg(
+                question, "Neither (RANDOM)", "cached",
+                cache_size, 0.0, 0,
+                lookahead=lookahead, prefetch_budget=None, prefetch_threshold=0.0,
                 mode_perplexity=False, mode_generate=True,
             )
-            # Pass through predictor properties if added by _make_custom_configs
-            if predictor_base_dir:
-                pf["predictor_base_dir"] = predictor_base_dir
-            if predictor_tag:
-                pf["predictor_tag"] = predictor_tag
-            configs.append(pf)
+            rnd["cache_policy"] = "RANDOM"
+            configs.append(rnd)
 
-        if getattr(args, "include_oracle_full_union", False):
+        if not full_union_only:
+            for budget in iter_custom_prefetch_budgets(args, cache_size):
+                top_b = cfg(
+                    question, f"Oracle Top-B B={budget}",
+                    "predict", cache_size, 0.0, 0,
+                    lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
+                    mode_perplexity=False, mode_generate=True,
+                )
+                top_b["is_oracle"] = True
+                top_b["oracle_full_union"] = False
+                configs.append(top_b)
+                
+                pf = cfg(
+                    question, f"Actual Predictor B={budget}",
+                    "predict", cache_size, 0.0, 0,
+                    lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
+                    mode_perplexity=False, mode_generate=True,
+                )
+                # Pass through predictor properties if added by _make_custom_configs
+                if predictor_base_dir:
+                    pf["predictor_base_dir"] = predictor_base_dir
+                if predictor_tag:
+                    pf["predictor_tag"] = predictor_tag
+                configs.append(pf)
+
+        if getattr(args, "include_oracle_full_union", False) or full_union_only:
             full = cfg(
                 question, f"Oracle Full Union LA={lookahead}",
                 "predict", cache_size, 0.0, 0,
-                lookahead=lookahead, prefetch_budget=cache_size,
+                lookahead=lookahead, prefetch_budget=cache_size, prefetch_threshold=0.0,
                 mode_perplexity=False, mode_generate=True,
             )
             full["is_oracle"] = True
@@ -1523,7 +1529,7 @@ def lambda_fn_sweep_configs(
             configs.append(cfg(
                 "LAMBDA_FN_SWEEP", "LRU Baseline", "cached",
                 cache_size, 0.0, 0,
-                lookahead=lookahead, prefetch_budget=None,
+                lookahead=lookahead, prefetch_budget=None, prefetch_threshold=0.0,
                 # Run generation perplexity pass + generation (TPS); merge fills gen_perplexity + tokens_per_second.
                 mode_perplexity=True, mode_generate=True,
             ))
@@ -1536,7 +1542,7 @@ def lambda_fn_sweep_configs(
                     configs.append(cfg(
                         "LAMBDA_FN_SWEEP", f"CacheCond λ={lambda_val} FN={fn}",
                         "cached", cache_size, lambda_val, fn,
-                        lookahead=lookahead, prefetch_budget=None,
+                        lookahead=lookahead, prefetch_budget=None, prefetch_threshold=0.0,
                         mode_perplexity=True, mode_generate=True,
                     ))
 
@@ -1549,7 +1555,7 @@ def lambda_fn_sweep_configs(
                         "LAMBDA_FN_SWEEP", f"CacheCond λ={lambda_val} PM={fp}",
                         "cached", cache_size, lambda_val, 0,
                         prob_mass_threshold=fp,
-                        lookahead=lookahead, prefetch_budget=None,
+                        lookahead=lookahead, prefetch_budget=None, prefetch_threshold=0.0,
                         mode_perplexity=True, mode_generate=True,
                     ))
 
@@ -1731,8 +1737,11 @@ def execute_comprehensive_run(
             predictor_stride=predictor_stride,
             disable_measurement=getattr(args, "disable_measurement", False),
             cache_policy=config.get("cache_policy"),
+            oracle_trace_path=resolve_oracle_trace_path(args, batch_idx if batch_idx is not None else 0) if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
+            oracle_lookahead=lookahead if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
+            oracle_full_union=config.get("oracle_full_union", False),
         )
-        _append_oracle_cmd_flags(cmd, config, args, batch_idx if batch_idx is not None else 0, lookahead)
+
         out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
         if out is None:
             return None
@@ -1829,8 +1838,10 @@ def execute_comprehensive_run(
                         predictor_stride=predictor_stride,
                         disable_measurement=getattr(args, "disable_measurement", False),
                         cache_policy=config.get("cache_policy"),
+                        oracle_trace_path=resolve_oracle_trace_path(args, batch_idx if batch_idx is not None else 0) if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
+                        oracle_lookahead=lookahead if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
+                        oracle_full_union=config.get("oracle_full_union", False),
                     )
-                    _append_oracle_cmd_flags(cmd, config, args, batch_idx, lookahead)
                     out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
                     if out:
                         outputs.append(out)
@@ -1871,8 +1882,10 @@ def execute_comprehensive_run(
                         predictor_device=args.predictor_device,
                         disable_measurement=getattr(args, "disable_measurement", False),
                         cache_policy=config.get("cache_policy"),
+                        oracle_trace_path=resolve_oracle_trace_path(args, batch_idx if batch_idx is not None else 0) if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
+                        oracle_lookahead=lookahead if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
+                        oracle_full_union=config.get("oracle_full_union", False),
                     )
-                    _append_oracle_cmd_flags(cmd, config, args, batch_idx, lookahead)
                     out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
                     if out:
                         outputs.append(out)
@@ -3520,6 +3533,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--model", choices=["qwen", "mixtral"], default="qwen")
     p.add_argument("--cache-sizes", type=int, nargs="+", default=[8], help="Cache sizes to sweep.")
     p.add_argument("--prefetch-budgets", type=int, nargs="+", default=[16, 32], help="Explicit prefetch budgets when --custom-explicit-prefetch-budgets is set.")
+    p.add_argument("--prefetch-threshold", type=float, default=0.0, help="Probability threshold (0.0 to 1.0) to filter experts in the predictor backend.")
     p.add_argument("--budget-fractions", type=float, nargs="+", default=[0.25, 0.5, 0.75, 1.0],
                    help="Budget as a fraction of cache size for custom_1_16/lambda_fn/top_p sweeps. "
                         "Sweeps the sweet spot between cache thrashing (high fraction) and under-utilisation (low fraction).")
@@ -3685,6 +3699,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--include-oracle-full-union",
         action="store_true",
         help="oracle_baseline_sweep: add Oracle Full Union row per cache size (prefetch entire LA window).",
+    )
+    p.add_argument(
+        "--oracle-full-union-only",
+        action="store_true",
+        help="oracle_baseline_sweep: emit ONLY the Oracle Full Union row (skip LRU/RANDOM/Top-B/Predictor).",
     )
     p.add_argument(
         "--couple-lookahead-to-cache",

@@ -61,15 +61,13 @@ class IExpertPredictor {
 public:
     virtual ~IExpertPredictor() = default;
     
-    virtual void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) = 0;
     virtual std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) = 0;
-    virtual bool is_ready() = 0;
-    virtual std::vector<int64_t> get_prediction() = 0;
-    virtual std::vector<int64_t> try_get_prediction() = 0;
     virtual double get_prediction_time_ms() = 0;
     virtual int get_history_length() { return 1; }
     /// When true, callers should load every expert ID returned (full lookahead union), not top-B.
     virtual bool prefetch_full_union() const { return false; }
+    /// When true, caller should bypass budget limitation because predictor has already filtered by threshold.
+    virtual bool has_prefetch_threshold() const { return false; }
 };
 
 // ============================================================================
@@ -81,14 +79,21 @@ public:
     SharedMemoryPredictor(int layer_idx, const std::string& shm_name = "/expert_predictor_shm") 
         : layer_idx_(layer_idx), shm_name_(shm_name) {
         
-        shm_fd_ = shm_open(shm_name_.c_str(), O_CREAT | O_RDWR, 0666);
+        bool created = false;
+        shm_fd_ = shm_open(shm_name_.c_str(), O_RDWR, 0666);
+        if (shm_fd_ == -1) {
+            shm_fd_ = shm_open(shm_name_.c_str(), O_CREAT | O_RDWR, 0666);
+            created = true;
+        }
         if (shm_fd_ == -1) {
             throw std::runtime_error("Failed to create shared memory");
         }
         
         size_t shm_size = sizeof(ExpertPredictionRequest) + sizeof(ExpertPredictionResponse);
-        if (ftruncate(shm_fd_, shm_size) == -1) {
-            throw std::runtime_error("Failed to set shared memory size");
+        if (created) {
+            if (ftruncate(shm_fd_, shm_size) == -1) {
+                throw std::runtime_error("Failed to set shared memory size");
+            }
         }
         
         void* ptr = mmap(nullptr, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd_, 0);
@@ -118,40 +123,23 @@ public:
         shm_unlink(shm_name_.c_str());
     }
     
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
+    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
         response_->reset();
-        
         request_->token_id = 0; // Deprecated
         request_->context_length = 0;
-        
         request_->processed.store(false);
         request_->ready.store(true);
-    }
-    
-    std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
-        predict_async(embedding, prefill_dist, prev_expert_onehot, prev_layers_feat, source_decode_step);
-        return get_prediction();
-    }
-
-    bool is_ready() override {
-        return response_->ready.load();
-    }
-    
-    std::vector<int64_t> get_prediction() override {
-        while (!response_->ready.load()) {
-            std::this_thread::yield();
-        }
         
-        if (layer_idx_ < 0 || layer_idx_ >= 32) {
-            return {};
-        }
-        
-        return {response_->expert_ids[layer_idx_]};
-    }
-    
-    std::vector<int64_t> try_get_prediction() override {
-        if (!response_->ready.load()) {
-            return {};
+        int spin_count = 0;
+        while (!response_->ready.load(std::memory_order_acquire)) {
+            if (spin_count < 1000) {
+                // hot spin
+            } else if (spin_count < 10000) {
+                std::this_thread::yield();
+            } else {
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
+            }
+            spin_count++;
         }
         
         if (layer_idx_ < 0 || layer_idx_ >= 32) {
@@ -178,19 +166,10 @@ private:
 // ============================================================================
 
 
-class ThreadedTorchScriptPredictor : public IExpertPredictor {
+class TorchScriptPredictor : public IExpertPredictor {
 public:
-    struct PredictionJob {
-        torch::Tensor embedding;
-        c10::optional<torch::Tensor> prefill_dist;
-        c10::optional<torch::Tensor> prev_expert_onehot;
-        c10::optional<torch::Tensor> prev_layers_feat;
-        int64_t source_decode_step;
-        int64_t job_id;
-    };
-    
-    ThreadedTorchScriptPredictor(const std::string& model_path, int layer_idx = -1, torch::Device device = torch::kCPU) 
-        : layer_idx_(layer_idx), device_(device), running_(true), model_loaded_(false) {
+    TorchScriptPredictor(const std::string& model_path, int layer_idx = -1, torch::Device device = torch::kCPU, float prefetch_threshold = 0.0f) 
+        : layer_idx_(layer_idx), device_(device), prefetch_threshold_(prefetch_threshold), model_loaded_(false) {
         
         // Load the model
         try {
@@ -236,10 +215,10 @@ public:
 
             // Attempt to load on the specified device
             if (device_.type() != torch::kCPU) {
-                 std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+                 std::cout << "[TorchScriptPredictor Layer " << layer_idx_ 
                           << "] Loading model on device: " << device_ << " (NPU/GPU)" << std::endl;
             } else {
-                 std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+                 std::cout << "[TorchScriptPredictor Layer " << layer_idx_ 
                           << "] Loading model on CPU" << std::endl;
             }
 
@@ -252,135 +231,30 @@ public:
             model_accepts_prefill_dist_ = true;
             model_accepts_prev_expert_ = true;
             model_accepts_prev_layers_ = true;
-            std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_
+            std::cout << "[TorchScriptPredictor Layer " << layer_idx_
                       << "] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API)." << std::endl;
-            std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_
+            std::cout << "[TorchScriptPredictor Layer " << layer_idx_
                       << "] prefill_dist support: " << (model_accepts_prefill_dist_ ? "yes" : "no") 
                       << ", prev_expert_onehot support: " << (model_accepts_prev_expert_ ? "yes" : "no") 
                       << ", prev_layers_feat support: " << (model_accepts_prev_layers_ ? "yes" : "no") << std::endl;
-            std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+            std::cout << "[TorchScriptPredictor Layer " << layer_idx_ 
                       << "] Loaded model: " << model_path << std::endl;
         } catch (const c10::Error& e) {
-            std::cerr << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+            std::cerr << "[TorchScriptPredictor Layer " << layer_idx_ 
                       << "] Failed to load model on " << device_ << ": " << e.what() << std::endl;
             // Fallback to CPU? Maybe not if user explicitly requested NPU.
             model_loaded_ = false;
         }
-        
-        // Start worker thread
-        worker_thread_ = std::thread(&ThreadedTorchScriptPredictor::worker_loop, this);
-        
-        std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
-                  << "] Worker thread started" << std::endl;
     }
     
-    ~ThreadedTorchScriptPredictor() {
-        // Signal thread to stop
-        {
-            std::lock_guard<std::mutex> lock(queue_mutex_);
-            running_ = false;
-        }
-        queue_cv_.notify_one();
-        
-        // Wait for thread to finish
-        if (worker_thread_.joinable()) {
-            worker_thread_.join();
-        }
-        
-        std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
+    ~TorchScriptPredictor() {
+        std::cout << "[TorchScriptPredictor Layer " << layer_idx_ 
                   << "] Shutdown complete" << std::endl;
-    }
-    
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
-        PredictionJob job;
-        job.embedding = embedding;
-        job.prefill_dist = prefill_dist;
-        job.prev_expert_onehot = prev_expert_onehot;
-        job.prev_layers_feat = prev_layers_feat;
-        job.source_decode_step = source_decode_step;
-        job.job_id = next_job_id_++;
-        
-        {
-            std::lock_guard<std::mutex> lock(queue_mutex_);
-            job_queue_.push(job);
-        }
-        queue_cv_.notify_one();
     }
 
     std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
-        return internal_predict(embedding, prefill_dist, prev_expert_onehot, prev_layers_feat);
-    }
-    
-    bool is_ready() override {
-        return prediction_ready_.load();
-    }
-    
-    std::vector<int64_t> get_prediction() override {
-        // Wait for prediction to be ready
-        std::unique_lock<std::mutex> lock(result_mutex_);
-        result_cv_.wait(lock, [this] { return prediction_ready_.load(); });
-        // if (!predicted_experts_.empty()) {
-        //     std::cout << "[ThreadedTorchScriptPredictor Layer " << layer_idx_ 
-        //               << "] Prediction ready, top value: " << predicted_experts_[0] << std::endl;
-        // }
-        return predicted_experts_;
-    }
-    
-    std::vector<int64_t> try_get_prediction() override {
-        if (!prediction_ready_.load()) {
-            return {};
-        }
+        (void)source_decode_step;
         
-        std::lock_guard<std::mutex> lock(result_mutex_);
-        return predicted_experts_;
-    }
-    
-    double get_prediction_time_ms() override {
-        return prediction_time_ms_;
-    }
-
-    int get_history_length() override {
-        return history_length_;
-    }
-    
-private:
-    void worker_loop() {
-        while (running_) {
-            PredictionJob job;
-            
-            // Wait for a job
-            {
-                std::unique_lock<std::mutex> lock(queue_mutex_);
-                queue_cv_.wait(lock, [this] { 
-                    return !job_queue_.empty() || !running_; 
-                });
-                
-                if (!running_ && job_queue_.empty()) {
-                    break;
-                }
-                
-                if (!job_queue_.empty()) {
-                    job = job_queue_.front();
-                    job_queue_.pop();
-                }
-            }
-            
-            // Process the job
-            process_prediction(job);
-        }
-    }
-    
-    void process_prediction(const PredictionJob& job) {
-        auto result = internal_predict(job.embedding, job.prefill_dist, job.prev_expert_onehot, job.prev_layers_feat);
-        {
-            std::lock_guard<std::mutex> lock(result_mutex_);
-            predicted_experts_ = result;
-        }
-        prediction_ready_.store(true);
-        result_cv_.notify_all();
-    }
-
-    std::vector<int64_t> internal_predict(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist, c10::optional<torch::Tensor> prev_expert_onehot, c10::optional<torch::Tensor> prev_layers_feat) {
         auto start = std::chrono::high_resolution_clock::now();
         
         if (!model_loaded_) {
@@ -450,20 +324,32 @@ private:
            
             auto output = output_ivalue.toTensor();
             
-            //std::cout << "predictor model output: " << output << std::endl;
+            if (prefetch_threshold_ > 0.0f) {
+                output = torch::sigmoid(output);
+            }
+
             // Extract prediction
             auto indices = output.argsort(-1, true).to(torch::kCPU, torch::kInt64);
+            auto values = output.to(torch::kCPU, torch::kFloat32);
             
             std::vector<int64_t> predicted_experts;
             if (indices.dim() == 2) {
-                auto acc = indices.accessor<int64_t, 2>();
+                auto idx_acc = indices.accessor<int64_t, 2>();
+                auto val_acc = values.accessor<float, 2>();
                 for (int i = 0; i < indices.size(1); ++i) {
-                    predicted_experts.push_back(acc[0][i]);
+                    int64_t exp_id = idx_acc[0][i];
+                    if (prefetch_threshold_ <= 0.0f || val_acc[0][exp_id] >= prefetch_threshold_) {
+                        predicted_experts.push_back(exp_id);
+                    }
                 }
             } else if (indices.dim() == 1) {
-                auto acc = indices.accessor<int64_t, 1>();
+                auto idx_acc = indices.accessor<int64_t, 1>();
+                auto val_acc = values.accessor<float, 1>();
                 for (int i = 0; i < indices.size(0); ++i) {
-                    predicted_experts.push_back(acc[i]);
+                    int64_t exp_id = idx_acc[i];
+                    if (prefetch_threshold_ <= 0.0f || val_acc[exp_id] >= prefetch_threshold_) {
+                        predicted_experts.push_back(exp_id);
+                    }
                 }
             }
             
@@ -480,34 +366,29 @@ private:
         }
     }
     
+    bool has_prefetch_threshold() const override {
+        return prefetch_threshold_ > 0.0f;
+    }
+
+    double get_prediction_time_ms() override {
+        return prediction_time_ms_;
+    }
+    
+private:
     int layer_idx_;
     torch::Device device_;
+    float prefetch_threshold_;
     torch::jit::script::Module model_;
     bool model_loaded_;
     bool model_accepts_prefill_dist_ = false;  // Detected from the model's forward schema at load time
     bool model_accepts_prev_expert_ = false;   // Detected from the model's forward schema at load time
     bool model_accepts_prev_layers_ = false;   // Fallback detected dynamically on first call
     
-    std::atomic<bool> running_;
-    std::thread worker_thread_;
-    
-    std::queue<PredictionJob> job_queue_;
-    std::mutex queue_mutex_;
-    std::condition_variable queue_cv_;
-    
-    std::atomic<bool> prediction_ready_{false};
-    std::vector<int64_t> predicted_experts_;
     double prediction_time_ms_ = 0.0;
-    std::mutex result_mutex_;
-    std::condition_variable result_cv_;
-    
-    double delta_avg_ = 0.0;
     int history_length_ = 1;
     
     std::deque<torch::Tensor> emb_history_;
     std::deque<torch::Tensor> prev_expert_history_;
-    
-    std::atomic<int64_t> next_job_id_{0};
 };
 
 // ============================================================================
@@ -523,6 +404,7 @@ public:
         std::ifstream ifs(trace_path);
         if (!ifs.is_open()) {
             std::cerr << "Failed to open oracle trace file: " << trace_path << std::endl;
+            std::exit(EXIT_FAILURE);
             return;
         }
 
@@ -565,10 +447,6 @@ public:
         std::cout << "[OracleTracePredictor Layer " << layer_idx_ << "] Loaded " << token_experts_.size() << " tokens from " << trace_path << std::endl;
     }
 
-    void predict_async(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
-        // Not used
-    }
-
     std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
         (void)embedding;
         (void)prefill_dist;
@@ -579,6 +457,8 @@ public:
         if (source_decode_step >= 0) {
             token_idx = static_cast<int>(source_decode_step);
             current_token_idx_ = token_idx;
+        } else {
+            token_idx = current_token_idx_++;
         }
 
         const int horizon = std::max(lookahead_, 1);
@@ -586,6 +466,8 @@ public:
         const int start_i = (source_decode_step < 0) ? 0 : 1;
 
         std::unordered_map<int64_t, int> expert_counts;
+        // Track earliest token index at which each expert is needed (for tie-breaking)
+        std::unordered_map<int64_t, int> expert_earliest_need;
         for (int i = start_i; i <= horizon; ++i) {
             const int future_idx = token_idx + i;
             if (future_idx < 0 || future_idx >= static_cast<int>(token_experts_.size())) {
@@ -593,16 +475,27 @@ public:
             }
             for (int64_t expert : token_experts_[static_cast<size_t>(future_idx)]) {
                 expert_counts[expert]++;
+                // Record the earliest future index at which this expert appears
+                auto it = expert_earliest_need.find(expert);
+                if (it == expert_earliest_need.end()) {
+                    expert_earliest_need[expert] = future_idx;
+                }
             }
         }
 
         std::vector<std::pair<int64_t, int>> sorted_experts(expert_counts.begin(), expert_counts.end());
         std::sort(sorted_experts.begin(), sorted_experts.end(),
-                  [](const std::pair<int64_t, int>& a, const std::pair<int64_t, int>& b) {
+                  [&](const std::pair<int64_t, int>& a, const std::pair<int64_t, int>& b) {
                       if (a.second != b.second) {
-                          return a.second > b.second;
+                          return a.second > b.second; // Higher frequency first
                       }
-                      return a.first < b.first;
+                      // Tie-break: expert needed sooner (smaller future_idx) comes first
+                      int ea = expert_earliest_need.count(a.first) ? expert_earliest_need.at(a.first) : INT_MAX;
+                      int eb = expert_earliest_need.count(b.first) ? expert_earliest_need.at(b.first) : INT_MAX;
+                      if (ea != eb) {
+                          return ea < eb; // Sooner-needed expert first
+                      }
+                      return a.first < b.first; // Final tie-break by ID (stable)
                   });
 
         std::vector<int64_t> predicted_experts;
@@ -617,9 +510,10 @@ public:
 
     bool prefetch_full_union() const override { return full_union_; }
 
-    bool is_ready() override { return true; }
-    std::vector<int64_t> get_prediction() override { return {}; }
-    std::vector<int64_t> try_get_prediction() override { return {}; }
+    bool has_prefetch_threshold() const override {
+        return false;
+    }
+
     double get_prediction_time_ms() override { return prediction_time_ms_; }
 
 private:

@@ -42,7 +42,7 @@ def main():
         max_cached_experts_per_layer=128,
         prefetch_experts_count=128,
         config_path=config_path,
-        expert_weights_dir=None
+        expert_weights_dir=str(ROOT / "unified_llm_w4a16" / "model_weights" / "Qwen3-30B-A3B-AWQ_packed")
     )
 
     text = load_wikitext_test_text()

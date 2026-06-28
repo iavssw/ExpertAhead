@@ -8,6 +8,7 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_cached/helper.hpp"
 #include "unified_llm_w4a16_cached/npuSetup.hpp"
+#include "unified_llm_w4a16_common/io_thread_pool.hpp"
 #include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
@@ -668,6 +669,13 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
 
     // 3. Load all missing experts concurrently
     if (!slots_and_experts_to_load.empty()) {
+        if (update_stats) {
+            std::cout << "[MoE] Layer " << layer_idx_
+                      << ": loading " << slots_and_experts_to_load.size()
+                      << " expert(s)"
+                      << (force_miss ? " [force_miss]" : "")
+                      << std::endl;
+        }
         load_experts_weights(slots_and_experts_to_load, weights_dir_);
         // Ensure weights are fully on device before usage
         (void)hipDeviceSynchronize();

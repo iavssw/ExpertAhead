@@ -36,43 +36,49 @@ else:
 ArchitectureType = None
 
 
-def _apply_routing_and_cache_cli(model: Any, args: Any) -> None:
-    """Apply lambda / forced routing / cache policy from argparse (shared by main and WikiText eval)."""
-    if args.lambda_val != 0.0 and hasattr(model, "set_lambda"):
-        print(f"Setting lambda to {args.lambda_val}")
-        model.set_lambda(args.lambda_val)
+def _apply_routing_and_cache_cli(model: Any, run_config: dict) -> None:
+    """Apply lambda / forced routing / cache policy from config."""
+    lambda_val = run_config.get("lambda_val", 0.0)
+    if lambda_val != 0.0 and hasattr(model, "set_lambda"):
+        print(f"Setting lambda to {lambda_val}")
+        model.set_lambda(lambda_val)
 
-    if args.forced_top_n > 0 and hasattr(model, "set_forced_top_n"):
-        model.set_forced_top_n(args.forced_top_n)
-        print(f"Forced top-{args.forced_top_n} experts into cache mask.")
+    forced_top_n = run_config.get("forced_top_n", 0)
+    if forced_top_n > 0 and hasattr(model, "set_forced_top_n"):
+        model.set_forced_top_n(forced_top_n)
+        print(f"Forced top-{forced_top_n} experts into cache mask.")
 
-    if args.forced_top_p >= 0.0 and hasattr(model, "set_forced_top_p"):
-        model.set_forced_top_p(args.forced_top_p)
-        print(f"Forced top-p={args.forced_top_p} experts into cache mask.")
+    forced_top_p = run_config.get("forced_top_p", -1.0)
+    if forced_top_p >= 0.0 and hasattr(model, "set_forced_top_p"):
+        model.set_forced_top_p(forced_top_p)
+        print(f"Forced top-p={forced_top_p} experts into cache mask.")
 
-    if args.mass_threshold_substitution_p >= 0.0 and hasattr(model, "set_mass_threshold_substitution_p"):
-        model.set_mass_threshold_substitution_p(args.mass_threshold_substitution_p)
+    mass_p = run_config.get("mass_threshold_substitution_p", -1.0)
+    if mass_p >= 0.0 and hasattr(model, "set_mass_threshold_substitution_p"):
+        model.set_mass_threshold_substitution_p(mass_p)
         print(
-            f"Probability-mass prefix p={args.mass_threshold_substitution_p} OR'd into cache mask "
+            f"Probability-mass prefix p={mass_p} OR'd into cache mask "
             f"(same λ-biased top-k as forced_top_n; use --lambda-val e.g. 1.0 for cache-conditional routing)."
         )
-        if args.lambda_val == 0.0:
-            print("Warning: --mass-threshold-substitution-p has no effect while --lambda-val is 0.")
+        if lambda_val == 0.0:
+            print("Warning: mass_threshold_substitution_p has no effect while lambda_val is 0.")
 
-    if args.prefill_top_n > 0 and hasattr(model, "set_prefill_top_n"):
-        model.set_prefill_top_n(args.prefill_top_n)
-        print(f"Set prefill top-{args.prefill_top_n} locked experts.")
+    prefill_top_n = run_config.get("prefill_top_n", 0)
+    if prefill_top_n > 0 and hasattr(model, "set_prefill_top_n"):
+        model.set_prefill_top_n(prefill_top_n)
+        print(f"Set prefill top-{prefill_top_n} locked experts.")
 
-    if hasattr(args, "cache_policy") and hasattr(model, "set_cache_policy"):
-        model.set_cache_policy(args.cache_policy)
-        print(f"Set expert cache policy to {args.cache_policy}.")
+    cache_policy = run_config.get("cache_policy")
+    if cache_policy and hasattr(model, "set_cache_policy"):
+        model.set_cache_policy(cache_policy)
+        print(f"Set expert cache policy to {cache_policy}.")
 
-    if getattr(args, "suppress_predictor_stats", False):
+    if run_config.get("suppress_predictor_stats", False):
         if hasattr(model, "set_suppress_predictor_stats"):
             model.set_suppress_predictor_stats(True)
             print("Suppressing predictor stats.")
         else:
-            print("Warning: --suppress-predictor-stats ignored (backend has no set_suppress_predictor_stats).")
+            print("Warning: suppress_predictor_stats ignored (backend has no set_suppress_predictor_stats).")
 
 
 def load_config_with_comments(path: str) -> dict:
@@ -201,46 +207,41 @@ def _get_quantized_tensors(state_dict, base_name: str):
     return qweight, scales, qzeros, g_idx
 
 
+QWEN3_30B_CONFIG = {
+    "vocab_size": 151936,
+    "hidden_size": 2048,
+    "intermediate_size": 768,
+    "num_hidden_layers": 48,
+    "num_attention_heads": 32,
+    "num_key_value_heads": 4,
+    "head_dim": 128,
+    "rms_norm_eps": 1e-6,
+    "rope_theta": 1000000.0,
+    "max_seq_len": 8192,
+    "max_batch_size": 1,
+    "groupsize": 128,
+    "num_experts": 128,
+    "num_experts_per_tok": 8,
+}
+
 class Qwen3_30BA3BW4A16Model:
     """Qwen3 30B-A3B AWQ w4a16 quantized model wrapper."""
 
     def __init__(
         self,
-        model_path: Optional[str] = "QuixiAI/Qwen3-30B-A3B-AWQ",
-        tokenizer_path: Optional[str] = None,
-        vocab_size: int = 151936,
-        hidden_size: int = 2048,
-        intermediate_size: int = 768,
-        num_hidden_layers: int = 48,
-        num_attention_heads: int = 32,
-        num_key_value_heads: int = 4,
-        head_dim: int = 128,
-        rms_norm_eps: float = 1e-6,
-        rope_theta: float = 1000000.0,
-        max_seq_len: int = 8192,
-        max_batch_size: int = 1,
-        groupsize: int = 128,
-        num_experts: int = 128,
-        num_experts_per_tok: int = 8,
-        device: str = "cuda",
-        backend: str = "base",
-        max_cached_experts_per_layer: int = 0,
-        config_path: Optional[str] = None,
-        predictor_models_dir: str = "",
-        predictor_device: str = "gpu",
-        prefetch_experts_count: int = 1,
-        predict_layers: Optional[List[int]] = None,
-        per_layer_cache_sizes: Optional[List[int]] = None,
-        expert_reuse_csv: Optional[str] = None,
-        predictor_lookahead: int = 1,
-        expert_weights_dir: Optional[str] = DEFAULT_EXPERT_WEIGHTS_DIR,
-        oracle_trace_path: str = "",
-        oracle_lookahead: int = 0,
-        oracle_full_union: bool = False,
+        run_config: dict,
     ):
         """
-        Initialize Qwen3 30B-A3B AWQ w4a16 quantized model.
+        Initialize Qwen3 30B-A3B AWQ w4a16 quantized model using a single JSON config.
         """
+        
+        # Extract core config with defaults
+        model_path = run_config.get("model_path", "QuixiAI/Qwen3-30B-A3B-AWQ")
+        tokenizer_path = run_config.get("tokenizer_path", model_path)
+        device = run_config.get("device", "cuda")
+        backend = run_config.get("backend", "base")
+        config_path = run_config.get("config_path", None)
+        expert_weights_dir = run_config.get("expert_weights_dir", DEFAULT_EXPERT_WEIGHTS_DIR)
 
         if backend not in ["base", "predict", "cached"]:
             raise ValueError(f"Invalid backend: {backend}. Choose from: base, predict, cached")
@@ -248,6 +249,10 @@ class Qwen3_30BA3BW4A16Model:
         if not expert_weights_dir:
             expert_weights_dir = None
 
+        predictor_lookahead = run_config.get("predictor_lookahead", 1)
+        oracle_trace_path = run_config.get("oracle_trace_path", "")
+        oracle_lookahead = run_config.get("oracle_lookahead", 0)
+        
         if oracle_trace_path and oracle_lookahead <= 0:
             oracle_lookahead = predictor_lookahead if predictor_lookahead > 0 else 1
 
@@ -270,35 +275,31 @@ class Qwen3_30BA3BW4A16Model:
 
         self.device = device
         self.model_path = model_path
-        self.vocab_size = vocab_size
-        self.hidden_size = hidden_size
-        self.intermediate_size = intermediate_size
-        self.num_hidden_layers = num_hidden_layers
-        self.num_attention_heads = num_attention_heads
-        self.num_key_value_heads = num_key_value_heads
-        self.head_dim = head_dim
-        self.max_seq_len = max_seq_len
-        self.groupsize = groupsize
-        self.num_experts = num_experts
-        self.num_experts_per_tok = num_experts_per_tok
+        
+        # Apply the static architecture config
+        for k, v in QWEN3_30B_CONFIG.items():
+            setattr(self, k, v)
 
         constructor_args = [
             ArchitectureType.QWEN,
-            vocab_size,
-            hidden_size,
-            intermediate_size,
-            num_hidden_layers,
-            num_attention_heads,
-            num_key_value_heads,
-            head_dim,
-            rms_norm_eps,
-            rope_theta,
-            max_seq_len,
-            max_batch_size,
-            groupsize,
-            num_experts,
-            num_experts_per_tok,
+            self.vocab_size,
+            self.hidden_size,
+            self.intermediate_size,
+            self.num_hidden_layers,
+            self.num_attention_heads,
+            self.num_key_value_heads,
+            self.head_dim,
+            self.rms_norm_eps,
+            self.rope_theta,
+            self.max_seq_len,
+            self.max_batch_size,
+            self.groupsize,
+            self.num_experts,
+            self.num_experts_per_tok,
         ]
+
+        max_cached_experts_per_layer = run_config.get("max_cached_experts", 0)
+        per_layer_cache_sizes = run_config.get("per_layer_cache_sizes", None)
 
         if backend == "cached":
             constructor_args.append(max_cached_experts_per_layer)
@@ -315,6 +316,11 @@ class Qwen3_30BA3BW4A16Model:
             # predict backend arg order: device, max_cached, predictor_path, config, prefetch, predict_layers, per_layer_cache_sizes
             import tempfile, json as _json
             _temp_config_path = None
+            
+            predictor_device = run_config.get("predictor_device", "gpu")
+            predictor_models_dir = run_config.get("predictor_model", "")
+            expert_reuse_csv = run_config.get("expert_reuse_csv", None)
+            
             if predictor_device != "auto" and predictor_models_dir:
                 base_cfg = load_config_with_comments(config_path) if config_path else {}
                 base_cfg["predictor_device"] = predictor_device
@@ -326,6 +332,7 @@ class Qwen3_30BA3BW4A16Model:
             else:
                 config_to_pass = config_path
             
+            per_layer_cache_sizes = run_config.get("per_layer_cache_sizes", None)
             if expert_reuse_csv and predictor_models_dir:
                 per_layer_cache_sizes, per_layer_prefetch_counts = self._calibrate_from_csv(expert_reuse_csv, predictor_models_dir)
                 print(f"[Calibration] Loaded per-layer counts from {expert_reuse_csv}")
@@ -335,13 +342,14 @@ class Qwen3_30BA3BW4A16Model:
             constructor_args.append(max_cached_experts_per_layer)
             constructor_args.append(predictor_models_dir)
             constructor_args.append(config_to_pass)
-            constructor_args.append(prefetch_experts_count)
-            constructor_args.append(predict_layers if predict_layers is not None else [])
+            constructor_args.append(run_config.get("prefetch_experts_count", 1))
+            constructor_args.append(run_config.get("predict_layers", []) or [])
             constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
             constructor_args.append(per_layer_prefetch_counts)
             constructor_args.append(oracle_trace_path)
             constructor_args.append(oracle_lookahead)
-            constructor_args.append(oracle_full_union)
+            constructor_args.append(run_config.get("oracle_full_union", False))
+            constructor_args.append(run_config.get("prefetch_threshold", 0.0))
         else:
             constructor_args.append(config_path)
 
@@ -830,13 +838,21 @@ class Qwen3_30BA3BW4A16Model:
         if hasattr(self.model, "set_suppress_predictor_stats"):
             self.model.set_suppress_predictor_stats(v)
 
-def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
-                    max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50,
-                    generate=True, perplexity=False, config_path=None):
+def run_prompt_test(run_config: dict):
     """
     Run prompt test case: load single long prompt from prompts.txt,
     concatenate base prompt, truncate to requested token count, and generate output.
     """
+    target_tokens = run_config.get("prompt_test", 256)
+    model_path = run_config.get("model_path", "QuixiAI/Qwen3-30B-A3B-AWQ")
+    tokenizer_path = run_config.get("tokenizer_path", model_path)
+    device = run_config.get("device", "cuda")
+    max_new_tokens = run_config.get("max_new_tokens", 512)
+    temperature = run_config.get("temperature", 0.7)
+    top_p = run_config.get("top_p", 0.9)
+    top_k = run_config.get("top_k", 50)
+    generate = run_config.get("generate", True)
+    perplexity = run_config.get("perplexity", False)
     from pathlib import Path
 
     script_dir = Path(__file__).parent
@@ -921,13 +937,8 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
 
     print("Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...")
     try:
-        model = Qwen3_30BA3BW4A16Model(
-            model_path=model_path,
-            tokenizer_path=tokenizer_path,
-            device=device,
-            backend=backend,
-            config_path=config_path
-        )
+        model = Qwen3_30BA3BW4A16Model(run_config)
+        _apply_routing_and_cache_cli(model, run_config)
         print("Model initialized successfully!")
     except Exception as e:
         print(f"Error initializing model: {e}")
@@ -1038,28 +1049,19 @@ def _load_wikitext103_raw_text(model_weights_dir: Path, split: str = "test") -> 
     return text
 
 
-def run_wikitext103_perplexity(
-    model_path=None,
-    tokenizer_path=None,
-    device="cuda",
-    backend="base",
-    config_path=None,
-    split: str = "test",
-    max_length: int = 2048,
-    stride: int = 2048,
-    max_windows: int = 0,
-    cli_args: Any = None,
-):
+def run_wikitext103_perplexity(run_config: dict):
     """
     Evaluate perplexity on WikiText-103 with sliding-window evaluation.
     Saves fetched text and tokenized IDs under model_weights.
-
-    If *cli_args* is set (typically ``argparse.Namespace`` from ``main``), the model is
-    constructed like a normal CLI run (cache size, predict backend, etc.) and routing
-    flags (lambda, forced top-n / mass, cache policy) are applied.
-
-    *max_windows*: if > 0, stop after that many windows (quick smoke test).
     """
+    model_path = run_config.get("model_path", "QuixiAI/Qwen3-30B-A3B-AWQ")
+    tokenizer_path = run_config.get("tokenizer_path", model_path)
+    device = run_config.get("device", "cuda")
+    split = run_config.get("wikitext103_split", "test")
+    max_length = run_config.get("wikitext103_max_length", 2048)
+    stride = run_config.get("wikitext103_stride", 2048)
+    max_windows = run_config.get("wikitext103_max_windows", 0)
+
     if max_length < 2:
         raise ValueError("max_length must be >= 2")
     if stride < 1:
@@ -1075,36 +1077,10 @@ def run_wikitext103_perplexity(
 
     text = _load_wikitext103_raw_text(model_weights_dir, split=split)
 
-    if model_path is None:
-        model_path = "QuixiAI/Qwen3-30B-A3B-AWQ"
-
     print("Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...")
     try:
-        if cli_args is not None:
-            model = Qwen3_30BA3BW4A16Model(
-                model_path=cli_args.model_path or model_path,
-                tokenizer_path=cli_args.tokenizer_path or tokenizer_path,
-                device=cli_args.device,
-                backend=cli_args.backend,
-                config_path=cli_args.config_path or config_path,
-                max_cached_experts_per_layer=cli_args.max_cached_experts,
-                prefetch_experts_count=cli_args.prefetch_experts_count,
-                predictor_models_dir=cli_args.predictor_model,
-                predictor_device=cli_args.predictor_device,
-                predict_layers=cli_args.predict_layers,
-                expert_reuse_csv=cli_args.expert_reuse_csv,
-                predictor_lookahead=cli_args.predictor_lookahead,
-                expert_weights_dir=cli_args.expert_weights_dir,
-            )
-            _apply_routing_and_cache_cli(model, cli_args)
-        else:
-            model = Qwen3_30BA3BW4A16Model(
-                model_path=model_path,
-                tokenizer_path=tokenizer_path,
-                device=device,
-                backend=backend,
-                config_path=config_path,
-            )
+        model = Qwen3_30BA3BW4A16Model(run_config)
+        _apply_routing_and_cache_cli(model, run_config)
         print("Model initialized successfully!")
     except Exception as e:
         print(f"Error initializing model: {e}")
@@ -1255,266 +1231,78 @@ def main():
     """Example usage of Qwen3_30BA3BW4A16Model when run as a script."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Qwen3 30B-A3B AWQ W4A16 Quantized Model - Unified LibTorch Backend")
+    parser = argparse.ArgumentParser(description="Qwen3 30B-A3B AWQ W4A16 Quantized Model")
     parser.add_argument(
-        "--text",
+        "--run-config",
         type=str,
-        default="What is the meaning of life the universe and everything?",
-        help="Input text to process (default: 'What is the meaning of life?')"
+        required=True,
+        help="Path to JSON run configuration file"
     )
-    parser.add_argument(
-        "--tokenizer-path",
-        type=str,
-        default=None,
-        help="Path to tokenizer or HuggingFace model name"
-    )
-    parser.add_argument(
-        "--model-path",
-        type=str,
-        default="QuixiAI/Qwen3-30B-A3B-AWQ",
-        help="Path to quantized model (default: QuixiAI/Qwen3-30B-A3B-AWQ)"
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default="cuda",
-        choices=["cpu", "cuda"],
-        help="Device to run on (default: cuda)"
-    )
-    parser.add_argument(
-        "--backend",
-        type=str,
-        default="base",
-        choices=["base", "predict", "cached"],
-        help="Backend to use: base (all experts), predict (heterogeneous), cached (selective loading)"
-    )
-    parser.add_argument(
-        "--config-path",
-        type=str,
-        default=os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_qwen3_30B_A3B.json5")),
-        help="Path to NPU config JSON"
-    )
-    parser.add_argument(
-        "--generate",
-        dest="generate",
-        action="store_true",
-        default=True,
-        help="Generate text instead of just getting logits (default: True)"
-    )
-    parser.add_argument(
-        "--no-generate",
-        dest="generate",
-        action="store_false",
-        help="Disable generation, just get logits"
-    )
-    parser.add_argument(
-        "--max-new-tokens",
-        type=int,
-        default=16,
-        help="Maximum number of tokens to generate (if --generate is used, default: 16)"
-    )
-    parser.add_argument(
-        "--temperature",
-        type=float,
-        default=0.0,
-        help="Sampling temperature (0.0 = greedy decoding)"
-    )
-    parser.add_argument(
-        "--top-p",
-        type=float,
-        default=0.9,
-        help="Nucleus sampling parameter (0.0-1.0)"
-    )
-    parser.add_argument(
-        "--top-k",
-        type=int,
-        default=50,
-        help="Top-k sampling parameter: only considers the top k most likely tokens."
-    )
-    parser.add_argument(
-        "--prompt-test",
-        type=int,
-        default=None,
-        help="Run prompt test case with specified token count."
-    )
-    parser.add_argument(
-        "--max-cached-experts",
-        type=int,
-        default=8,
-        help="Maximum number of experts to cache per layer (cached/predict backends only, default: 8)"
-    )
-    parser.add_argument(
-        "--prefetch-experts-count",
-        type=int,
-        default=1,
-        help="Number of experts to speculatively prefetch (predict backend only, default: 1)"
-    )
-    parser.add_argument(
-        "--perplexity",
-        action="store_true",
-        help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
-    )
-    parser.add_argument(
-        "--wikitext103-perplexity",
-        action="store_true",
-        default=False,
-        help="Compute perplexity on WikiText-103 and save downloaded/tokenized files under model_weights."
-    )
-    parser.add_argument(
-        "--wikitext103-split",
-        type=str,
-        default="test",
-        choices=["train", "valid", "validation", "test"],
-        help="WikiText-103 split to evaluate."
-    )
-    parser.add_argument(
-        "--wikitext103-max-length",
-        type=int,
-        default=2048,
-        help="Max context length per evaluation window for WikiText-103 perplexity."
-    )
-    parser.add_argument(
-        "--wikitext103-stride",
-        type=int,
-        default=2048,
-        help="Stride for sliding-window WikiText-103 perplexity."
-    )
-    parser.add_argument(
-        "--wikitext103-max-windows",
-        type=int,
-        default=0,
-        help="If > 0, only evaluate this many sliding windows (smoke test / cheap run). 0 = full split.",
-    )
-    parser.add_argument("--sweep-prompts-file", type=str, default=None)
-    parser.add_argument(
-        "--generation-perplexity",
-        action="store_true",
-        default=False,
-        help="Score -log p(generated token | prefix) on model-generated continuations (requires generation).",
-    )
-    parser.add_argument("--lambda-val", type=float, default=0.0)
-    parser.add_argument("--predict-layers", type=int, nargs="+", default=None)
-    parser.add_argument("--predictor-model", type=str, default="")
-    parser.add_argument("--predictor-device", type=str, default="gpu")
-    parser.add_argument(
-        "--predictor-lookahead", type=int, default=1,
-        help="Invoke the predictor every N decode tokens where N = lookahead depth (fN from model path). "
-             "Default 1 = every token (original behaviour)."
-    )
-    parser.add_argument("--expert-reuse-csv", type=str, default=None,
-                        help="Path to expert_reuse.csv to calibrate per-layer cache and prefetch counts.")
-    parser.add_argument(
-        "--forced-top-n", type=int, default=0,
-        help="(cached backend) Force the top-N unbiased experts into the cache mask every step. "
-             "0 = disabled (standard routing)."
-    )
-    parser.add_argument(
-        "--forced-top-p", type=float, default=-1.0,
-        help="(cached backend) Force the minimum set of experts whose cumulative softmax "
-             "probability >= p into the cache mask every step. Adapts to routing confidence. "
-             "-1.0 = disabled (default)."
-    )
-    parser.add_argument(
-        "--mass-threshold-substitution-p", type=float, default=-1.0,
-        help="(cached/predict backends) Alternate routing: keep smallest top-k prefix "
-             "with cumulative mass >= p and substitute remaining routed slots. "
-             "-1.0 = disabled (default)."
-    )
-    parser.add_argument(
-        "--expert-weights-dir", type=str, default=DEFAULT_EXPERT_WEIGHTS_DIR,
-        help="Directory for MoE expert weight files (default: Qwen3-30B-A3B-AWQ_packed). "
-             "Supports unpacked (9 files/expert) and packed (1 file/expert, EXPK) layouts — "
-             "auto-detected at runtime. Pass an empty string to use the standard presaved-bins path."
-    )
-    parser.add_argument(
-        "--cache-policy",
-        type=str,
-        default="LRU",
-        choices=["LRU", "MRU", "LFU", "MFU", "CLOCK", "RANDOM", "LFRU", "PREFILL", "lru", "mru", "lfu", "mfu", "clock", "random", "lfru", "prefill"],
-        help="Cache eviction policy for experts"
-    )
-    parser.add_argument(
-        "--prefill-top-n", type=int, default=0,
-        help="(cached backend) Under PREFILL policy, lock the top-N experts from prefill into the cache."
-    )
-    parser.add_argument(
-        "--suppress-predictor-stats", action="store_true", default=False,
-        help="Disable measurement for runtime performance evaluation."
-    )
-
-    parser.add_argument(
-        "--oracle-trace", type=str, default="",
-        help="Path to oracle trace file"
-    )
-    parser.add_argument(
-        "--oracle-lookahead", type=int, default=0,
-        help="Lookahead tokens for oracle trace predictor"
-    )
-    parser.add_argument(
-        "--oracle-full-union", action="store_true", default=False,
-        help="Oracle prefetch: load full expert union in lookahead window (ignores top-B budget cap).",
-    )
-    parser.add_argument(
-        "--capture-oracle-trace", type=str, default="",
-        help="Capture an exact oracle trace (with PROMPT TOKEN IDS) to this path via generate(), then exit",
-    )
-
-    args = parser.parse_args()
+    cli_args = parser.parse_args()
+    
+    with open(cli_args.run_config, 'r') as f:
+        run_config = json.load(f)
+        
+    class Args:
+        pass
+    args = Args()
+    for k, v in run_config.items():
+        setattr(args, k, v)
+        
+    args.text = getattr(args, "text", "What is the meaning of life the universe and everything?")
+    args.tokenizer_path = getattr(args, "tokenizer_path", None)
+    args.model_path = getattr(args, "model_path", "QuixiAI/Qwen3-30B-A3B-AWQ")
+    args.device = getattr(args, "device", "cuda")
+    args.backend = getattr(args, "backend", "base")
+    args.config_path = getattr(args, "config_path", None)
+    args.generate = getattr(args, "generate", True)
+    args.max_new_tokens = getattr(args, "max_new_tokens", 16)
+    args.temperature = getattr(args, "temperature", 0.0)
+    args.top_p = getattr(args, "top_p", 0.9)
+    args.top_k = getattr(args, "top_k", 50)
+    args.prompt_test = getattr(args, "prompt_test", None)
+    args.max_cached_experts = getattr(args, "max_cached_experts", 8)
+    args.prefetch_experts_count = getattr(args, "prefetch_experts_count", 1)
+    args.prefetch_threshold = getattr(args, "prefetch_threshold", 0.0)
+    args.perplexity = getattr(args, "perplexity", False)
+    args.wikitext103_perplexity = getattr(args, "wikitext103_perplexity", False)
+    args.wikitext103_split = getattr(args, "wikitext103_split", "test")
+    args.wikitext103_max_length = getattr(args, "wikitext103_max_length", 2048)
+    args.wikitext103_stride = getattr(args, "wikitext103_stride", 2048)
+    args.wikitext103_max_windows = getattr(args, "wikitext103_max_windows", 0)
+    args.sweep_prompts_file = getattr(args, "sweep_prompts_file", None)
+    args.generation_perplexity = getattr(args, "generation_perplexity", False)
+    args.lambda_val = getattr(args, "lambda_val", 0.0)
+    args.predict_layers = getattr(args, "predict_layers", None)
+    args.predictor_model = getattr(args, "predictor_model", "")
+    args.predictor_device = getattr(args, "predictor_device", "gpu")
+    args.predictor_lookahead = getattr(args, "predictor_lookahead", 1)
+    args.expert_reuse_csv = getattr(args, "expert_reuse_csv", None)
+    args.forced_top_n = getattr(args, "forced_top_n", 0)
+    args.forced_top_p = getattr(args, "forced_top_p", -1.0)
+    args.mass_threshold_substitution_p = getattr(args, "mass_threshold_substitution_p", -1.0)
+    args.expert_weights_dir = getattr(args, "expert_weights_dir", DEFAULT_EXPERT_WEIGHTS_DIR)
+    args.cache_policy = getattr(args, "cache_policy", "LRU")
+    args.prefill_top_n = getattr(args, "prefill_top_n", 0)
+    args.suppress_predictor_stats = getattr(args, "suppress_predictor_stats", False)
+    args.oracle_trace = getattr(args, "oracle_trace", "")
+    args.oracle_lookahead = getattr(args, "oracle_lookahead", 0)
+    args.oracle_full_union = getattr(args, "oracle_full_union", False)
+    args.capture_oracle_trace = getattr(args, "capture_oracle_trace", "")
     args.oracle_prompt_token_ids = None
 
     if args.wikitext103_perplexity:
-        return run_wikitext103_perplexity(
-            model_path=args.model_path,
-            tokenizer_path=args.tokenizer_path,
-            device=args.device,
-            backend=args.backend,
-            config_path=args.config_path,
-            split=args.wikitext103_split,
-            max_length=args.wikitext103_max_length,
-            stride=args.wikitext103_stride,
-            max_windows=args.wikitext103_max_windows,
-            cli_args=args,
-        )
+        return run_wikitext103_perplexity(run_config)
 
     if args.prompt_test is not None:
-        return run_prompt_test(
-            args.prompt_test,
-            model_path=args.model_path,
-            tokenizer_path=args.tokenizer_path,
-            device=args.device,
-            backend=args.backend,
-            max_new_tokens=args.max_new_tokens,
-            temperature=args.temperature,
-            top_p=args.top_p,
-            top_k=args.top_k,
-            generate=args.generate,
-            perplexity=args.perplexity,
-            config_path=args.config_path
-        )
+        return run_prompt_test(run_config)
 
     print("=" * 60)
     print("Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...")
     print("=" * 60)
 
     try:
-        model = Qwen3_30BA3BW4A16Model(
-            model_path=args.model_path,
-            tokenizer_path=args.tokenizer_path,
-            device=args.device,
-            backend=args.backend,
-            config_path=args.config_path,
-            max_cached_experts_per_layer=args.max_cached_experts,
-            prefetch_experts_count=args.prefetch_experts_count,
-            predictor_models_dir=args.predictor_model,
-            predictor_device=args.predictor_device,
-            predict_layers=args.predict_layers,
-            expert_reuse_csv=args.expert_reuse_csv,
-            predictor_lookahead=args.predictor_lookahead,
-            expert_weights_dir=args.expert_weights_dir,
-            oracle_trace_path=args.oracle_trace,
-            oracle_lookahead=args.oracle_lookahead,
-            oracle_full_union=args.oracle_full_union,
-        )
+        model = Qwen3_30BA3BW4A16Model(run_config)
 
         print("Model initialized successfully!")
     except Exception as e:
@@ -1527,7 +1315,7 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
-    _apply_routing_and_cache_cli(model, args)
+    _apply_routing_and_cache_cli(model, run_config)
 
     if args.capture_oracle_trace:
         oracle_bundle = None
@@ -1605,7 +1393,13 @@ def main():
         for i, prompt in enumerate(prompts):
             print(f"\nProcessing Prompt {i+1}/{len(prompts)}...")
             try:
-                input_ids = model.tokenize(prompt)
+                if isinstance(prompt, dict):
+                    if "token_ids" in prompt and prompt["token_ids"]:
+                        input_ids = torch.tensor([prompt["token_ids"]], dtype=torch.long, device=args.device)
+                    else:
+                        input_ids = model.tokenize(prompt.get("text", ""))
+                else:
+                    input_ids = model.tokenize(prompt)
 
                 if args.generation_perplexity:
                     start_time = time.time()

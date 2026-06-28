@@ -39,7 +39,7 @@ SKIP_SEQUENTIAL="${SKIP_SEQUENTIAL:-0}"
 EXTRA_SWEEP_ARGS=(${EXTRA_SWEEP_ARGS:-})
 
 RUNNER=(python3 py/utils/finals_experiment_runner.py
-  --experiment sec2_predictor_effectiveness
+  --experiment sec5_all_methods
   --predictor-base-dir "$PREDICTOR_BASE"
   --num-prompts "$NUM_PROMPTS"
   --prompt-max-chars "$PROMPT_MAX_CHARS"
@@ -47,9 +47,6 @@ RUNNER=(python3 py/utils/finals_experiment_runner.py
 )
 if [[ -n "$SUBPROCESS_TIMEOUT" ]]; then
   RUNNER+=(--subprocess-timeout "$SUBPROCESS_TIMEOUT")
-fi
-if [[ ${#EXTRA_SWEEP_ARGS[@]} -gt 0 ]]; then
-  RUNNER+=("${EXTRA_SWEEP_ARGS[@]}")
 fi
 
 run_sec2() {
@@ -77,11 +74,11 @@ run_sec2() {
   echo "================================================================"
 
   if [[ "${DRY_RUN:-0}" == "1" ]]; then
-    "${RUNNER[@]}" --dry-run --out-root "$run_out"
+    "${RUNNER[@]}" --out-root "$run_out" "${EXTRA_SWEEP_ARGS[@]}" --dry-run
     return 0
   fi
 
-  "${RUNNER[@]}" --out-root "$run_out"
+  "${RUNNER[@]}" --out-root "$run_out" "${EXTRA_SWEEP_ARGS[@]}"
 }
 
 echo "[sec2-io-ab] Section 2 A/B: parallel (0) vs sequential (1) expert SSD I/O"

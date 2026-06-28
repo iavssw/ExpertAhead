@@ -2,6 +2,7 @@
 #include "unified_llm_w4a16_predict/npuSetup.hpp"
 #include "unified_llm_w4a16_predict/unified_llm_w4a16.hpp"
 #define HETEROPREDICT_SUPPORT_LOGICAL_ABORT 1
+#include "unified_llm_w4a16_common/io_thread_pool.hpp"
 #include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 
 #include <algorithm>
@@ -20,6 +21,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/uio.h>
 #include <future>
 #include <vector>
 
@@ -1215,6 +1217,24 @@ void MixtureOfExpertsImpl::print_cache_stats() const {
     unified_llm_w4a16_common::print_moe_stall_bandwidth(std::cout, stall_loads_, prefetch_loads_, avg_load_time);
     unified_llm_w4a16_common::print_moe_prefetch_overlap(
         std::cout, prefetch_hits_ready_, prefetch_hits_wait_, prefetch_ticks_skipped_);
+
+    // Miss-cause breakdown
+    if (miss_not_present_ + miss_not_ready_stall_ > 0) {
+        std::cout << "    MissCause: NotPresent=" << miss_not_present_
+                  << ", NotReadyStall=" << miss_not_ready_stall_ << "\n";
+    }
+    // Prefetch efficiency
+    if (prefetch_loads_ > 0) {
+        std::cout << "    PrefetchEff: Dropped=" << prefetch_dropped_no_victim_
+                  << ", AlreadyCached=" << prefetch_already_cached_
+                  << ", UsedBeforeEvict=" << prefetch_used_before_eviction_
+                  << ", EvictedBeforeUse=" << prefetch_evicted_before_use_ << "\n";
+    }
+    // Global concurrency peak (reported from layer 0 only to avoid duplicate prints)
+    if (layer_idx_ == 0) {
+        std::cout << "    GlobalSpecLoad: PeakConcurrent="
+                  << global_max_active_speculative_loads().load(std::memory_order_relaxed) << "\n";
+    }
     std::cout
               << "    Predictor TopK matches: 0=" << pred_match_0_
               << " 1=" << pred_match_1_
@@ -1252,6 +1272,17 @@ void MixtureOfExpertsImpl::reset_cache_stats() {
     pred_match_0_ = 0;
     pred_match_1_ = 0;
     pred_match_2_ = 0;
+    // Miss-cause breakdown
+    miss_not_present_ = 0;
+    miss_not_ready_stall_ = 0;
+    prefetch_dropped_no_victim_ = 0;
+    prefetch_already_cached_ = 0;
+    // Prefetch efficiency
+    prefetch_used_before_eviction_ = 0;
+    prefetch_evicted_before_use_ = 0;
+    // Reset slot load origins and prefetch pin list
+    std::fill(slot_load_origin_.begin(), slot_load_origin_.end(), 0);
+    prefetched_experts_.clear();
 }
 
 void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
