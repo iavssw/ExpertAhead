@@ -36,7 +36,10 @@
         }
     }
 
-    auto load_expert_worker = [this](int64_t slot_idx, int64_t expert_idx, uint64_t load_id, const std::string& path) {
+    auto load_expert_worker = [this, is_prefetch](int64_t slot_idx, int64_t expert_idx, uint64_t load_id, const std::string& path) {
+        if (is_prefetch && this->abort_pending_prefetches_.load(std::memory_order_relaxed)) {
+            throw std::runtime_error("PrefetchAborted");
+        }
 #ifdef HETEROPREDICT_SUPPORT_LOGICAL_ABORT
         if (this->slot_load_id_[slot_idx].load(std::memory_order_relaxed) != load_id) return;
 #endif
@@ -203,7 +206,7 @@
             uint64_t load_id = 0;
 #endif
             std::string path = weights_dir + "/layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx) + ".bin";
-            futures.push_back(io_pool.enqueue(load_expert_worker, slot_idx, expert_idx, load_id, path));
+            futures.push_back(io_pool.enqueue(!is_prefetch, load_expert_worker, slot_idx, expert_idx, load_id, path));
         }
 
         for (auto& f : futures) {

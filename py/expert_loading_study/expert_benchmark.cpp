@@ -77,10 +77,12 @@ private:
     bool stop_;
 };
 
-static IOThreadPool& get_io_pool() {
-    // 16 threads matches the model's default HETEROPREDICT_IO_THREADS=16
-    static IOThreadPool pool(16);
-    return pool;
+static IOThreadPool* g_pool = nullptr;
+static IOThreadPool& get_io_pool(int threads = 16) {
+    if (!g_pool) {
+        g_pool = new IOThreadPool(threads);
+    }
+    return *g_pool;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -240,19 +242,21 @@ size_t load_expert(const std::string& path, std::vector<AlignedBuffer>& bufs) {
 int main(int argc, char** argv) {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0]
-                  << " <packed_dir> <iters> [num_experts=8]\n"
+                  << " <packed_dir> <iters> [num_experts=8] [num_threads=16]\n"
                   << "  packed_dir   — directory containing layer_L_expert_N.bin files\n"
                   << "  iters        — number of timed repetitions\n"
-                  << "  num_experts  — number of experts to load per layer per iteration (default 8 = K)\n";
+                  << "  num_experts  — number of experts to load per layer per iteration (default 8 = K)\n"
+                  << "  num_threads  — number of threads in the IO pool\n";
         return 1;
     }
 
     const std::string packed_dir = argv[1];
     const int ITERS       = std::atoi(argv[2]);
     const int num_experts = (argc >= 4) ? std::atoi(argv[3]) : 8;
+    const int num_threads = (argc >= 5) ? std::atoi(argv[4]) : 16;
 
-    if (num_experts < 1 || num_experts > 8) {
-        std::cerr << "num_experts must be between 1 and 8\n";
+    if (num_experts < 1 || num_experts > 64) {
+        std::cerr << "num_experts must be between 1 and 64\n";
         return 1;
     }
 
@@ -277,7 +281,7 @@ int main(int argc, char** argv) {
     std::printf("Page cache dropped before each iteration (requires sudo for true SSD numbers).\n\n");
 
     // Pre-warm the pool *before* timing starts
-    (void)get_io_pool();
+    (void)get_io_pool(num_threads);
 
     std::vector<std::vector<AlignedBuffer>> bufs(num_experts);
 
@@ -313,7 +317,7 @@ int main(int argc, char** argv) {
     // ── Parallel: pre-warmed IOThreadPool (Whole Network)
     run_test("Parallel   (K experts, IOThreadPool)", total_bytes, [&]() {
         total_bytes = 0;
-        auto& pool = get_io_pool();
+        auto& pool = get_io_pool(num_threads);
         for (int L = 0; L < 48; ++L) {
             std::vector<std::future<size_t>> futures;
             futures.reserve(num_experts);

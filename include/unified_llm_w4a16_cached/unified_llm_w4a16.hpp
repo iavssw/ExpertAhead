@@ -231,6 +231,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t cache_hits_ = 0;
     int64_t cache_misses_ = 0;
     double total_expert_load_time_ms_ = 0.0;  // cumulative time spent in load_expert_weights()
+    std::atomic<bool> abort_pending_prefetches_{false};
 
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
@@ -244,8 +245,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
 
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
     void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
-    void load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir);
-    void load_experts_weights_packed(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir);
+    void load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir, bool is_prefetch = false);
+    void load_experts_weights_packed(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir, bool is_prefetch = false);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
     std::vector<int64_t> ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats = true);
     size_t pick_victim_ready();

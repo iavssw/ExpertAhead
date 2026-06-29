@@ -733,6 +733,13 @@ void MixtureOfExpertsImpl::set_context_token_ids(const std::vector<int64_t>& tok
 
 void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embedding, int64_t source_decode_step,
                                                        c10::optional<torch::Tensor> prev_layers_feat) {
+    if (!has_predictor()) return;
+
+    abort_pending_prefetches_.store(false, std::memory_order_relaxed);
+
+    auto current_embeddings = embedding.clone();
+    auto prev_layers_feat_val = prev_layers_feat.has_value() ? prev_layers_feat.value().clone() : torch::Tensor();
+
     // Check if predictor is available
     if (!predictor_) {
         return;
@@ -827,7 +834,11 @@ void MixtureOfExpertsImpl::trigger_speculative_loading(const torch::Tensor& embe
                 int prev = global_active_speculative_loads().fetch_add(1, std::memory_order_relaxed) + 1;
                 int cur_max = global_max_active_speculative_loads().load(std::memory_order_relaxed);
                 while (prev > cur_max && !global_max_active_speculative_loads().compare_exchange_weak(cur_max, prev, std::memory_order_relaxed)) {}
-                load_predicted_experts(top_experts);
+                try {
+                    load_predicted_experts(top_experts);
+                } catch (...) {
+                    // Intentionally swallow the abort exception (or any other prefetch error)
+                }
                 global_active_speculative_loads().fetch_sub(1, std::memory_order_relaxed);
             }
         });
@@ -869,13 +880,17 @@ void MixtureOfExpertsImpl::run_predictor_prefill_warmup(const torch::Tensor& emb
         std::cout << "\n";
     }
     if (!pred_result.empty()) {
-        auto pf = experts_to_prefetch(pred_result);
+        std::vector<int64_t> pf = experts_to_prefetch(pred_result);
         if (layer_idx_ == 0) {
             std::cout << "[Layer 0 Warmup Debug] experts_to_prefetch returned: ";
             for (auto e : pf) std::cout << e << " ";
             std::cout << "\n";
         }
-        load_predicted_experts(pf, /*prefill_end_warmup=*/true);
+        
+        abort_pending_prefetches_.store(false, std::memory_order_relaxed);
+        try {
+            load_predicted_experts(pf, /*prefill_end_warmup=*/true);
+        } catch (...) {}
     }
 }
 
@@ -972,7 +987,7 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
         }
 
         try {
-            load_experts_weights(slots_and_experts_to_load, weights_dir_);
+            load_experts_weights(slots_and_experts_to_load, weights_dir_, true);
         } catch (...) {
             std::lock_guard<std::mutex> lock(expert_slots_mutex_);
             for (auto& p : slots_and_experts_to_load) {
@@ -1287,6 +1302,11 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
                     // Track prefetch efficiency: if origin was prefetch and now router is using it
                     if (static_cast<size_t>(s) < slot_load_origin_.size() && slot_load_origin_[s] == 1) {
                         ++prefetch_used_before_eviction_;
+                        if (was_ready) {
+                            ++prefetch_hits_ready_;
+                        } else {
+                            ++prefetch_hits_wait_;
+                        }
                         slot_load_origin_[s] = 2; // 2 = used (prevent double-count)
                     }
                     slot_meta_[s].access_count++;
@@ -1372,6 +1392,7 @@ std::vector<int64_t> MixtureOfExpertsImpl::ensure_experts_cached(const std::vect
 
     // 3. Load if needed
     if (!slots_and_experts_to_load.empty()) {
+        abort_pending_prefetches_.store(true, std::memory_order_relaxed);
         lock.unlock(); // Unlock during slow disk I/O!
         
         stall_loads_ += slots_and_experts_to_load.size();

@@ -4677,3 +4677,1696 @@ Stephens , which was performed in 2001 at the Royal Court Theatre . He had a gue
 
 ---
 
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " , and in 2004 he played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . Boulter was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur , which was performed at the Drum
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+, as " Daniel " in 2009 . Boulter played " Daniel " in the 2009 production of the play The Merchant of Venice at the Royal Shakespeare Company ( RSC ) . He played " Daniel " in the 2009 production of the play The Merchant of Venice at the Royal Shakespeare Company ( RSC ) . He played " Daniel " in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+e @-@ m and its meaning or are unable to understand it at all . " 
+
+ Du Fu was born in 712 in the city of Gongxian , now in the modern - day city of Qinzhou , in the province of Sichuan . He was born into a family of officials and scholars , and his grandfather was a famous poet . He was a descendant of
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . Du Fu and Li Bai 's friendship was not without its problems : they sometimes quarrelled , and they were separated by the An Lush rebellion in 755 . They never met again . Du Fu 's poem " A Song of the Parting Wild
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+itter is the river , and the river is long , 
+
+ The river is long , and the river is long . 
+
+ The river is long , and the river is long . 
+
+ The river is long , and the river is long . 
+
+ The river is long , and the river is long . 
+
+ The river is long , and the river is long . 
+
+ The river is long , and the river
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " , and in 2004 he played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . Boulter was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur , which was performed at the Drum Theatre
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+in 2009 as " Daniel " . Boulter also appeared in the 2009 film The Last Days of American Crime directed by James N Kien . 
+
+In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida Theatre in London . In 20
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+e @-@ m 's intent or are unable to understand it at all . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of the literati , and his ancestors had served as officials in the imperial court for generations . His grandfather was a famous calligrapher and poet .
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . Du Fu and Li Bai 's friendship was not without its problems : they sometimes quarrelled , and they were separated by the An Lush rebellion . However , they remained in contact through poetry . Du Fu 's poems about Li Bai are among his most famous .
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+itterness and resentment have filled my heart , and I have no place to put it . 
+
+ The world is not as it was . 
+
+ The people are in great distress . 
+
+ The country is in chaos . 
+
+ The capital is in ruins . 
+
+ The imperial court is in exile . 
+
+ The war has not ended . 
+
+ The people are still suffering . 
+
+ The country is still in disarray .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+, as " Daniel " in 2009 . In 2010 Boulter played " Daniel " in the television series Casualty . In 2011 Boulter played " Daniel " in the television series Casualty . In 2012 Boulter played " Daniel " in the television series Casualty . In 2013 Boul
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+e @-@ m 's intent or are unable to appreciate the full range of his art . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was the famous calligrapher and poet Du Shenyan . He was a descendant of the famous
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . Du Fu and Li Bai 's friendship was not without its tensions ; they had different personalities and styles . Du Fu 's poetry often reflects the emotional and philosophical depth of his friendship with Li Bai . 
+
+ = = = Later years = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+itter feelings and the sorrow of the people are the same . 
+
+ The people 's sorrow is the same as my sorrow . 
+
+ The people 's sorrow is the same as my sorrow . 
+
+ The people 's sorrow is the same as my sorrow . 
+
+ The people 's sorrow is the same as my sorrow . 
+
+ The people 's sorrow is the same as my sorrow . 
+
+ The people
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " , and in 2004 he played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . Boulter was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur , which was performed at the Drum
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+, as " Daniel " in 2009 . In 2010 Boulter played " Daniel " in the television series Casualty . In 2011 Boulter played " Daniel " in the television series Casualty . In 2012 Boulter played " Daniel " in the television series Casualty . In 2013 Boul
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+e @-@ m 's intent or are unable to appreciate the full range of his art . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was the famous calligrapher and poet Du Shenyan . His family had a long tradition of
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 751 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is about this friendship . 
+
+ = = = The An Lushan Rebellion and the
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+itter feelings and the desire to serve the country are both in vain . 
+
+ The country is broken , but the mountains and rivers remain . 
+
+ In the spring , the city is filled with grass and trees . 
+
+ The feeling of the scene is sad , and the birds are singing . 
+
+ The family is separated by the war , and the letters are not sent . 
+
+ The head of the family is the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " , and in 2004 he played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur , which was performed at the Drum Theatre in Plymouth and the Menier Chocolate Factory in London . He
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+, as " Daniel " in 2009 . In 2010 Boulter played " Daniel " in the television series Casualty . In 2011 Boulter played " Daniel " in the television series Casualty . In 2012 Boulter played " Daniel " in the television series Casualty . In 2013 Boul
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+etics or misinterpret the meaning . " 
+
+ Du Fu was born in 712 in the city of Qufu , the birthplace of Confucius . He was born into a family of scholars and officials , and his grandfather was a famous poet and official . He was a descendant of the famous general Du Rui of the Liang dynasty . His family had a long history of official
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 751 . They were both known for their friendship and their mutual admiration . Du Fu 's poem " The Meeting " ( 《 赠李白 》 ) is a tribute to Li Bai .
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+itter feelings and the sorrow of the old man , 
+
+ The river is long and the river is long . 
+
+ The old man is not a man of the world , 
+
+ The river is long and the river is long . 
+
+ The old man is not a man of the world , 
+
+ The river is long and the river is long . 
+
+ The old man is not a man of the world .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+, as " Daniel " in 2009 . In 2010 Boulter played " Daniel " in the television series Casualty again , and also played " Daniel " in the television series Holby City . In 2011 Boulter played " Daniel " in the television series Casualty for the third time . 
+
+In 2012 , B
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+e @-@ m 's intent or are unable to appreciate the full range of his art . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was the famous poet Du Shenyan . Du Fu 's early life was spent in the capital
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+mple of the " free and easy " style of the Tang dynasty 's most famous poet . Du Fu 's later poetry , while more disciplined and formal , was still influenced by this encounter . The two would meet again in 745 and 755 . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is still in the south ; 
+
+ The war has not yet ended . 
+
+ The country is broken , but the rivers and mountains remain ; 
+
+ In the spring , the grass and trees are green . 
+
+ The people are scattered and the family is broken ; 
+
+ The letters are not sent . 
+
+ The fire of war has been burning for three months ; 
+
+ The family is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=56 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=56 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " , and in 2004 he played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . Boulter was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur , which was performed at the Drum Theatre
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=56 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . In 2010 Boulter played " Daniel " in the television series Casualty again , and also played " Daniel " in the television series Holby City . In 2011 Boulter played " Daniel " in the television series Casualty for the third time . 
+
+In 2012 , Boul
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=56 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+e @-@ m 's intent or are unable to appreciate the full range of his art . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his ancestors had served in the imperial court for generations . His grandfather was a famous calligrapher and poet
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=56 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 751 . They were both part of the " Three per sons " ( San Da Ren ) , a group of three poets who were known for their romantic style . Du Fu 's friendship with Li Bai
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=56 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+itter feelings and the sorrow of the old man , 
+
+ The river is long and the river is long . 
+
+ The old man 's sorrow is not the sorrow of the river , 
+
+ But the sorrow of the people . 
+
+ This is a translation of a poem by Du Fu . 
+
+ The poem 's title is " The Old Man " . 
+
+ The poem 's content is about the sorrow of
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+.v. series The Bill as " Scott Parry " in the episode " The Long and the Short " . In 2004 Boulter played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+as " Daniel " in 2009 . Boulter also appeared in the 2009 film The Last Days of Ted 2000 , which was released in 2010 . 
+
+ In 2010 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , performed at the Almeida
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+e @-@ m or fail to appreciate its full significance . " 
+
+ Du Fu was born in 712 in the city of Qufu , in the province of Shandong . He was born into a family of scholars and officials , and his grandfather was a famous calligrapher and poet . His family had a long history of serving the government , and he was expected to follow
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+mple of the " romantic " style of poetry , which he would later contrast with his own more " realist " style . The two would meet again in 745 and 746 . Du Fu 's poem " The Meeting of the Two Bards " ( 2002 ) is a tribute to this friendship . 
+
+ = = = The An Lushan rebellion
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=64 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=64 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+.v. series The Street as " Simon " , and in 2004 he played " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside Mark Strong and Derek Jacobi . Boulter was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur , which was performed at the Drum Theatre in Plymouth
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=64 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+in 2009 as " Daniel " . In 2009 Boulter appeared in the film The Last Days on Mars , which was released in 2013 . 
+
+In 2010 Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was performed at the Almeida Theatre in London .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=64 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+e @-@ m 's intent or are unable to appreciate the full range of his art . " 
+
+ Du Fu was born in 712 in the city of Qishan , which is now in the modern - day city of Henan , China . He was born into a family of officials and scholars , and his grandfather was a famous poet and official . His early life was spent
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=64 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+mple of the " free and easy " style of the Tang dynasty 's most famous poet . Du Fu 's later work , however , would take a different path , becoming more " constrained " and " serious " . The two poets would meet again in 745 and 755 . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = =
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=64 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+itter and bitter , the old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is not a man of the world . 
+
+ The old man is
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 4
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+
+### Prompt 5
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+The lead scientist, Dr. Emily, decided to interview each of the unicorns to gather information about their unique abilities. She asked them, "If I were to ask you if you have a magic horn, would you say yes?" Each unicorn responded with either a "yes" or a "no." Dr. Emily noticed that exactly 1/3 of the unicorns answered "yes" to
+```
+
+---
+

@@ -431,6 +431,7 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     std::vector<bool> expert_slot_ready_; // For condition variable, size max_cached_experts_
     std::condition_variable expert_slots_cv_; // To wait for background loading
     std::unique_ptr<std::atomic<uint64_t>[]> slot_load_id_; // Logical abort ID per slot
+    std::atomic<bool> abort_pending_prefetches_{false};
     
     // Expert file format (auto-detected on first load)
     enum class ExpertFormat { UNKNOWN, UNPACKED, PACKED };
@@ -449,8 +450,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
 
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, uint64_t load_id, const std::string& weights_dir);
     void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, uint64_t load_id, const std::string& weights_dir);
-    void load_experts_weights(const std::vector<ExpertLoadRequest>& slots_and_experts, const std::string& weights_dir);
-    void load_experts_weights_packed(const std::vector<ExpertLoadRequest>& slots_and_experts, const std::string& weights_dir);
+    void load_experts_weights(const std::vector<ExpertLoadRequest>& slots_and_experts, const std::string& weights_dir, bool is_prefetch = false);
+    void load_experts_weights_packed(const std::vector<ExpertLoadRequest>& slots_and_experts, const std::string& weights_dir, bool is_prefetch = false);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
     std::vector<int64_t> ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats = true);
     size_t pick_victim_ready();

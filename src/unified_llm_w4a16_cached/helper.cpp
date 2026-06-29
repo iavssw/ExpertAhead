@@ -1188,7 +1188,7 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
 }
 
 void MixtureOfExpertsImpl::load_experts_weights_packed(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts,
-                                                       const std::string& weights_dir) {
+                                                       const std::string& weights_dir, bool is_prefetch) {
 #include "unified_llm_w4a16_common/moe_expert_load_packed.inl"
 }
 
@@ -1197,7 +1197,7 @@ void MixtureOfExpertsImpl::load_expert_weights_packed(int64_t slot_idx, int64_t 
     load_experts_weights_packed({{slot_idx, expert_idx}}, weights_dir);
 }
 
-void MixtureOfExpertsImpl::load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir) {
+void MixtureOfExpertsImpl::load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir, bool is_prefetch) {
     auto start_time = std::chrono::high_resolution_clock::now();
     
     if (weights_dir.empty()) {
@@ -1221,7 +1221,7 @@ void MixtureOfExpertsImpl::load_experts_weights(const std::vector<std::pair<int6
     }
 
     if (expert_format_ == ExpertFormat::PACKED) {
-        load_experts_weights_packed(slots_and_experts, weights_dir);
+        load_experts_weights_packed(slots_and_experts, weights_dir, is_prefetch);
         auto end_time = std::chrono::high_resolution_clock::now();
         double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
         total_expert_load_time_ms_ += ms;

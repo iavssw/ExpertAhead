@@ -35,16 +35,13 @@ def compile_benchmark():
     subprocess.run(cmd, check=True)
     print("Compilation successful.")
 
-def run_benchmark(num_experts, packed_dir):
+def run_benchmark(num_experts, packed_dir, num_threads):
     """
-    New binary signature: run_ssd_benchmark <packed_dir> <iters> [num_experts]
-    Output labels:
-        "Sequential (K experts, serial loop)"
-        "Parallel   (K experts, IOThreadPool)"
+    New binary signature: run_ssd_benchmark <packed_dir> <iters> [num_experts] [num_threads]
     """
     cmd = [
         "sudo", "./run_ssd_benchmark",
-        packed_dir, str(ITERS), str(num_experts)
+        packed_dir, str(ITERS), str(num_experts), str(num_threads)
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
@@ -71,94 +68,113 @@ def run_benchmark(num_experts, packed_dir):
     return data
 
 def main():
-    compile_benchmark()
+    plot_only = "--plot-only" in sys.argv
+    if not plot_only:
+        compile_benchmark()
 
-    expert_counts = [1, 2, 3, 4, 5, 6, 7, 8]
+    expert_counts = [1, 2, 4, 8, 16, 24, 32, 48, 64]
+    fixed_threads = 16
 
     all_data = {
-        "Seq": {"time": [], "bw": []},
-        "Par": {"time": [], "bw": []},
+        "Seq": {"time": [], "total_time": []},
+        "Par": {"time": [], "total_time": []},
     }
 
-    for model_name, dirs in MODELS.items():
-        print(f"\n--- Running benchmarks for {model_name} ---")
-        for count in expert_counts:
-            print(f"Loading {count} experts...")
-            raw_data = run_benchmark(count, dirs["packed"])
-
-            for key in ("Seq", "Par"):
-                if key in raw_data:
-                    mean_us, bw_gbps = raw_data[key]
-                    time_per_expert_ms = (mean_us / 1000.0) / (count * 48)
-                    all_data[key]["time"].append(time_per_expert_ms)
-                    all_data[key]["bw"].append(bw_gbps)
-                else:
-                    print(f"  Warning: missing {key} data for K={count}")
-                    all_data[key]["time"].append(None)
-                    all_data[key]["bw"].append(None)
+    if plot_only:
+        import csv
+        csv_file = "expert_loading_benchmark.csv"
+        print(f"Reading data from {csv_file}...")
+        parsed = {"Seq": {}, "Par": {}}
+        expert_counts_set = set()
+        
+        try:
+            with open(csv_file, "r") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    k = int(row["Num_Experts"])
+                    expert_counts_set.add(k)
+                    config = "Seq" if "Seq" in row["Config"] else "Par"
+                    
+                    t_per_exp = float(row["Time_per_Expert_ms"])
+                    if "Total_Time_ms" in row:
+                        t_total = float(row["Total_Time_ms"])
+                    else:
+                        # Infer from older CSV format
+                        t_total = t_per_exp * (k * 48)
+                    
+                    parsed[config][k] = (t_per_exp, t_total)
+            
+            expert_counts = sorted(list(expert_counts_set))
+            for k in expert_counts:
+                for key in ("Seq", "Par"):
+                    if k in parsed[key]:
+                        t, tt = parsed[key][k]
+                        all_data[key]["time"].append(t)
+                        all_data[key]["total_time"].append(tt)
+                    else:
+                        all_data[key]["time"].append(None)
+                        all_data[key]["total_time"].append(None)
+        except Exception as e:
+            print(f"Error reading {csv_file}: {e}")
+            sys.exit(1)
+    else:
+        for model_name, dirs in MODELS.items():
+            print(f"\n--- Running benchmarks for {model_name} (T={fixed_threads}) ---")
+            for count in expert_counts:
+                print(f"Loading {count} experts...")
+                raw_data = run_benchmark(count, dirs["packed"], fixed_threads)
+    
+                for key in ("Seq", "Par"):
+                    if key in raw_data:
+                        mean_us, bw_gbps = raw_data[key]
+                        total_time_ms = mean_us / 1000.0
+                        time_per_expert_ms = total_time_ms / (count * 48)
+                        all_data[key]["time"].append(time_per_expert_ms)
+                        all_data[key]["total_time"].append(total_time_ms)
+                    else:
+                        print(f"  Warning: missing {key} data for K={count}")
+                        all_data[key]["time"].append(None)
+                        all_data[key]["total_time"].append(None)
 
     # ── Plotting ──────────────────────────────────────────────────────────────
-    fig, axes = plt.subplots(1, 3, figsize=(21, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
     colors  = {"Seq": "steelblue",  "Par": "darkorange"}
     markers = {"Seq": "^",          "Par": "D"}
     labels  = {"Seq": "Sequential (serial loop)",
-               "Par": "Parallel (IOThreadPool, 16 threads)"}
+               "Par": "Parallel (IOThreadPool)"}
 
-    ax_time, ax_bw, ax_speedup = axes
+    ax_time, ax_total = axes
 
     # 1. Time per expert
     for key in ("Seq", "Par"):
         valid = [(x, y) for x, y in zip(expert_counts, all_data[key]["time"]) if y is not None]
-        xs, ys = zip(*valid) if valid else ([], [])
-        ax_time.plot(xs, ys, label=labels[key], color=colors[key],
-                     marker=markers[key], markersize=7, linewidth=2)
+        if valid:
+            xs, ys = zip(*valid)
+            ax_time.plot(xs, ys, label=labels[key], color=colors[key],
+                         marker=markers[key], markersize=7, linewidth=2)
 
     ax_time.set_xlabel("Number of experts loaded (K)", fontsize=12)
     ax_time.set_ylabel("Time per expert (ms)", fontsize=12)
-    ax_time.set_title("Expert load latency vs parallelism", fontsize=13)
+    ax_time.set_title("Expert load latency vs number of experts", fontsize=13)
     ax_time.set_xticks(expert_counts)
     ax_time.grid(True, ls="--", alpha=0.5)
     ax_time.legend(fontsize=10)
 
-    # 2. Aggregate bandwidth
+    # 2. Total time
     for key in ("Seq", "Par"):
-        valid = [(x, y) for x, y in zip(expert_counts, all_data[key]["bw"]) if y is not None]
-        xs, ys = zip(*valid) if valid else ([], [])
-        ax_bw.plot(xs, ys, label=labels[key], color=colors[key],
-                   marker=markers[key], markersize=7, linewidth=2)
+        valid = [(x, y) for x, y in zip(expert_counts, all_data[key]["total_time"]) if y is not None]
+        if valid:
+            xs, ys = zip(*valid)
+            ax_total.plot(xs, ys, label=labels[key], color=colors[key],
+                          marker=markers[key], markersize=7, linewidth=2)
 
-    ax_bw.axhline(y=MAX_SSD_BW, color="green", linestyle="--", linewidth=1.5,
-                  label=f"SSD peak ({MAX_SSD_BW} GB/s)")
-    ax_bw.set_xlabel("Number of experts loaded (K)", fontsize=12)
-    ax_bw.set_ylabel("Aggregate bandwidth (GB/s)", fontsize=12)
-    ax_bw.set_title("SSD bandwidth utilisation", fontsize=13)
-    ax_bw.set_xticks(expert_counts)
-    ax_bw.grid(True, ls="--", alpha=0.5)
-    ax_bw.legend(fontsize=10)
-
-    # 3. Speedup (Seq wall-time / Par wall-time)
-    speedup_vals = []
-    for i in range(len(expert_counts)):
-        ts = all_data["Seq"]["time"][i]  # time per expert (ms)
-        tp = all_data["Par"]["time"][i]
-        if ts is not None and tp is not None and tp > 0:
-            # wall-clock ratio: (ts * K) / (tp * K) = ts / tp
-            speedup_vals.append(ts / tp)
-        else:
-            speedup_vals.append(None)
-
-    valid_s = [(x, y) for x, y in zip(expert_counts, speedup_vals) if y is not None]
-    xs, ys = zip(*valid_s) if valid_s else ([], [])
-    ax_speedup.plot(xs, ys, color="purple", marker="D", markersize=7, linewidth=2,
-                    label="Speedup (Seq / Par)")
-    ax_speedup.axhline(y=1.0, color="black", linestyle="-", linewidth=1, alpha=0.4)
-    ax_speedup.set_xlabel("Number of experts loaded (K)", fontsize=12)
-    ax_speedup.set_ylabel("Speedup", fontsize=12)
-    ax_speedup.set_title("Parallelisation speedup", fontsize=13)
-    ax_speedup.set_xticks(expert_counts)
-    ax_speedup.grid(True, ls="--", alpha=0.5)
-    ax_speedup.legend(fontsize=10)
+    ax_total.set_xlabel("Number of experts loaded (K)", fontsize=12)
+    ax_total.set_ylabel("Total time (ms)", fontsize=12)
+    ax_total.set_title("Total load latency vs number of experts", fontsize=13)
+    ax_total.set_xticks(expert_counts)
+    ax_total.grid(True, ls="--", alpha=0.5)
+    ax_total.legend(fontsize=10)
 
     plt.tight_layout()
 
@@ -167,14 +183,13 @@ def main():
     csv_file = "expert_loading_benchmark.csv"
     with open(csv_file, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["Num_Experts", "Config", "Time_per_Expert_ms",
-                         "Total_Bandwidth_GBps"])
+        writer.writerow(["Num_Experts", "Config", "Time_per_Expert_ms", "Total_Time_ms"])
         for i, count in enumerate(expert_counts):
             for key in ("Seq", "Par"):
                 t = all_data[key]["time"][i]
-                b = all_data[key]["bw"][i]
+                tt = all_data[key]["total_time"][i]
                 if t is not None:
-                    writer.writerow([count, labels[key], f"{t:.4f}", f"{b:.4f}"])
+                    writer.writerow([count, labels[key], f"{t:.4f}", f"{tt:.2f}"])
     print(f"\nData saved to {csv_file}")
 
     out_file = "expert_loading_scaling.png"

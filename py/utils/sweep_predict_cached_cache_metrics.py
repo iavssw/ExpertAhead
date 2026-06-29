@@ -1453,7 +1453,7 @@ def oracle_baseline_sweep_configs(
         else iter_cache_lookahead_pairs(args, min_cache_map)
     )
     for cache_size, lookahead in pair_iter:
-        if not full_union_only and cache_size not in seen_lru_cache_sizes:
+        if cache_size not in seen_lru_cache_sizes:
             seen_lru_cache_sizes.add(cache_size)
             lru = cfg(
                 question, "Neither (LRU)", "cached",
@@ -1485,18 +1485,19 @@ def oracle_baseline_sweep_configs(
                 top_b["oracle_full_union"] = False
                 configs.append(top_b)
                 
-                pf = cfg(
-                    question, f"Actual Predictor B={budget}",
-                    "predict", cache_size, 0.0, 0,
-                    lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
-                    mode_perplexity=False, mode_generate=True,
-                )
-                # Pass through predictor properties if added by _make_custom_configs
-                if predictor_base_dir:
-                    pf["predictor_base_dir"] = predictor_base_dir
-                if predictor_tag:
-                    pf["predictor_tag"] = predictor_tag
-                configs.append(pf)
+                if not getattr(args, "no_actual_predictor", False):
+                    pf = cfg(
+                        question, f"Actual Predictor B={budget}",
+                        "predict", cache_size, 0.0, 0,
+                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
+                        mode_perplexity=False, mode_generate=True,
+                    )
+                    # Pass through predictor properties if added by _make_custom_configs
+                    if predictor_base_dir:
+                        pf["predictor_base_dir"] = predictor_base_dir
+                    if predictor_tag:
+                        pf["predictor_tag"] = predictor_tag
+                    configs.append(pf)
 
         if getattr(args, "include_oracle_full_union", False) or full_union_only:
             full = cfg(
@@ -1559,6 +1560,56 @@ def lambda_fn_sweep_configs(
                         mode_perplexity=True, mode_generate=True,
                     ))
 
+    return configs
+
+def unified_sweep_configs(
+    args: argparse.Namespace,
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    configs: List[Dict[str, Any]] = []
+    question = "UNIFIED_SWEEP"
+    for cache_size in args.cache_sizes:
+        rnd = cfg(
+            question, "Neither (RANDOM)", "cached",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=None, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        rnd["cache_policy"] = "RANDOM"
+        configs.append(rnd)
+
+        oracle_cc = cfg(
+            question, "Oracle Full Union + CC (J=6)", "predict",
+            cache_size, 1.0, 6,
+            lookahead=1, prefetch_budget=cache_size, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        oracle_cc["is_oracle"] = True
+        oracle_cc["oracle_full_union"] = True
+        configs.append(oracle_cc)
+    return configs
+
+def sec3_3_2_configs(
+    args: argparse.Namespace,
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    configs: List[Dict[str, Any]] = []
+    question = "SEC3_3_2"
+    for cache_size in args.cache_sizes:
+        # # LRU
+        # c_lru = cfg(question, "Neither (LRU)", "cached", cache_size, 0.0, 0, lookahead=1, prefetch_budget=None, prefetch_threshold=0.0, mode_perplexity=False, mode_generate=True)
+        # c_lru["cache_policy"] = "LRU"
+        # configs.append(c_lru)
+        
+        # RANDOM
+        c_rand = cfg(question, "Neither (RANDOM)", "cached", cache_size, 0.0, 0, lookahead=1, prefetch_budget=None, prefetch_threshold=0.0, mode_perplexity=False, mode_generate=True)
+        c_rand["cache_policy"] = "RANDOM"
+        configs.append(c_rand)
+
+        # Cache-Cond Only lambda=1.0 FN=4, 5, 6
+        for j in [4, 5, 6]:
+            c_cc = cfg(question, f"Cache-Cond (J={j})", "cached", cache_size, 1.0, j, lookahead=1, prefetch_budget=None, prefetch_threshold=0.0, mode_perplexity=False, mode_generate=True)
+            configs.append(c_cc)
     return configs
 
 
@@ -3408,6 +3459,8 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             "custom_1_16_no_ppl": lambda: _make_custom_configs(custom_1_16_no_ppl_configs, "CUSTOM_1_16_NO_PPL"),
             "lambda_fn_sweep": lambda: lambda_fn_sweep_configs(args, min_cache_map),
             "oracle_baseline_sweep": lambda: _make_custom_configs(oracle_baseline_sweep_configs, "ORACLE_BASELINE_SWEEP"),
+            "sec3_3_2_cache_cond": lambda: sec3_3_2_configs(args, min_cache_map),
+            "unified_sweep": lambda: unified_sweep_configs(args, min_cache_map),
         }
         configs = question_builders[args.sweep_question]()
         # When --prefetch-only, also include RANDOM baseline in the same run
@@ -3522,6 +3575,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "custom_1_16_no_ppl",
             "lambda_fn_sweep",
             "oracle_baseline_sweep",
+            "sec3_3_2_cache_cond",
+            "unified_sweep",
         ],
         default="custom_1_16_no_ppl",
         help="custom_1_16(_no_ppl): LRU/prefetch/cache-cond/hybrid over lookahead x budget "
@@ -3547,7 +3602,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--predictor-base-dir",
         type=str,
-        default="/home/michael/heteroPredict/trainingData/qwen3_30b/final_multi_input_model",
+        default="/home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb",
         help="Base directory containing eh1_h32_fN predictor dirs for comprehensive mode.",
     )
     p.add_argument(
@@ -3699,6 +3754,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--include-oracle-full-union",
         action="store_true",
         help="oracle_baseline_sweep: add Oracle Full Union row per cache size (prefetch entire LA window).",
+    )
+    p.add_argument(
+        "--no-actual-predictor",
+        action="store_true",
+        help="oracle_baseline_sweep: skip running the actual predictor, only run oracle and baselines.",
     )
     p.add_argument(
         "--oracle-full-union-only",
