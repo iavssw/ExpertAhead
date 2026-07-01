@@ -386,7 +386,8 @@ def run_one(
         cmd: List[str] = [_sweep_python(), exp.script, *exp.extra_args]
         cmd.extend([
             "--num-prompts", str(num_prompts),
-            "--max-new-tokens", str(max_new_tokens),
+            "--max-new-tokens", str(max_new_tokens),    
+            "--prompt-max-chars", str(prompt_max_chars),
             "--output-prefix", prefix,
         ])
         if subprocess_timeout is not None:

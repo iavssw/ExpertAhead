@@ -132,6 +132,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
                          int64_t prefetch_experts_count = 1, const std::string& oracle_trace_path = "", int64_t oracle_lookahead = 0,
                          bool oracle_full_union = false, float prefetch_threshold = 0.0f);
 
+    ~MixtureOfExpertsImpl();
+
     torch::Tensor forward(const torch::Tensor &x, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
     void set_weights_dir(const std::string& dir) { weights_dir_ = dir; }
     void prefill_cache_for_testing();

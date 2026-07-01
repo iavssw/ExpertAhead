@@ -1393,6 +1393,41 @@ def custom_1_16_no_ppl_configs(
                     )
                     oracle_cfg["is_oracle"] = True
                     configs.append(oracle_cfg)
+                    
+            for threshold in getattr(args, "prefetch_thresholds", []):
+                if threshold <= 0.0:
+                    continue
+                for pj in prefetch_j_list:
+                    pj_label = f" J={pj}" if pj else ""
+                    c = cfg(
+                        "CUSTOM_1_16_NO_PPL", f"Prefetch Only T={threshold}{pj_label}{tag_suffix}",
+                        "predict", cache_size, 0.0,
+                        pj,
+                        lookahead=lookahead, prefetch_budget=cache_size, prefetch_threshold=threshold,
+                        mode_perplexity=_routing_policy_perplexity(0.0, args),
+                        mode_generate=True,
+                    )
+                    if predictor_base_dir:
+                        c["predictor_base_dir"] = predictor_base_dir
+                        c["predictor_tag"] = predictor_tag
+                    configs.append(c)
+                for lambda_val in args.lambdas:
+                    if lambda_val == 0.0:
+                        continue
+                    if prefetch_only:
+                        continue
+                    bc = cfg(
+                        "CUSTOM_1_16_NO_PPL", f"Both λ={lambda_val} T={threshold}{tag_suffix}",
+                        "predict", cache_size, lambda_val,
+                        args.routing_bias_top_n,
+                        lookahead=lookahead, prefetch_budget=cache_size, prefetch_threshold=threshold,
+                        mode_perplexity=_routing_policy_perplexity(lambda_val, args),
+                        mode_generate=True,
+                    )
+                    if predictor_base_dir:
+                        bc["predictor_base_dir"] = predictor_base_dir
+                        bc["predictor_tag"] = predictor_tag
+                    configs.append(bc)
     return configs
 
 
@@ -1589,6 +1624,126 @@ def unified_sweep_configs(
         configs.append(oracle_cc)
     return configs
 
+def thread_benchmark_configs(
+    args: argparse.Namespace,
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    configs: List[Dict[str, Any]] = []
+    question = "THREAD_BENCH"
+    for cache_size in args.cache_sizes:
+        # 1. RANDOM
+        c_rand = cfg(
+            question, "Neither (RANDOM)", "cached",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=None, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        c_rand["cache_policy"] = "RANDOM"
+        configs.append(c_rand)
+
+        # 2. Oracle Full Union
+        c_oracle = cfg(
+            question, "Oracle Full Union", "predict",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=cache_size, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        c_oracle["is_oracle"] = True
+        c_oracle["oracle_full_union"] = True
+        configs.append(c_oracle)
+
+        # 3. Predictor B=12
+        c_pred = cfg(
+            question, "Prefetch Only B=12", "predict",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=12, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        configs.append(c_pred)
+
+        # 4. Cache Cond Only lambda=1 (J=6)
+        c_cc = cfg(
+            question, "Cache-Cond Only lambda=1.0", "cached",
+            cache_size, 1.0, 6,
+            lookahead=1, prefetch_budget=None, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        configs.append(c_cc)
+
+        # 5. Both lambda=1 B=12 (J=6)
+        c_both = cfg(
+            question, "Both lambda=1.0 B=12", "predict",
+            cache_size, 1.0, 6,
+            lookahead=1, prefetch_budget=12, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        configs.append(c_both)
+        
+    return configs
+
+def meeting_sweep_sequential_configs(
+    args: argparse.Namespace,
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    configs: List[Dict[str, Any]] = []
+    question = "MEETING_SEQ"
+    for cache_size in [8, 16, 24]:
+        c_rand = cfg(
+            question, "Neither (RANDOM)", "cached",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=None, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        c_rand["cache_policy"] = "RANDOM"
+        configs.append(c_rand)
+    return configs
+
+def meeting_sweep_parallel_configs(
+    args: argparse.Namespace,
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    configs: List[Dict[str, Any]] = []
+    question = "MEETING_PAR"
+    
+    grid = {
+        8: [(1, [2, 4, 6, 8])],
+        16: [(1, [4, 8, 12, 16]), (2, [4, 8, 12, 16])],
+        24: [(1, [6, 12, 18, 24]), (2, [6, 12, 18, 24]), (3, [6, 12, 18, 24])]
+    }
+    
+    for cache_size in [8, 16, 24]:
+        c_rand = cfg(
+            question, "Neither (RANDOM)", "cached",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=None, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        c_rand["cache_policy"] = "RANDOM"
+        configs.append(c_rand)
+        
+        c_oracle = cfg(
+            question, "Oracle Full Union", "predict",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=cache_size, prefetch_threshold=0.0,
+            mode_perplexity=False, mode_generate=True,
+        )
+        c_oracle["is_oracle"] = True
+        c_oracle["oracle_full_union"] = True
+        configs.append(c_oracle)
+        
+        if cache_size in grid:
+            for la, budgets in grid[cache_size]:
+                for b in budgets:
+                    c_pred = cfg(
+                        question, f"Predictor LA={la} B={b}", "predict",
+                        cache_size, 0.0, 0,
+                        lookahead=la, prefetch_budget=b, prefetch_threshold=0.0,
+                        mode_perplexity=False, mode_generate=True,
+                    )
+                    configs.append(c_pred)
+                    
+    return configs
+
 def sec3_3_2_configs(
     args: argparse.Namespace,
     min_cache_map: Optional[Dict[int, int]] = None,
@@ -1607,7 +1762,7 @@ def sec3_3_2_configs(
         configs.append(c_rand)
 
         # Cache-Cond Only lambda=1.0 FN=4, 5, 6
-        for j in [4, 5, 6]:
+        for j in [6]:
             c_cc = cfg(question, f"Cache-Cond (J={j})", "cached", cache_size, 1.0, j, lookahead=1, prefetch_budget=None, prefetch_threshold=0.0, mode_perplexity=False, mode_generate=True)
             configs.append(c_cc)
     return configs
@@ -3461,6 +3616,9 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             "oracle_baseline_sweep": lambda: _make_custom_configs(oracle_baseline_sweep_configs, "ORACLE_BASELINE_SWEEP"),
             "sec3_3_2_cache_cond": lambda: sec3_3_2_configs(args, min_cache_map),
             "unified_sweep": lambda: unified_sweep_configs(args, min_cache_map),
+            "thread_benchmark": lambda: thread_benchmark_configs(args, min_cache_map),
+            "meeting_sweep_sequential": lambda: meeting_sweep_sequential_configs(args, min_cache_map),
+            "meeting_sweep_parallel": lambda: meeting_sweep_parallel_configs(args, min_cache_map),
         }
         configs = question_builders[args.sweep_question]()
         # When --prefetch-only, also include RANDOM baseline in the same run
@@ -3577,6 +3735,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "oracle_baseline_sweep",
             "sec3_3_2_cache_cond",
             "unified_sweep",
+            "thread_benchmark",
+            "meeting_sweep_sequential",
+            "meeting_sweep_parallel",
         ],
         default="custom_1_16_no_ppl",
         help="custom_1_16(_no_ppl): LRU/prefetch/cache-cond/hybrid over lookahead x budget "
@@ -3588,6 +3749,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--model", choices=["qwen", "mixtral"], default="qwen")
     p.add_argument("--cache-sizes", type=int, nargs="+", default=[8], help="Cache sizes to sweep.")
     p.add_argument("--prefetch-budgets", type=int, nargs="+", default=[16, 32], help="Explicit prefetch budgets when --custom-explicit-prefetch-budgets is set.")
+    p.add_argument("--prefetch-thresholds", type=float, nargs="+", default=[], help="Probability thresholds to sweep for threshold-based routing.")
     p.add_argument("--prefetch-threshold", type=float, default=0.0, help="Probability threshold (0.0 to 1.0) to filter experts in the predictor backend.")
     p.add_argument("--budget-fractions", type=float, nargs="+", default=[0.25, 0.5, 0.75, 1.0],
                    help="Budget as a fraction of cache size for custom_1_16/lambda_fn/top_p sweeps. "

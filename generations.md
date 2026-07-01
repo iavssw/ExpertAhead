@@ -6370,3 +6370,21675 @@ The lead scientist, Dr. Emily, decided to interview each of the unicorns to gath
 
 ---
 
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 195
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth as King George VI . Boulter played " the young king " in the film . He was cast in the role after being recommended by his agent . Boulter described the experience of working on the film as " a real privilege " and " a very special experience " . He also appeared in the 2011 film The Iron Lady
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+time was too unrefined for the examiners . However , he was able to secure a minor post in the capital , and in 740 , he married into a prominent family . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in Luoyang at the time
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the sense of being unable to pass the exam . He was simply not selected for the degree . The exam was extremely competitive , and only a small percentage of candidates were accepted . 
+
+ In 741 , he moved to the capital city of Chang 'n , and began a period of " wandering " ( youxue ) , which was common for scholars of the time to do before taking
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Alexi Kaye Campbell . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 196
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+time was too poetic and not sufficiently orthodox . He then took the exam again in 741 , and passed . However , he was not given a government post immediately . He was assigned to a minor post in the capital , but he was not satisfied with the position and resigned . He then spent several years in the countryside , where he married and had children . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Wilson and performed at the Almeida Theatre . In a review of the play for The Guardian , critic Fionnuala Ellwood
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " romantic " and not yet in the classical style required for the exam . He then took a second attempt in 741 , and passed . He was then given a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " Private 1st Class " in the film . 
+
+In the 2010s , Boulter appeared in the 2013 film The Impossible , in which he played " Lucas " , the son of the main character . The film was directed by J.A. Bayona and based on a true story . Boulter also appeared in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was not a failure in the literary sense . He had already begun to write poetry that was more than just a product of his education . He was also beginning to travel more widely , and his early poems show a certain amount of ambition and a desire to be noticed . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " Private 1st Class " in the film . 
+
+In the 2010s , Boulter appeared in the 2013 film The Impossible , in which he played " Lucas " , the son of the main character . The film was directed by J.A. Bayona and based on a true story . Boulter also appeared in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was not a failure in the literary sense . He had already begun to write poetry that was more than just a product of his education . He was also beginning to travel more widely , and his early poems show a certain amount of ambition and a desire to be noticed . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Xuanzhou ( now in Anhui ) . He served for a short time before being dismissed for reasons that are unclear . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Xuanzhou ( now in Anhui ) . He served for a short time before being dismissed for reasons that are unclear . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph noted , " Robert Boulter is a revelation as Tom , the young
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a minor post in the capital , and in 740 , he moved to the city of Luoyang . There he met the poet Li Bai , who was a few years older . The two became close friends , and they are often referred to as " Li Du " , a term that has become a common reference to the two . They shared a love of alcohol and a passion for poetry , and they often
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph noted , " Robert Boulter is a revelation as Tom , the young
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a minor post in the capital , and in 740 , he moved to the city of Luoyang . There he met the poet Li Bai , who was a few years older . The two became close friends , and they are often referred to as " Li Du " , a term that has become a common reference to the two . They shared a love of alcohol and a passion for poetry , and they often
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the UK . The play was directed by Lyndsey Turner and was a
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=None
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . This was a low - level position , but it gave him the opportunity to meet influential people and to begin his literary career . 
+
+ = = = The An Lushan rebellion and its aftermath = = = 
+
+ In 755 , the An Lushan rebellion broke out in the north of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the UK . The play was directed by Lyndsey Turner and was a
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . This was a low - level position , but it gave him the opportunity to meet influential people and to begin his literary career . 
+
+ = = = The An Lushan rebellion and its aftermath = = = 
+
+ In 755 , the An Lushan rebellion broke out in the north of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the play for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of about ten years in the east of the country , during which he may have married and had a son . In 744 , he met Li Bai , the other great Tang poet , and the two became friends . They were both in Chang 'an in the early 750s , but their paths diverged . Du Fu 's career was not going well . He was not able to secure a
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Works . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too literary and not in the style of the required " jinshi " examination . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . They had a son and a daughter , but the daughter died young . In 745 , he left the capital for a time , and
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success , and was later transferred to the West End and then to Broadway . The New York Times reviewed the play and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 747 , and again failed . He was then 35 years old . He was not to be admitted to the Hanlin Academy until 750 , at the age of 38 . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times reviewed the production and noted , " Robert Boulter is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too literary and not sufficiently focused on the rigidly formal eight- @- character regulated verse ( lüshi ) , which was the required format for the exam . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too literary and not sufficiently focused on the rigidly formal eight- character parallelism required for the examination . However , he was able to secure a government post in the capital , and in 741 , he married a woman from the same family as his mother 's family . This was a common practice in the Tang dynasty , and the marriage was not a love match . The couple had a son and a daughter , but the daughter died young . 
+
+ = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Daviditches , directed by Matthew Dunster . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a revelation . " Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near the capital , where he lived for several years . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too literary and not sufficiently focused on the rigidly formal eight - part essay style required for the exam . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He married in 741 , and his wife , Lady Yang , was from a prominent family . They had a son and a daughter . In 744 , he left the capital for a period of travel . He was in the area
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Alexi Kaye Campbell , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of about ten years in the east of the Yellow River , in the area of the modern - day city of Qufu , Confucius ' hometown . He later described this time as the " ten years of hardship " . During this time , he married , and his first son was born . He also began to write more seriously . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Alexi Kaye Campbell , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Works . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in Lu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was directed by Lyndsey Turner and featured a cast that included Matthew Goode and Douglas Hodge . The play was a critical success
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 741 , and passed . He was then given a minor post in the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was directed by Lyndsey Turner and featured a cast that included Matthew Goode and Douglas Hodge . The play was a critical success
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 741 , and passed . He was then given a minor post in the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " in style . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinsu , and in the Yangtze River valley . He was a guest of the aristocracy and the wealthy , and he wrote of the opulence of the time . He also began to write about the suffering of the common people . In 744 , he
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success , and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " in style . However , he was not a failure . He continued to travel , and in 740 , he married the daughter of a prominent family , which gave him a more stable financial situation . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a turning point in Du Fu 's life and in
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+The 2010 film The King 's Speech is a historical drama about the 1930s and 1940s, focusing on the life of King George VI of the United Kingdom. The film was directed by Tom Hooper and written by David Seidler. It stars Colin Firth as the King, and the film received
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the other great Tang poet , and the two became friends . They were both in Chang 'an in the early 750s , but their friendship was not always easy . Du Fu 's poetry often reflects the difficulties of the time , and the two were known to have had arguments . 
+
+ = = = The An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in the film . In 2012 , he appeared in the film The Iron Lady , in which he played a soldier in the film . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the Yellow River , in the area of the modern - day provinces of Shandong and Henan . He married in 741 , and his wife , Lady Yang , was from a family of high rank and influence . She was a devoted wife and mother , and the couple had four sons and a daughter , though only one
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The play was also adapted into a film in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Revenue . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played a soldier in the film . 
+
+In 20
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Luoyang . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter as Tom is a revelation . "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of about ten years in the east of the empire , in the area of Qinyang ( now in Henan ) , where he lived with his father . He was not particularly successful in his studies , and he did not pass the exam again until 750 , when he was 38 years old . 
+
+ = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 741 , and again in 746 . He finally passed the highest level of the examination in 750 , at the age of 38 . He was then assigned to a minor post in the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical and commercial success . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter brings a touching vulnerability to the role
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major turning point in the Tang dynasty and in Du
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter brings
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Luoyang . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Alexi Kaye Campbell . The play was performed at the Royal Court Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 , he married into a prominent family in the area . He then moved to the village of Qishan , near the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major turning point in
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter as Tom is a revelation . "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Fuchun . This was a minor post , but it was a step on the ladder of officialdom . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter brings
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the literary sense : he had already begun to write poetry in a style that would later be considered his own . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the literary sense . He had already begun to write poetry in a style that would later be called " the old style " ( gushí ) , and he had also written in the " parallel " ( lianwen ) style , which was popular at the time . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not yet " classical " enough for the examiners . He was not alone in this : many of the candidates who failed the exam were later to become famous poets . Du Fu 's failure to pass the exam was a major turning point in his life . He then embarked on a period of travel and study , which lasted for about a decade . During this time , he met the poet Li Bai , who was about ten years older than him . The two became close
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later passed the exam in 741 , and was appointed to a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major turning point in the Tang dynasty and in Du Fu 's life .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played " Private " in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played " Private " in the film . 
+
+In
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of about ten years in the east of the empire , in the area of Luoyang and the lower reaches of the Yellow River . During this time , he was a guest of the Tang court , and he may have been a minor official in the region . He was also a guest of the aristocratic families of the area . He was a frequent visitor to the capital , and he may have been a minor official in
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu . He was then transferred to the capital in 745 , where he met the poet Li Bai and the musician Gao Lian . This meeting is considered a landmark in the history of Chinese poetry . Du Fu 's friendship with Li Bai was a famous one ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too poetic and not sufficiently " classical " in style . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinsu , and in the capital of the Tang dynasty , Chang 'n . He was a guest of the aristocracy and the Buddhist and Daoist monasteries , and he was exposed to the culture of the court and the common people . He was also exposed to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter as Tom is a revelation . " In
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too poetic and not sufficiently " classical " in style . However , he was later able to secure a government post through the recommendation of a patron . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played a soldier in the film . 
+
+In 20
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the literary sense : he was already known for his poetic talent . He was invited to the capital by a patron , and he spent the next several years in the capital , where he met the poet Li Bai and the calligrapher and painter Zhang Xu . These were the " Three perfections " of the Tang dynasty : the poet Li Bai , the calligrapher Zhang Xu and the poet Du
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too literary and not in the standard format of the " eight - part essay " , which was the required format for the exam . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out , and the Tang court was thrown into chaos . Du Fu was in Luoyang at the time , and was captured by the rebels . He was held in Chang 'an for three years
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played " Private " in the film . 
+
+In 2011 , Boulter played " Daniel " in the play The Merchant of Venice at the Almeida Theatre . He also played " Daniel " in the 2011 film adaptation of The Merchant of Venice . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too literary and not sufficiently focused on the Confucian classics . This is a common problem for young poets who are more interested in the arts than in the rigours of the civil service examination . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played " Private " in the film . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too literary and not in the standard format of the time . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Revenue . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in a minor role as a soldier . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the play for The Guardian , theatre critic Michael Billington noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of about ten years in the east of the empire , in the area of Luoyang and the lower reaches of the Yellow River . During this time , he married , and his first son was born . He also began to write more seriously . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in a minor role as a soldier . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the play for The Guardian , theatre critic Michael Billington noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of travel in the lower Yangtze region , and in 740 , he moved to the capital , Luoyang . 
+
+ = = = An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Alexi Kaye Campbell , which was performed at the Almeida Theatre . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too literary and not in the style of the " eight - legged " essay required for the exam . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu ( near modern - day Xuzhou ) . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Alexi Rzepka . The play was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships and the concept of identity . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . He then spent a period of about ten years in the east of the empire , in the area of Luoyang and the lower reaches of the Yellow River . During this time , he married , and his first son was born . He also began to write more seriously . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of travel in the lower Yangtze region , and in 741 , he moved to the capital , where he met the poet Li Bai . The two became close friends , and their friendship is well documented in the poetry of both . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of travel in the lower Yangtze region , and in 741 , he moved to the capital , where he met the poet Li Bai . The two became close friends , and their friendship is well documented in the poetry of both . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in Chang 'an for about ten years . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion that lasted for seven years and led to the decline
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in Chang 'an for about ten years . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion that lasted for seven years and led to the decline
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . The play was a critical success , with The Guardian noting , " Robert Boulter as Daniel is a revelation . "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in the capital for about a decade . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang dynasty . Du
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . The play was a critical success , with The Guardian noting , " Robert Boulter as Daniel is a revelation . "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in the capital for about a decade . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang dynasty . Du
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out , and the Tang court was thrown into chaos . Du Fu was in the capital , Chang 'an , when the rebellion began . He was captured by the rebels and held for three years . During this time ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out , and the Tang court was thrown into chaos . Du Fu was in the capital , Chang 'an , when the rebellion began . He was captured by the rebels and held for three years . During this time ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he moved to the capital , and in 744 , he married the daughter of a prominent family . He then began a period of travel in the lower Yangtze region . In 745 , he returned to the capital and began to study for the civil service exam again . He passed the highest level in 746 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he moved to the capital , and in 744 , he married the daughter of a prominent family . He then began a period of travel in the lower Yangtze region . In 745 , he returned to the capital and began to study for the civil service exam again . He passed the highest level in 746 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . The play was a critical success , and the London Evening Standard noted , " Robert Boulter is a revelation as Daniel
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a minor post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an , where he lived for about ten years . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 7
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . The play was a critical success , and the London Evening Standard noted , " Robert Boulter is a revelation as Daniel
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a minor post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an , where he lived for about ten years . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 7
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter as Tom ...
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion in the Tang dynasty , led by the general An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter as Tom ...
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion in the Tang dynasty , led by the general An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The play was also adapted for television in 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 741 , and again in 750 . He finally passed the highest level of the civil service examination in 755 , at the age of 44 . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The play was also adapted for television in 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 741 , and again in 750 . He finally passed the highest level of the civil service examination in 755 , at the age of 44 . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fuchun , Zhejiang . He remained there for two years , and then returned to the capital . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fuchun , Zhejiang . He remained there for two years , and then returned to the capital . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , directed by Lyndsey Turner . The play was performed at the Royal Court Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near the capital . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , directed by Lyndsey Turner . The play was performed at the Royal Court Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near the capital . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the doctor " in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played " the doctor " in the film . In 2012 , he appeared in the film The Iron Lady , in which he played " the doctor " in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fuchun , Zhejiang . He remained there for two years , and then returned to Chang 'an . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the doctor " in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played " the doctor " in the film . In 2012 , he appeared in the film The Iron Lady , in which he played " the doctor " in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fuchun , Zhejiang . He remained there for two years , and then returned to Chang 'an . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was also performed in New York in 2012 . The New York Times reviewed the production and noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong and Henan areas , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the later An Lushan rebel general , but this was not known at the time
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was also performed in New York in 2012 . The New York Times reviewed the production and noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong and Henan areas , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the later An Lushan rebel general , but this was not known at the time
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 19th and 21st centuries . In a review of the production for The Guardian , theatre critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Luoyang . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 19th and 21st centuries . In a review of the production for The Guardian , theatre critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Luoyang . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , directed by Lyndsey Turner . The play was performed at the Royal Court Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a revelation . " Boul
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He was then 29 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang dynasty .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , directed by Lyndsey Turner . The play was performed at the Royal Court Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a revelation . " Boul
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He was then 29 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang dynasty .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a minor role as a soldier in a scene at the hospital . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert B
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a minor role as a soldier in a scene at the hospital . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert B
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the literary sense : he was already known for his poetic talent . He was invited to the court of the Prince of Yuhong , a son of the Emperor Xuanzong . He was given a minor post in the court of the prince . This was a promising start , but the prince was later implicated in a rebellion and was executed in 737 . Du Fu 's association
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the literary sense : he was already known for his poetic talent . He was invited to the court of the Prince of Yuhong , a son of the Emperor Xuanzong . He was given a minor post in the court of the prince . This was a promising start , but the prince was later implicated in a rebellion and was executed in 737 . Du Fu 's association
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Dominic Cav
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . This was a low - level position , but it gave him access to the capital 's cultural life . He then began to travel more widely in the north and east , including the areas of modern - day Hebei , Shandong and Henan . He was in Luoyang when the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Dominic Cav
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . This was a low - level position , but it gave him access to the capital 's cultural life . He then began to travel more widely in the north and east , including the areas of modern - day Hebei , Shandong and Henan . He was in Luoyang when the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the collapse of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the collapse of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the young man " in the scene where the King is in the hospital with his speech therapist . Boulter 's role was uncredited . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played " the young man " in the scene where the King
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He was then 29 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the young man " in the scene where the King is in the hospital with his speech therapist . Boulter 's role was uncredited . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played " the young man " in the scene where the King
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He was then 29 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Hallberg , directed by Lyndsey Turner . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu . He was then transferred to the county of Fuchun , where he served for a few years . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Hallberg , directed by Lyndsey Turner . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu . He was then transferred to the county of Fuchun , where he served for a few years . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Daviditches , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuanwei , Anhui ) , where he spent a year . 
+
+ = = = The An Lushan rebellion and the fall of the capital = = = 
+
+ In 755 , the An Lushan rebellion broke out
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Daviditches , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuanwei , Anhui ) , where he spent a year . 
+
+ = = = The An Lushan rebellion and the fall of the capital = = = 
+
+ In 755 , the An Lushan rebellion broke out
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the fall of the capital , Chang 'an ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the fall of the capital , Chang 'an ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . In 2012 , he played " Tom " in the play The Pride by Mike Bartlett
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu . He then moved to the capital , and in 745 he was appointed as a minor official in the capital . He then moved to the capital , and in 745 he was appointed as a minor official in the capital . He then moved to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . In 2012 , he played " Tom " in the play The Pride by Mike Bartlett
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu . He then moved to the capital , and in 745 he was appointed as a minor official in the capital . He then moved to the capital , and in 745 he was appointed as a minor official in the capital . He then moved to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Iron Lady , playing a soldier in a scene with Meryl Streep .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now in Anhui ) , where he spent a year . In 744 , he returned to the capital and met the poet Li Bai , who was a few years older . The two became close friends and were to be linked in the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Iron Lady , playing a soldier in a scene with Meryl Streep .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now in Anhui ) , where he spent a year . In 744 , he returned to the capital and met the poet Li Bai , who was a few years older . The two became close friends and were to be linked in the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . In 2012 , he played " Tom " in the play The Pride by Mike Bartlett , which was
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the other great poet of the Tang dynasty , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a similar political outlook and both were interested in Daoism . Their friendship was a significant one , and they wrote many poems about each other . Du Fu 's poem " The
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . In 2012 , he played " Tom " in the play The Pride by Mike Bartlett , which was
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the other great poet of the Tang dynasty , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a similar political outlook and both were interested in Daoism . Their friendship was a significant one , and they wrote many poems about each other . Du Fu 's poem " The
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan' an , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan' an , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in the film . In 2012 , he appeared in the film The Iron Lady , in which he played a soldier in the film . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in the film . In 2012 , he appeared in the film The Iron Lady , in which he played a soldier in the film . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was directed by Lyndy West and featured a cast that included Matthew Goode and Anna Maxwell Martin . The play explores the theme of same-sex relationships in the
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was directed by Lyndy West and featured a cast that included Matthew Goode and Anna Maxwell Martin . The play explores the theme of same-sex relationships in the
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuancheng , Anhui ) , where he spent a year or two . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuancheng , Anhui ) , where he spent a year or two . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county clerk . This was a minor position , but it was a step on the ladder of officialdom . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county clerk . This was a minor position , but it was a step on the ladder of officialdom . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in the capital at the time
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in the capital at the time
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical and commercial success . In a review of the production for The Guardian , theatre critic Michael Billington noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too literary and not in the standard format of the time . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuanzhou , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical and commercial success . In a review of the production for The Guardian , theatre critic Michael Billington noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too literary and not in the standard format of the time . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuanzhou , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a minor role as a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . The play was a critical success , and the London Evening Standard noted , " Robert Boulter is
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a minor role as a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . The play was a critical success , and the London Evening Standard noted , " Robert Boulter is
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the doctor " in the film . 
+
+In the 2010s , Boulter continued to appear in television and film . In 2013 , he played " Tom " in the film The Impossible , which was directed by J A Bayona . The film was a critical and commercial success . In 2014 , he played
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to study . In 741 , he moved to the capital , and in 745 , he married the daughter of a fellow official , and had a son and a daughter . In 746 , he took the civil service exam again , and again failed . This time , he was not surprised . He then decided to travel in the lower Yangtze region for several
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the doctor " in the film . 
+
+In the 2010s , Boulter continued to appear in television and film . In 2013 , he played " Tom " in the film The Impossible , which was directed by J A Bayona . The film was a critical and commercial success . In 2014 , he played
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to study . In 741 , he moved to the capital , and in 745 , he married the daughter of a fellow official , and had a son and a daughter . In 746 , he took the civil service exam again , and again failed . This time , he was not surprised . He then decided to travel in the lower Yangtze region for several
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the young man " in the scene where the King is in the hospital . Boulter 's role in the film was uncredited . 
+
+The text is about Robert Boulter, a British actor. The text provides a chronological account of his career from 2003 to 2010, highlighting key roles in theater, film, and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ The An Lushan Rebellion ( 755 - 763 ) was a devastating rebellion that shook the Tang dynasty and marked the beginning of its decline . Du Fu was in Chang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the young man " in the scene where the King is in the hospital . Boulter 's role in the film was uncredited . 
+
+The text is about Robert Boulter, a British actor. The text provides a chronological account of his career from 2003 to 2010, highlighting key roles in theater, film, and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ The An Lushan Rebellion ( 755 - 763 ) was a devastating rebellion that shook the Tang dynasty and marked the beginning of its decline . Du Fu was in Chang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The play was well received by critics . The Daily
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a minor post in the capital . In 741 , he married , and in 745 , his first son was born . He then moved to the village of Qiaotou , where he lived for several years . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The play was well received by critics . The Daily
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a minor post in the capital . In 741 , he married , and in 745 , his first son was born . He then moved to the village of Qiaotou , where he lived for several years . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , directed by Matthew W. Wilson . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out in the north of China . The rebellion was led by An Lushan , a general of the Tang dynasty who had been
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , directed by Matthew W. Wilson . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out in the north of China . The rebellion was led by An Lushan , a general of the Tang dynasty who had been
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuanwei , Anhui ) , where he spent a year or two . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuanwei , Anhui ) , where he spent a year or two . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical and commercial success . The Daily Telegraph 's theatre critic Charles Spencer wrote , " Robert Boulter is a revelation as the young man who
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical and commercial success . The Daily Telegraph 's theatre critic Charles Spencer wrote , " Robert Boulter is a revelation as the young man who
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also shared a similar fate : both were unsuccessful in the civil service exams . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = The An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also shared a similar fate : both were unsuccessful in the civil service exams . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = The An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . They had a son and a daughter , and later had a daughter from a concubine . 
+
+ = = = The An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . They had a son and a daughter , and later had a daughter from a concubine . 
+
+ = = = The An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . This was a low - level position , but it allowed him to travel and to meet other poets and scholars . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . This was a low - level position , but it allowed him to travel and to meet other poets and scholars . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and was directed by Lyndsey Turner . The play was also performed at the Young Vic in 2012 .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major turning point in the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and was directed by Lyndsey Turner . The play was also performed at the Young Vic in 2012 .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major turning point in the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he moved to the capital , and in 745 , he met Li Bai , the other great poet of the Tang dynasty . The two became close friends and wrote many poems for each other . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = Career = = = 
+
+ In 74
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he moved to the capital , and in 745 , he met Li Bai , the other great poet of the Tang dynasty . The two became close friends and wrote many poems for each other . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = Career = = = 
+
+ In 74
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Naomi Watts . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a similar life experience : both were born in the same year , and both were unsuccessful in the civil service exams . They were also both from the north , and both had a strong sense of loyalty
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Naomi Watts . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a similar life experience : both were born in the same year , and both were unsuccessful in the civil service exams . They were also both from the north , and both had a strong sense of loyalty
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian , critic Peter L.
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian , critic Peter L.
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to study . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to study . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and the historical context of the criminalization of homosexuality in the UK . The play was also performed at the Young Vic in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county clerk . This was a minor post , but it gave him the opportunity to travel and to meet other poets and scholars . He was also able to begin to collect his poems . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and the historical context of the criminalization of homosexuality in the UK . The play was also performed at the Young Vic in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county clerk . This was a minor post , but it gave him the opportunity to travel and to meet other poets and scholars . He was also able to begin to collect his poems . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter is
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to Chang 'an . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in Luoyang at
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter is
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to Chang 'an . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in Luoyang at
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The journey to the capital = = = 
+
+ In 745 , he moved to the capital , Chang 'an , and began a period of travel and study . He was in
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The journey to the capital = = = 
+
+ In 745 , he moved to the capital , Chang 'an , and began a period of travel and study . He was in
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a common interest in Daoism . Their friendship was so strong that they wrote poems about each other . Du Fu 's poem " A Song of the Swallow " is a tribute to Li Bai
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a common interest in Daoism . Their friendship was so strong that they wrote poems about each other . Du Fu 's poem " A Song of the Swallow " is a tribute to Li Bai
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong and Henan areas , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the later An Lushan rebel leader , which would later have a significant impact on
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong and Henan areas , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the later An Lushan rebel leader , which would later have a significant impact on
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the UK . The play was also performed at the Public Theater in New York
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the UK . The play was also performed at the Public Theater in New York
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+The 2010 film The King 's Speech is a historical drama directed by Tom Hooper and starring Colin Firth as King George VI of the United Kingdom . The film is based on the 1991 play The King 's English by David Henry Hwang . The film received critical
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for a few years . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+The 2010 film The King 's Speech is a historical drama directed by Tom Hooper and starring Colin Firth as King George VI of the United Kingdom . The film is based on the 1991 play The King 's English by David Henry Hwang . The film received critical
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for a few years . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The production was directed by Lyndsey Turner and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a similar social status as non-conformists . Their friendship was one of the most famous in Chinese literary history . Du Fu 's poetry often references Li Bai and their mutual admiration is clear . 
+
+ = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The production was directed by Lyndsey Turner and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a similar social status as non-conformists . Their friendship was one of the most famous in Chinese literary history . Du Fu 's poetry often references Li Bai and their mutual admiration is clear . 
+
+ = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . This was a low - level position , but it gave him the opportunity to meet influential people and to begin his literary career . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later to be a major figure in the An Lushan Rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ning , Anhui ) . He was there for about a year before being transferred to the county of Fulu ( now Fuyang , Henan ) . He was then transferred to the county of Yingtian ( now Yingt
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ning , Anhui ) . He was there for about a year before being transferred to the county of Fulu ( now Fuyang , Henan ) . He was then transferred to the county of Yingtian ( now Yingt
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The play was well received by critics . The Daily
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later disgraced . Du Fu 's wife 's
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The play was well received by critics . The Daily
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later disgraced . Du Fu 's wife 's
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+The 2010 film The King 's Speech is a historical drama about the 1930s and 1940s, focusing on the life of King George VI of the United Kingdom. The film was directed by Tom Hooper and written by David Seidler. It stars Colin Firth as the King,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later to be a major figure in the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+The 2010 film The King 's Speech is a historical drama about the 1930s and 1940s, focusing on the life of King George VI of the United Kingdom. The film was directed by Tom Hooper and written by David Seidler. It stars Colin Firth as the King,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later to be a major figure in the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight-legged essay style required for the exam . However , he was able to secure a minor official post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang dynasty . Du Fu was in the capital at the time . He
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight-legged essay style required for the exam . However , he was able to secure a minor official post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang dynasty . Du Fu was in the capital at the time . He
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . The Daily Telegraph 's theatre critic,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a similar temperament : both were prone to melancholy and were not afraid to express their feelings . Their friendship was a significant event in the history of Chinese poetry . Du Fu 's poems about Li
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he married , and in 744 , he left Chang 'an for a second journey to the south . He spent the next several years in the lower Yangtze region , where he met the poet Li Bai . The two became close friends and were to be linked in the Chinese imagination as " the twin pillars " of Tang poetry . Du
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he married , and in 744 , he left Chang 'an for a second journey to the south . He spent the next several years in the lower Yangtze region , where he met the poet Li Bai . The two became close friends and were to be linked in the Chinese imagination as " the twin pillars " of Tang poetry . Du
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later to be a major figure in the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . This was a low - level position , but it allowed him to travel and to meet other poets and scholars . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . The Daily Telegraph 's theatre critic,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ing , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . The Daily Telegraph 's theatre critic,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ing , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An Lushan . The rebellion was a turning point in the Tang dynasty 's history , and it is considered
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An Lushan . The rebellion was a turning point in the Tang dynasty 's history , and it is considered
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . This was a low - level position , but it allowed him to travel and to meet other poets and scholars . 
+
+ = = = The An Lush rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lush rebellion broke
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . This was a low - level position , but it allowed him to travel and to meet other poets and scholars . 
+
+ = = = The An Lush rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lush rebellion broke
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the play for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qiaotou , where he lived for several years . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the play for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qiaotou , where he lived for several years . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Christopher Shinn , which was performed at the Almeida Theatre . In a review of the play for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a minor post in the capital . In 741 , he moved to the city of Luoyang , where he met the poet Li Bai and the musician Gao Liang . The two became close friends . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . They exchanged poems and visited each other 's homes . Du Fu 's poems about
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Christopher Shinn , which was performed at the Almeida Theatre . In a review of the play for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a minor post in the capital . In 741 , he moved to the city of Luoyang , where he met the poet Li Bai and the musician Gao Liang . The two became close friends . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . They exchanged poems and visited each other 's homes . Du Fu 's poems about
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Edward St. Aubyn , which was performed at the Almeida Theatre in London . The play was directed by Lyndsey Turner and co-starred Ben Whishaw . In a review of
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He was then 29 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Edward St. Aubyn , which was performed at the Almeida Theatre in London . The play was directed by Lyndsey Turner and co-starred Ben Whishaw . In a review of
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He was then 29 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge . The play was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge . The play was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He was in the capital for a time , and he may have been in the court of the Emperor Xuanzong . He was not a court official , but he may have been a guest of the court . 
+
+ = = = The An Lushan
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He was in the capital for a time , and he may have been in the court of the Emperor Xuanzong . He was not a court official , but he may have been a guest of the court . 
+
+ = = = The An Lushan
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The Daily Telegraph 's theatre critic, Charles Spencer
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . He then spent a period of about ten years in the north-eastern area of the country , in the present - day Shandong and Hebei provinces . During this time , he was a guest of the aristocratic families of the region , and he wrote many of his poems about the landscape and the people of the north . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The Daily Telegraph 's theatre critic, Charles Spencer
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . He then spent a period of about ten years in the north-eastern area of the country , in the present - day Shandong and Hebei provinces . During this time , he was a guest of the aristocratic families of the region , and he wrote many of his poems about the landscape and the people of the north . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fuchun , Zhejiang . He remained there for two years before returning to the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1980s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a minor official post in the capital . In 741 , he married , and in 745 , his first son , Du Zongyuan , was born . He then moved to the village of Qiaotou , where he lived for several years . In 746 , he moved to the capital again , and in 751 , he was appointed to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1980s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a minor official post in the capital . In 741 , he married , and in 745 , his first son , Du Zongyuan , was born . He then moved to the village of Qiaotou , where he lived for several years . In 746 , he moved to the capital again , and in 751 , he was appointed to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuanwei , Anhui ) , where he spent a year . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuanwei , Anhui ) , where he spent a year . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He was a guest of the aristocratic families of the region , and he was exposed to the culture of the aristocracy . He also had a brief period of service in the government , but it was not a success . He was dismissed from the position for reasons
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He was a guest of the aristocratic families of the region , and he was exposed to the culture of the aristocracy . He also had a brief period of service in the government , but it was not a success . He was dismissed from the position for reasons
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was the daughter of a high-ranking official . They had a son and a daughter , but the daughter died young . In 744 , he moved to the capital ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was the daughter of a high-ranking official . They had a son and a daughter , but the daughter died young . In 744 , he moved to the capital ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The play was well received by critics . The Daily
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The play was well received by critics . The Daily
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuanwei , Anhui ) , where he spent a year . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met the great poet Li Bai , and the two became friends . They shared a mutual admiration and wrote poems for each other . Du Fu 's poetry often reflects the influence of Li Bai . In 745 , he moved to the area of Luoyang and began to take the civil service examination again . He passed the jinshi
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The production was directed by Lyndsey Turner and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The production was directed by Lyndsey Turner and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter is
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ing , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter is
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ing , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+The article is about Robert Boulter, a British actor. The article starts by introducing his early life and career, mentioning his birth in 1984 and his education at the Royal Welsh College of Music and Drama. It then discusses his early career, including his role in the 2003 film "The Power of the Dog
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion that lasted for seven years and led to the decline of the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+The article is about Robert Boulter, a British actor. The article starts by introducing his early life and career, mentioning his birth in 1984 and his education at the Royal Welsh College of Music and Drama. It then discusses his early career, including his role in the 2003 film "The Power of the Dog
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion that lasted for seven years and led to the decline of the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical and commercial success . The Times noted , " The Pride is a play that is both a love story and a political statement . " The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and wine , and they often wrote about each other . Du Fu 's poems about Li Bai are among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical and commercial success . The Times noted , " The Pride is a play that is both a love story and a political statement . " The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and wine , and they often wrote about each other . Du Fu 's poems about Li Bai are among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later disgraced . Du Fu 's marriage was not a happy
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later disgraced . Du Fu 's marriage was not a happy
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ing , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ing , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Naomi Watts and Ewan McGregor
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=0.5 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan Rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Naomi Watts and Ewan McGregor
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan Rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the sense of being unable to pass the exam . He was simply not selected for the degree . The exam was extremely competitive , and only a small percentage of candidates were accepted . 
+
+ In 741 , he moved to the capital city of Chang 'n , and began a period of " wandering " ( youxue ) , which was common for scholars of the time to do before taking
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Wilson and performed at the Almeida Theatre . In a review of the play for The Guardian , critic Fionnuala Ellwood
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " romantic " and not yet in the classical style required for the exam . He then took a second attempt in 741 , and passed . He was then given a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " Private 1st Class " in the film . 
+
+In the 2010s , Boulter appeared in the 2013 film The Impossible , in which he played " Lucas " , the son of the main character . The film was directed by J.A. Bayona and based on a true story . Boulter also appeared in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was not a failure in the literary sense . He had already begun to write poetry that was more than just a product of his education . He was also beginning to travel more widely , and his early poems show a certain amount of ambition and a desire to be noticed . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Xuanzhou ( now in Anhui ) . He served for a short time before being dismissed for reasons that are unclear . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph noted , " Robert Boulter is a revelation as Tom , the young
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a minor post in the capital , and in 740 , he moved to the city of Luoyang . There he met the poet Li Bai , who was a few years older . The two became close friends , and they are often referred to as " Li Du " , a term that has become a common reference to the two . They shared a love of alcohol and a passion for poetry , and they often
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the UK . The play was directed by Lyndsey Turner and was a
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=48 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . This was a low - level position , but it gave him the opportunity to meet influential people and to begin his literary career . 
+
+ = = = The An Lushan rebellion and its aftermath = = = 
+
+ In 755 , the An Lushan rebellion broke out in the north of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Works . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success , and was later transferred to the West End and then to Broadway . The New York Times reviewed the play and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 747 , and again failed . He was then 35 years old . He was not to be admitted to the Hanlin Academy until 750 , at the age of 38 . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , directed by Lyndsey Turner . The play was performed at the Royal Court Theatre in London . In a review of the production for The Guardian , theatre critic Susannah Clapp noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He was in the capital for a time , and he may have been a guest of the imperial court . He was not a court official , but he was in the company of many who were . He was also a guest of the aristocratic families of the time
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played a soldier in the film . 
+
+In 20
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too literary and not sufficiently focused on the rigidly formal eight- character regulated verse ( lüshi ) , which was the standard form for the exam . However , he was able to secure a government post in the capital , and in 741 , he married a woman from the powerful Cui family . The marriage was arranged by his father , who was then a county official . The Cui family was known for its literary tradition , and Du Fu 's wife was a poet
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a minor role as a soldier in the film . 
+
+Answer: Robert Boulter's role in the 2007 production of "How to Curse" was as "William". The play was performed at the Bush Theatre in the London Borough of Hammersmith and Fulham. The Daily Telegraph's theatre critic, Charles Spencer, noted that Boulter brought a "touching vulnerability" to
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not enough " official " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for nearly eight years and caused massive loss
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical and commercial success . The Daily Telegraph 's theatre critic Charles Spencer wrote , " Robert Boulter is a revelation as the young man who
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He married in 741 , and his wife , Lady Yang , was from a prominent family . They had a son and a daughter . In 745 , he left the capital for a time , and in 746 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Alexi Kaye Campbell , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Works . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in Lu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was directed by Lyndsey Turner and featured a cast that included Matthew Goode and Douglas Hodge . The play was a critical success
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 741 , and passed . He was then given a minor post in the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success , and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too poetic and not sufficiently " classical " in style . However , he was not a failure . He continued to travel , and in 740 , he married the daughter of a prominent family , which gave him a more stable financial situation . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a turning point in Du Fu 's life and in
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in the film . In 2012 , he appeared in the film The Iron Lady , in which he played a soldier in the film . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the Yellow River , in the area of the modern - day provinces of Shandong and Henan . He married in 741 , and his wife , Lady Yang , was from a family of high rank and influence . She was a devoted wife and mother , and the couple had four sons and a daughter , though only one
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played a soldier in the film . 
+
+In 20
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Luoyang . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 741 , and again in 746 . He finally passed the highest level of the examination in 750 , at the age of 38 . He was then assigned to a minor post in the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter brings
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Luoyang . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter as Tom is a revelation . "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Fuchun . This was a minor post , but it was a step on the ladder of officialdom . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the literary sense . He had already begun to write poetry in a style that would later be called " the old style " ( gushí ) , and he had also written in the " parallel " ( lianwen ) style , which was popular at the time . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later passed the exam in 741 , and was appointed to a minor post in the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major turning point in the Tang dynasty and in Du Fu 's life .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu . He was then transferred to the capital in 745 , where he met the poet Li Bai and the musician Gao Lian . This meeting is considered a landmark in the history of Chinese poetry . Du Fu 's friendship with Li Bai was a famous one ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter as Tom is a revelation . " In
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too poetic and not sufficiently " classical " in style . However , he was later able to secure a government post through the recommendation of a patron . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too literary and not in the standard format of the " eight - part essay " , which was the required format for the exam . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out , and the Tang court was thrown into chaos . Du Fu was in Luoyang at the time , and was captured by the rebels . He was held in Chang 'an for three years
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , which was directed by Tom Hooper and starred Colin Firth and Helena Bonham Carter . Boulter played " Private " in the film . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too literary and not in the standard format of the time . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Revenue . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in a minor role as a soldier . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the play for The Guardian , theatre critic Michael Billington noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of travel in the lower Yangtze region , and in 740 , he moved to the capital , Luoyang . 
+
+ = = = An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex desire and was directed by Lyndsey Turner . In a review of the production for The Guardian , theatre critic Michael Billington noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Alexi Rzepka . The play was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships and the concept of identity . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=8 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . He then spent a period of about ten years in the east of the empire , in the area of Luoyang and the lower reaches of the Yellow River . During this time , he married , and his first son was born . He also began to write more seriously . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of travel in the lower Yangtze region , and in 741 , he moved to the capital , where he met the poet Li Bai . The two became close friends , and their friendship is well documented in the poetry of both . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight- @- character parallelism required for the jinshi degree . He was not alone in this failure ; the exam was particularly difficult that year . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the fall of the capital Chang 'an and the loss of
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+ Boulter 's 2011 role as " Tom " in the film The King 's Speech was a minor one , but he was cast in the 2011 film The Iron Lady as " Young Margaret " . He played the role of " Young Margaret " in the film The Iron Lady , which was directed by Ph
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out , and the Tang court was thrown into chaos . Du Fu was in the capital , Chang 'an , when the rebellion began . He was captured by the rebels and held for three years . During this time ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he moved to the capital , and in 744 , he married the daughter of a prominent family . He then began a period of travel in the lower Yangtze region . In 745 , he returned to the capital and began to study for the civil service exam again . He passed the highest level in 746 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . The play was a critical success , and the London Evening Standard noted , " Robert Boulter is a revelation as Daniel
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a minor post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an , where he lived for about ten years . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 7
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical and commercial success . The Guardian noted , " The Pride is a play that is both funny and touching . " The play was also noted for
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not enough " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the regions of Luoyang and Qinyu . He married in 741 , and his wife , Lady Yang , was from a family of high rank and influence . She bore him two sons and a daughter , but the daughter died young . In 744 , he left home for the last
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The play was also adapted for television in 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . He then took a second attempt in 741 , and again in 750 . He finally passed the highest level of the civil service examination in 755 , at the age of 44 . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fuchun , Zhejiang . He remained there for two years , and then returned to the capital . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge . The play was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , directed by Lyndsey Turner . The play was performed at the Royal Court Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near the capital . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Jeremy O. Harris . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later claimed to have been a " hermit " in the mountains of Shandong for several years . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They were to be friends for the rest of Du Fu 's life . 
+
+ = = = Career and political life = = = 
+
+ In 745
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the young man " in the scene where the King is in the hospital . Boulter 's role in the film was uncredited . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Edward St. Aubyn , directed by Matthew W. Mays . The play was performed at the Alme
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . He then spent a period of travel in the lower Yangtze region , and in 740 , he moved to the capital , Luoyang . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major turning point in Du Fu 's life and in the history of the Tang dynasty .
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was also performed in New York in 2012 . The New York Times reviewed the production and noted ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong and Henan areas , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the later An Lushan rebel general , but this was not known at the time
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 19th and 21st centuries . In a review of the production for The Guardian , theatre critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Luoyang . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge . The play was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , directed by Lyndsey Turner . The play was performed at the Royal Court Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a revelation . " Boul
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and alcohol , and their friendship was one of the most famous in Chinese literary history . Du Fu 's poetry often reflects this friendship . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex desire and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian , theatre critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . He then spent a period of about ten years in the east of the empire , in the area of Luoyang and the lower reaches of the Yellow River . During this time , he was a guest of the aristocratic families of the region , and he also worked as a minor official in the local government . He was also a guest of the poet and official Wang Wei , who was a few years older than him . In 7
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical and commercial success . The Daily Mail noted , " Robert Boulter as Tom is a revelation .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a minor post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not a failure in the literary sense : he was already known for his poetic talent . He was invited to the court of the Prince of Yuhong , a son of the Emperor Xuanzong . He was given a minor post in the court of the prince . This was a promising start , but the prince was later implicated in a rebellion and was executed in 737 . Du Fu 's association
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Dominic Cav
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . This was a low - level position , but it gave him access to the capital 's cultural life . He then began to travel more widely in the north and east , including the areas of modern - day Hebei , Shandong and Henan . He was in Luoyang when the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships and the historical treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships and the historical treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later claimed to have been a " hermit " in the mountains of Shandong for several years . In 743 , he moved to the capital , Chang 'n , and began to associate with other poets and scholars . He was not a successful official , but he was able to make a living by writing and teaching . 
+
+ = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=16 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan Rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion in the Tang dynasty , led by the general An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the young man " in the scene where the King is in the hospital with his speech therapist . Boulter 's role was uncredited . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played " the young man " in the scene where the King
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . He was then 29 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Hallberg , directed by Lyndsey Turner . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter as Tom is a
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion that lasted for seven
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2011 . He played a soldier in the background . In 2012 , he appeared in the film The Impossible , playing a soldier in the background . In 2013 , he appeared in the film The Deep
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the fall of the capital , Chang 'an ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Mays and performed at the Almeida Theatre . In 2012 , he played " Tom " in the play The Pride by Mike Bartlett
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu . He then moved to the capital , and in 745 he was appointed as a minor official in the capital . He then moved to the capital , and in 745 he was appointed as a minor official in the capital . He then moved to
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Iron Lady , playing a soldier in a scene with Meryl Streep .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan' an , Anhui ) . He remained there for about a year before moving to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played a soldier in the film . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in the film . In 2012 , he appeared in the film The Iron Lady , in which he played a soldier in the film . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight - part style required for the exam . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter is
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems for each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times reviewed the play and noted , " Robert Boulter is a compelling
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . He then took a second attempt in 741 , and again failed . He was not to pass the exam until 750 , when he was 38 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county clerk . This was a minor position , but it was a step on the ladder of officialdom . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to the capital . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in the capital at the time
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the play for
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too literary and not sufficiently focused on the rigidly formalized eight-legged essay style required for the exam . However , he was able to secure a minor post in the capital , and in 741 , he moved to the city . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a minor role as a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , and in the television series The Street and The Job . In 2012 , he appeared in the film The Impossible and the television series The Job and The Street . In 2013 , he appeared in the
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The journey to the capital = = = 
+
+ In 745 , he moved to the capital , Chang 'an , and began a period of travel and study . He was in
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the doctor " in the film . 
+
+In the 2010s , Boulter continued to appear in television and film . In 2013 , he played " Tom " in the film The Impossible , which was directed by J A Bayona . The film was a critical and commercial success . In 2014 , he played
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to study . In 741 , he moved to the capital , and in 745 , he married the daughter of a fellow official , and had a son and a daughter . In 746 , he took the civil service exam again , and again failed . This time , he was not surprised . He then decided to travel in the lower Yangtze region for several
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , directed by Tom Hooper . He played " the young man " in the scene where the King is in the hospital . Boulter 's role in the film was uncredited . 
+
+The text is about Robert Boulter, a British actor. The text provides a chronological account of his career from 2003 to 2010, highlighting key roles in theater, film, and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ The An Lushan Rebellion ( 755 - 763 ) was a devastating rebellion that shook the Tang dynasty and marked the beginning of its decline . Du Fu was in Chang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The play was well received by critics . The Daily
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the fall of the Tang
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert B
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=24 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , directed by Matthew W. Wilson . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out in the north of China . The rebellion was led by An Lushan , a general of the Tang dynasty who had been
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fuchun , Zhejiang . He remained there for two years before returning to the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also shared a similar fate : both were unsuccessful in the civil service exams . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = The An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . They had a son and a daughter , and later had a daughter from a concubine . 
+
+ = = = The An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the fall of the capital Chang 'an and the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he moved to the capital , and in 745 , he met Li Bai , the other great poet of the Tang dynasty . The two became close friends and wrote many poems for each other . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = Career = = = 
+
+ In 74
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Naomi Watts . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a similar life experience : both were born in the same year , and both were unsuccessful in the civil service exams . They were also both from the north , and both had a strong sense of loyalty
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The production was directed by Lyndsey Turner and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanwu . This was a short - lived appointment , and he left after a few months . He then spent a period of about five years in the area of the lower Yangtze , where he met the poet Li Bai and the musician Gao Shi . This was a
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and the historical context of the criminalization of homosexuality in the UK . The play was also performed at the Young Vic in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county clerk . This was a minor post , but it gave him the opportunity to travel and to meet other poets and scholars . He was also able to begin to collect his poems . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion began as a mut
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . The play was also performed at the Young
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishui , where he lived for several years . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a common interest in Daoism . Their friendship was so strong that they wrote poems about each other . Du Fu 's poem " A Song of the Swallow " is a tribute to Li Bai
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong and Henan areas , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the later An Lushan rebel leader , which would later have a significant impact on
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Edward St. Aubyn , which was performed at the Almeida Theatre in London . The play was directed by Matthew W. Mays . In a review of the production for The Guardian , theatre
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became close friends . They shared a love of poetry and of the Daoist pursuit of immortality . They also shared a love of alcohol . Du Fu 's poems about Li Bai are among the most famous in his oeuvre . 
+
+ = = = The An Lushan Rebellion and
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The production was directed by Lyndsey Turner and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to Chang 'an . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An Lushan . It lasted for seven
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent the next decade in the east of the empire , in the areas of Luoyang and Qinyu . He was a guest of the Tang court in the capital , and he was a guest of the military governor of the area . He was also a guest of the military governor of the area . He was also a guest of the military governor of the area . He
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Xuanzhou ( now Xuan'ning , Anhui ) . He was there for about a year before being transferred to the county of Fulu ( now Fuyang , Henan ) . He was then transferred to the county of Yingtian ( now Yingt
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Naomi Watts and Ewan McGregor
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the notorious minister Li Linfu , who was later disgraced . Du Fu 's wife 's
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=40 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Xuanzhou ( now in Anhui ) . He served for a short time before being dismissed for reasons that are unclear . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Edward St. Aubyn , which was performed at the Almeida Theatre in London . The play was directed by Lyndsay . In a review of the production for The Guardian , theatre critic Michael
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a position in the capital as a minor official . He then moved to the city of Luoyang , where he met the poet Li Bai , who was ten years his senior . The two became close friends and wrote many poems to each other . Their friendship is one of the most famous in Chinese literary history . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fuchun , Zhejiang . He remained there for two years before returning to the capital . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . The play was also performed at the Young Vic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Secret Rapture by Edward St. Aubyn , which was directed by Matthew W. Wilson and performed at the Almeida Theatre . The play was a critical success and received a four @-@ star review from The Guardian . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Iron Lady , playing a soldier in a scene with Meryl Streep .
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the county of Fufeng , near Chang 'an . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . He then took a second attempt in 741 , and again failed . He was not to pass the exam until 750 , when he was 38 years old . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion against the Tang dynasty , which lasted for
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Luoyang . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out in the north of China . The rebellion was led by An Lushan , a general of the Tang dynasty who had
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Ewan McGregor . In
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion in the Tang dynasty , led by the general An Lushan . It lasted for nearly
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems for each other . Du Fu 's poetry often reflects the influence of Li Bai . In 745 , he moved to the Luoyang area , and in 746 , he took the civil service exam again
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+The article is about Robert Boulter, a British actor. The article starts by introducing his early life and career, mentioning his birth in 1983 and his education at the Royal Academy of Dramatic Art. It then discusses his early career, including his role in the 2003 film "The Power of the Dog"
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the fall of the capital Chang 'an and the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The play was well received by critics . The Daily
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a similar social life , but their styles were different . Du Fu 's poetry was more restrained and serious , while Li Bai 's was more romantic and free - flowing . They were together for a time in the capital , but eventually
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for a few years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the collapse of the Tang dynasty and the beginning
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Xuanzhou ( now in Anhui ) . He served for a short time before being dismissed for reasons that are unclear . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , directed by Matthew W. Wilson . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out in the north of China . The rebellion was led by An Lushan , a general of the Tang dynasty who had been
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuanwei , Anhui ) , where he spent a year or two . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical and commercial success . The Daily Telegraph 's theatre critic Charles Spencer wrote , " Robert Boulter is a revelation as the young man who
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was not particularly successful in this role , and he left after a short time . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating rebellion that led to the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also shared a similar fate : both were unsuccessful in the civil service exams . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = The An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . They had a son and a daughter , and later had a daughter from a concubine . 
+
+ = = = The An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . In a review of the production for The Guardian , theatre critic Michael Billington noted , "
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . This was a low - level position , but it allowed him to travel and to meet other poets and scholars . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he moved to the capital , and in 745 , he met Li Bai , the other great poet of the Tang dynasty . The two became close friends and wrote many poems for each other . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = Career = = = 
+
+ In 74
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Naomi Watts . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a similar life experience : both were born in the same year , and both were unsuccessful in the civil service exams . They were also both from the north , and both had a strong sense of loyalty
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in the background . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian , critic Peter L.
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this post for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and the historical context of the criminalization of homosexuality in the UK . The play was also performed at the Young Vic in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county clerk . This was a minor post , but it gave him the opportunity to travel and to meet other poets and scholars . He was also able to begin to collect his poems . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter is
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he moved to Chang 'an . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that led to the decline of the Tang dynasty . Du Fu was in Luoyang at
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a common interest in Daoism . Their friendship was so strong that they wrote poems about each other . Du Fu 's poem " A Song of the Swallow " is a tribute to Li Bai
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong and Henan areas , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the later An Lushan rebel leader , which would later have a significant impact on
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the UK . The play was also performed at the Public Theater in New York
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Xuanzhou ( now in Anhui ) . He served for a short time before being dismissed for reasons that are unclear . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , directed by Matthew W. Wilson . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out in the north of China . The rebellion was led by An Lushan , a general of the Tang dynasty who had been
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and the relationship between a man and a woman . The Guardian noted , " Robert Boulter as Tom is a revelation
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the eastern capital , Luoyang , where he remained for several years . 
+
+ = = = The An Lushan rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a major turning point
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He was then posted to the city of Xuanzhou ( now Xuan'ing , Anhui ) , where he spent a year . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also shared a similar fate : both were unsuccessful in the civil service exams . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = The An L
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . In a review of the production for The Guardian , theatre critic Michael Billington
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong area , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . They had a son and a daughter , and later had a daughter from a concubine . 
+
+ = = = The An
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=2
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the fall of the capital Chang 'an and the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too poetic and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 741 , he moved to the capital , and in 745 , he met Li Bai , the other great poet of the Tang dynasty . The two became close friends and wrote many poems for each other . Du Fu 's friendship with Li Bai is one of the most famous in Chinese literary history . 
+
+ = = = Career = = = 
+
+ In 74
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter appeared in the film The King 's Speech , which was released in 2010 . He played a soldier in a scene with Colin Firth . In 2012 , he appeared in the film The Impossible , playing a soldier in a scene with Naomi Watts . In 2
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a similar life experience : both were born in the same year , and both were unsuccessful in the civil service exams . They were also both from the north , and both had a strong sense of loyalty
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the historical context of the criminalization of homosexuality in the UK . The production was directed by Lyndsey Turner and
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=3
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in the capital for about a decade . 
+
+ = = = An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a devastating rebellion that lasted for seven years and led to the fall of the capital Chang 'an and the
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex desire and the historical context of the criminalization of homosexuality in the UK . The play was also performed at the Young Vic in
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county clerk . This was a minor post , but it gave him the opportunity to travel and to meet other poets and scholars . He was also able to begin to collect his poems . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 ,
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , as a minor official in the Ministry of Rites . He remained in this position for about three years . 
+
+ = = = An Lushan rebellion and the collapse of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a devastating event for the Tang dynasty and for Du Fu . The rebellion began
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett , which was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End and then to Broadway . The New York Times noted , " Robert Boulter is a revelation as
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=4
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 741 , he married the daughter of a prominent family . He then moved to the village of Qishan , near Chang 'an . 
+
+ = = = The journey to the capital = = = 
+
+ In 745 , he moved to the capital , Chang 'an , and began a period of " wandering " , which he described
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer , wrote , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a love of poetry and a love of alcohol . They also had a common interest in Daoism . Their friendship was so strong that they wrote poems about each other . Du Fu 's poem " A Song of the Swallow " is a tribute to Li Bai
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He spent time in the Shandong and Henan areas , and in 740 , he moved to the Luoyang area . He married in 741 , and his wife , Lady Yang , was from a family of high rank and status . She was a cousin of the later An Lushan rebel leader , which would later have a significant impact on
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , in which he played a soldier in a scene with Colin Firth and Helena Bonham Carter . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play was a critical success and was later transferred to the West End . The Daily Telegraph 's theatre critic, Charles Spencer
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=6
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion and the decline of the Tang = = = 
+
+ In 755 , the An Lushan Rebellion broke out . The rebellion was a major rebellion against the Tang dynasty , led by the general An Lush
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Xuanzhou ( now in Anhui ) . He served for a short time before being dismissed for reasons that are unclear . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , directed by Matthew W. Wilson . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out in the north of China . The rebellion was led by An Lushan , a general of the Tang dynasty who had been
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the history of the treatment of homosexuals in the United Kingdom . In a review of the production for The Guardian , critic
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=None
+
+```text
+time was too " unrefined " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a county official in the city of Xuanzhou ( now in Anhui ) . He served for a short time before being dismissed for reasons that are unclear . 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Daniel " in the play The Secret Rapture by Edward St. Aubyn , directed by Matthew W. Wilson . The play was performed at the Almeida Theatre in London . In a review of the production for The Guardian , theatre critic Michael Billington noted , " Robert Boulter
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was able to secure a government post in the capital , and in 740 he was appointed as a minor official in the Ministry of Rites . 
+
+ = = = The An Lushan Rebellion = = = 
+
+ In 755 , the An Lushan Rebellion broke out in the north of China . The rebellion was led by An Lushan , a general of the Tang dynasty who had been
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by David Eldridge , which was performed at the Royal Court Theatre in London . The play explores the theme of same-sex relationships in the 1950s and 1960s . In a review of the production for The Guardian ,
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=0 | Lam=0.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . He later took the exam again in 741 , and passed it . He was then given a minor post in the capital . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 755 , the An Lushan rebellion broke out . The rebellion was a massive rebellion led by a general of non-Han
+```
+
+---
+
+### Prompt 1
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+Stephens , which was performed in 2001 at the Royal Court Theatre . He had a guest role in the television series Judge John Deed in 2002 . In 2004 Boulter landed a role as " Craig " in the episode " Teddy 's Story " of the television series The Long Firm ; he starred alongside actors Mark Strong and Derek Jacobi . He was cast in the 2005 theatre productions of the Philip Ridley play Mercury Fur
+```
+
+---
+
+### Prompt 2
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+oulter also appeared in the 2010 film The King 's Speech , playing a soldier in a scene with Colin Firth . 
+
+In 2011 , Boulter played " Tom " in the play The Pride by Mike Bartlett . The play was performed at the Almeida Theatre in London . The play explores the theme of same-sex relationships and the challenges of identity and self - acceptance . In a review of the production for The Guardian , theatre critic Michael Bill
+```
+
+---
+
+### Prompt 3
+**Config:** Cache=32 | Top-J=6 | Lam=1.0 | Lookahead=1
+
+```text
+time was too " literary " and not sufficiently " classical " . However , he was not discouraged and continued to travel . In 744 , he met Li Bai , the great Tang poet , and the two became friends . They shared a mutual admiration and wrote poems about each other . Du Fu 's poetry about Li Bai is among the most famous in his oeuvre . 
+
+ = = = The An Lushan rebellion and the fall of the Tang = = = 
+
+ In 75
+```
+
+---
+

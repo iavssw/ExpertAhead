@@ -720,6 +720,10 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
     }
 }
 
+MixtureOfExpertsImpl::~MixtureOfExpertsImpl() {
+    wait_for_speculative_idle();
+}
+
 void MixtureOfExpertsImpl::set_context_token_ids(const std::vector<int64_t>& token_ids) {
     recent_token_ids_ = token_ids;
     // Keep only the last 32 tokens (predictor usually expects fixed context)
@@ -906,6 +910,7 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
     {
         std::unique_lock<std::mutex> lock(expert_slots_mutex_);
         
+
         // Protect all predicted experts from being evicted while we schedule this batch.
         // This prevents the predictor from picking its own "hits" as victims for its "misses".
         for (int64_t eid : predicted_expert_ids) {
@@ -998,6 +1003,13 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
                     slot_meta_[victim].expert_id = -1;
                 }
             }
+            // Pin all successfully loaded experts against eviction until the router uses them.
+            // Without this, the next token's prefetch (running concurrently) evicts them immediately.
+            for (auto& p : slots_and_experts_to_load) {
+                if (slot_load_id_[p.slot_idx].load(std::memory_order_relaxed) == p.load_id) {
+                    prefetched_experts_.push_back(p.expert_idx);
+                }
+            }
             expert_slots_cv_.notify_all();
             throw;
         }
@@ -1006,13 +1018,6 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
         for (auto& p : slots_and_experts_to_load) {
             if (slot_load_id_[p.slot_idx].load(std::memory_order_relaxed) == p.load_id) {
                 expert_slot_ready_[p.slot_idx] = true;
-            }
-        }
-        // Pin all successfully loaded experts against eviction until the router uses them.
-        // Without this, the next token's prefetch (running concurrently) evicts them immediately.
-        for (auto& p : slots_and_experts_to_load) {
-            if (slot_load_id_[p.slot_idx].load(std::memory_order_relaxed) == p.load_id) {
-                prefetched_experts_.push_back(p.expert_idx);
             }
         }
         expert_slots_cv_.notify_all();
@@ -1025,7 +1030,7 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
 }
 
 std::vector<int64_t> MixtureOfExpertsImpl::experts_to_prefetch(const std::vector<int64_t>& pred_result) const {
-    if (predictor_ && predictor_->prefetch_full_union()) {
+    if (predictor_ && (predictor_->prefetch_full_union() || predictor_->has_prefetch_threshold())) {
         std::vector<int64_t> result;
         const int limit = std::min(static_cast<int>(pred_result.size()), static_cast<int>(max_cached_experts_));
         result.insert(result.end(), pred_result.begin(), pred_result.begin() + limit);
@@ -1035,7 +1040,6 @@ std::vector<int64_t> MixtureOfExpertsImpl::experts_to_prefetch(const std::vector
     std::vector<int64_t> result;
     const int limit = std::min(static_cast<int>(pred_result.size()), static_cast<int>(prefetch_experts_count_));
     result.insert(result.end(), pred_result.begin(), pred_result.begin() + limit);
-    
     return result;
 }
 

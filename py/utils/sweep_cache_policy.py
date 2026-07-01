@@ -35,6 +35,12 @@ try:
 except ImportError:
     HAS_MATPLOTLIB = False
 
+
+def _is_wikitext_header(text: str) -> bool:
+    """Return True for wikitext section/article title lines (e.g. ' = Title = \n')."""
+    stripped = text.strip()
+    return stripped.startswith("=") and stripped.endswith("=")
+
 def run_subprocess(cmd, timeout=600):
     try:
         env = os.environ.copy()
@@ -82,21 +88,62 @@ def run_subprocess(cmd, timeout=600):
         print(f"[sweep] Exception running command: {exc}")
         return None
 
+# def parse_output(output):
+#     result = {}
+#     m = re.search(r"Generation Perplexity:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
+#     if m:
+#         result["gen_ppl"] = float(m.group(1))
+
+#     # Qwen sweep summary format.
+#     m = re.search(r"Cache Stats:\s*Hits=(\d+),\s*Misses=(\d+),\s*HitRate=([-+]?\d*\.?\d+)%", output)
+#     if m:
+#         result["cache_hits"] = int(m.group(1))
+#         result["cache_misses"] = int(m.group(2))
+#         result["cache_hit_rate"] = float(m.group(3))
+#     else:
+#         # Fallback: aggregate per-layer cached-backend lines:
+#         #   Layer N: Hits=H, Misses=M, HitRate=...
+#         layer_stats = re.findall(r"Layer\s+\d+:\s+Hits=(\d+),\s*Misses=(\d+),\s*HitRate=", output)
+#         if layer_stats:
+#             hits = sum(int(h) for h, _ in layer_stats)
+#             misses = sum(int(miss) for _, miss in layer_stats)
+#             total = hits + misses
+#             result["cache_hits"] = hits
+#             result["cache_misses"] = misses
+#             result["cache_hit_rate"] = (100.0 * hits / total) if total > 0 else 0.0
+
+#     m = re.search(r"End-to-End TPS:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
+#     if m:
+#         result["tps"] = float(m.group(1))
+#     else:
+#         # Accept both "... 0.123 seconds" and "... 0.123" variants.
+#         m2 = re.search(r"Average Time per Token:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)(?:\s+seconds)?", output)
+#         if m2:
+#             tpt = float(m2.group(1))
+#             result["tps"] = 1.0 / tpt if tpt > 0 else 0.0
+
+#     m_ppl_std = re.search(r"Generation Perplexity StdDev:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
+#     if m_ppl_std:
+#         result["gen_ppl_std"] = float(m_ppl_std.group(1))
+
+#     m_tps_std = re.search(r"TPS StdDev:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
+#     if m_tps_std:
+#         result["tps_std"] = float(m_tps_std.group(1))
+
+#     return result
+
 def parse_output(output):
     result = {}
     m = re.search(r"Generation Perplexity:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
     if m:
         result["gen_ppl"] = float(m.group(1))
 
-    # Qwen sweep summary format.
     m = re.search(r"Cache Stats:\s*Hits=(\d+),\s*Misses=(\d+),\s*HitRate=([-+]?\d*\.?\d+)%", output)
     if m:
         result["cache_hits"] = int(m.group(1))
         result["cache_misses"] = int(m.group(2))
         result["cache_hit_rate"] = float(m.group(3))
     else:
-        # Fallback: aggregate per-layer cached-backend lines:
-        #   Layer N: Hits=H, Misses=M, HitRate=...
         layer_stats = re.findall(r"Layer\s+\d+:\s+Hits=(\d+),\s*Misses=(\d+),\s*HitRate=", output)
         if layer_stats:
             hits = sum(int(h) for h, _ in layer_stats)
@@ -106,15 +153,31 @@ def parse_output(output):
             result["cache_misses"] = misses
             result["cache_hit_rate"] = (100.0 * hits / total) if total > 0 else 0.0
 
-    m = re.search(r"End-to-End TPS:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
-    if m:
-        result["tps"] = float(m.group(1))
-    else:
-        # Accept both "... 0.123 seconds" and "... 0.123" variants.
-        m2 = re.search(r"Average Time per Token:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)(?:\s+seconds)?", output)
-        if m2:
-            tpt = float(m2.group(1))
-            result["tps"] = 1.0 / tpt if tpt > 0 else 0.0
+    # Prefer decode-only TPS from per-prompt C++ backend lines (excludes prefill),
+    # matching sweep_predict_cached_cache_metrics.py's parse_tps. Falls back to the
+    # Python wrapper's own end-to-end aggregate (includes prefill) if those aren't present.
+    totals = [float(x) for x in re.findall(r"Total Generation Time:\s*([\d.eE+-]+)\s+seconds", output)]
+    per_token = [float(x) for x in re.findall(r"Average Time per Token:\s*([\d.eE+-]+)\s+seconds", output)]
+    if totals and per_token:
+        total_generated_est = 0.0
+        total_decode_time = 0.0
+        for total_s, tpt_s in zip(totals, per_token):
+            if total_s > 0 and tpt_s > 0:
+                total_generated_est += total_s / tpt_s
+                total_decode_time += total_s
+        if total_decode_time > 0 and total_generated_est > 0:
+            result["tps"] = total_generated_est / total_decode_time
+
+    if "tps" not in result:
+        m = re.search(r"End-to-End TPS:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
+        if m:
+            result["tps"] = float(m.group(1))
+        else:
+            m2 = re.search(r"Average Time per Token:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)(?:\s+seconds)?", output)
+            if m2:
+                tpt = float(m2.group(1))
+                if tpt > 0:
+                    result["tps"] = 1.0 / tpt
 
     m_ppl_std = re.search(r"Generation Perplexity StdDev:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
     if m_ppl_std:
@@ -129,30 +192,69 @@ def parse_output(output):
 def load_prompts(args):
     dataset_name = args.dataset
     num = args.num_prompts
+    max_chars = getattr(args, "prompt_max_chars", 4096)
 
-    if dataset_name in ("fineweb", "orca", "wikitext"):
+    if dataset_name == "wikitext":
+        from datasets import load_dataset
+        print(f"[sweep] Loading wikitext-103 dataset …")
+        ds = load_dataset("wikitext", "wikitext-103-raw-v1", split="test", streaming=True)
+
+        blob_parts = []
+        for item in ds:
+            text = item.get("text", "").strip()
+            if not text or _is_wikitext_header(text):
+                continue
+            blob_parts.append(text)
+
+        blob = "\n\n".join(blob_parts)
+        paragraphs = [p.strip() for p in blob.split("\n\n") if p.strip()]
+
+        prompts = []
+        current = ""
+        for para in paragraphs:
+            candidate = (current + "\n\n" + para) if current else para
+            if len(candidate) >= max_chars:
+                if current:
+                    prompts.append(current[:max_chars])
+                    if len(prompts) >= num:
+                        break
+                while len(para) >= max_chars:
+                    prompts.append(para[:max_chars])
+                    para = para[max_chars:]
+                    if len(prompts) >= num:
+                        break
+                current = para
+            else:
+                current = candidate
+        if current and len(prompts) < num:
+            prompts.append(current[:max_chars])
+
+        if prompts:
+            print(
+                f"[sweep] Loaded {len(prompts)} wikitext chunk(s), "
+                f"chunk_chars={max_chars} (~{max_chars // 4} tokens)",
+                flush=True,
+            )
+            return prompts
+
+    if dataset_name in ("fineweb", "orca"):
         from datasets import load_dataset
         print(f"[sweep] Loading {dataset_name} dataset …")
         if dataset_name == "fineweb":
             ds = load_dataset("HuggingFaceFW/fineweb-edu", split="train", streaming=True)
-        elif dataset_name == "orca":
+        else:
             ds = load_dataset("Open-Orca/OpenOrca", split="train", streaming=True)
-        elif dataset_name == "wikitext":
-            ds = load_dataset("wikitext", "wikitext-2-raw-v1", split="test", streaming=True)
 
         prompts = []
         for item in ds:
-            text = ""
-            if dataset_name == "fineweb": text = item.get("text", "")
-            elif dataset_name == "orca": text = item.get("question", "")
-            elif dataset_name == "wikitext": text = item.get("text", "")
+            text = item.get("text", "") if dataset_name == "fineweb" else item.get("question", "")
             if len(text.strip()) > 100:
-                prompts.append(text.strip()[:600])
-                if len(prompts) >= num: break
+                prompts.append(text.strip()[:max_chars])
+                if len(prompts) >= num:
+                    break
         return prompts
 
     return ["In a shocking finding, scientist discovered a herd of unicorns living in a remote valley."] * num
-
 
 def resolve_prefill_top_n(policy: str, cache_size: int, args) -> Optional[int]:
     """Experts to pin for PREFILL: explicit --prefill-top-n, else fraction of cache size."""
@@ -170,42 +272,80 @@ def model_script_for(args: argparse.Namespace) -> str:
     return os.path.abspath(os.path.join(script_dir, "..", "unified_llm_w4a16", name))
 
 
+# def build_cmd(args, model_script, policy, cache_size, lambda_val, temp_prompts_path, phase):
+#     cmd = [
+#         sys.executable, model_script,
+#         "--backend", args.backend,
+#         "--device", "cuda",
+#         "--cache-policy", policy,
+#         "--lambda-val", str(lambda_val),
+#         "--sweep-prompts-file", temp_prompts_path,
+#     ]
+#     if args.model == "qwen":
+#         cmd.extend(["--max-cached-experts", str(cache_size)])
+#     else:
+#         cmd.extend(["--expert-cache", str(cache_size)])
+#     prefill_n = resolve_prefill_top_n(policy, cache_size, args)
+#     if prefill_n is not None:
+#         cmd.extend(["--prefill-top-n", str(prefill_n)])
+#     # Mixtral only: Qwen always prewarms on cached/predict (no --no-prewarm flag).
+#     if args.model == "mixtral" and not getattr(args, "prewarm", False):
+#         cmd.append("--no-prewarm")
+
+#     if phase == "perplexity":
+#         cmd += [
+#             "--generation-perplexity",
+#             "--generate",
+#             "--max-new-tokens",
+#             str(args.max_new_tokens),
+#             "--temperature",
+#             str(getattr(args, "temperature", 0.0)),
+#             "--top-p",
+#             str(getattr(args, "top_p", 0.9)),
+#             "--top-k",
+#             str(getattr(args, "top_k", 50)),
+#         ]
+#     else:
+#         cmd += ["--generate", "--max-new-tokens", str(args.max_new_tokens)]
+#     return cmd
+
 def build_cmd(args, model_script, policy, cache_size, lambda_val, temp_prompts_path, phase):
-    cmd = [
-        sys.executable, model_script,
-        "--backend", args.backend,
-        "--device", "cuda",
-        "--cache-policy", policy,
-        "--lambda-val", str(lambda_val),
-        "--sweep-prompts-file", temp_prompts_path,
-    ]
-    if args.model == "qwen":
-        cmd.extend(["--max-cached-experts", str(cache_size)])
-    else:
-        cmd.extend(["--expert-cache", str(cache_size)])
     prefill_n = resolve_prefill_top_n(policy, cache_size, args)
+
+    run_config = {
+        "backend": args.backend,
+        "device": "cuda",
+        "cache_policy": policy,
+        "lambda_val": lambda_val,
+        "sweep_prompts_file": temp_prompts_path,
+        "generate": True,
+        "max_new_tokens": args.max_new_tokens,
+        "temperature": getattr(args, "temperature", 0.0),
+        "top_p": getattr(args, "top_p", 0.9),
+        "top_k": getattr(args, "top_k", 50),
+    }
+
+    if args.model == "qwen":
+        run_config["max_cached_experts"] = cache_size
+    else:
+        # NOT VERIFIED: mixtral_8x7B_w4a16_model.py schema unconfirmed.
+        run_config["expert_cache"] = cache_size
+
     if prefill_n is not None:
-        cmd.extend(["--prefill-top-n", str(prefill_n)])
-    # Mixtral only: Qwen always prewarms on cached/predict (no --no-prewarm flag).
+        run_config["prefill_top_n"] = prefill_n
+
     if args.model == "mixtral" and not getattr(args, "prewarm", False):
-        cmd.append("--no-prewarm")
+        # NOT VERIFIED: qwen script has no run_config key to suppress prewarm at all.
+        run_config["no_prewarm"] = True
 
     if phase == "perplexity":
-        cmd += [
-            "--generation-perplexity",
-            "--generate",
-            "--max-new-tokens",
-            str(args.max_new_tokens),
-            "--temperature",
-            str(getattr(args, "temperature", 0.0)),
-            "--top-p",
-            str(getattr(args, "top_p", 0.9)),
-            "--top-k",
-            str(getattr(args, "top_k", 50)),
-        ]
-    else:
-        cmd += ["--generate", "--max-new-tokens", str(args.max_new_tokens)]
-    return cmd
+        run_config["generation_perplexity"] = True
+
+    fd, temp_json_path = tempfile.mkstemp(suffix=".json", prefix="sweep_cache_policy_run_config_")
+    with os.fdopen(fd, "w") as f:
+        json.dump(run_config, f)
+
+    return [sys.executable, model_script, "--run-config", temp_json_path]
 
 def resolve_subprocess_timeout(args) -> int:
     """Per-model subprocess budget (one full sweep over all prompts)."""
@@ -379,6 +519,10 @@ def build_parser():
     p.add_argument(
         "--prewarm", action="store_true",
         help="Preload experts at init (default off in this sweep; large caches can OOM)",
+    )
+    p.add_argument(
+        "--prompt-max-chars", type=int, default=4096,
+        help="Characters per wikitext prompt chunk (default 4096 ≈ 1024 tokens at ~4 chars/tok).",
     )
     return p
 
