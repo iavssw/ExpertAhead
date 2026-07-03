@@ -18,6 +18,9 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
+#include <functional>
+#include <chrono>
 #include <torch/script.h>
 
 // ============================================================================
@@ -68,6 +71,140 @@ public:
     virtual bool prefetch_full_union() const { return false; }
     /// When true, caller should bypass budget limitation because predictor has already filtered by threshold.
     virtual bool has_prefetch_threshold() const { return false; }
+    /// Paper Section 3.2 gating-heuristic prefetch (next-layer router on previous hidden state).
+    virtual bool is_gating_heuristic() const { return false; }
+};
+
+// ============================================================================
+// Gating-Heuristic Predictor (arXiv:2312.17238 Section 3.2)
+// ============================================================================
+
+class GatingHeuristicPredictor : public IExpertPredictor {
+public:
+    using RouterFn = std::function<torch::Tensor(torch::Tensor)>;
+
+    GatingHeuristicPredictor(RouterFn router_fn, int layer_idx, int prefetch_count,
+                             bool use_softmax_before_topk, int num_experts_per_tok,
+                             float score_percentile = 0.0f)
+        : router_fn_(std::move(router_fn)),
+          layer_idx_(layer_idx),
+          prefetch_count_(prefetch_count),
+          use_softmax_before_topk_(use_softmax_before_topk),
+          num_experts_per_tok_(num_experts_per_tok),
+          score_percentile_(score_percentile) {
+        std::cout << "[GatingHeuristicPredictor Layer " << layer_idx_ << "] ";
+        if (score_percentile_ > 0.0f) {
+            std::cout << "score_percentile=" << score_percentile_
+                      << " (Zhu et al. score-based prefetch)";
+        } else {
+            std::cout << "prefetch_count=" << prefetch_count_
+                      << " softmax_before_topk=" << (use_softmax_before_topk_ ? "yes" : "no");
+        }
+        std::cout << std::endl;
+    }
+
+    std::vector<int64_t> predict_sync(torch::Tensor hidden_state,
+                                      c10::optional<torch::Tensor> prefill_dist = c10::nullopt,
+                                      c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt,
+                                      c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt,
+                                      int64_t source_decode_step = -1) override {
+        (void)prefill_dist;
+        (void)prev_expert_onehot;
+        (void)prev_layers_feat;
+        (void)source_decode_step;
+
+        auto start = std::chrono::high_resolution_clock::now();
+        if (!router_fn_) {
+            return {};
+        }
+
+        try {
+            torch::Tensor h = hidden_state;
+            if (h.dim() == 1) {
+                h = h.unsqueeze(0);
+            } else if (h.dim() == 3) {
+                // Decode path passes [batch, seq, hidden]; router expects [tokens, hidden].
+                h = h.reshape({-1, h.size(-1)});
+            }
+            torch::Tensor router_out = router_fn_(h);
+            if (router_out.dim() == 1) {
+                router_out = router_out.unsqueeze(0);
+            }
+
+            torch::Tensor scores = router_out;
+            if (use_softmax_before_topk_) {
+                scores = torch::softmax(scores.to(torch::kFloat32), -1).to(router_out.dtype());
+            }
+
+            std::vector<int64_t> predicted_experts;
+            if (score_percentile_ > 0.0f) {
+                torch::Tensor probs = scores;
+                if (!use_softmax_before_topk_) {
+                    probs = torch::softmax(scores.to(torch::kFloat32), -1);
+                }
+                torch::Tensor row = probs.flatten().to(torch::kFloat32);
+                const float qval = torch::quantile(row, score_percentile_).item<float>();
+                torch::Tensor mask = row >= qval;
+                torch::Tensor hit_idx = mask.nonzero().flatten();
+                if (hit_idx.numel() == 0) {
+                    auto top1 = row.argmax();
+                    hit_idx = top1.reshape({1});
+                }
+                torch::Tensor hit_scores = row.index_select(0, hit_idx);
+                auto order = hit_scores.argsort(/*dim=*/0, /*descending=*/true);
+                hit_idx = hit_idx.index_select(0, order).to(torch::kCPU, torch::kInt64);
+                predicted_experts.reserve(static_cast<size_t>(hit_idx.numel()));
+                auto acc = hit_idx.accessor<int64_t, 1>();
+                for (int i = 0; i < hit_idx.size(0); ++i) {
+                    predicted_experts.push_back(acc[i]);
+                }
+                if (static_cast<int>(predicted_experts.size()) > num_experts_per_tok_) {
+                    predicted_experts.resize(static_cast<size_t>(num_experts_per_tok_));
+                }
+            } else {
+                const int topk = std::max(
+                    1, std::min({prefetch_count_, num_experts_per_tok_,
+                                 static_cast<int>(scores.size(-1))}));
+                auto topk_result = scores.topk(topk, -1);
+                auto topk_idx = std::get<1>(topk_result).to(torch::kCPU, torch::kInt64);
+                predicted_experts.reserve(topk);
+                if (topk_idx.dim() == 2) {
+                    auto acc = topk_idx.accessor<int64_t, 2>();
+                    for (int i = 0; i < topk_idx.size(1); ++i) {
+                        predicted_experts.push_back(acc[0][i]);
+                    }
+                } else if (topk_idx.dim() == 1) {
+                    auto acc = topk_idx.accessor<int64_t, 1>();
+                    for (int i = 0; i < topk_idx.size(0); ++i) {
+                        predicted_experts.push_back(acc[i]);
+                    }
+                }
+            }
+
+            auto end = std::chrono::high_resolution_clock::now();
+            prediction_time_ms_ = std::chrono::duration<double, std::milli>(end - start).count();
+            return predicted_experts;
+        } catch (const std::exception& e) {
+            std::cerr << "[GatingHeuristicPredictor Layer " << layer_idx_
+                      << "] prediction error: " << e.what() << std::endl;
+            return {};
+        }
+    }
+
+    bool is_gating_heuristic() const override { return true; }
+
+    bool has_prefetch_threshold() const override { return score_percentile_ > 0.0f; }
+
+    double get_prediction_time_ms() override { return prediction_time_ms_; }
+
+private:
+    RouterFn router_fn_;
+    int layer_idx_;
+    int prefetch_count_;
+    bool use_softmax_before_topk_;
+    int num_experts_per_tok_;
+    float score_percentile_;
+    double prediction_time_ms_ = 0.0;
 };
 
 // ============================================================================
@@ -398,8 +535,10 @@ private:
 class OracleTracePredictor : public IExpertPredictor {
 public:
     OracleTracePredictor(const std::string& trace_path, int layer_idx, int lookahead, int budget,
-                         bool full_union = false)
-        : layer_idx_(layer_idx), lookahead_(lookahead), budget_(budget), full_union_(full_union) {
+                         bool full_union = false, float routing_agreement = 1.0f,
+                         int64_t num_experts = 128, uint64_t noise_seed = 42)
+        : layer_idx_(layer_idx), lookahead_(lookahead), budget_(budget), full_union_(full_union),
+          routing_agreement_(routing_agreement), num_experts_(num_experts), noise_seed_(noise_seed) {
         
         std::ifstream ifs(trace_path);
         if (!ifs.is_open()) {
@@ -444,7 +583,13 @@ public:
                 }
             }
         }
-        std::cout << "[OracleTracePredictor Layer " << layer_idx_ << "] Loaded " << token_experts_.size() << " tokens from " << trace_path << std::endl;
+        std::cout << "[OracleTracePredictor Layer " << layer_idx_ << "] Loaded " << token_experts_.size()
+                  << " tokens from " << trace_path;
+        if (routing_agreement_ < 1.0f - 1e-6f) {
+            std::cout << " (noisy oracle: routing_agreement=" << routing_agreement_
+                      << ", noise_seed=" << noise_seed_ << ")";
+        }
+        std::cout << std::endl;
     }
 
     std::vector<int64_t> predict_sync(torch::Tensor embedding, c10::optional<torch::Tensor> prefill_dist = c10::nullopt, c10::optional<torch::Tensor> prev_expert_onehot = c10::nullopt, c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt, int64_t source_decode_step = -1) override {
@@ -468,14 +613,58 @@ public:
         std::unordered_map<int64_t, int> expert_counts;
         // Track earliest token index at which each expert is needed (for tie-breaking)
         std::unordered_map<int64_t, int> expert_earliest_need;
+
+        const bool use_noisy_oracle = routing_agreement_ < 1.0f - 1e-6f;
+        std::mt19937_64 rng;
+        std::uniform_int_distribution<int64_t> expert_dist;
+        if (use_noisy_oracle) {
+            rng.seed(noise_seed_ ^ (static_cast<uint64_t>(layer_idx_) << 32) ^
+                     (static_cast<uint64_t>(token_idx) * 0x9E3779B97F4A7C15ULL));
+            expert_dist = std::uniform_int_distribution<int64_t>(0, std::max<int64_t>(num_experts_ - 1, 0));
+        }
+
         for (int i = start_i; i <= horizon; ++i) {
             const int future_idx = token_idx + i;
             if (future_idx < 0 || future_idx >= static_cast<int>(token_experts_.size())) {
                 continue;
             }
-            for (int64_t expert : token_experts_[static_cast<size_t>(future_idx)]) {
+            const std::vector<int64_t>& true_experts = token_experts_[static_cast<size_t>(future_idx)];
+            if (true_experts.empty()) {
+                continue;
+            }
+
+            std::unordered_set<int64_t> predicted_for_token;
+            if (!use_noisy_oracle) {
+                for (int64_t expert : true_experts) {
+                    predicted_for_token.insert(expert);
+                }
+            } else {
+                const int B = static_cast<int>(true_experts.size());
+                int n_keep = std::max(1, static_cast<int>(std::lround(routing_agreement_ * B)));
+                n_keep = std::min(B, n_keep);
+
+                std::vector<int> pick_idx(B);
+                std::iota(pick_idx.begin(), pick_idx.end(), 0);
+                std::shuffle(pick_idx.begin(), pick_idx.end(), rng);
+
+                std::unordered_set<int64_t> true_set(true_experts.begin(), true_experts.end());
+                for (int k = 0; k < n_keep; ++k) {
+                    predicted_for_token.insert(true_experts[static_cast<size_t>(pick_idx[k])]);
+                }
+
+                int attempts = 0;
+                while (static_cast<int>(predicted_for_token.size()) < B && attempts < num_experts_ * 4) {
+                    ++attempts;
+                    const int64_t cand = expert_dist(rng);
+                    if (true_set.count(cand) || predicted_for_token.count(cand)) {
+                        continue;
+                    }
+                    predicted_for_token.insert(cand);
+                }
+            }
+
+            for (int64_t expert : predicted_for_token) {
                 expert_counts[expert]++;
-                // Record the earliest future index at which this expert appears
                 auto it = expert_earliest_need.find(expert);
                 if (it == expert_earliest_need.end()) {
                     expert_earliest_need[expert] = future_idx;
@@ -521,6 +710,9 @@ private:
     int lookahead_;
     int budget_;
     bool full_union_;
+    float routing_agreement_;
+    int64_t num_experts_;
+    uint64_t noise_seed_;
     std::vector<std::vector<int64_t>> token_experts_;
     std::atomic<int> current_token_idx_{0};
     double prediction_time_ms_ = 0.0;

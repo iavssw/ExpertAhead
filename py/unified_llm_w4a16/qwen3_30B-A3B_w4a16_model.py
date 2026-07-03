@@ -80,6 +80,10 @@ def _apply_routing_and_cache_cli(model: Any, run_config: dict) -> None:
         else:
             print("Warning: suppress_predictor_stats ignored (backend has no set_suppress_predictor_stats).")
 
+    if run_config.get("prefetch_non_evicting", False) and hasattr(model, "set_prefetch_non_evicting"):
+        model.set_prefetch_non_evicting(True)
+        print("Enabled non-evicting speculative prefetch (paper mode).")
+
 
 def load_config_with_comments(path: str) -> dict:
     """Load JSON/JSON5-like config with // and /* */ comments stripped."""
@@ -252,6 +256,11 @@ class Qwen3_30BA3BW4A16Model:
         predictor_lookahead = run_config.get("predictor_lookahead", 1)
         oracle_trace_path = run_config.get("oracle_trace_path", "")
         oracle_lookahead = run_config.get("oracle_lookahead", 0)
+        predictor_type = run_config.get("predictor_type", "torchscript")
+        gating_lookahead = run_config.get("gating_lookahead", 1)
+        gating_score_percentile = float(run_config.get("gating_score_percentile", 0.0))
+        speculative_cache_fraction = float(run_config.get("speculative_cache_fraction", 0.0))
+        prefetch_non_evicting = bool(run_config.get("prefetch_non_evicting", False))
         
         if oracle_trace_path and oracle_lookahead <= 0:
             oracle_lookahead = predictor_lookahead if predictor_lookahead > 0 else 1
@@ -350,15 +359,28 @@ class Qwen3_30BA3BW4A16Model:
             constructor_args.append(oracle_lookahead)
             constructor_args.append(run_config.get("oracle_full_union", False))
             constructor_args.append(run_config.get("prefetch_threshold", 0.0))
+            constructor_args.append(predictor_type)
+            constructor_args.append(gating_lookahead)
+            constructor_args.append(prefetch_non_evicting)
+            constructor_args.append(gating_score_percentile)
+            constructor_args.append(speculative_cache_fraction)
+            constructor_args.append(run_config.get("oracle_routing_agreement", 1.0))
+            constructor_args.append(run_config.get("oracle_noise_seed", 42))
         else:
             constructor_args.append(config_path)
 
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
 
         if backend == "predict" and hasattr(self.model, "set_predictor_lookahead"):
-            la = oracle_lookahead if oracle_trace_path else predictor_lookahead
-            if la > 0:
-                self.model.set_predictor_lookahead(la)
+            if predictor_type == "gating":
+                self.model.set_predictor_lookahead(gating_lookahead)
+            else:
+                la = oracle_lookahead if oracle_trace_path else predictor_lookahead
+                if la > 0:
+                    self.model.set_predictor_lookahead(la)
+
+        if backend == "predict" and prefetch_non_evicting and hasattr(self.model, "set_prefetch_non_evicting"):
+            self.model.set_prefetch_non_evicting(True)
 
         # Clean up temp config
         if backend == "predict" and 'tmp' in dir() and hasattr(tmp, 'name'):
@@ -742,6 +764,49 @@ class Qwen3_30BA3BW4A16Model:
             top_k,
             eos_token_id
         )
+
+    def generation_perplexity(
+        self,
+        prompt_ids: torch.Tensor,
+        full_ids: torch.Tensor,
+    ) -> dict:
+        """Token NLL on the generated suffix using the M=1 decode forward path."""
+        if prompt_ids.dim() != 2 or full_ids.dim() != 2:
+            raise ValueError("Expected prompt_ids and full_ids with shape [batch, seq_len]")
+        if prompt_ids.size(0) != 1 or full_ids.size(0) != 1:
+            raise ValueError("generation_perplexity currently supports batch size 1")
+        if full_ids.size(1) < prompt_ids.size(1):
+            raise ValueError("full_ids must be at least as long as prompt_ids")
+
+        prompt_len = int(prompt_ids.size(1))
+        seq_len = int(full_ids.size(1))
+        num_gen_tokens = seq_len - prompt_len
+        if num_gen_tokens <= 0:
+            return {"sum_nll": 0.0, "num_gen_tokens": 0}
+
+        if full_ids.device != self.device:
+            full_ids = full_ids.to(self.device)
+
+        self.reset_cache_stats()
+        sum_nll = 0.0
+        counted = 0
+
+        with torch.no_grad():
+            for i in range(seq_len - 1):
+                input_token = full_ids[:, i : i + 1]
+                logits = self.model.forward(input_token, start_pos=i)
+                target = full_ids[0, i + 1]
+                if i + 1 < prompt_len:
+                    continue
+                nll = F.cross_entropy(
+                    logits[:, -1, :].float(),
+                    target.unsqueeze(0),
+                    reduction="sum",
+                )
+                sum_nll += float(nll.item())
+                counted += 1
+
+        return {"sum_nll": sum_nll, "num_gen_tokens": counted}
 
     def __call__(self, input_ids: torch.Tensor, start_pos: int = 0) -> torch.Tensor:
         """Forward pass."""
@@ -1277,6 +1342,11 @@ def main():
     args.predictor_model = getattr(args, "predictor_model", "")
     args.predictor_device = getattr(args, "predictor_device", "gpu")
     args.predictor_lookahead = getattr(args, "predictor_lookahead", 1)
+    args.predictor_type = getattr(args, "predictor_type", "torchscript")
+    args.gating_lookahead = getattr(args, "gating_lookahead", 1)
+    args.gating_score_percentile = getattr(args, "gating_score_percentile", 0.0)
+    args.speculative_cache_fraction = getattr(args, "speculative_cache_fraction", 0.0)
+    args.prefetch_non_evicting = getattr(args, "prefetch_non_evicting", False)
     args.expert_reuse_csv = getattr(args, "expert_reuse_csv", None)
     args.forced_top_n = getattr(args, "forced_top_n", 0)
     args.forced_top_p = getattr(args, "forced_top_p", -1.0)
@@ -1413,26 +1483,29 @@ def main():
                     elapsed = time.time() - start_time
                     num_generated = full_ids.size(1) - input_ids.size(1)
                     if num_generated > 0:
+                        if args.generate:
+                            total_time += elapsed
+                            total_generated_tokens += num_generated
+                            prompt_tps_list.append(num_generated / elapsed)
+
+                            if model.tokenizer is not None:
+                                prompt_len = input_ids.size(1)
+                                generated_tokens = full_ids[0, prompt_len:].tolist()
+                                decoded_generated = model.tokenizer.decode(
+                                    generated_tokens, skip_special_tokens=False
+                                )
+                                print(f"\n{'='*60}")
+                                print("Generated text only:")
+                                print(f"{'='*60}")
+                                print(decoded_generated)
+                                print(f"{'='*60}")
+
                         gp = model.generation_perplexity(input_ids, full_ids)
                         total_nll_sum += gp["sum_nll"]
                         total_gen_toks_for_ppl += gp["num_gen_tokens"]
                         prompts_with_gen += 1
                         prompt_ppl = math.exp(gp["sum_nll"] / gp["num_gen_tokens"])
                         prompt_ppl_list.append(prompt_ppl)
-                        if args.generate:
-                            total_time += elapsed
-                            total_generated_tokens += num_generated
-                            prompt_tps_list.append(num_generated / elapsed)
-                            
-                            if model.tokenizer is not None:
-                                prompt_len = input_ids.size(1)
-                                generated_tokens = full_ids[0, prompt_len:].tolist()
-                                decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
-                                print(f"\n{'='*60}")
-                                print("Generated text only:")
-                                print(f"{'='*60}")
-                                print(decoded_generated)
-                                print(f"{'='*60}")
                 elif args.generate:
                     start_time = time.time()
                     generated = model.generate(

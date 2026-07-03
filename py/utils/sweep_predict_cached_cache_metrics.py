@@ -439,6 +439,8 @@ def parse_output(output: str) -> Dict[str, Optional[float]]:
     result: Dict[str, Optional[float]] = {
         "gen_perplexity": None,
         "gen_perplexity_std": None,
+        "prompt_gen_perplexity": None,
+        "prompt_gen_perplexity_std": None,
         "tokens_per_second": None,
         "tokens_per_second_std": None,
         "cache_hits": None,
@@ -459,6 +461,19 @@ def parse_output(output: str) -> Dict[str, Optional[float]]:
         "pred_requested_hits_topk": None,
         "pred_requested_total_topk": None,
         "pred_requested_rate_topk_pct": None,
+        "gating_prefetch_hits": None,
+        "gating_prefetch_total": None,
+        "gating_prefetch_recall_pct": None,
+        "gating_pred_recall_hits": None,
+        "gating_pred_recall_total": None,
+        "gating_pred_recall_pct": None,
+        "gating_pred_precision_hits": None,
+        "gating_pred_precision_total": None,
+        "gating_pred_precision_pct": None,
+        "gating_prefetch_delivery_pct": None,
+        "prefetch_already_cached": None,
+        "prefetch_dropped_no_victim": None,
+        "gating_prefetch_triggers": None,
         "stall_loads": None,
         "prefetch_loads": None,
         "prefetch_hits_ready": None,
@@ -467,13 +482,27 @@ def parse_output(output: str) -> Dict[str, Optional[float]]:
         "avg_ms_per_expert_load": None,
     }
 
-    ppl_matches = re.findall(r"Perplexity:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
+    ppl_matches = re.findall(
+        r"^Perplexity:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)",
+        output,
+        re.MULTILINE,
+    )
     if ppl_matches:
         result["gen_perplexity"] = float(ppl_matches[-1])
-        
-    m_ppl_std = re.search(r"Generation Perplexity StdDev:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output)
-    if m_ppl_std:
-        result["gen_perplexity_std"] = float(m_ppl_std.group(1))
+
+    m_prompt_ppl = re.search(
+        r"Generation Perplexity:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)",
+        output,
+    )
+    if m_prompt_ppl:
+        result["prompt_gen_perplexity"] = float(m_prompt_ppl.group(1))
+
+    m_prompt_ppl_std = re.search(
+        r"Generation Perplexity StdDev:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)",
+        output,
+    )
+    if m_prompt_ppl_std:
+        result["prompt_gen_perplexity_std"] = float(m_prompt_ppl_std.group(1))
 
     result["tokens_per_second"] = parse_tps(output)
 
@@ -569,6 +598,47 @@ def parse_output(output: str) -> Dict[str, Optional[float]]:
         result["prefetch_hits_wait"] = wait
         result["prefetch_ticks_skipped"] = skipped
 
+    gating_matches = re.findall(r"GatingPrefetch Delivery=([\d.]+)% \((\d+)/(\d+)\)", output)
+    if not gating_matches:
+        gating_matches = re.findall(r"GatingPrefetch Recall=([\d.]+)% \((\d+)/(\d+)\)", output)
+    if gating_matches:
+        total_hits = sum(int(m[1]) for m in gating_matches)
+        total_eval = sum(int(m[2]) for m in gating_matches)
+        if total_eval > 0:
+            result["gating_prefetch_hits"] = total_hits
+            result["gating_prefetch_total"] = total_eval
+            result["gating_prefetch_delivery_pct"] = (100.0 * total_hits) / total_eval
+            result["gating_prefetch_recall_pct"] = result["gating_prefetch_delivery_pct"]
+
+    gating_pred_recall_matches = re.findall(r"GatingPredict Recall=([\d.]+)% \((\d+)/(\d+)\)", output)
+    if gating_pred_recall_matches:
+        total_hits = sum(int(m[1]) for m in gating_pred_recall_matches)
+        total_eval = sum(int(m[2]) for m in gating_pred_recall_matches)
+        if total_eval > 0:
+            result["gating_pred_recall_hits"] = total_hits
+            result["gating_pred_recall_total"] = total_eval
+            result["gating_pred_recall_pct"] = (100.0 * total_hits) / total_eval
+
+    gating_pred_precision_matches = re.findall(r"GatingPredict Precision=([\d.]+)% \((\d+)/(\d+)\)", output)
+    if gating_pred_precision_matches:
+        total_hits = sum(int(m[1]) for m in gating_pred_precision_matches)
+        total_eval = sum(int(m[2]) for m in gating_pred_precision_matches)
+        if total_eval > 0:
+            result["gating_pred_precision_hits"] = total_hits
+            result["gating_pred_precision_total"] = total_eval
+            result["gating_pred_precision_pct"] = (100.0 * total_hits) / total_eval
+
+    prefetch_eff_matches = re.findall(
+        r"PrefetchEff: Dropped=(\d+), AlreadyCached=(\d+)", output
+    )
+    if prefetch_eff_matches:
+        result["prefetch_dropped_no_victim"] = sum(int(m[0]) for m in prefetch_eff_matches)
+        result["prefetch_already_cached"] = sum(int(m[1]) for m in prefetch_eff_matches)
+
+    trigger_matches = re.findall(r"GatingPrefetch Triggers=(\d+)", output)
+    if trigger_matches:
+        result["gating_prefetch_triggers"] = sum(int(m) for m in trigger_matches)
+
     return result
 
 
@@ -625,7 +695,7 @@ def iter_cache_lookahead_coupled_pairs(
 
 
 def resolve_oracle_trace_path(args: argparse.Namespace, batch_idx: int) -> str:
-    default_dir = "/home/michael/heteroPredict/trainingData/qwen_traces"
+    default_dir = "/home/michael/heteroPredict/trainingData/wikitext_test_traces"
     if args.model == "mixtral":
         default_dir = "/home/michael/heteroPredict/trainingData/mixtral_traces"
     trace_dir = getattr(args, "oracle_trace_dir", None) or default_dir
@@ -703,6 +773,7 @@ def build_model_cmd(
     max_new_tokens: int = 80,
     mode_generate: bool = True,
     mode_wikitext_perplexity: bool = False,
+    generation_perplexity: bool = False,
     expert_reuse_csv: Optional[str] = None,
     predictor_device: Optional[str] = None,
     expert_weights_dir: Optional[str] = None,
@@ -712,6 +783,13 @@ def build_model_cmd(
     oracle_trace_path: Optional[str] = None,
     oracle_lookahead: Optional[int] = None,
     oracle_full_union: bool = False,
+    oracle_routing_agreement: Optional[float] = None,
+    oracle_noise_seed: Optional[int] = None,
+    predictor_type: Optional[str] = None,
+    gating_lookahead: Optional[int] = None,
+    prefetch_non_evicting: bool = False,
+    gating_score_percentile: Optional[float] = None,
+    speculative_cache_fraction: Optional[float] = None,
 ) -> List[str]:
     script = QWEN_MODEL_SCRIPT if model == "qwen" else MIXTRAL_MODEL_SCRIPT
     
@@ -744,6 +822,7 @@ def build_model_cmd(
         "wikitext103_max_length": 4096,
         "wikitext103_stride": 2048,
         "wikitext103_max_windows": 8,
+        "generation_perplexity": generation_perplexity,
     }
 
     if backend == "predict":
@@ -774,6 +853,20 @@ def build_model_cmd(
         run_config["oracle_lookahead"] = oracle_lookahead
     if oracle_full_union:
         run_config["oracle_full_union"] = True
+    if oracle_routing_agreement is not None and oracle_routing_agreement < 1.0 - 1e-6:
+        run_config["oracle_routing_agreement"] = oracle_routing_agreement
+    if oracle_noise_seed is not None:
+        run_config["oracle_noise_seed"] = oracle_noise_seed
+    if predictor_type:
+        run_config["predictor_type"] = predictor_type
+    if gating_lookahead is not None:
+        run_config["gating_lookahead"] = gating_lookahead
+    if gating_score_percentile is not None and gating_score_percentile > 0.0:
+        run_config["gating_score_percentile"] = gating_score_percentile
+    if speculative_cache_fraction is not None and speculative_cache_fraction > 0.0:
+        run_config["speculative_cache_fraction"] = speculative_cache_fraction
+    if prefetch_non_evicting:
+        run_config["prefetch_non_evicting"] = True
 
     # Create temporary JSON file for the run config
     fd, temp_json_path = tempfile.mkstemp(suffix=".json", prefix="sweep_run_config_")
@@ -920,6 +1013,9 @@ def load_prompts(args: argparse.Namespace) -> List[str]:
         with open(path, "r", encoding="utf-8") as f:
             raw = f.read()
         prompts = [p.strip() for p in raw.split("\n\n") if p.strip()]
+        if n <= 0:
+            print(f"[sweep] Loaded all {len(prompts)} prompt(s) from {path}", flush=True)
+            return prompts
         return prompts[:n]
 
     default = (
@@ -1019,6 +1115,8 @@ def cfg(
     prefetch_threshold: float = 0.0,
     mode_perplexity: bool = True,
     mode_generate: bool = True,
+    mode_generation_perplexity: bool = False,
+    temperature: Optional[float] = None,
 ) -> Dict[str, Any]:
     return {
         "question": question,
@@ -1036,6 +1134,8 @@ def cfg(
         "prefetch_threshold": prefetch_threshold,
         "mode_perplexity": mode_perplexity,
         "mode_generate": mode_generate,
+        "mode_generation_perplexity": mode_generation_perplexity,
+        "temperature": temperature,
     }
 
 
@@ -1063,6 +1163,41 @@ def iter_custom_prefetch_budgets(args: argparse.Namespace, cache_size: int) -> L
     if getattr(args, "custom_explicit_prefetch_budgets", False):
         return sorted({int(b) for b in args.prefetch_budgets if 1 <= int(b) <= int(cache_size)})
     return sorted({max(1, int(cache_size * float(f))) for f in args.budget_fractions})
+
+
+def gating_routed_top_k(model: str) -> int:
+    """Max experts the next MoE layer routes to; caps cross-layer gating prefetch."""
+    return 8 if model == "qwen" else 2
+
+
+def effective_gating_prefetch_budget(budget: int, model: str) -> int:
+    """Gating only prefetches next-layer router top-k — never more than routed width."""
+    return min(int(budget), gating_routed_top_k(model))
+
+
+def gating_budget_label(budget: int, model: str) -> str:
+    gating_b = effective_gating_prefetch_budget(budget, model)
+    if gating_b < int(budget):
+        return f"B={gating_b} (sweep B={budget})"
+    return f"B={gating_b}"
+
+
+def apply_gating_sweep_fields(
+    config: Dict[str, Any],
+    *,
+    budget: int,
+    cache_size: int,
+    args: argparse.Namespace,
+) -> int:
+    """Set gating predictor fields; returns effective prefetch budget (≤ routed top-k)."""
+    gating_b = effective_gating_prefetch_budget(budget, args.model)
+    config["prefetch_budget"] = gating_b
+    config["predictor_type"] = "gating"
+    config["gating_lookahead"] = 1
+    config["speculative_cache_fraction"] = float(gating_b) / float(cache_size)
+    config["prefetch_non_evicting"] = bool(getattr(args, "prefetch_non_evicting", False))
+    config["cache_policy"] = "LRU"
+    return gating_b
 
 
 def _valid_lookaheads_for_cache(
@@ -1471,6 +1606,201 @@ def random_baseline_configs(
     return configs
 
 
+def paper_baseline_sweep_configs(
+    args: argparse.Namespace,
+    predictor_base_dir: Optional[str] = None,
+    predictor_tag: str = "",
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    """Paper Table 2 style ablations: LRU-only, gating prefetch, ML predictor, oracle ceiling."""
+    configs: List[Dict[str, Any]] = []
+    question = "PAPER_BASELINE"
+    topk = 8 if args.model == "qwen" else 2
+
+    for cache_size in args.cache_sizes:
+        lru = cfg(
+            question, "LRU only (cached)", "cached",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=None,
+            mode_perplexity=False, mode_generate=True,
+        )
+        lru["cache_policy"] = "LRU"
+        configs.append(lru)
+
+        naive = cfg(
+            question, f"Naive k={topk} (cached)", "cached",
+            topk, 0.0, 0,
+            lookahead=1, prefetch_budget=None,
+            mode_perplexity=False, mode_generate=True,
+        )
+        naive["cache_policy"] = "LRU"
+        configs.append(naive)
+
+        for budget in iter_custom_prefetch_budgets(args, cache_size):
+            gating = cfg(
+                question, f"LRU+Gating {gating_budget_label(budget, args.model)}", "predict",
+                cache_size, 0.0, 0,
+                lookahead=1, prefetch_budget=budget,
+                mode_perplexity=False, mode_generate=True,
+            )
+            apply_gating_sweep_fields(gating, budget=budget, cache_size=cache_size, args=args)
+            configs.append(gating)
+
+            if predictor_base_dir or args.predictor_base_dir:
+                ml = cfg(
+                    question, f"LRU+ML B={budget}", "predict",
+                    cache_size, 0.0, 0,
+                    lookahead=1, prefetch_budget=budget,
+                    mode_perplexity=False, mode_generate=True,
+                )
+                ml["cache_policy"] = "LRU"
+                if predictor_base_dir:
+                    ml["predictor_base_dir"] = predictor_base_dir
+                if predictor_tag:
+                    ml["predictor_tag"] = predictor_tag
+                configs.append(ml)
+
+            oracle = cfg(
+                question, f"Oracle B={budget}", "predict",
+                cache_size, 0.0, 0,
+                lookahead=1, prefetch_budget=budget,
+                mode_perplexity=False, mode_generate=True,
+            )
+            oracle["is_oracle"] = True
+            oracle["oracle_full_union"] = False
+            oracle["cache_policy"] = "LRU"
+            configs.append(oracle)
+
+    return configs
+
+
+def gating_vs_ml_sweep_configs(
+    args: argparse.Namespace,
+    predictor_base_dir: Optional[str] = None,
+    predictor_tag: str = "",
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    """Fair gating vs ML comparison: same cache, budget fraction, partitioned speculative pool."""
+    configs: List[Dict[str, Any]] = []
+    question = "GATING_VS_ML"
+    tag_suffix = f" [{predictor_tag}]" if predictor_tag else ""
+
+    for cache_size in args.cache_sizes:
+        lru = cfg(
+            question, f"LRU only (cached){tag_suffix}", "cached",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=None,
+            mode_perplexity=False, mode_generate=True,
+        )
+        lru["cache_policy"] = "LRU"
+        configs.append(lru)
+
+        for budget in iter_custom_prefetch_budgets(args, cache_size):
+            frac = float(budget) / float(cache_size)
+
+            gating = cfg(
+                question, f"Gating {gating_budget_label(budget, args.model)}{tag_suffix}", "predict",
+                cache_size, 0.0, 0,
+                lookahead=1, prefetch_budget=budget,
+                mode_perplexity=False, mode_generate=True,
+            )
+            apply_gating_sweep_fields(gating, budget=budget, cache_size=cache_size, args=args)
+            configs.append(gating)
+
+            if predictor_base_dir or args.predictor_base_dir:
+                for cache_size_la, lookahead in iter_cache_lookahead_pairs(args, min_cache_map):
+                    if cache_size_la != cache_size:
+                        continue
+                    ml = cfg(
+                        question, f"ML B={budget} LA={lookahead}{tag_suffix}", "predict",
+                        cache_size, 0.0, 0,
+                        lookahead=lookahead, prefetch_budget=budget,
+                        mode_perplexity=False, mode_generate=True,
+                    )
+                    ml["speculative_cache_fraction"] = frac
+                    ml["cache_policy"] = "LRU"
+                    _tag_predictor_config(ml, predictor_base_dir, predictor_tag)
+                    configs.append(ml)
+
+    return configs
+
+
+def gating_budget_sweep_configs(
+    args: argparse.Namespace,
+    predictor_base_dir: Optional[str] = None,
+    predictor_tag: str = "",
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    """Gating-heuristic prefetch only, over explicit prefetch budgets B."""
+    configs: List[Dict[str, Any]] = []
+    question = "GATING_BUDGET_SWEEP"
+    for cache_size in args.cache_sizes:
+        for budget in iter_custom_prefetch_budgets(args, cache_size):
+            gating = cfg(
+                question, f"Gating {gating_budget_label(budget, args.model)}", "predict",
+                cache_size, 0.0, 0,
+                lookahead=1, prefetch_budget=budget,
+                mode_perplexity=False, mode_generate=True,
+            )
+            apply_gating_sweep_fields(gating, budget=budget, cache_size=cache_size, args=args)
+            configs.append(gating)
+    return configs
+
+
+def lru_vs_gating_sweep_configs(
+    args: argparse.Namespace,
+    predictor_base_dir: Optional[str] = None,
+    predictor_tag: str = "",
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    """Straight LRU (cached) vs LRU + cross-layer gating prefetch over budget B."""
+    configs: List[Dict[str, Any]] = []
+    question = "LRU_VS_GATING"
+    for cache_size in args.cache_sizes:
+        lru = cfg(
+            question, "LRU only (cached)", "cached",
+            cache_size, 0.0, 0,
+            lookahead=1, prefetch_budget=None,
+            mode_perplexity=False, mode_generate=True,
+        )
+        lru["cache_policy"] = "LRU"
+        configs.append(lru)
+
+        for budget in iter_custom_prefetch_budgets(args, cache_size):
+            gating = cfg(
+                question, f"LRU+Gating {gating_budget_label(budget, args.model)}", "predict",
+                cache_size, 0.0, 0,
+                lookahead=1, prefetch_budget=budget,
+                mode_perplexity=False, mode_generate=True,
+            )
+            apply_gating_sweep_fields(gating, budget=budget, cache_size=cache_size, args=args)
+            configs.append(gating)
+
+        for pct in getattr(args, "gating_score_percentiles", []) or []:
+            pct_f = float(pct)
+            if pct_f <= 0.0:
+                continue
+            pct_label = f"p{int(round(pct_f * 100))}"
+            gating_pct = cfg(
+                question, f"LRU+Gating score>={pct_label}", "predict",
+                cache_size, 0.0, 0,
+                lookahead=1, prefetch_budget=None,
+                mode_perplexity=False, mode_generate=True,
+            )
+            gating_pct["predictor_type"] = "gating"
+            gating_pct["gating_lookahead"] = 1
+            gating_pct["gating_score_percentile"] = pct_f
+            budgets = list(iter_custom_prefetch_budgets(args, cache_size))
+            if budgets:
+                spec_b = effective_gating_prefetch_budget(max(budgets), args.model)
+                gating_pct["speculative_cache_fraction"] = float(spec_b) / float(cache_size)
+                gating_pct["prefetch_budget"] = spec_b
+            gating_pct["prefetch_non_evicting"] = bool(getattr(args, "prefetch_non_evicting", False))
+            gating_pct["cache_policy"] = "LRU"
+            configs.append(gating_pct)
+    return configs
+
+
 def oracle_baseline_sweep_configs(
     args: argparse.Namespace,
     predictor_base_dir: Optional[str] = None,
@@ -1535,15 +1865,23 @@ def oracle_baseline_sweep_configs(
                     configs.append(pf)
 
         if getattr(args, "include_oracle_full_union", False) or full_union_only:
-            full = cfg(
-                question, f"Oracle Full Union LA={lookahead}",
-                "predict", cache_size, 0.0, 0,
-                lookahead=lookahead, prefetch_budget=cache_size, prefetch_threshold=0.0,
-                mode_perplexity=False, mode_generate=True,
-            )
-            full["is_oracle"] = True
-            full["oracle_full_union"] = True
-            configs.append(full)
+            agreements = getattr(args, "oracle_routing_agreements", None) or [1.0]
+            for agreement in agreements:
+                if agreement >= 1.0 - 1e-6:
+                    label = f"Oracle Full Union LA={lookahead}"
+                else:
+                    label = f"Oracle Noisy A={agreement:g} LA={lookahead}"
+                full = cfg(
+                    question, label,
+                    "predict", cache_size, 0.0, 0,
+                    lookahead=lookahead, prefetch_budget=cache_size, prefetch_threshold=0.0,
+                    mode_perplexity=False, mode_generate=True,
+                )
+                full["is_oracle"] = True
+                full["oracle_full_union"] = True
+                if agreement < 1.0 - 1e-6:
+                    full["oracle_routing_agreement"] = agreement
+                configs.append(full)
     return configs
 
 
@@ -1768,6 +2106,40 @@ def sec3_3_2_configs(
     return configs
 
 
+def cc_prompt_compare_configs(
+    args: argparse.Namespace,
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    """Greedy generations: cache-cond at λ=1 for each forced-top-J in ``--cc-forced-top-ns``.
+
+    Default: J=5, J=6, J=0 at T=0. Collects WikiText-103 perplexity plus generation perplexity
+    on custom prompt continuations. Responses go to ``--out-dir/generations.md``.
+    """
+    configs: List[Dict[str, Any]] = []
+    question = "CC_PROMPT_COMPARE"
+    cc_js = list(getattr(args, "cc_forced_top_ns", [5, 6, 0]))
+    temperatures = list(getattr(args, "cc_temperatures", [0.0]))
+    for cache_size in args.cache_sizes:
+        for temperature in temperatures:
+            common = dict(
+                lookahead=1,
+                prefetch_budget=None,
+                prefetch_threshold=0.0,
+                mode_perplexity=True,
+                mode_generate=True,
+                mode_generation_perplexity=True,
+                temperature=float(temperature),
+            )
+            t_label = f"T={temperature:g}"
+            for cc_j in cc_js:
+                configs.append(cfg(
+                    question, f"Cache-Cond (J={cc_j}, λ=1, {t_label})", "cached",
+                    cache_size, 1.0, int(cc_j),
+                    **common,
+                ))
+    return configs
+
+
 
 
 def _cfg_key_optional(value: Any) -> Any:
@@ -1800,6 +2172,7 @@ def cfg_key(config: Dict[str, Any]) -> Tuple[Any, ...]:
         stride,
         config.get("mode_perplexity"),
         config.get("mode_generate"),
+        _cfg_key_optional(config.get("temperature")),
         config.get("bookend_pass") or "main",
     )
 
@@ -1893,6 +2266,11 @@ def execute_comprehensive_run(
     budget = config.get("prefetch_budget")
     predictor_stride = config.get("predictor_stride")
     predictor_tag = config.get("predictor_tag", "")
+    run_temperature = (
+        float(config["temperature"])
+        if config.get("temperature") is not None
+        else float(args.temperature)
+    )
     pm_str = f" PM={prob_mass_threshold}" if prob_mass_threshold >= 0.0 else ""
     tag_str = f" predictor={predictor_tag}" if predictor_tag else ""
     stride_str = ""
@@ -1900,7 +2278,7 @@ def execute_comprehensive_run(
         stride_str = f" stride={predictor_stride}"
     print(
         f"\n{'=' * 18} {config['question']} | {config['label']} | "
-        f"C={cache_size} λ={lambda_val} FN={forced_top_n}{pm_str}"
+        f"C={cache_size} λ={lambda_val} FN={forced_top_n} T={run_temperature:g}{pm_str}"
         f"{f' LA={lookahead}{stride_str} B={budget}' if lookahead is not None else ''}{tag_str} "
         f"[{run_idx + 1}/{total_runs}] {'=' * 18}",
         flush=True,
@@ -1915,7 +2293,8 @@ def execute_comprehensive_run(
     # Use per-config predictor_base_dir override if present (multi-predictor comparison)
     effective_predictor_base_dir = config.get("predictor_base_dir", args.predictor_base_dir)
     predictor_path = ""
-    if config["backend"] == "predict" and not config.get("is_oracle", False):
+    predictor_type = config.get("predictor_type")
+    if config["backend"] == "predict" and not config.get("is_oracle", False) and predictor_type != "gating":
         assert lookahead is not None
         predictor_path = predictor_path_for_lookahead(effective_predictor_base_dir, lookahead)
 
@@ -1932,12 +2311,13 @@ def execute_comprehensive_run(
             forced_top_n=forced_top_n,
             prob_mass_threshold=prob_mass_threshold,
             config_path=args.config_path,
-            temperature=args.temperature,
+            temperature=run_temperature,
             top_p=args.top_p,
             top_k=args.top_k,
             max_new_tokens=args.max_new_tokens,
             mode_generate=mode_generate,
             mode_wikitext_perplexity=mode_perplexity,
+            generation_perplexity=mode_generate and bool(config.get("mode_generation_perplexity", False)),
             predictor_device=args.predictor_device,
             expert_weights_dir=getattr(args, "expert_weights_dir", None),
             predictor_stride=predictor_stride,
@@ -1946,6 +2326,13 @@ def execute_comprehensive_run(
             oracle_trace_path=resolve_oracle_trace_path(args, batch_idx if batch_idx is not None else 0) if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
             oracle_lookahead=lookahead if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
             oracle_full_union=config.get("oracle_full_union", False),
+            oracle_routing_agreement=config.get("oracle_routing_agreement"),
+            oracle_noise_seed=getattr(args, "oracle_noise_seed", None),
+            predictor_type=predictor_type,
+            gating_lookahead=config.get("gating_lookahead"),
+            prefetch_non_evicting=bool(config.get("prefetch_non_evicting", False)),
+            gating_score_percentile=config.get("gating_score_percentile"),
+            speculative_cache_fraction=config.get("speculative_cache_fraction"),
         )
 
         out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
@@ -1961,7 +2348,8 @@ def execute_comprehensive_run(
                     for idx, gen_text in enumerate(matches):
                         gen_text = gen_text.strip()
                         f.write(f"### Prompt {(batch_idx if batch_idx is not None else 0) + idx + 1}\n")
-                        f.write(f"**Config:** Cache={cache_size} | Top-J={forced_top_n} | Lam={lambda_val} | Lookahead={lookahead}\n\n")
+                        f.write(f"**Label:** {config.get('label', '')}\n")
+                        f.write(f"**Config:** Cache={cache_size} | Top-J={forced_top_n} | Lam={lambda_val} | T={run_temperature:g} | Lookahead={lookahead}\n\n")
                         f.write(f"```text\n{gen_text}\n```\n\n---\n\n")
                     
         return parse_output(out)
@@ -1969,6 +2357,8 @@ def execute_comprehensive_run(
     merged: Dict[str, Optional[float]] = {
         "gen_perplexity": None,
         "gen_perplexity_std": None,
+        "prompt_gen_perplexity": None,
+        "prompt_gen_perplexity_std": None,
         "tokens_per_second": None,
         "tokens_per_second_std": None,
         "cache_hits": None,
@@ -2033,7 +2423,7 @@ def execute_comprehensive_run(
                         forced_top_n=forced_top_n,
                         prob_mass_threshold=prob_mass_threshold,
                         config_path=args.config_path,
-                        temperature=args.temperature,
+                        temperature=run_temperature,
                         top_p=args.top_p,
                         top_k=args.top_k,
                         max_new_tokens=args.max_new_tokens,
@@ -2047,6 +2437,13 @@ def execute_comprehensive_run(
                         oracle_trace_path=resolve_oracle_trace_path(args, batch_idx if batch_idx is not None else 0) if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
                         oracle_lookahead=lookahead if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
                         oracle_full_union=config.get("oracle_full_union", False),
+                        oracle_routing_agreement=config.get("oracle_routing_agreement"),
+                        oracle_noise_seed=getattr(args, "oracle_noise_seed", None),
+                        predictor_type=predictor_type,
+                        gating_lookahead=config.get("gating_lookahead"),
+                        prefetch_non_evicting=bool(config.get("prefetch_non_evicting", False)),
+                        gating_score_percentile=config.get("gating_score_percentile"),
+                        speculative_cache_fraction=config.get("speculative_cache_fraction"),
                     )
                     out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
                     if out:
@@ -2079,7 +2476,7 @@ def execute_comprehensive_run(
                         forced_top_n=forced_top_n,
                         prob_mass_threshold=prob_mass_threshold,
                         config_path=args.config_path,
-                        temperature=args.temperature,
+                        temperature=run_temperature,
                         top_p=args.top_p,
                         top_k=args.top_k,
                         max_new_tokens=args.max_new_tokens,
@@ -2091,6 +2488,13 @@ def execute_comprehensive_run(
                         oracle_trace_path=resolve_oracle_trace_path(args, batch_idx if batch_idx is not None else 0) if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
                         oracle_lookahead=lookahead if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
                         oracle_full_union=config.get("oracle_full_union", False),
+                        oracle_routing_agreement=config.get("oracle_routing_agreement"),
+                        oracle_noise_seed=getattr(args, "oracle_noise_seed", None),
+                        predictor_type=predictor_type,
+                        gating_lookahead=config.get("gating_lookahead"),
+                        prefetch_non_evicting=bool(config.get("prefetch_non_evicting", False)),
+                        gating_score_percentile=config.get("gating_score_percentile"),
+                        speculative_cache_fraction=config.get("speculative_cache_fraction"),
                     )
                     out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
                     if out:
@@ -2101,6 +2505,21 @@ def execute_comprehensive_run(
                     except OSError:
                         pass
             merge_metrics(aggregate_cold_prompt_metrics(outputs))
+
+    if config["question"] == "CC_PROMPT_COMPARE":
+        gen_file = os.path.join(getattr(args, "out_dir", "."), "generations.md")
+        with open(gen_file, "a", encoding="utf-8") as f:
+            f.write(f"## {config.get('label', '')}\n\n")
+            if merged.get("gen_perplexity") is not None:
+                f.write(f"- **WikiText-103 perplexity:** {merged['gen_perplexity']:.4f}\n")
+            if merged.get("prompt_gen_perplexity") is not None:
+                ppl_line = f"- **Custom-prompt generation perplexity:** {merged['prompt_gen_perplexity']:.4f}"
+                if merged.get("prompt_gen_perplexity_std") is not None:
+                    ppl_line += f" (σ={merged['prompt_gen_perplexity_std']:.4f})"
+                f.write(ppl_line + "\n")
+            if merged.get("tokens_per_second") is not None:
+                f.write(f"- **TPS:** {merged['tokens_per_second']:.2f}\n")
+            f.write("\n---\n\n")
 
     return {
         "question": config["question"],
@@ -2116,8 +2535,10 @@ def execute_comprehensive_run(
         "predictor_stride": predictor_stride if predictor_stride is not None else lookahead,
         "prefetch_budget": budget,
         "predictor_tag": predictor_tag,
+        "oracle_routing_agreement": config.get("oracle_routing_agreement"),
         "mode_perplexity": config.get("mode_perplexity", False),
         "mode_generate": config.get("mode_generate", False),
+        "temperature": run_temperature,
         "bookend_pass": config.get("bookend_pass", "main"),
         **merged,
     }
@@ -3565,6 +3986,16 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
         return run_ppl_winners_only(args)
 
     os.makedirs(plot_dir, exist_ok=True)
+    if args.sweep_question == "cc_prompt_compare":
+        gen_file = os.path.join(plot_dir, "generations.md")
+        with open(gen_file, "w", encoding="utf-8") as f:
+            f.write("# Cache-conditional vs unbiased router — prompt response compare\n\n")
+            f.write(f"Run: `{time.strftime('%Y-%m-%d %H:%M:%S')}`\n\n")
+            f.write(
+                "Perplexity: `gen_perplexity` = WikiText-103 (CSV); "
+                "`prompt_gen_perplexity` = token-weighted NLL on sampled/greedy continuations "
+                "of your custom prompts.\n\n"
+            )
     write_plot_command_file(plot_dir, " ".join(sys.argv))
     csv_parent = os.path.dirname(os.path.abspath(csv_file))
     if csv_parent:
@@ -3615,10 +4046,15 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             "lambda_fn_sweep": lambda: lambda_fn_sweep_configs(args, min_cache_map),
             "oracle_baseline_sweep": lambda: _make_custom_configs(oracle_baseline_sweep_configs, "ORACLE_BASELINE_SWEEP"),
             "sec3_3_2_cache_cond": lambda: sec3_3_2_configs(args, min_cache_map),
+            "cc_prompt_compare": lambda: cc_prompt_compare_configs(args, min_cache_map),
             "unified_sweep": lambda: unified_sweep_configs(args, min_cache_map),
             "thread_benchmark": lambda: thread_benchmark_configs(args, min_cache_map),
             "meeting_sweep_sequential": lambda: meeting_sweep_sequential_configs(args, min_cache_map),
             "meeting_sweep_parallel": lambda: meeting_sweep_parallel_configs(args, min_cache_map),
+            "paper_baseline": lambda: _make_custom_configs(paper_baseline_sweep_configs, "PAPER_BASELINE"),
+            "gating_vs_ml": lambda: _make_custom_configs(gating_vs_ml_sweep_configs, "GATING_VS_ML"),
+            "gating_budget_sweep": lambda: _make_custom_configs(gating_budget_sweep_configs, "GATING_BUDGET_SWEEP"),
+            "lru_vs_gating": lambda: _make_custom_configs(lru_vs_gating_sweep_configs, "LRU_VS_GATING"),
         }
         configs = question_builders[args.sweep_question]()
         # When --prefetch-only, also include RANDOM baseline in the same run
@@ -3702,8 +4138,12 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
     print(f"\n[sweep] Results saved to {csv_file}", flush=True)
     ok_count = sum(1 for row in results if row_has_data(row))
     print(f"[sweep] Runs with data: {ok_count} / {len(results)}", flush=True)
-    if getattr(args, "random_baseline_only", False):
-        print("[sweep] Skipping plots (--random-baseline-only append mode).", flush=True)
+    if getattr(args, "random_baseline_only", False) or args.sweep_question == "cc_prompt_compare":
+        if args.sweep_question == "cc_prompt_compare":
+            gen_file = os.path.join(plot_dir, "generations.md")
+            print(f"[sweep] Prompt responses saved to {gen_file}", flush=True)
+        else:
+            print("[sweep] Skipping plots (--random-baseline-only append mode).", flush=True)
     else:
         print("\n[sweep] Generating plots...", flush=True)
         try:
@@ -3734,21 +4174,51 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "lambda_fn_sweep",
             "oracle_baseline_sweep",
             "sec3_3_2_cache_cond",
+            "cc_prompt_compare",
             "unified_sweep",
             "thread_benchmark",
             "meeting_sweep_sequential",
             "meeting_sweep_parallel",
+            "paper_baseline",
+            "gating_vs_ml",
+            "gating_budget_sweep",
+            "lru_vs_gating",
         ],
         default="custom_1_16_no_ppl",
         help="custom_1_16(_no_ppl): LRU/prefetch/cache-cond/hybrid over lookahead x budget "
              "(with/without a perplexity pass). lambda_fn_sweep: cache-conditional routing "
-             "forced-top-J vs probability-mass threshold. oracle_baseline_sweep: Oracle Top-B "
-             "vs LRU vs RANDOM over cache size with coupled lookahead.",
+             "forced-top-J vs probability-mass threshold. cc_prompt_compare: greedy generations "
+             "for cache-cond λ=1 at each J in --cc-forced-top-ns (default: 5 6 0). oracle_baseline_sweep: "
+             "Oracle Top-B vs LRU vs RANDOM over cache size with coupled lookahead. "
+             "gating_vs_ml: cross-layer gating vs ML prefetch-only with matched budget fraction "
+             "(ML uses full sweep budget; gating capped at routed top-k, speculative pool sized to cap). "
+             "gating_budget_sweep: paper gating-heuristic prefetch only over --prefetch-budgets. "
+             "lru_vs_gating: straight LRU (cached) vs LRU+gating prefetch over --prefetch-budgets.",
+    )
+    p.add_argument(
+        "--prefetch-non-evicting",
+        action="store_true",
+        default=False,
+        help="gating rows: only prefetch into empty cache slots (default: off; use LRU eviction).",
+    )
+    p.add_argument(
+        "--no-prefetch-non-evicting",
+        action="store_false",
+        dest="prefetch_non_evicting",
+        help="Allow gating prefetch to evict LRU victims (not paper-faithful).",
     )
 
     p.add_argument("--model", choices=["qwen", "mixtral"], default="qwen")
     p.add_argument("--cache-sizes", type=int, nargs="+", default=[8], help="Cache sizes to sweep.")
     p.add_argument("--prefetch-budgets", type=int, nargs="+", default=[16, 32], help="Explicit prefetch budgets when --custom-explicit-prefetch-budgets is set.")
+    p.add_argument(
+        "--gating-score-percentiles",
+        type=float,
+        nargs="+",
+        default=[],
+        help="Gating score-based prefetch: prefetch all experts with softmax score >= this percentile "
+             "(Zhu et al. / SpecMD). E.g. 0.8 for 80th percentile. Adaptive count vs fixed top-B.",
+    )
     p.add_argument("--prefetch-thresholds", type=float, nargs="+", default=[], help="Probability thresholds to sweep for threshold-based routing.")
     p.add_argument("--prefetch-threshold", type=float, default=0.0, help="Probability threshold (0.0 to 1.0) to filter experts in the predictor backend.")
     p.add_argument("--budget-fractions", type=float, nargs="+", default=[0.25, 0.5, 0.75, 1.0],
@@ -3784,6 +4254,20 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--cache-cond-forced-top-ns", type=int, nargs="+", default=[4, 6, 8],
                    help="lambda_fn_sweep: forced-top-J values to compare.")
     p.add_argument(
+        "--cc-temperatures",
+        type=float,
+        nargs="+",
+        default=[0.0],
+        help="cc_prompt_compare: sampling temperatures per routing config (default: 0 = greedy).",
+    )
+    p.add_argument(
+        "--cc-forced-top-ns",
+        type=int,
+        nargs="+",
+        default=[5, 6, 0],
+        help="cc_prompt_compare: cache-conditional forced-top-J values at λ=1 (default: 5 6 0).",
+    )
+    p.add_argument(
         "--probability-mass-thresholds",
         type=float,
         nargs="+",
@@ -3793,7 +4277,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--config-path", type=str, default=None)
     p.add_argument("--dataset", choices=["default", "txt", "wikitext", "fineweb", "orca", "oracle"], default="default")
     p.add_argument("--prompts-txt", type=str, default=None)
-    p.add_argument("--num-prompts", type=int, default=1)
+    p.add_argument(
+        "--num-prompts",
+        type=int,
+        default=1,
+        help="Number of prompts to use. With --dataset txt, 0 means all prompts in --prompts-txt.",
+    )
     p.add_argument(
         "--prompt-max-chars", type=int, default=4096,
         help="Characters per prompt chunk. For wikitext the corpus is concatenated then "
@@ -3939,10 +4428,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="With --couple-lookahead-to-cache: lookahead = max(1, cache_size // divisor). Default 8.",
     )
     p.add_argument(
+        "--oracle-routing-agreements",
+        type=float,
+        nargs="+",
+        default=None,
+        help="oracle_baseline_sweep: draft-model proxy routing agreement fractions "
+        "(e.g. 0.875 0.90 1.0). Each value emits a Full Union row per cache/lookahead.",
+    )
+    p.add_argument(
+        "--oracle-noise-seed",
+        type=int,
+        default=42,
+        help="Deterministic seed for noisy oracle expert corruption (default: 42).",
+    )
+    p.add_argument(
         "--oracle-trace-dir",
         type=str,
         default=None,
-        help="Directory containing oracle_trace_*_{idx}.txt files (default: trainingData/qwen_traces).",
+        help="Directory containing oracle_trace_*_{idx}.txt files (default: trainingData/wikitext_test_traces).",
     )
     return p
 

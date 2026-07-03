@@ -130,7 +130,11 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
                          int64_t max_seq_len = 8192, bool use_softmax_before_topk = false, bool normalize_topk_prob = false,
                          double lambda = 0.0, const std::string& predictor_model_path = "", torch::Device predictor_device = torch::kCPU,
                          int64_t prefetch_experts_count = 1, const std::string& oracle_trace_path = "", int64_t oracle_lookahead = 0,
-                         bool oracle_full_union = false, float prefetch_threshold = 0.0f);
+                         bool oracle_full_union = false, float prefetch_threshold = 0.0f,
+                         const std::string& predictor_type = "torchscript",
+                         float gating_score_percentile = 0.0f,
+                         float speculative_cache_fraction = 0.0f,
+                         float oracle_routing_agreement = 1.0f, uint64_t oracle_noise_seed = 42);
 
     ~MixtureOfExpertsImpl();
 
@@ -230,10 +234,18 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     void set_context_token_ids(const std::vector<int64_t>& token_ids);
     void trigger_speculative_loading(const torch::Tensor& embedding, int64_t source_decode_step,
                                      c10::optional<torch::Tensor> prev_layers_feat = c10::nullopt);
+    /// Paper gating prefetch: layer L+1 loads experts predicted from layer L MoE input hidden state.
+    void trigger_gating_prefetch(const torch::Tensor& prev_moe_input, int64_t source_decode_step);
+    void set_prefetch_non_evicting(bool v) { prefetch_non_evicting_ = v; }
+    bool prefetch_non_evicting() const { return prefetch_non_evicting_; }
+    std::pair<int64_t, int64_t> get_gating_prefetch_stats() const {
+        return {gating_prefetch_hits_, gating_prefetch_total_};
+    }
     /// One-shot predictor + prefetch after prefill (uses last / prev-prefill-token routing; does not use decode prev_token state).
     void run_predictor_prefill_warmup(const torch::Tensor& embedding, const torch::Tensor& prefill_dist_row,
                                     const torch::Tensor& prev_expert_mh_row, c10::optional<torch::Tensor> prev_layers_feat);
-    void load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids, bool prefill_end_warmup = false);
+    void load_predicted_experts(const std::vector<int64_t>& predicted_expert_ids, bool prefill_end_warmup = false,
+                                bool cross_layer_gating = false);
 
     bool has_predictor() const { return predictor_ != nullptr; }
     void set_suppress_predictor_stats(bool v) { suppress_predictor_stats_ = v; }
@@ -274,6 +286,10 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t num_experts_;
     int64_t num_experts_per_tok_;
     int64_t max_cached_experts_;
+    /** Slots [0, main_cache_slot_count_) serve routed experts; [main_cache_slot_count_, max) are speculative-only. */
+    int64_t main_cache_slot_count_ = 0;
+    int64_t speculative_slot_count_ = 0;
+    float speculative_cache_fraction_ = 0.0f;
     int64_t layer_idx_;
     int64_t prefetch_experts_count_;
     bool use_softmax_before_topk_;
@@ -351,6 +367,20 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t prefetch_used_before_eviction_ = 0;
     /** Experts that were prefetched (origin=prefetch) but evicted before the router used them. */
     int64_t prefetch_evicted_before_use_ = 0;
+    /** Gating-heuristic: routed expert was prefetched and ready at router time. */
+    int64_t gating_prefetch_hits_ = 0;
+    int64_t gating_prefetch_total_ = 0;
+    /** Cross-layer gating: last top-B experts predicted for this layer (set synchronously on trigger). */
+    std::vector<int64_t> last_gating_prefetch_experts_;
+    /** Prediction accuracy: routed expert was in last_gating_prefetch_experts_. */
+    int64_t gating_pred_recall_hits_ = 0;
+    int64_t gating_pred_recall_total_ = 0;
+    /** Prediction accuracy: predicted expert appeared in actual routed top-k. */
+    int64_t gating_pred_precision_hits_ = 0;
+    int64_t gating_pred_precision_total_ = 0;
+    int64_t gating_prefetch_triggers_ = 0;
+    /** When true, speculative loads only use empty cache slots (paper non-evicting prefetch). */
+    bool prefetch_non_evicting_ = false;
 
     // ── Global concurrency counters (static → shared across all layer instances) ──
     static std::atomic<int>& global_active_speculative_loads() {
@@ -457,14 +487,21 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
     std::vector<int64_t> ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats = true);
     size_t pick_victim_ready();
+    size_t pick_victim_ready(size_t slot_begin, size_t slot_end);
     std::vector<int64_t> experts_to_prefetch(const std::vector<int64_t>& pred_result) const;
-    size_t pick_lru_ready();
-    size_t pick_mru_ready();
-    size_t pick_lfu_ready();
-    size_t pick_mfu_ready();
-    size_t pick_clock_ready();
-    size_t pick_random_ready();
-    size_t pick_lfru_ready();
+    size_t pick_lru_ready(size_t slot_begin, size_t slot_end);
+    size_t pick_mru_ready(size_t slot_begin, size_t slot_end);
+    size_t pick_lfu_ready(size_t slot_begin, size_t slot_end);
+    size_t pick_mfu_ready(size_t slot_begin, size_t slot_end);
+    size_t pick_clock_ready(size_t slot_begin, size_t slot_end);
+    size_t pick_random_ready(size_t slot_begin, size_t slot_end);
+    size_t pick_lfru_ready(size_t slot_begin, size_t slot_end);
+    size_t main_slot_begin() const { return 0; }
+    size_t main_slot_end() const {
+        return speculative_slot_count_ > 0 ? static_cast<size_t>(main_cache_slot_count_) : expert_slots_indices.size();
+    }
+    size_t speculative_slot_begin() const { return main_slot_end(); }
+    size_t speculative_slot_end() const { return expert_slots_indices.size(); }
     void update_cache_bitmask_locked();
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
@@ -491,7 +528,11 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                         const std::vector<int64_t>& per_layer_cache_sizes = {},
                         const std::vector<int64_t>& per_layer_prefetch_counts = {},
                         const std::string& oracle_trace_path = "", int64_t oracle_lookahead = 0,
-                        bool oracle_full_union = false, float prefetch_threshold = 0.0f);
+                        bool oracle_full_union = false, float prefetch_threshold = 0.0f,
+                        const std::string& predictor_type = "torchscript", int64_t gating_lookahead = 1,
+                        bool prefetch_non_evicting = false, float gating_score_percentile = 0.0f,
+                        float speculative_cache_fraction = 0.0f,
+                        float oracle_routing_agreement = 1.0f, uint64_t oracle_noise_seed = 42);
 
     // Forward pass: takes token IDs and returns logits
     torch::Tensor forward(torch::Tensor input_ids, int64_t start_pos = 0);
@@ -548,9 +589,7 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     // Set how often the predictor fires: every `stride` decode tokens.
     // Call this after construction with stride = lookahead depth (fN from predictor path).
     void set_predictor_lookahead(int64_t stride);
-
-
-    
+    void set_prefetch_non_evicting(bool v);
     // Training data collection
     void enable_training_data_collection() { collect_training_data_ = true; }
     void disable_training_data_collection() { collect_training_data_ = false; }
@@ -665,6 +704,13 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void record_oracle_trace_layer(int64_t layer_idx, const std::vector<int64_t>& experts);
     void install_oracle_capture_callbacks();
     void clear_oracle_capture_callbacks();
+    void maybe_trigger_gating_prefetch(int64_t from_layer_idx, const torch::Tensor& moe_input);
+
+    std::string predictor_type_ = "torchscript";
+    float gating_score_percentile_ = 0.0f;
+    float speculative_cache_fraction_ = 0.0f;
+    int64_t decode_token_step_ = 0;
+    int64_t current_decode_step_ = 0;
 
     // Last-token MoE inputs from the most recent forward (for prefill warmup); [hidden_size] per layer, CPU.
     std::vector<torch::Tensor> prefill_last_moe_inputs_cpu_;

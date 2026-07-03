@@ -1,9 +1,11 @@
-In a shocking finding, scientist discovered a herd of unicorns living in a remote, previously unexplored valley, in the Andes Mountains. Even more surprising to the researchers was the fact that the unicorns spoke perfect English.
+The capital of France is
 
-Describe a few reasons why a person might want to learn a new language. Consider cultural, economic, and personal motives in your response.
+Answer briefly: Water is made of hydrogen and oxygen. The chemical formula is
 
-You are a wise advisor to a young king who is facing a difficult decision about whether to go to war or seek peace. What is your counsel?
+Write a Python function that merges two sorted lists. Here is the implementation:
 
-Explain the theory of relativity to a clever high school student who loves physics but hates math. Use an analogy to make your point.
+def merge_sorted(a, b):
 
-Write a short poem about the changing of the seasons, focusing on the transition from autumn to winter.
+A train leaves Boston at 9am at 60 mph toward NYC. Another leaves NYC at 10am at 80 mph toward Boston. The distance is 400 miles. To find when they meet, we set up the equation
+
+France is a country in Western Europe. Its capital city is

@@ -1223,12 +1223,33 @@ void MixtureOfExpertsImpl::print_cache_stats() const {
         std::cout << "    MissCause: NotPresent=" << miss_not_present_
                   << ", NotReadyStall=" << miss_not_ready_stall_ << "\n";
     }
-    // Prefetch efficiency
-    if (prefetch_loads_ > 0) {
+    // Prefetch efficiency / gating scheduling diagnostics
+    if (prefetch_loads_ > 0 || gating_prefetch_total_ > 0) {
         std::cout << "    PrefetchEff: Dropped=" << prefetch_dropped_no_victim_
                   << ", AlreadyCached=" << prefetch_already_cached_
                   << ", UsedBeforeEvict=" << prefetch_used_before_eviction_
                   << ", EvictedBeforeUse=" << prefetch_evicted_before_use_ << "\n";
+    }
+    if (gating_pred_recall_total_ > 0) {
+        double gating_pred_recall = 100.0 * static_cast<double>(gating_pred_recall_hits_) /
+                                    static_cast<double>(gating_pred_recall_total_);
+        std::cout << "    GatingPredict Recall=" << gating_pred_recall << "% ("
+                  << gating_pred_recall_hits_ << "/" << gating_pred_recall_total_ << ")\n";
+    }
+    if (gating_pred_precision_total_ > 0) {
+        double gating_pred_precision = 100.0 * static_cast<double>(gating_pred_precision_hits_) /
+                                       static_cast<double>(gating_pred_precision_total_);
+        std::cout << "    GatingPredict Precision=" << gating_pred_precision << "% ("
+                  << gating_pred_precision_hits_ << "/" << gating_pred_precision_total_ << ")\n";
+    }
+    if (gating_prefetch_total_ > 0) {
+        double gating_delivery = 100.0 * static_cast<double>(gating_prefetch_hits_) /
+                                 static_cast<double>(gating_prefetch_total_);
+        std::cout << "    GatingPrefetch Delivery=" << gating_delivery << "% ("
+                  << gating_prefetch_hits_ << "/" << gating_prefetch_total_ << ")\n";
+    }
+    if (gating_prefetch_triggers_ > 0) {
+        std::cout << "    GatingPrefetch Triggers=" << gating_prefetch_triggers_ << "\n";
     }
     // Global concurrency peak (reported from layer 0 only to avoid duplicate prints)
     if (layer_idx_ == 0) {
@@ -1280,14 +1301,23 @@ void MixtureOfExpertsImpl::reset_cache_stats() {
     // Prefetch efficiency
     prefetch_used_before_eviction_ = 0;
     prefetch_evicted_before_use_ = 0;
+    gating_prefetch_hits_ = 0;
+    gating_prefetch_total_ = 0;
+    last_gating_prefetch_experts_.clear();
+    gating_pred_recall_hits_ = 0;
+    gating_pred_recall_total_ = 0;
+    gating_pred_precision_hits_ = 0;
+    gating_pred_precision_total_ = 0;
+    gating_prefetch_triggers_ = 0;
     // Reset slot load origins and prefetch pin list
     std::fill(slot_load_origin_.begin(), slot_load_origin_.end(), 0);
     prefetched_experts_.clear();
 }
 
 void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
-    if (num_to_warm > max_cached_experts_) {
-        num_to_warm = max_cached_experts_;
+    const int64_t main_slots = speculative_slot_count_ > 0 ? main_cache_slot_count_ : max_cached_experts_;
+    if (num_to_warm > main_slots) {
+        num_to_warm = main_slots;
     }
     if (num_to_warm > num_experts_) {
         num_to_warm = num_experts_;
