@@ -19,7 +19,7 @@ cd "$REPO_ROOT"
 source "$REPO_ROOT/utils/setup.sh"
 
 OUT_ROOT="${OUT_ROOT:-$REPO_ROOT/py/utils/final_results_runs}"
-PREDICTOR_BASE="${PREDICTOR_BASE:-$REPO_ROOT/trainingData/qwen3_30b/final_predictor}"
+PREDICTOR_BASE="${PREDICTOR_BASE:-$REPO_ROOT/trainingData/qwen3_30b/transformer_final_pfill_markov_emb}"
 NUM_PROMPTS="${NUM_PROMPTS:-10}"
 PROMPT_MAX_CHARS="${PROMPT_MAX_CHARS:-4096}"
 MAX_NEW_TOKENS="${MAX_NEW_TOKENS:-150}"

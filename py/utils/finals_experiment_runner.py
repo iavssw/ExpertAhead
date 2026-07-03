@@ -23,6 +23,15 @@ Experiments:
 ``sec5_all_methods``
     Section 5. LRU vs Prefetch vs Cache-Cond vs Hybrid (λ∈{0,1}), with PPL.
 
+``sec5_c32_test``
+    Section 5 smoke at C=32: RANDOM/LRU/Cache-Cond once; Prefetch + Hybrid at LA×B (B=8,16,24).
+
+``sec5_c24_test``
+    Section 5 smoke at C=24: RANDOM/LRU/Cache-Cond once; Prefetch + Hybrid at LA×B (B=6,12,18).
+
+``sec5_c16_test``
+    Section 5 smoke at C=16, LA=1,2: Prefetch + Hybrid at B=4,8,12.
+
 ``final_results_collection``
     Full thesis sweep: C∈{8,16,24,32,40,48,56,64}, all valid lookaheads × budget
     fractions, 10-prompt TPS for all four policies, then a second pass that runs wikitext
@@ -51,7 +60,7 @@ CACHE_POLICY_SCRIPT = os.path.join(SCRIPT_DIR, "sweep_cache_policy.py")
 ROOT_PY = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 
 DEFAULT_PREDICTOR_BASE = (
-    "/home/michael/heteroPredict/trainingData/qwen3_30b/final_predictor"
+    "/home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb"
 )
 DEFAULT_REUSE_CSV = os.path.join(ROOT_PY, "expert_predictor", "expert_reuse_qwen3_30b.csv")
 
@@ -169,6 +178,63 @@ def _experiment_defs() -> Dict[str, Experiment]:
                 *_common_sweep_args(FINALS_LOOKAHEADS),
                 "--sweep-question", "custom_1_16_no_ppl",
                 "--lambdas", "0", "1",
+                "--cache-cond-forced-top-ns", "5",
+            ],
+        ),
+        "sec5_c32_test": Experiment(
+            key="sec5_c32_test",
+            description="(sec 5) C=32: baselines once + Prefetch + Hybrid at all LA×B (B=8,16,24).",
+            script=METRICS_SWEEP_SCRIPT,
+            sweep_question="sec5_c32_hybrid_grid",
+            extra_args=[
+                "--model", "qwen",
+                "--dataset", "wikitext",
+                "--cache-sizes", "32",
+                "--lookaheads", "1", "2", "3",
+                "--budget-fractions", "0.25", "0.5", "0.75",
+                "--routing-bias-top-n", str(FINALS_ROUTING_BIAS_TOP_N),
+                "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+                "--expert-weights-dir", "/home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed",
+                "--sweep-question", "sec5_c32_hybrid_grid",
+                "--lambdas", "1",
+                "--cache-cond-forced-top-ns", "5",
+            ],
+        ),
+        "sec5_c24_test": Experiment(
+            key="sec5_c24_test",
+            description="(sec 5) C=24: baselines once + Prefetch + Hybrid at all LA×B (B=6,12,18).",
+            script=METRICS_SWEEP_SCRIPT,
+            sweep_question="sec5_c24_hybrid_grid",
+            extra_args=[
+                "--model", "qwen",
+                "--dataset", "wikitext",
+                "--cache-sizes", "24",
+                "--lookaheads", "1", "2", "3",
+                "--budget-fractions", "0.25", "0.5", "0.75",
+                "--routing-bias-top-n", str(FINALS_ROUTING_BIAS_TOP_N),
+                "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+                "--expert-weights-dir", "/home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed",
+                "--sweep-question", "sec5_c24_hybrid_grid",
+                "--lambdas", "1",
+                "--cache-cond-forced-top-ns", "5",
+            ],
+        ),
+        "sec5_c16_test": Experiment(
+            key="sec5_c16_test",
+            description="(sec 5) C=16, LA=1,2: baselines once + Prefetch + Hybrid at B=4,8,12.",
+            script=METRICS_SWEEP_SCRIPT,
+            sweep_question="sec5_c16_hybrid_grid",
+            extra_args=[
+                "--model", "qwen",
+                "--dataset", "wikitext",
+                "--cache-sizes", "16",
+                "--lookaheads", "1", "2",
+                "--budget-fractions", "0.25", "0.5", "0.75",
+                "--routing-bias-top-n", str(FINALS_ROUTING_BIAS_TOP_N),
+                "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+                "--expert-weights-dir", "/home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed",
+                "--sweep-question", "sec5_c16_hybrid_grid",
+                "--lambdas", "1",
                 "--cache-cond-forced-top-ns", "5",
             ],
         ),

@@ -24,7 +24,7 @@ Outputs:
   sec2_stalls_vs_tps.png             — attribution scatter (prefetch rows)
   sec3_predictor_speedup_vs_lru.png  — max prefetch TPS / LRU vs N
   sec4_routing_fn_pm.png             — forced-top-J vs PM vs LRU (panels per lookahead)
-  sec5_methods_tps_ppl_vs_lookahead.png — four policies vs N at ~50% B
+  sec5_methods_tps_ppl_vs_lookahead.png — four policies vs N at ~50% B (baseline = RANDOM by default)
   sec5_tps_ppl_tradeoff.png          — TPS vs perplexity scatter per cache size
 """
 
@@ -125,7 +125,9 @@ def _load_csv(path: str) -> pd.DataFrame:
 
 def _filter_custom(df: pd.DataFrame) -> pd.DataFrame:
     q = df.get("question", pd.Series("", index=df.index)).astype(str)
-    return df.loc[q.str.contains("CUSTOM_1_16", na=False)].copy()
+    return df.loc[
+        q.str.contains("CUSTOM_1_16", na=False) | q.str.match(r"SEC5_C\d+_HYBRID_GRID", na=False)
+    ].copy()
 
 
 def _filter_routing(df: pd.DataFrame) -> pd.DataFrame:
@@ -148,6 +150,8 @@ def _policy_label(label: str, lambda_val: float) -> Optional[str]:
     s = str(label)
     if s == "Neither (LRU)":
         return "LRU"
+    if s == "Neither (RANDOM)":
+        return "Random"
     if s.startswith("Prefetch Only"):
         return "Prefetch" if float(lambda_val) == 0.0 else None
     if s.startswith("Cache-Cond Only"):
@@ -530,18 +534,31 @@ def _add_policy_columns(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def _canonical_at_budget_frac(df: pd.DataFrame, budget_frac: float, tol: float = 0.06) -> pd.DataFrame:
+def _sec5_policy_order(baseline: str) -> List[str]:
+    """Baseline eviction policy + the three active policies (prefetch / cache-cond / hybrid)."""
+    base = BASELINE_PLOT_NAMES.get(baseline.lower(), BASELINE_PLOT_NAMES["random"])
+    return [base, "Prefetch", "Cache-Cond", "Hybrid"]
+
+
+def _canonical_at_budget_frac(
+    df: pd.DataFrame,
+    budget_frac: float,
+    *,
+    baseline: str = "random",
+    tol: float = 0.06,
+) -> pd.DataFrame:
     """One row per (lookahead, policy): closest prefetch budget fraction to target."""
+    baseline_policy = BASELINE_PLOT_NAMES.get(baseline.lower(), BASELINE_PLOT_NAMES["random"])
     rows: List[pd.Series] = []
     for la in sorted(df["lookahead"].dropna().unique()):
-        for pol in POLICY_ORDER:
+        for pol in _sec5_policy_order(baseline):
             m = (df["lookahead"] == la) & (df["policy"] == pol)
-            if pol != "LRU":
+            if pol != baseline_policy:
                 m &= df["budget_frac"].notna()
             sub = df.loc[m]
             if sub.empty:
                 continue
-            if pol == "LRU":
+            if pol == baseline_policy:
                 rows.append(sub.iloc[0])
                 continue
             j = (sub["budget_frac"] - budget_frac).abs().idxmin()
@@ -549,34 +566,54 @@ def _canonical_at_budget_frac(df: pd.DataFrame, budget_frac: float, tol: float =
     return pd.DataFrame(rows) if rows else pd.DataFrame()
 
 
-def plot_sec5_methods(df: pd.DataFrame, out_dir: str, *, budget_frac: float = 0.5) -> None:
+def plot_sec5_methods(
+    df: pd.DataFrame,
+    out_dir: str,
+    *,
+    budget_frac: float = 0.5,
+    baseline: str = "random",
+    cache_size: Optional[int] = None,
+) -> None:
+    baseline_policy = BASELINE_PLOT_NAMES.get(baseline.lower(), BASELINE_PLOT_NAMES["random"])
+    baseline_style = POLICY_STYLES.get(baseline_policy, POLICY_STYLES["Random"])
     df = _add_policy_columns(_filter_custom(df))
-    canon = _canonical_at_budget_frac(df, budget_frac)
+    if cache_size is not None:
+        df = df[df["cache_size"] == cache_size]
+    canon = _canonical_at_budget_frac(df, budget_frac, baseline=baseline)
     if canon.empty:
         print("[thesis_plot] sec5: no canonical policy rows", flush=True)
         return
     canon.to_csv(os.path.join(out_dir, "sec5_canonical_configs.csv"), index=False)
 
-    # (A) Lookahead sweep — same x-axis story as fixed-cache32, but C varies with N (reuse grid).
+    cache_sizes = sorted(canon["cache_size"].dropna().unique())
+    c_title = (
+        f"C = {int(cache_sizes[0])}"
+        if cache_size is not None or len(cache_sizes) == 1
+        else "C = expert-reuse min per lookahead"
+    )
+
+    # (A) Lookahead sweep at canonical B/C per policy.
     with plt.style.context(PLOT_STYLE):
         fig, axes = plt.subplots(2, 1, figsize=(9, 8), squeeze=False)
         fig.suptitle(
-            f"Four policies @ ≈{budget_frac:.0%} B/C  (C = expert-reuse min per lookahead, "
-            f"≈67 experts @ N=16)",
+            f"Four policies @ ≈{budget_frac:.0%} B/C  ({c_title}, baseline = {baseline_policy})",
             fontsize=12, fontweight="bold", y=1.01,
         )
         las = sorted(canon["lookahead"].dropna().unique())
         for row, (metric, ylab) in enumerate((
-            ("tokens_per_second", "TPS Speedup (vs LRU)"),
+            ("tokens_per_second", f"TPS (× vs {baseline_policy})"),
             ("gen_perplexity", "Gen perplexity (↓)"),
         )):
             ax = axes[row][0]
-            lru_by_la: Dict[float, float] = {}
-            lru_sub = canon[canon["policy"] == "LRU"].sort_values("lookahead")
-            if not lru_sub.empty:
-                ax.plot(lru_sub["lookahead"], lru_sub[metric], **POLICY_STYLES["LRU"], label="LRU")
-                for _, r in lru_sub.iterrows():
-                    lru_by_la[float(r["lookahead"])] = float(r[metric])
+            base_by_la: Dict[float, float] = {}
+            base_sub = canon[canon["policy"] == baseline_policy].sort_values("lookahead")
+            if not base_sub.empty:
+                ax.plot(
+                    base_sub["lookahead"], base_sub[metric],
+                    label=baseline_policy, **baseline_style,
+                )
+                for _, r in base_sub.iterrows():
+                    base_by_la[float(r["lookahead"])] = float(r[metric])
             for pol in ("Prefetch", "Cache-Cond", "Hybrid"):
                 s = canon[canon["policy"] == pol].sort_values("lookahead")
                 if s.empty:
@@ -586,7 +623,7 @@ def plot_sec5_methods(df: pd.DataFrame, out_dir: str, *, budget_frac: float = 0.
                 for _, r in s.iterrows():
                     la = float(r["lookahead"])
                     c = int(r["cache_size"]) if pd.notna(r.get("cache_size")) else None
-                    ref = lru_by_la.get(la) if metric == "tokens_per_second" else None
+                    ref = base_by_la.get(la) if metric == "tokens_per_second" else None
                     if metric == "tokens_per_second" and ref and ref > 0:
                         ax.annotate(
                             f"×{float(r[metric])/ref:.2f}",
@@ -609,17 +646,17 @@ def plot_sec5_methods(df: pd.DataFrame, out_dir: str, *, budget_frac: float = 0.
 
     # (B) TPS–PPL tradeoff: one panel per distinct cache size in canonical set
     sub = canon[canon["tokens_per_second"].notna() & canon["gen_perplexity"].notna()]
-    cache_sizes = sorted(sub["cache_size"].dropna().unique())
-    n = len(cache_sizes)
+    tradeoff_cache_sizes = sorted(sub["cache_size"].dropna().unique())
+    n = len(tradeoff_cache_sizes)
     ncols = min(3, n)
     nrows = int(math.ceil(n / ncols)) if n else 1
     with plt.style.context(PLOT_STYLE):
         fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4.5 * nrows), squeeze=False)
         fig.suptitle("TPS vs gen-PPL at canonical configs (each point labeled by N)", fontsize=12, fontweight="bold")
-        for i, c in enumerate(cache_sizes):
+        for i, c in enumerate(tradeoff_cache_sizes):
             ax = axes.flat[i]
             panel = sub[sub["cache_size"] == c]
-            for pol in POLICY_ORDER:
+            for pol in _sec5_policy_order(baseline):
                 m = panel["policy"] == pol
                 if not m.any():
                     continue
@@ -700,7 +737,7 @@ def _best_row_per_policy(sub: pd.DataFrame, policy: str) -> Optional[pd.Series]:
     """Return the row with max TPS for ``policy`` within ``sub``."""
     pols = _add_policy_columns(sub)
     m = pols["policy"] == policy
-    if policy != "LRU":
+    if policy not in ("LRU", "Random"):
         m &= pols["tokens_per_second"].notna()
     rows = pols.loc[m]
     if rows.empty:
@@ -1116,8 +1153,8 @@ def main() -> int:
     p.add_argument(
         "--baseline",
         choices=["lru", "random"],
-        default="lru",
-        help="Eviction baseline for unified LFRU speedup annotations (default: LRU).",
+        default="random",
+        help="Eviction baseline for section 5 plots and LFRU speedup annotations (default: RANDOM).",
     )
     args = p.parse_args()
 
@@ -1140,7 +1177,13 @@ def main() -> int:
 
     if args.csv_sec5 and os.path.isfile(args.csv_sec5):
         df5 = _load_csv(args.csv_sec5)
-        plot_sec5_methods(df5, args.out_dir, budget_frac=args.budget_frac)
+        plot_sec5_methods(
+            df5,
+            args.out_dir,
+            budget_frac=args.budget_frac,
+            baseline=args.baseline,
+            cache_size=c,
+        )
         df_fix = _load_csv(args.csv_sec2) if args.csv_sec2 and os.path.isfile(args.csv_sec2) else None
         plot_sec5_fixed_cache_if_present(df5, df_fix, c, args.out_dir, budget_frac=args.budget_frac)
 
