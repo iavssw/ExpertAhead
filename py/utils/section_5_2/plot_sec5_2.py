@@ -26,11 +26,11 @@ CSV_PATHS = [
 # baseline line since they're typically measured under different cache constraints.
 BASELINE_TPS_BY_CACHE_SIZE = {
     # Parallel
-    # 16: 2.54,   
-    # 32: 3.44,   
+    16: 2.54,   
+    32: 3.44,   
     # Sequential
-    16: 1.65,
-    32: 2.78,   
+    # 16: 1.65,
+    # 32: 2.78,   
 }
 
 BASELINE_LABEL = "Baseline TPS"

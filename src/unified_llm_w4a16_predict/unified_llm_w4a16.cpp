@@ -629,9 +629,10 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
         zero_point_.resize_as_(zero_point);
     }
 
-    quantized_weight_.copy_(qweight_packed.to(torch::kUInt8).contiguous(), /*non_blocking=*/true);
-    scale_.copy_(scale.to(torch::kBFloat16).contiguous(), /*non_blocking=*/true);
-    zero_point_.copy_(zero_point.to(torch::kInt8).contiguous(), /*non_blocking=*/true);
+    // Blocking copy so O_DIRECT pinned staging can be released immediately after load.
+    quantized_weight_.copy_(qweight_packed.to(torch::kUInt8).contiguous(), /*non_blocking=*/false);
+    scale_.copy_(scale.to(torch::kBFloat16).contiguous(), /*non_blocking=*/false);
+    zero_point_.copy_(zero_point.to(torch::kInt8).contiguous(), /*non_blocking=*/false);
 }
 
 // MixtureOfExpertsImpl Implementation
@@ -1896,8 +1897,6 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     // Advance: this token's unbiased top-1 becomes the reference for next token's check.
     // current_true_top1 was computed from router_out above, before lambda bias.
     last_true_top1_expert_ = current_true_top1;
-
-
 
     // Trigger speculative loading for the next token based on current embedding
     if (!predictor_ || !predictor_->is_gating_heuristic()) {

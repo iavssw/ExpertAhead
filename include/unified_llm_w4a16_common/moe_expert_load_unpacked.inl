@@ -101,10 +101,16 @@
         std::lock_guard<std::mutex> lock(expert_slots_mutex_);
         if (slot_load_id_[slot_idx].load(std::memory_order_relaxed) == load_id) {
             gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+            gate_up_q_pinned_[slot_idx] = torch::Tensor();
+            gate_up_s_pinned_[slot_idx] = torch::Tensor();
+            gate_up_z_pinned_[slot_idx] = torch::Tensor();
         }
     }
 #else
     gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+    gate_up_q_pinned_[slot_idx] = torch::Tensor();
+    gate_up_s_pinned_[slot_idx] = torch::Tensor();
+    gate_up_z_pinned_[slot_idx] = torch::Tensor();
 #endif
   }
 
@@ -176,10 +182,16 @@
         std::lock_guard<std::mutex> lock(expert_slots_mutex_);
         if (slot_load_id_[slot_idx].load(std::memory_order_relaxed) == load_id) {
             down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
+            down_q_pinned_[slot_idx] = torch::Tensor();
+            down_s_pinned_[slot_idx] = torch::Tensor();
+            down_z_pinned_[slot_idx] = torch::Tensor();
         }
     }
 #else
     down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
+    down_q_pinned_[slot_idx] = torch::Tensor();
+    down_s_pinned_[slot_idx] = torch::Tensor();
+    down_z_pinned_[slot_idx] = torch::Tensor();
 #endif
   }
 }

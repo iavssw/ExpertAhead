@@ -170,10 +170,24 @@
         if (slot_load_id_[slot_idx].load(std::memory_order_relaxed) == load_id) {
             gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
             down_experts[slot_idx]->set_unpacked_params(dest_dq, dest_ds, dest_dz);
+            // GPU cache holds the authoritative copy; drop pinned staging to avoid 2x expert RAM.
+            gate_up_q_pinned_[slot_idx] = torch::Tensor();
+            gate_up_s_pinned_[slot_idx] = torch::Tensor();
+            gate_up_z_pinned_[slot_idx] = torch::Tensor();
+            down_q_pinned_[slot_idx] = torch::Tensor();
+            down_s_pinned_[slot_idx] = torch::Tensor();
+            down_z_pinned_[slot_idx] = torch::Tensor();
         }
 #else
         gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
         down_experts[slot_idx]->set_unpacked_params(dest_dq, dest_ds, dest_dz);
+        // GPU cache holds the authoritative copy; drop pinned staging to avoid 2x expert RAM.
+        gate_up_q_pinned_[slot_idx] = torch::Tensor();
+        gate_up_s_pinned_[slot_idx] = torch::Tensor();
+        gate_up_z_pinned_[slot_idx] = torch::Tensor();
+        down_q_pinned_[slot_idx] = torch::Tensor();
+        down_s_pinned_[slot_idx] = torch::Tensor();
+        down_z_pinned_[slot_idx] = torch::Tensor();
 #endif
     };
 

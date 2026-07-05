@@ -1158,11 +1158,26 @@ def _prefetch_forced_top_ns_list(args: argparse.Namespace) -> List[int]:
     return out
 
 
+def _routing_bias_top_ns_list(args: argparse.Namespace) -> List[int]:
+    """Forced top-J values for Cache-Cond and Hybrid (Both) rows."""
+    raw = getattr(args, "routing_bias_top_ns", None)
+    if raw:
+        return sorted({int(x) for x in raw})
+    return [int(args.routing_bias_top_n)]
+
+
 def iter_custom_prefetch_budgets(args: argparse.Namespace, cache_size: int) -> List[int]:
-    """Prefetch budgets for CUSTOM_1_16 family: explicit list or fractions of cache_size."""
+    """Prefetch budgets for CUSTOM_1_16 family: explicit list, fractions, or their union."""
+    budgets: set[int] = set()
+    fractions = list(getattr(args, "budget_fractions", []) or [])
     if getattr(args, "custom_explicit_prefetch_budgets", False):
-        return sorted({int(b) for b in args.prefetch_budgets if 1 <= int(b) <= int(cache_size)})
-    return sorted({max(1, int(cache_size * float(f))) for f in args.budget_fractions})
+        budgets.update(int(b) for b in args.prefetch_budgets if 1 <= int(b) <= int(cache_size))
+        for f in fractions:
+            budgets.add(max(1, int(cache_size * float(f))))
+    else:
+        for f in fractions:
+            budgets.add(max(1, int(cache_size * float(f))))
+    return sorted(budgets)
 
 
 def gating_routed_top_k(model: str) -> int:
@@ -1266,18 +1281,21 @@ def _append_cache_cond_once_per_cache(
     for lambda_val in args.lambdas:
         if lambda_val == 0.0:
             continue
-        cc = cfg(
-            question, f"Cache-Cond Only λ={lambda_val}{tag_suffix}",
-            "cached", cache_size, lambda_val,
-            args.routing_bias_top_n,
-            lookahead=None, prefetch_budget=None,
-            mode_perplexity=_routing_policy_perplexity(lambda_val, args),
-            mode_generate=True,
-        )
-        if bookend:
-            cc["bookend_pass"] = bookend
-        _tag_predictor_config(cc, predictor_base_dir, predictor_tag)
-        configs.append(cc)
+        j_values = _routing_bias_top_ns_list(args)
+        for j in j_values:
+            j_label = f" J={j}" if len(j_values) > 1 else ""
+            cc = cfg(
+                question, f"Cache-Cond Only λ={lambda_val}{j_label}{tag_suffix}",
+                "cached", cache_size, lambda_val,
+                j,
+                lookahead=None, prefetch_budget=None,
+                mode_perplexity=_routing_policy_perplexity(lambda_val, args),
+                mode_generate=True,
+            )
+            if bookend:
+                cc["bookend_pass"] = bookend
+            _tag_predictor_config(cc, predictor_base_dir, predictor_tag)
+            configs.append(cc)
 
 
 def _custom_1_16_configs_for_cache_grouped(
@@ -1344,17 +1362,20 @@ def _custom_1_16_configs_for_cache_grouped(
                 for lambda_val in args.lambdas:
                     if lambda_val == 0.0:
                         continue
-                    bc = cfg(
-                        question, f"Both λ={lambda_val} B={budget}{tag_suffix}",
-                        "predict", cache_size, lambda_val,
-                        args.routing_bias_top_n,
-                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
-                        mode_perplexity=_routing_policy_perplexity(lambda_val, args),
-                        mode_generate=True,
-                    )
-                    bc["bookend_pass"] = "main"
-                    _tag_predictor_config(bc, predictor_base_dir, predictor_tag)
-                    configs.append(bc)
+                    j_values = _routing_bias_top_ns_list(args)
+                    for j in j_values:
+                        j_label = f" J={j}" if len(j_values) > 1 else ""
+                        bc = cfg(
+                            question, f"Both λ={lambda_val}{j_label} B={budget}{tag_suffix}",
+                            "predict", cache_size, lambda_val,
+                            j,
+                            lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
+                            mode_perplexity=_routing_policy_perplexity(lambda_val, args),
+                            mode_generate=True,
+                        )
+                        bc["bookend_pass"] = "main"
+                        _tag_predictor_config(bc, predictor_base_dir, predictor_tag)
+                        configs.append(bc)
 
         configs.append(_lru_cfg("end"))
         _cc_cfg("end")
@@ -1422,18 +1443,20 @@ def custom_1_16_configs(
                 for lambda_val in args.lambdas:
                     if lambda_val == 0.0:
                         continue
-                    bc = cfg(
-                        "CUSTOM_1_16", f"Both λ={lambda_val} B={budget}{tag_suffix}",
-                        "predict", cache_size, lambda_val,
-                        args.routing_bias_top_n,
-                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
-                        mode_perplexity=_routing_policy_perplexity(lambda_val, args),
-                        mode_generate=True,
-                    )
-                    if predictor_base_dir:
-                        bc["predictor_base_dir"] = predictor_base_dir
-                        bc["predictor_tag"] = predictor_tag
-                    configs.append(bc)
+                    for j in _routing_bias_top_ns_list(args):
+                        j_label = f" J={j}" if len(_routing_bias_top_ns_list(args)) > 1 else ""
+                        bc = cfg(
+                            "CUSTOM_1_16", f"Both λ={lambda_val}{j_label} B={budget}{tag_suffix}",
+                            "predict", cache_size, lambda_val,
+                            j,
+                            lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
+                            mode_perplexity=_routing_policy_perplexity(lambda_val, args),
+                            mode_generate=True,
+                        )
+                        if predictor_base_dir:
+                            bc["predictor_base_dir"] = predictor_base_dir
+                            bc["predictor_tag"] = predictor_tag
+                        configs.append(bc)
     return configs
 
 
@@ -1504,18 +1527,21 @@ def custom_1_16_no_ppl_configs(
                         continue
                     if prefetch_only:
                         continue  # skip hybrid (Both) rows
-                    bc = cfg(
-                        "CUSTOM_1_16_NO_PPL", f"Both λ={lambda_val} B={budget}{tag_suffix}",
-                        "predict", cache_size, lambda_val,
-                        args.routing_bias_top_n,
-                        lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
-                        mode_perplexity=_routing_policy_perplexity(lambda_val, args),
-                        mode_generate=True,
-                    )
-                    if predictor_base_dir:
-                        bc["predictor_base_dir"] = predictor_base_dir
-                        bc["predictor_tag"] = predictor_tag
-                    configs.append(bc)
+                    j_values = _routing_bias_top_ns_list(args)
+                    for j in j_values:
+                        j_label = f" J={j}" if len(j_values) > 1 else ""
+                        bc = cfg(
+                            "CUSTOM_1_16_NO_PPL", f"Both λ={lambda_val}{j_label} B={budget}{tag_suffix}",
+                            "predict", cache_size, lambda_val,
+                            j,
+                            lookahead=lookahead, prefetch_budget=budget, prefetch_threshold=0.0,
+                            mode_perplexity=_routing_policy_perplexity(lambda_val, args),
+                            mode_generate=True,
+                        )
+                        if predictor_base_dir:
+                            bc["predictor_base_dir"] = predictor_base_dir
+                            bc["predictor_tag"] = predictor_tag
+                        configs.append(bc)
                 
                 if getattr(args, "include_oracle_baselines", False):
                     oracle_cfg = cfg(
@@ -1551,18 +1577,21 @@ def custom_1_16_no_ppl_configs(
                         continue
                     if prefetch_only:
                         continue
-                    bc = cfg(
-                        "CUSTOM_1_16_NO_PPL", f"Both λ={lambda_val} T={threshold}{tag_suffix}",
-                        "predict", cache_size, lambda_val,
-                        args.routing_bias_top_n,
-                        lookahead=lookahead, prefetch_budget=cache_size, prefetch_threshold=threshold,
-                        mode_perplexity=_routing_policy_perplexity(lambda_val, args),
-                        mode_generate=True,
-                    )
-                    if predictor_base_dir:
-                        bc["predictor_base_dir"] = predictor_base_dir
-                        bc["predictor_tag"] = predictor_tag
-                    configs.append(bc)
+                    j_values = _routing_bias_top_ns_list(args)
+                    for j in j_values:
+                        j_label = f" J={j}" if len(j_values) > 1 else ""
+                        bc = cfg(
+                            "CUSTOM_1_16_NO_PPL", f"Both λ={lambda_val}{j_label} T={threshold}{tag_suffix}",
+                            "predict", cache_size, lambda_val,
+                            j,
+                            lookahead=lookahead, prefetch_budget=cache_size, prefetch_threshold=threshold,
+                            mode_perplexity=_routing_policy_perplexity(lambda_val, args),
+                            mode_generate=True,
+                        )
+                        if predictor_base_dir:
+                            bc["predictor_base_dir"] = predictor_base_dir
+                            bc["predictor_tag"] = predictor_tag
+                        configs.append(bc)
     return configs
 
 
@@ -1577,6 +1606,8 @@ def apply_non_baseline_cache_policy(configs: List[Dict[str, Any]], policy: Optio
             c["cache_policy"] = "LRU"
         elif label.startswith("Neither (RANDOM)"):
             c["cache_policy"] = "RANDOM"
+        elif label.startswith("Cache-Cond Only"):
+            c["cache_policy"] = "LRU"
         else:
             c["cache_policy"] = p
 
@@ -1744,6 +1775,37 @@ def gating_budget_sweep_configs(
             )
             apply_gating_sweep_fields(gating, budget=budget, cache_size=cache_size, args=args)
             configs.append(gating)
+    return configs
+
+
+def gating_cc_sweep_configs(
+    args: argparse.Namespace,
+    predictor_base_dir: Optional[str] = None,
+    predictor_tag: str = "",
+    min_cache_map: Optional[Dict[int, int]] = None,
+) -> List[Dict[str, Any]]:
+    """Cross-layer gating prefetch + cache-conditional routing (λ=1, forced top-J)."""
+    configs: List[Dict[str, Any]] = []
+    question = "GATING_CC_SWEEP"
+    for cache_size in args.cache_sizes:
+        for budget in iter_custom_prefetch_budgets(args, cache_size):
+            for j in _routing_bias_top_ns_list(args):
+                gating_cc = cfg(
+                    question,
+                    f"Gating+CC λ=1.0 J={j} {gating_budget_label(budget, args.model)}",
+                    "predict",
+                    cache_size,
+                    1.0,
+                    j,
+                    lookahead=1,
+                    prefetch_budget=budget,
+                    mode_perplexity=False,
+                    mode_generate=True,
+                )
+                apply_gating_sweep_fields(gating_cc, budget=budget, cache_size=cache_size, args=args)
+                gating_cc["lambda_val"] = 1.0
+                gating_cc["forced_top_n"] = j
+                configs.append(gating_cc)
     return configs
 
 
@@ -4054,6 +4116,7 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             "paper_baseline": lambda: _make_custom_configs(paper_baseline_sweep_configs, "PAPER_BASELINE"),
             "gating_vs_ml": lambda: _make_custom_configs(gating_vs_ml_sweep_configs, "GATING_VS_ML"),
             "gating_budget_sweep": lambda: _make_custom_configs(gating_budget_sweep_configs, "GATING_BUDGET_SWEEP"),
+            "gating_cc_sweep": lambda: _make_custom_configs(gating_cc_sweep_configs, "GATING_CC_SWEEP"),
             "lru_vs_gating": lambda: _make_custom_configs(lru_vs_gating_sweep_configs, "LRU_VS_GATING"),
         }
         configs = question_builders[args.sweep_question]()
@@ -4071,8 +4134,11 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             )
     apply_non_baseline_cache_policy(configs, getattr(args, "non_baseline_cache_policy", None))
 
+    append_existing = getattr(args, "append", False)
     merge_existing = (
-        args.retry_failed or getattr(args, "random_baseline_only", False)
+        args.retry_failed
+        or getattr(args, "random_baseline_only", False)
+        or append_existing
     )
     existing_rows: List[Dict[str, Any]] = []
     done_keys: set[Tuple[Any, ...]] = set()
@@ -4083,9 +4149,12 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             existing_rows.append(row_dict)
             if row_has_data(row_dict):
                 done_keys.add(cfg_key(row_dict))
-        before = len(configs)
-        configs = [c for c in configs if cfg_key(c) not in done_keys]
-        print(f"[sweep] --retry-failed: {before - len(configs)} configs already done, {len(configs)} to re-run.", flush=True)
+        if args.retry_failed:
+            before = len(configs)
+            configs = [c for c in configs if cfg_key(c) not in done_keys]
+            print(f"[sweep] --retry-failed: {before - len(configs)} configs already done, {len(configs)} to re-run.", flush=True)
+        elif append_existing:
+            print(f"[sweep] --append: keeping {len(existing_rows)} existing row(s), adding {len(configs)} new config(s).", flush=True)
 
     expanded_runs: List[Dict[str, Any]] = []
     for config_id, config in enumerate(configs):
@@ -4182,6 +4251,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "paper_baseline",
             "gating_vs_ml",
             "gating_budget_sweep",
+            "gating_cc_sweep",
             "lru_vs_gating",
         ],
         default="custom_1_16_no_ppl",
@@ -4193,6 +4263,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
              "gating_vs_ml: cross-layer gating vs ML prefetch-only with matched budget fraction "
              "(ML uses full sweep budget; gating capped at routed top-k, speculative pool sized to cap). "
              "gating_budget_sweep: paper gating-heuristic prefetch only over --prefetch-budgets. "
+             "gating_cc_sweep: gating prefetch + cache-conditional routing (λ=1, --routing-bias-top-ns). "
              "lru_vs_gating: straight LRU (cached) vs LRU+gating prefetch over --prefetch-budgets.",
     )
     p.add_argument(
@@ -4223,7 +4294,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--prefetch-threshold", type=float, default=0.0, help="Probability threshold (0.0 to 1.0) to filter experts in the predictor backend.")
     p.add_argument("--budget-fractions", type=float, nargs="+", default=[0.25, 0.5, 0.75, 1.0],
                    help="Budget as a fraction of cache size for custom_1_16/lambda_fn/top_p sweeps. "
-                        "Sweeps the sweet spot between cache thrashing (high fraction) and under-utilisation (low fraction).")
+                        "Sweeps the sweet spot between cache thrashing (high fraction) and under-utilisation (low fraction). "
+                        "With --custom-explicit-prefetch-budgets, unions these fractions with --prefetch-budgets.")
     p.add_argument(
         "--custom-explicit-prefetch-budgets",
         action="store_true",
@@ -4250,7 +4322,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--predictor-device", type=str, default="cpu")
     p.add_argument("--routing-bias-top-n", type=int, default=6, dest="routing_bias_top_n",
                    help="Forced top-N for Cache-Cond and Both configs (biases router toward cached experts). "
-                        "Prefetch Only always uses 0 (unbiased router).")
+                        "Prefetch Only always uses 0 (unbiased router). "
+                        "Ignored when --routing-bias-top-ns is set.")
+    p.add_argument(
+        "--routing-bias-top-ns",
+        type=int,
+        nargs="+",
+        default=None,
+        help="CUSTOM_1_16 family: sweep multiple forced-top-J values for Cache-Cond and Hybrid "
+             "(e.g. 5 6). Overrides --routing-bias-top-n.",
+    )
     p.add_argument("--cache-cond-forced-top-ns", type=int, nargs="+", default=[4, 6, 8],
                    help="lambda_fn_sweep: forced-top-J values to compare.")
     p.add_argument(
@@ -4351,6 +4432,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="After sweep or with --plot-only, print §decode model regime alignment per CSV row.",
     )
     p.add_argument("--retry-failed", action="store_true")
+    p.add_argument(
+        "--append",
+        action="store_true",
+        help="Append new sweep rows to an existing --csv-file instead of overwriting it "
+             "(e.g. phase-2 gating after phase-1 custom_1_16_no_ppl).",
+    )
     p.add_argument("--repeat-each-config", type=int, default=1)
     p.add_argument("--shuffle-config-order", action="store_true")
     p.add_argument("--drop-page-cache-between-runs", action="store_true")
