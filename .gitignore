@@ -18,7 +18,7 @@
 trainingData/**/*.pt
 trainingData/
 
-py/utils/final_results_runs/
+# py/utils/final_results_runs/  # explicitly un-ignored
 py/utils/final_results_runs_boyyyyyy/
 
 **/*.png
@@ -44,3 +44,7 @@ trainingDataExtended/qwen3_30b/
 .venv/
 *.nohup
 max_cache.json
+
+# Explicitly track results in these directories
+!py/utils/final_results_runs/**
+!py/utils/section_5_2/**
