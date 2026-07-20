@@ -70,7 +70,7 @@ def main():
     E = L * K
     N = 1  # Oracle best lookahead acts effectively like stride=1 for prefetching window
     
-    bench_df = pd.read_csv('/home/michael/heteroPredict/py/expert_loading_study/expert_loading_benchmark.csv')
+    bench_df = pd.read_csv('/home/michael/heteroPredict/py/expert_loading_study/fast_ssd/expert_loading_benchmark.csv')
     bench_df = bench_df[bench_df['Config'].str.contains('Parallel')].sort_values('Num_Experts')
     benchmark_m = np.concatenate(([0], bench_df['Num_Experts'].values))
     benchmark_t_per_expert = np.concatenate(([0.0], bench_df['Time_per_Expert_ms'].values))

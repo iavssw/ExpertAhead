@@ -30,7 +30,7 @@ T_ceil = 49
 
 
 # SSD expert loading benchmark file
-benchmark_file = r'/home/michael/heteroPredict/py/expert_loading_study/expert_loading_benchmark.csv'
+benchmark_file = r'/home/michael/heteroPredict/py/expert_loading_study/fast_ssd/expert_loading_benchmark.csv'
 
 # Read from benchmark file for Parallel IOThreadPool
 bench_df = pd.read_csv(benchmark_file)

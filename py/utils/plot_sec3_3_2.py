@@ -50,7 +50,7 @@ h = np.linspace(0, 1, 100)
 T_ceil = 49
 K = 8
 
-benchmark_file = r'/home/michael/heteroPredict/py/expert_loading_study/expert_loading_benchmark.csv'
+benchmark_file = r'/home/michael/heteroPredict/py/expert_loading_study/fast_ssd/expert_loading_benchmark.csv'
 
 bench_df = pd.read_csv(benchmark_file)
 bench_df = bench_df[bench_df['Config'].str.contains('Parallel')]

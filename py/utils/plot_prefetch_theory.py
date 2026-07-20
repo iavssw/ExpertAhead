@@ -25,8 +25,8 @@ plt.rcParams.update({
 # =========================
 # Configuration
 # =========================
-csv_path = "/home/michael/heteroPredict/py/utils/final_results_runs/sec2_expert_io_ab/parallel/sec5_all_methods/oracle_sweep_best_stall_fixed_5_prompts.csv"
-benchmark_file = '/home/michael/heteroPredict/py/expert_loading_study/expert_loading_benchmark.csv'
+csv_path = "/home/michael/heteroPredict/py/utils/final_results_runs/oracle_la_vs_cache/20260705_222605/sweep.csv"
+benchmark_file = '/home/michael/heteroPredict/py/expert_loading_study/fast_ssd/expert_loading_benchmark.csv'
 
 T_ceil = 49.0
 L = 48

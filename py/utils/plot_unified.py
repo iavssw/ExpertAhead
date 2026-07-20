@@ -27,7 +27,7 @@ plt.rcParams.update({
 # Configuration
 # =========================
 csv_path = "/home/michael/heteroPredict/py/utils/final_results_runs/sec3_3_3_unified.csv"
-benchmark_file = '/home/michael/heteroPredict/py/expert_loading_study/expert_loading_benchmark.csv'
+benchmark_file = '/home/michael/heteroPredict/py/expert_loading_study/fast_ssd/expert_loading_benchmark.csv'
 
 T_ceil = 49.0
 L = 48
