@@ -10,7 +10,7 @@ If you need to reproduce the final data runs for the paper, you can use the pres
 The final 10-prompt oracle sweep (including `--max-new-tokens 150`) can be re-run by overriding the environment variables in `run_final_best_10prompt_oracle.sh`:
 
 ```bash
-OUT_ROOT=py/utils/final_results_runs/final_10prompt_oracle_150 MAX_NEW_TOKENS=150 ./run_final_best_10prompt_oracle.sh
+OUT_ROOT=py/utils/final_results_runs/final_10prompt_oracle_150 MAX_NEW_TOKENS=150 ./sh_scripts/run_final_best_10prompt_oracle.sh
 ```
 
 ### Example: Reproducing the SSD Streaming Baseline (Force Miss Anchor)
