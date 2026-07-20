@@ -54,3 +54,25 @@ python3 py/utils/sweep_predict_cached_cache_metrics.py \
 ```
 
 Once the sweep completes, it outputs all of the configurations and their resulting TPS (Tokens Per Second) and hit rates to the CSV file you specified. You can then analyze the CSV (or use plotting scripts like `py/utils/section_5_2/plot_sec5_2.py`) to easily identify the configuration that provides the highest TPS for that cache size!
+
+## Modeling Steady State Decode (Chapter 3 Plots)
+
+To generate the plots that compare the theoretical performance model (based on empirical SSD loading benchmarks) against the actual measured throughput, run the following Python scripts from the root of the repository:
+
+### Chapter 3.1 & 3.3: Naive Decode and Cache-Conditional Routing
+Generates the natural cache hit rate vs TPS plots mapping out theoretical limits against actuals for Cache-Conditional routing (J=6) and multiple J values.
+```bash
+python3 py/plot_sec3_3_2.py
+```
+
+### Chapter 3.2: Predictive Prefetching
+Plots the hardware ceiling and compares the theoretical vs measured throughput across different cache sizes under Oracle prefetching conditions.
+```bash
+python3 py/plot_prefetch_theory.py
+```
+
+### Chapter 3.4: Unified Model
+Generates the complete theoretical model plot containing the combined impact of prefetching and cache-conditional routing (Unified Model) against actual measurements.
+```bash
+python3 py/plot_unified.py
+```
