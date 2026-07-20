@@ -183,7 +183,7 @@ CACHE_SIZES="16 32 48 64" ./sh_scripts/run_final_best_10prompt_oracle.sh
 Use the Python plotting scripts to recreate the graphs from the paper based on your collected CSV data.
 ```bash
 # Example: Generate Chapter 3 theoretical throughput plots
-python3 py/utils/plot_sec3_3_2.py
+python3 py/utils/modeling_cache_conditional.py
 
 # Example: Generate best lookahead scaling plots
 python3 py/utils/plot_oracle_best_lookahead.py

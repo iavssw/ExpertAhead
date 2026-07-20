@@ -62,7 +62,7 @@ To generate the plots that compare the theoretical performance model (based on e
 ### Chapter 3.1 & 3.3: Naive Decode and Cache-Conditional Routing
 Generates the natural cache hit rate vs TPS plots mapping out theoretical limits against actuals for Cache-Conditional routing (J=6) and multiple J values.
 ```bash
-python3 py/plot_sec3_3_2.py
+python3 py/utils/modeling_cache_conditional.py
 ```
 
 ### Chapter 3.2: Predictive Prefetching

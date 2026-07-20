@@ -232,7 +232,7 @@ ax1.set_title("Cache-Conditional Routing (J=6)", fontweight="bold")
 ax1.legend(loc="upper left", framealpha=0.9, fontsize=9, ncol=2)
 
 fig1.tight_layout()
-out_path1 = "/home/michael/heteroPredict/py/cache_conditional_J6.png"
+out_path1 = "/home/michael/heteroPredict/py/utils/modeling_cache_conditional_J6.png"
 fig1.savefig(out_path1, dpi=300, bbox_inches="tight")
 plt.close(fig1)
 
@@ -290,7 +290,7 @@ ax2.set_title("Theoretical Cache-Conditional Routing Across J", fontweight="bold
 ax2.legend(loc="upper left", framealpha=0.9)
 fig2.tight_layout()
 
-out_path2 = "/home/michael/heteroPredict/py/cache_conditional_multi_J.png"
+out_path2 = "/home/michael/heteroPredict/py/utils/modeling_cache_conditional_multi_J.png"
 fig2.savefig(out_path2, dpi=300, bbox_inches="tight")
 plt.close(fig2)
 
