@@ -1,0 +1,4 @@
+policy,cache_size,lambda,prefill_top_n,tps,tps_std,cache_hit_rate
+LRU,24,0.0,,4.1742,0.1126,67.74
+LRU,40,0.0,,6.0821,0.3239,83.64
+LRU,56,0.0,,9.6013,0.5394,93.43

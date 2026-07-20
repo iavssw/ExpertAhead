@@ -1,0 +1,163 @@
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=87.85/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Pre-warming 8 experts for all layers...
+Layer 0: Pre-warming 8 experts.
+Layer 0: using unpacked expert format.
+Layer 1: Pre-warming 8 experts.
+Layer 1: using unpacked expert format.
+Layer 2: Pre-warming 8 experts.
+Layer 2: using unpacked expert format.
+Layer 3: Pre-warming 8 experts.
+Layer 3: using unpacked expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 8 experts.
+Layer 4: using unpacked expert format.
+Layer 5: Pre-warming 8 experts.
+Layer 5: using unpacked expert format.
+Layer 6: Pre-warming 8 experts.
+Layer 6: using unpacked expert format.
+Layer 7: Pre-warming 8 experts.
+Layer 7: using unpacked expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 8 experts.
+Layer 8: using unpacked expert format.
+Layer 9: Pre-warming 8 experts.
+Layer 9: using unpacked expert format.
+Layer 10: Pre-warming 8 experts.
+Layer 10: using unpacked expert format.
+Layer 11: Pre-warming 8 experts.
+Layer 11: using unpacked expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 8 experts.
+Layer 12: using unpacked expert format.
+Layer 13: Pre-warming 8 experts.
+Layer 13: using unpacked expert format.
+Layer 14: Pre-warming 8 experts.
+Layer 14: using unpacked expert format.
+Layer 15: Pre-warming 8 experts.
+Layer 15: using unpacked expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 8 experts.
+Layer 16: using unpacked expert format.
+Layer 17: Pre-warming 8 experts.
+Layer 17: using unpacked expert format.
+Layer 18: Pre-warming 8 experts.
+Layer 18: using unpacked expert format.
+Layer 19: Pre-warming 8 experts.
+Layer 19: using unpacked expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 8 experts.
+Layer 20: using unpacked expert format.
+Layer 21: Pre-warming 8 experts.
+Layer 21: using unpacked expert format.
+Layer 22: Pre-warming 8 experts.
+Layer 22: using unpacked expert format.
+Layer 23: Pre-warming 8 experts.
+Layer 23: using unpacked expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 8 experts.
+Layer 24: using unpacked expert format.
+Layer 25: Pre-warming 8 experts.
+Layer 25: using unpacked expert format.
+Layer 26: Pre-warming 8 experts.
+Layer 26: using unpacked expert format.
+Layer 27: Pre-warming 8 experts.
+Layer 27: using unpacked expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 8 experts.
+Layer 28: using unpacked expert format.
+Layer 29: Pre-warming 8 experts.
+Layer 29: using unpacked expert format.
+Layer 30: Pre-warming 8 experts.
+Layer 30: using unpacked expert format.
+Layer 31: Pre-warming 8 experts.
+Layer 31: using unpacked expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 8 experts.
+Layer 32: using unpacked expert format.
+Layer 33: Pre-warming 8 experts.
+Layer 33: using unpacked expert format.
+Layer 34: Pre-warming 8 experts.
+Layer 34: using unpacked expert format.
+Layer 35: Pre-warming 8 experts.
+Layer 35: using unpacked expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 8 experts.
+Layer 36: using unpacked expert format.
+Layer 37: Pre-warming 8 experts.
+Layer 37: using unpacked expert format.
+Layer 38: Pre-warming 8 experts.
+Layer 38: using unpacked expert format.
+Layer 39: Pre-warming 8 experts.
+Layer 39: using unpacked expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 8 experts.
+Layer 40: using unpacked expert format.
+Layer 41: Pre-warming 8 experts.
+Layer 41: using unpacked expert format.
+Layer 42: Pre-warming 8 experts.
+Layer 42: using unpacked expert format.
+Layer 43: Pre-warming 8 experts.
+Layer 43: using unpacked expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 8 experts.
+Layer 44: using unpacked expert format.
+Layer 45: Pre-warming 8 experts.
+Layer 45: using unpacked expert format.
+Layer 46: Pre-warming 8 experts.
+Layer 46: using unpacked expert format.
+Layer 47: Pre-warming 8 experts.
+Layer 47: using unpacked expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 814]
+Skipping warmup.
+Prefill time: 9.42523 seconds
+Generation phase
+[gen 5/255] elapsed=1.2s  TPS=4.183
+[gen 10/255] elapsed=2.3s  TPS=4.301
+[gen 15/255] elapsed=3.4s  TPS=4.390
+[gen 20/255] elapsed=4.5s  TPS=4.452
+[gen 25/255] elapsed=5.5s  TPS=4.550
+[gen 30/255] elapsed=6.5s  TPS=4.620
+[gen 35/255] elapsed=7.6s  TPS=4.604
+[gen 40/255] elapsed=8.6s  TPS=4.635
+[gen 45/255] elapsed=9.7s  TPS=4.621
+[gen 50/255] elapsed=10.8s  TPS=4.631
+[gen 55/255] elapsed=11.9s  TPS=4.603
+[gen 60/255] elapsed=13.0s  TPS=4.612
+[gen 65/255] elapsed=14.1s  TPS=4.620
+[gen 70/255] elapsed=15.3s  TPS=4.584
+[gen 75/255] elapsed=16.3s  TPS=4.602
+[gen 80/255] elapsed=17.3s  TPS=4.634
+[gen 85/255] elapsed=18.4s  TPS=4.611
+[gen 90/255] elapsed=19.5s  TPS=4.605
+[gen 95/255] elapsed=20.6s  TPS=4.613
+[gen 100/255] elapsed=21.9s  TPS=4.572
+[gen 105/255] elapsed=23.0s  TPS=4.565
+[gen 110/255] elapsed=24.0s  TPS=4.586
+[gen 115/255] elapsed=25.1s  TPS=4.589
+[gen 120/255] elapsed=26.2s  TPS=4.588
+[gen 125/255] elapsed=27.4s  TPS=4.565
+[gen 130/255] elapsed=28.6s  TPS=4.546
+[gen 135/255] elapsed=29.7s  TPS=4.545
+[gen 140/255] elapsed=30.8s  TPS=4.550
+[gen 145/255] elapsed=31.8s  TPS=4.558
+[gen 150/255] elapsed=32.9s  TPS=4.562

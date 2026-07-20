@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd /home/michael/heteroPredict
+source utils/setup.sh
+python3 py/utils/sweep_predict_cached_cache_metrics.py \
+  --model qwen --dataset wikitext \
+  --cache-sizes 24 --lookaheads 1 2 3 \
+  --budget-fractions 0.25 0.5 0.75 1.0 \
+  --routing-bias-top-n 5 \
+  --constraint-expert-reuse-csv py/expert_predictor/expert_reuse_qwen3_30b.csv \
+  --predictor-base-dir trainingData/qwen3_30b/final_predictor \
+  --sweep-question custom_1_16_no_ppl \
+  --lambdas 0 1 --num-prompts 10 --prompt-max-chars 4096 \
+  --max-new-tokens 256 --temperature 0.0 \
+  --non-baseline-cache-policy LFRU --disable-measurement \
+  --drop-page-cache-before-first-run --drop-page-cache-between-runs \
+  --log-file py/utils/final_results_runs/sec5_lfru_final/C24_LA1_LA2_LA3/run.log \
+  --out-dir py/utils/final_results_runs/sec5_lfru_final/C24_LA1_LA2_LA3 \
+  --csv-file py/utils/final_results_runs/sec5_lfru_final/C24_LA1_LA2_LA3/sweep.csv

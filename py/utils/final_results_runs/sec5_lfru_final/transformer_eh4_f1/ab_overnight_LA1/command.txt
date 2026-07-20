@@ -1,0 +1,38 @@
+# Overnight A/B: transformer (eh4 + prefill) vs final_predictor (emb hist1)
+# LA=1 only | LFRU | FN=5 | λ=0,1 | 4 budget fractions | 10 prompts
+#
+# Cache sizes match ppl_winners sweep: 8–64 (all valid at LA=1).
+#
+# Config count: 8 caches × (1 LRU + 2×9 predictor rows) = 152 runs
+#   per predictor tag: 1 Cache-Cond + 4 Prefetch + 4 Both
+#   (Cache-Cond uses cached backend — identical across tags but run twice for CSV clarity)
+# Est. runtime: ~15–20 h at ~8 min/config (resume with --retry-failed if interrupted)
+#
+# CSV columns predictor_tag: "transformer" vs "final_predictor"
+# Plots: plot_predictor_comparison auto-runs at end (prefetch TPS/hit-rate by tag)
+#
+# Resume after interrupt:
+#   append --retry-failed to the python command (same --csv-file)
+
+cd /home/michael/heteroPredict && source utils/setup.sh
+python py/utils/sweep_predict_cached_cache_metrics.py \
+  --model qwen --dataset wikitext \
+  --cache-sizes 8 16 24 32 40 48 56 64 \
+  --lookaheads 1 \
+  --budget-fractions 0.25 0.5 0.75 1.0 \
+  --routing-bias-top-n 5 \
+  --constraint-expert-reuse-csv py/expert_predictor/expert_reuse_qwen3_30b.csv \
+  --predictor-base-dirs \
+    trainingData/qwen3_30b/transformer \
+    trainingData/qwen3_30b/final_predictor \
+  --sweep-question custom_1_16_no_ppl \
+  --lambdas 0 1 \
+  --num-prompts 10 \
+  --prompt-max-chars 4096 --max-new-tokens 256 --temperature 0.0 \
+  --non-baseline-cache-policy LFRU \
+  --disable-measurement \
+  --drop-page-cache-before-first-run \
+  --drop-page-cache-between-runs \
+  --log-file py/utils/final_results_runs/sec5_lfru_final/transformer_eh4_f1/ab_overnight_LA1/run.log \
+  --out-dir py/utils/final_results_runs/sec5_lfru_final/transformer_eh4_f1/ab_overnight_LA1 \
+  --csv-file py/utils/final_results_runs/sec5_lfru_final/transformer_eh4_f1/ab_overnight_LA1/sweep.csv

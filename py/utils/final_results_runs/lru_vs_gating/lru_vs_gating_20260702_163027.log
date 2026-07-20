@@ -1,0 +1,3208 @@
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=43.17/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Pre-warming 16 experts for all layers...
+Layer 0: Pre-warming 16 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 16 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 16 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 16 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 16 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 16 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 16 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 16 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 16 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 16 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 16 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 16 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 16 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 16 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 16 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 16 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 16 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 16 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 16 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 16 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 16 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 16 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 16 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 16 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 16 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 16 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 16 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 16 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 16 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 16 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 16 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 16 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 16 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 16 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 16 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 16 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 16 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 16 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 16 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 16 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 16 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 16 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 16 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 16 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 16 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 16 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 16 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 16 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 5]
+Skipping warmup.
+Prefill time: 1.2783 seconds
+Generation phase
+[MoE] Layer 0: loading 5 expert(s)
+[MoE] Layer 1: loading 6 expert(s)
+[MoE] Layer 2: loading 3 expert(s)
+[MoE] Layer 3: loading 5 expert(s)
+[MoE] Layer 4: loading 4 expert(s)
+[MoE] Layer 5: loading 3 expert(s)
+[MoE] Layer 6: loading 5 expert(s)
+[MoE] Layer 7: loading 4 expert(s)
+[MoE] Layer 8: loading 4 expert(s)
+[MoE] Layer 9: loading 5 expert(s)
+[MoE] Layer 10: loading 4 expert(s)
+[MoE] Layer 11: loading 5 expert(s)
+[MoE] Layer 12: loading 4 expert(s)
+[MoE] Layer 13: loading 5 expert(s)
+[MoE] Layer 14: loading 5 expert(s)
+[MoE] Layer 15: loading 6 expert(s)
+[MoE] Layer 16: loading 2 expert(s)
+[MoE] Layer 17: loading 6 expert(s)
+[MoE] Layer 18: loading 5 expert(s)
+[MoE] Layer 19: loading 3 expert(s)
+[MoE] Layer 20: loading 4 expert(s)
+[MoE] Layer 21: loading 5 expert(s)
+[MoE] Layer 22: loading 2 expert(s)
+[MoE] Layer 23: loading 4 expert(s)
+[MoE] Layer 24: loading 4 expert(s)
+[MoE] Layer 25: loading 2 expert(s)
+[MoE] Layer 26: loading 4 expert(s)
+[MoE] Layer 27: loading 7 expert(s)
+[MoE] Layer 28: loading 4 expert(s)
+[MoE] Layer 29: loading 4 expert(s)
+[MoE] Layer 30: loading 3 expert(s)
+[MoE] Layer 31: loading 4 expert(s)
+[MoE] Layer 32: loading 1 expert(s)
+[MoE] Layer 33: loading 4 expert(s)
+[MoE] Layer 34: loading 3 expert(s)
+[MoE] Layer 35: loading 5 expert(s)
+[MoE] Layer 36: loading 5 expert(s)
+[MoE] Layer 37: loading 5 expert(s)
+[MoE] Layer 38: loading 6 expert(s)
+[MoE] Layer 39: loading 4 expert(s)
+[MoE] Layer 40: loading 5 expert(s)
+[MoE] Layer 41: loading 5 expert(s)
+[MoE] Layer 42: loading 6 expert(s)
+[MoE] Layer 43: loading 5 expert(s)
+[MoE] Layer 44: loading 5 expert(s)
+[MoE] Layer 45: loading 5 expert(s)
+[MoE] Layer 46: loading 4 expert(s)
+[MoE] Layer 47: loading 4 expert(s)
+[MoE] Layer 0: loading 6 expert(s)
+[MoE] Layer 1: loading 7 expert(s)
+[MoE] Layer 2: loading 7 expert(s)
+[MoE] Layer 3: loading 6 expert(s)
+[MoE] Layer 4: loading 4 expert(s)
+[MoE] Layer 5: loading 5 expert(s)
+[MoE] Layer 6: loading 6 expert(s)
+[MoE] Layer 7: loading 4 expert(s)
+[MoE] Layer 8: loading 5 expert(s)
+[MoE] Layer 9: loading 5 expert(s)
+[MoE] Layer 10: loading 6 expert(s)
+[MoE] Layer 11: loading 5 expert(s)
+[MoE] Layer 12: loading 5 expert(s)
+[MoE] Layer 13: loading 7 expert(s)
+[MoE] Layer 14: loading 5 expert(s)
+[MoE] Layer 15: loading 6 expert(s)
+[MoE] Layer 16: loading 3 expert(s)
+[MoE] Layer 17: loading 7 expert(s)
+[MoE] Layer 18: loading 4 expert(s)
+[MoE] Layer 19: loading 6 expert(s)
+[MoE] Layer 20: loading 5 expert(s)
+[MoE] Layer 21: loading 4 expert(s)
+[MoE] Layer 22: loading 6 expert(s)
+[MoE] Layer 23: loading 6 expert(s)
+[MoE] Layer 24: loading 5 expert(s)
+[MoE] Layer 25: loading 5 expert(s)
+[MoE] Layer 26: loading 5 expert(s)
+[MoE] Layer 27: loading 7 expert(s)
+[MoE] Layer 28: loading 5 expert(s)
+[MoE] Layer 29: loading 6 expert(s)
+[MoE] Layer 30: loading 5 expert(s)
+[MoE] Layer 31: loading 4 expert(s)
+[MoE] Layer 32: loading 4 expert(s)
+[MoE] Layer 33: loading 5 expert(s)
+[MoE] Layer 34: loading 6 expert(s)
+[MoE] Layer 35: loading 5 expert(s)
+[MoE] Layer 36: loading 5 expert(s)
+[MoE] Layer 37: loading 7 expert(s)
+[MoE] Layer 38: loading 5 expert(s)
+[MoE] Layer 39: loading 6 expert(s)
+[MoE] Layer 40: loading 5 expert(s)
+[MoE] Layer 41: loading 8 expert(s)
+[MoE] Layer 42: loading 4 expert(s)
+[MoE] Layer 43: loading 8 expert(s)
+[MoE] Layer 44: loading 5 expert(s)
+[MoE] Layer 45: loading 3 expert(s)
+[MoE] Layer 46: loading 5 expert(s)
+[MoE] Layer 47: loading 4 expert(s)
+[MoE] Layer 0: loading 6 expert(s)
+[MoE] Layer 1: loading 4 expert(s)
+[MoE] Layer 2: loading 5 expert(s)
+[MoE] Layer 3: loading 5 expert(s)
+[MoE] Layer 4: loading 4 expert(s)
+[MoE] Layer 5: loading 4 expert(s)
+[MoE] Layer 6: loading 3 expert(s)
+[MoE] Layer 7: loading 3 expert(s)
+[MoE] Layer 8: loading 4 expert(s)
+[MoE] Layer 9: loading 3 expert(s)
+[MoE] Layer 10: loading 5 expert(s)
+[MoE] Layer 11: loading 6 expert(s)
+[MoE] Layer 12: loading 4 expert(s)
+[MoE] Layer 13: loading 6 expert(s)
+[MoE] Layer 14: loading 4 expert(s)
+[MoE] Layer 15: loading 4 expert(s)
+[MoE] Layer 16: loading 4 expert(s)
+[MoE] Layer 17: loading 5 expert(s)
+[MoE] Layer 18: loading 3 expert(s)
+[MoE] Layer 19: loading 2 expert(s)
+[MoE] Layer 20: loading 3 expert(s)
+[MoE] Layer 21: loading 5 expert(s)
+[MoE] Layer 22: loading 3 expert(s)
+[MoE] Layer 23: loading 4 expert(s)
+[MoE] Layer 24: loading 4 expert(s)
+[MoE] Layer 25: loading 4 expert(s)
+[MoE] Layer 26: loading 4 expert(s)
+[MoE] Layer 27: loading 4 expert(s)
+[MoE] Layer 28: loading 4 expert(s)
+[MoE] Layer 29: loading 6 expert(s)
+[MoE] Layer 30: loading 2 expert(s)
+[MoE] Layer 31: loading 2 expert(s)
+[MoE] Layer 32: loading 4 expert(s)
+[MoE] Layer 33: loading 4 expert(s)
+[MoE] Layer 34: loading 5 expert(s)
+[MoE] Layer 35: loading 6 expert(s)
+[MoE] Layer 36: loading 4 expert(s)
+[MoE] Layer 37: loading 4 expert(s)
+[MoE] Layer 38: loading 4 expert(s)
+[MoE] Layer 39: loading 4 expert(s)
+[MoE] Layer 40: loading 4 expert(s)
+[MoE] Layer 41: loading 7 expert(s)
+[MoE] Layer 42: loading 6 expert(s)
+[MoE] Layer 43: loading 6 expert(s)
+[MoE] Layer 44: loading 5 expert(s)
+[MoE] Layer 45: loading 5 expert(s)
+[MoE] Layer 46: loading 4 expert(s)
+[MoE] Layer 47: loading 5 expert(s)
+[MoE] Layer 0: loading 7 expert(s)
+[MoE] Layer 1: loading 6 expert(s)
+[MoE] Layer 2: loading 7 expert(s)
+[MoE] Layer 3: loading 6 expert(s)
+[MoE] Layer 4: loading 2 expert(s)
+[MoE] Layer 5: loading 5 expert(s)
+[MoE] Layer 6: loading 1 expert(s)
+[MoE] Layer 7: loading 3 expert(s)
+[MoE] Layer 8: loading 3 expert(s)
+[MoE] Layer 9: loading 1 expert(s)
+[MoE] Layer 10: loading 5 expert(s)
+[MoE] Layer 11: loading 5 expert(s)
+[MoE] Layer 12: loading 4 expert(s)
+[MoE] Layer 13: loading 4 expert(s)
+[MoE] Layer 14: loading 3 expert(s)
+[MoE] Layer 15: loading 4 expert(s)
+[MoE] Layer 16: loading 4 expert(s)
+[MoE] Layer 17: loading 6 expert(s)
+[MoE] Layer 18: loading 4 expert(s)
+[MoE] Layer 19: loading 1 expert(s)
+[MoE] Layer 20: loading 4 expert(s)
+[MoE] Layer 21: loading 5 expert(s)
+[MoE] Layer 22: loading 7 expert(s)
+[MoE] Layer 23: loading 5 expert(s)
+[MoE] Layer 24: loading 6 expert(s)
+[MoE] Layer 25: loading 3 expert(s)
+[MoE] Layer 26: loading 6 expert(s)
+[MoE] Layer 27: loading 6 expert(s)
+[MoE] Layer 28: loading 5 expert(s)
+[MoE] Layer 29: loading 7 expert(s)
+[MoE] Layer 30: loading 3 expert(s)
+[MoE] Layer 31: loading 3 expert(s)
+[MoE] Layer 32: loading 4 expert(s)
+[MoE] Layer 33: loading 4 expert(s)
+[MoE] Layer 34: loading 5 expert(s)
+[MoE] Layer 35: loading 4 expert(s)
+[MoE] Layer 36: loading 5 expert(s)
+[MoE] Layer 37: loading 4 expert(s)
+[MoE] Layer 38: loading 3 expert(s)
+[MoE] Layer 39: loading 4 expert(s)
+[MoE] Layer 40: loading 5 expert(s)
+[MoE] Layer 41: loading 5 expert(s)
+[MoE] Layer 42: loading 2 expert(s)
+[MoE] Layer 43: loading 5 expert(s)
+[MoE] Layer 44: loading 4 expert(s)
+[MoE] Layer 45: loading 5 expert(s)
+[MoE] Layer 46: loading 4 expert(s)
+[MoE] Layer 47: loading 7 expert(s)
+[MoE] Layer 0: loading 7 expert(s)
+[MoE] Layer 1: loading 6 expert(s)
+[MoE] Layer 2: loading 3 expert(s)
+[MoE] Layer 3: loading 4 expert(s)
+[MoE] Layer 4: loading 3 expert(s)
+[MoE] Layer 5: loading 3 expert(s)
+[MoE] Layer 6: loading 2 expert(s)
+[MoE] Layer 7: loading 2 expert(s)
+[MoE] Layer 8: loading 1 expert(s)
+[MoE] Layer 9: loading 2 expert(s)
+[MoE] Layer 10: loading 2 expert(s)
+[MoE] Layer 11: loading 3 expert(s)
+[MoE] Layer 12: loading 5 expert(s)
+[MoE] Layer 13: loading 4 expert(s)
+[MoE] Layer 14: loading 3 expert(s)
+[MoE] Layer 15: loading 4 expert(s)
+[MoE] Layer 16: loading 3 expert(s)
+[MoE] Layer 17: loading 4 expert(s)
+[MoE] Layer 18: loading 2 expert(s)
+[MoE] Layer 19: loading 2 expert(s)
+[MoE] Layer 20: loading 2 expert(s)
+[MoE] Layer 21: loading 3 expert(s)
+[MoE] Layer 22: loading 5 expert(s)
+[MoE] Layer 23: loading 4 expert(s)
+[MoE] Layer 24: loading 5 expert(s)
+[MoE] Layer 25: loading 2 expert(s)
+[MoE] Layer 26: loading 4 expert(s)
+[MoE] Layer 27: loading 2 expert(s)
+[MoE] Layer 28: loading 3 expert(s)
+[MoE] Layer 29: loading 3 expert(s)
+[MoE] Layer 30: loading 1 expert(s)
+[MoE] Layer 31: loading 1 expert(s)
+[MoE] Layer 32: loading 2 expert(s)
+[MoE] Layer 33: loading 4 expert(s)
+[MoE] Layer 34: loading 3 expert(s)
+[MoE] Layer 35: loading 5 expert(s)
+[MoE] Layer 36: loading 2 expert(s)
+[MoE] Layer 37: loading 4 expert(s)
+[MoE] Layer 38: loading 2 expert(s)
+[MoE] Layer 39: loading 3 expert(s)
+[MoE] Layer 40: loading 3 expert(s)
+[MoE] Layer 41: loading 3 expert(s)
+[MoE] Layer 42: loading 4 expert(s)
+[MoE] Layer 43: loading 3 expert(s)
+[MoE] Layer 44: loading 4 expert(s)
+[MoE] Layer 45: loading 3 expert(s)
+[MoE] Layer 46: loading 3 expert(s)
+[MoE] Layer 47: loading 7 expert(s)
+[gen 5/15] elapsed=0.7s  TPS=7.171
+[MoE] Layer 0: loading 6 expert(s)
+[MoE] Layer 1: loading 3 expert(s)
+[MoE] Layer 2: loading 4 expert(s)
+[MoE] Layer 3: loading 4 expert(s)
+[MoE] Layer 4: loading 4 expert(s)
+[MoE] Layer 5: loading 3 expert(s)
+[MoE] Layer 6: loading 4 expert(s)
+[MoE] Layer 7: loading 2 expert(s)
+[MoE] Layer 8: loading 3 expert(s)
+[MoE] Layer 9: loading 3 expert(s)
+[MoE] Layer 10: loading 6 expert(s)
+[MoE] Layer 11: loading 5 expert(s)
+[MoE] Layer 12: loading 3 expert(s)
+[MoE] Layer 13: loading 5 expert(s)
+[MoE] Layer 14: loading 4 expert(s)
+[MoE] Layer 15: loading 4 expert(s)
+[MoE] Layer 16: loading 2 expert(s)
+[MoE] Layer 17: loading 2 expert(s)
+[MoE] Layer 18: loading 2 expert(s)
+[MoE] Layer 19: loading 3 expert(s)
+[MoE] Layer 20: loading 3 expert(s)
+[MoE] Layer 21: loading 4 expert(s)
+[MoE] Layer 22: loading 6 expert(s)
+[MoE] Layer 23: loading 5 expert(s)
+[MoE] Layer 24: loading 2 expert(s)
+[MoE] Layer 25: loading 4 expert(s)
+[MoE] Layer 26: loading 1 expert(s)
+[MoE] Layer 27: loading 2 expert(s)
+[MoE] Layer 28: loading 4 expert(s)
+[MoE] Layer 29: loading 3 expert(s)
+[MoE] Layer 30: loading 2 expert(s)
+[MoE] Layer 31: loading 2 expert(s)
+[MoE] Layer 32: loading 2 expert(s)
+[MoE] Layer 33: loading 4 expert(s)
+[MoE] Layer 34: loading 5 expert(s)
+[MoE] Layer 35: loading 4 expert(s)
+[MoE] Layer 36: loading 6 expert(s)
+[MoE] Layer 37: loading 4 expert(s)
+[MoE] Layer 38: loading 4 expert(s)
+[MoE] Layer 39: loading 4 expert(s)
+[MoE] Layer 40: loading 2 expert(s)
+[MoE] Layer 41: loading 3 expert(s)
+[MoE] Layer 42: loading 3 expert(s)
+[MoE] Layer 43: loading 4 expert(s)
+[MoE] Layer 44: loading 2 expert(s)
+[MoE] Layer 45: loading 3 expert(s)
+[MoE] Layer 46: loading 3 expert(s)
+[MoE] Layer 47: loading 6 expert(s)
+[MoE] Layer 0: loading 6 expert(s)
+[MoE] Layer 1: loading 5 expert(s)
+[MoE] Layer 2: loading 5 expert(s)
+[MoE] Layer 3: loading 3 expert(s)
+[MoE] Layer 4: loading 3 expert(s)
+[MoE] Layer 5: loading 4 expert(s)
+[MoE] Layer 7: loading 2 expert(s)
+[MoE] Layer 8: loading 3 expert(s)
+[MoE] Layer 9: loading 2 expert(s)
+[MoE] Layer 10: loading 3 expert(s)
+[MoE] Layer 11: loading 4 expert(s)
+[MoE] Layer 12: loading 5 expert(s)
+[MoE] Layer 13: loading 4 expert(s)
+[MoE] Layer 14: loading 3 expert(s)
+[MoE] Layer 15: loading 5 expert(s)
+[MoE] Layer 16: loading 4 expert(s)
+[MoE] Layer 17: loading 4 expert(s)
+[MoE] Layer 18: loading 1 expert(s)
+[MoE] Layer 19: loading 2 expert(s)
+[MoE] Layer 20: loading 3 expert(s)
+[MoE] Layer 21: loading 3 expert(s)
+[MoE] Layer 23: loading 3 expert(s)
+[MoE] Layer 24: loading 2 expert(s)
+[MoE] Layer 25: loading 2 expert(s)
+[MoE] Layer 26: loading 4 expert(s)
+[MoE] Layer 27: loading 5 expert(s)
+[MoE] Layer 28: loading 3 expert(s)
+[MoE] Layer 29: loading 3 expert(s)
+[MoE] Layer 31: loading 1 expert(s)
+[MoE] Layer 32: loading 2 expert(s)
+[MoE] Layer 33: loading 3 expert(s)
+[MoE] Layer 34: loading 2 expert(s)
+[MoE] Layer 35: loading 2 expert(s)
+[MoE] Layer 36: loading 4 expert(s)
+[MoE] Layer 37: loading 3 expert(s)
+[MoE] Layer 38: loading 1 expert(s)
+[MoE] Layer 39: loading 3 expert(s)
+[MoE] Layer 40: loading 2 expert(s)
+[MoE] Layer 41: loading 3 expert(s)
+[MoE] Layer 42: loading 4 expert(s)
+[MoE] Layer 43: loading 1 expert(s)
+[MoE] Layer 44: loading 1 expert(s)
+[MoE] Layer 45: loading 1 expert(s)
+[MoE] Layer 46: loading 3 expert(s)
+[MoE] Layer 47: loading 1 expert(s)
+[MoE] Layer 0: loading 1 expert(s)
+[MoE] Layer 1: loading 3 expert(s)
+[MoE] Layer 2: loading 2 expert(s)
+[MoE] Layer 3: loading 1 expert(s)
+[MoE] Layer 4: loading 2 expert(s)
+[MoE] Layer 5: loading 3 expert(s)
+[MoE] Layer 6: loading 2 expert(s)
+[MoE] Layer 7: loading 1 expert(s)
+[MoE] Layer 8: loading 2 expert(s)
+[MoE] Layer 9: loading 2 expert(s)
+[MoE] Layer 10: loading 3 expert(s)
+[MoE] Layer 11: loading 1 expert(s)
+[MoE] Layer 12: loading 3 expert(s)
+[MoE] Layer 13: loading 4 expert(s)
+[MoE] Layer 14: loading 2 expert(s)
+[MoE] Layer 15: loading 1 expert(s)
+[MoE] Layer 16: loading 2 expert(s)
+[MoE] Layer 17: loading 4 expert(s)
+[MoE] Layer 18: loading 2 expert(s)
+[MoE] Layer 19: loading 1 expert(s)
+[MoE] Layer 20: loading 1 expert(s)
+[MoE] Layer 21: loading 2 expert(s)
+[MoE] Layer 22: loading 3 expert(s)
+[MoE] Layer 23: loading 2 expert(s)
+[MoE] Layer 24: loading 4 expert(s)
+[MoE] Layer 25: loading 1 expert(s)
+[MoE] Layer 26: loading 2 expert(s)
+[MoE] Layer 27: loading 3 expert(s)
+[MoE] Layer 28: loading 2 expert(s)
+[MoE] Layer 29: loading 5 expert(s)
+[MoE] Layer 30: loading 1 expert(s)
+[MoE] Layer 31: loading 2 expert(s)
+[MoE] Layer 32: loading 1 expert(s)
+[MoE] Layer 33: loading 2 expert(s)
+[MoE] Layer 34: loading 3 expert(s)
+[MoE] Layer 35: loading 2 expert(s)
+[MoE] Layer 36: loading 4 expert(s)
+[MoE] Layer 37: loading 2 expert(s)
+[MoE] Layer 38: loading 4 expert(s)
+[MoE] Layer 39: loading 1 expert(s)
+[MoE] Layer 40: loading 3 expert(s)
+[MoE] Layer 41: loading 5 expert(s)
+[MoE] Layer 42: loading 2 expert(s)
+[MoE] Layer 43: loading 4 expert(s)
+[MoE] Layer 44: loading 3 expert(s)
+[MoE] Layer 45: loading 2 expert(s)
+[MoE] Layer 46: loading 4 expert(s)
+[MoE] Layer 47: loading 3 expert(s)
+[MoE] Layer 0: loading 7 expert(s)
+[MoE] Layer 1: loading 6 expert(s)
+[MoE] Layer 2: loading 6 expert(s)
+[MoE] Layer 3: loading 6 expert(s)
+[MoE] Layer 4: loading 4 expert(s)
+[MoE] Layer 5: loading 6 expert(s)
+[MoE] Layer 6: loading 3 expert(s)
+[MoE] Layer 7: loading 2 expert(s)
+[MoE] Layer 8: loading 5 expert(s)
+[MoE] Layer 9: loading 4 expert(s)
+[MoE] Layer 10: loading 6 expert(s)
+[MoE] Layer 11: loading 5 expert(s)
+[MoE] Layer 12: loading 4 expert(s)
+[MoE] Layer 13: loading 4 expert(s)
+[MoE] Layer 14: loading 4 expert(s)
+[MoE] Layer 15: loading 5 expert(s)
+[MoE] Layer 16: loading 4 expert(s)
+[MoE] Layer 17: loading 6 expert(s)
+[MoE] Layer 18: loading 2 expert(s)
+[MoE] Layer 19: loading 3 expert(s)
+[MoE] Layer 20: loading 5 expert(s)
+[MoE] Layer 21: loading 5 expert(s)
+[MoE] Layer 22: loading 5 expert(s)
+[MoE] Layer 23: loading 6 expert(s)
+[MoE] Layer 24: loading 5 expert(s)
+[MoE] Layer 25: loading 4 expert(s)
+[MoE] Layer 26: loading 5 expert(s)
+[MoE] Layer 27: loading 6 expert(s)
+[MoE] Layer 28: loading 5 expert(s)
+[MoE] Layer 29: loading 5 expert(s)
+[MoE] Layer 30: loading 6 expert(s)
+[MoE] Layer 31: loading 5 expert(s)
+[MoE] Layer 32: loading 6 expert(s)
+[MoE] Layer 33: loading 5 expert(s)
+[MoE] Layer 34: loading 8 expert(s)
+[MoE] Layer 35: loading 6 expert(s)
+[MoE] Layer 36: loading 7 expert(s)
+[MoE] Layer 37: loading 6 expert(s)
+[MoE] Layer 38: loading 5 expert(s)
+[MoE] Layer 39: loading 6 expert(s)
+[MoE] Layer 40: loading 4 expert(s)
+[MoE] Layer 41: loading 6 expert(s)
+[MoE] Layer 42: loading 5 expert(s)
+[MoE] Layer 43: loading 5 expert(s)
+[MoE] Layer 44: loading 5 expert(s)
+[MoE] Layer 45: loading 2 expert(s)
+[MoE] Layer 46: loading 5 expert(s)
+[MoE] Layer 47: loading 5 expert(s)
+[MoE] Layer 0: loading 6 expert(s)
+[MoE] Layer 1: loading 6 expert(s)
+[MoE] Layer 2: loading 5 expert(s)
+[MoE] Layer 3: loading 7 expert(s)
+[MoE] Layer 4: loading 4 expert(s)
+[MoE] Layer 5: loading 5 expert(s)
+[MoE] Layer 6: loading 2 expert(s)
+[MoE] Layer 7: loading 1 expert(s)
+[MoE] Layer 8: loading 5 expert(s)
+[MoE] Layer 9: loading 4 expert(s)
+[MoE] Layer 10: loading 4 expert(s)
+[MoE] Layer 11: loading 5 expert(s)
+[MoE] Layer 12: loading 3 expert(s)
+[MoE] Layer 13: loading 4 expert(s)
+[MoE] Layer 14: loading 3 expert(s)
+[MoE] Layer 15: loading 3 expert(s)
+[MoE] Layer 16: loading 3 expert(s)
+[MoE] Layer 17: loading 4 expert(s)
+[MoE] Layer 18: loading 2 expert(s)
+[MoE] Layer 19: loading 2 expert(s)
+[MoE] Layer 20: loading 2 expert(s)
+[MoE] Layer 21: loading 3 expert(s)
+[MoE] Layer 22: loading 2 expert(s)
+[MoE] Layer 23: loading 4 expert(s)
+[MoE] Layer 24: loading 2 expert(s)
+[MoE] Layer 25: loading 5 expert(s)
+[MoE] Layer 26: loading 5 expert(s)
+[MoE] Layer 27: loading 3 expert(s)
+[MoE] Layer 28: loading 4 expert(s)
+[MoE] Layer 29: loading 6 expert(s)
+[MoE] Layer 30: loading 2 expert(s)
+[MoE] Layer 31: loading 2 expert(s)
+[MoE] Layer 32: loading 3 expert(s)
+[MoE] Layer 33: loading 3 expert(s)
+[MoE] Layer 34: loading 4 expert(s)
+[MoE] Layer 35: loading 6 expert(s)
+[MoE] Layer 36: loading 2 expert(s)
+[MoE] Layer 37: loading 4 expert(s)
+[MoE] Layer 38: loading 4 expert(s)
+[MoE] Layer 39: loading 2 expert(s)
+[MoE] Layer 40: loading 5 expert(s)
+[MoE] Layer 41: loading 7 expert(s)
+[MoE] Layer 42: loading 3 expert(s)
+[MoE] Layer 43: loading 3 expert(s)
+[MoE] Layer 44: loading 5 expert(s)
+[MoE] Layer 45: loading 3 expert(s)
+[MoE] Layer 46: loading 3 expert(s)
+[MoE] Layer 47: loading 7 expert(s)
+[gen 10/15] elapsed=1.3s  TPS=7.565
+[MoE] Layer 0: loading 8 expert(s)
+[MoE] Layer 1: loading 6 expert(s)
+[MoE] Layer 2: loading 4 expert(s)
+[MoE] Layer 3: loading 6 expert(s)
+[MoE] Layer 4: loading 2 expert(s)
+[MoE] Layer 5: loading 4 expert(s)
+[MoE] Layer 6: loading 2 expert(s)
+[MoE] Layer 7: loading 1 expert(s)
+[MoE] Layer 8: loading 4 expert(s)
+[MoE] Layer 9: loading 2 expert(s)
+[MoE] Layer 10: loading 5 expert(s)
+[MoE] Layer 11: loading 6 expert(s)
+[MoE] Layer 12: loading 3 expert(s)
+[MoE] Layer 13: loading 5 expert(s)
+[MoE] Layer 14: loading 3 expert(s)
+[MoE] Layer 15: loading 4 expert(s)
+[MoE] Layer 16: loading 3 expert(s)
+[MoE] Layer 17: loading 5 expert(s)
+[MoE] Layer 18: loading 1 expert(s)
+[MoE] Layer 19: loading 2 expert(s)
+[MoE] Layer 20: loading 3 expert(s)
+[MoE] Layer 21: loading 4 expert(s)
+[MoE] Layer 22: loading 4 expert(s)
+[MoE] Layer 23: loading 5 expert(s)
+[MoE] Layer 24: loading 6 expert(s)
+[MoE] Layer 25: loading 3 expert(s)
+[MoE] Layer 26: loading 5 expert(s)
+[MoE] Layer 27: loading 4 expert(s)
+[MoE] Layer 28: loading 4 expert(s)
+[MoE] Layer 29: loading 6 expert(s)
+[MoE] Layer 30: loading 3 expert(s)
+[MoE] Layer 31: loading 2 expert(s)
+[MoE] Layer 32: loading 2 expert(s)
+[MoE] Layer 33: loading 3 expert(s)
+[MoE] Layer 34: loading 5 expert(s)
+[MoE] Layer 35: loading 6 expert(s)
+[MoE] Layer 36: loading 6 expert(s)
+[MoE] Layer 37: loading 5 expert(s)
+[MoE] Layer 38: loading 1 expert(s)
+[MoE] Layer 39: loading 3 expert(s)
+[MoE] Layer 40: loading 6 expert(s)
+[MoE] Layer 41: loading 5 expert(s)
+[MoE] Layer 42: loading 4 expert(s)
+[MoE] Layer 43: loading 5 expert(s)
+[MoE] Layer 44: loading 4 expert(s)
+[MoE] Layer 45: loading 3 expert(s)
+[MoE] Layer 46: loading 5 expert(s)
+[MoE] Layer 47: loading 7 expert(s)
+[MoE] Layer 0: loading 7 expert(s)
+[MoE] Layer 1: loading 6 expert(s)
+[MoE] Layer 2: loading 4 expert(s)
+[MoE] Layer 3: loading 5 expert(s)
+[MoE] Layer 4: loading 3 expert(s)
+[MoE] Layer 5: loading 4 expert(s)
+[MoE] Layer 6: loading 1 expert(s)
+[MoE] Layer 7: loading 1 expert(s)
+[MoE] Layer 8: loading 3 expert(s)
+[MoE] Layer 9: loading 4 expert(s)
+[MoE] Layer 10: loading 3 expert(s)
+[MoE] Layer 11: loading 4 expert(s)
+[MoE] Layer 12: loading 3 expert(s)
+[MoE] Layer 13: loading 5 expert(s)
+[MoE] Layer 14: loading 3 expert(s)
+[MoE] Layer 15: loading 3 expert(s)
+[MoE] Layer 16: loading 4 expert(s)
+[MoE] Layer 17: loading 3 expert(s)
+[MoE] Layer 18: loading 2 expert(s)
+[MoE] Layer 19: loading 3 expert(s)
+[MoE] Layer 20: loading 2 expert(s)
+[MoE] Layer 21: loading 4 expert(s)
+[MoE] Layer 22: loading 3 expert(s)
+[MoE] Layer 23: loading 5 expert(s)
+[MoE] Layer 24: loading 4 expert(s)
+[MoE] Layer 25: loading 4 expert(s)
+[MoE] Layer 26: loading 4 expert(s)
+[MoE] Layer 27: loading 3 expert(s)
+[MoE] Layer 28: loading 3 expert(s)
+[MoE] Layer 29: loading 3 expert(s)
+[MoE] Layer 30: loading 2 expert(s)
+[MoE] Layer 31: loading 2 expert(s)
+[MoE] Layer 32: loading 3 expert(s)
+[MoE] Layer 33: loading 4 expert(s)
+[MoE] Layer 34: loading 4 expert(s)
+[MoE] Layer 35: loading 4 expert(s)
+[MoE] Layer 36: loading 2 expert(s)
+[MoE] Layer 37: loading 2 expert(s)
+[MoE] Layer 38: loading 3 expert(s)
+[MoE] Layer 39: loading 3 expert(s)
+[MoE] Layer 40: loading 4 expert(s)
+[MoE] Layer 41: loading 3 expert(s)
+[MoE] Layer 42: loading 4 expert(s)
+[MoE] Layer 43: loading 4 expert(s)
+[MoE] Layer 44: loading 4 expert(s)
+[MoE] Layer 45: loading 2 expert(s)
+[MoE] Layer 46: loading 3 expert(s)
+[MoE] Layer 47: loading 7 expert(s)
+[MoE] Layer 0: loading 7 expert(s)
+[MoE] Layer 1: loading 3 expert(s)
+[MoE] Layer 2: loading 3 expert(s)
+[MoE] Layer 3: loading 3 expert(s)
+[MoE] Layer 4: loading 1 expert(s)
+[MoE] Layer 5: loading 3 expert(s)
+[MoE] Layer 6: loading 2 expert(s)
+[MoE] Layer 7: loading 1 expert(s)
+[MoE] Layer 8: loading 2 expert(s)
+[MoE] Layer 10: loading 1 expert(s)
+[MoE] Layer 11: loading 3 expert(s)
+[MoE] Layer 12: loading 4 expert(s)
+[MoE] Layer 13: loading 5 expert(s)
+[MoE] Layer 14: loading 1 expert(s)
+[MoE] Layer 15: loading 2 expert(s)
+[MoE] Layer 16: loading 4 expert(s)
+[MoE] Layer 17: loading 2 expert(s)
+[MoE] Layer 18: loading 4 expert(s)
+[MoE] Layer 19: loading 2 expert(s)
+[MoE] Layer 20: loading 2 expert(s)
+[MoE] Layer 21: loading 3 expert(s)
+[MoE] Layer 22: loading 3 expert(s)
+[MoE] Layer 23: loading 4 expert(s)
+[MoE] Layer 24: loading 2 expert(s)
+[MoE] Layer 25: loading 4 expert(s)
+[MoE] Layer 26: loading 1 expert(s)
+[MoE] Layer 27: loading 2 expert(s)
+[MoE] Layer 29: loading 6 expert(s)
+[MoE] Layer 30: loading 1 expert(s)
+[MoE] Layer 31: loading 1 expert(s)
+[MoE] Layer 32: loading 3 expert(s)
+[MoE] Layer 33: loading 1 expert(s)
+[MoE] Layer 34: loading 3 expert(s)
+[MoE] Layer 35: loading 4 expert(s)
+[MoE] Layer 36: loading 4 expert(s)
+[MoE] Layer 37: loading 2 expert(s)
+[MoE] Layer 39: loading 1 expert(s)
+[MoE] Layer 40: loading 1 expert(s)
+[MoE] Layer 41: loading 2 expert(s)
+[MoE] Layer 42: loading 3 expert(s)
+[MoE] Layer 43: loading 2 expert(s)
+[MoE] Layer 44: loading 1 expert(s)
+[MoE] Layer 45: loading 2 expert(s)
+[MoE] Layer 46: loading 1 expert(s)
+[MoE] Layer 47: loading 7 expert(s)
+[MoE] Layer 0: loading 6 expert(s)
+[MoE] Layer 1: loading 4 expert(s)
+[MoE] Layer 2: loading 7 expert(s)
+[MoE] Layer 3: loading 8 expert(s)
+[MoE] Layer 4: loading 4 expert(s)
+[MoE] Layer 5: loading 3 expert(s)
+[MoE] Layer 6: loading 3 expert(s)
+[MoE] Layer 8: loading 1 expert(s)
+[MoE] Layer 10: loading 6 expert(s)
+[MoE] Layer 11: loading 4 expert(s)
+[MoE] Layer 12: loading 3 expert(s)
+[MoE] Layer 13: loading 4 expert(s)
+[MoE] Layer 15: loading 3 expert(s)
+[MoE] Layer 16: loading 3 expert(s)
+[MoE] Layer 17: loading 4 expert(s)
+[MoE] Layer 18: loading 2 expert(s)
+[MoE] Layer 19: loading 5 expert(s)
+[MoE] Layer 20: loading 6 expert(s)
+[MoE] Layer 21: loading 4 expert(s)
+[MoE] Layer 22: loading 6 expert(s)
+[MoE] Layer 23: loading 6 expert(s)
+[MoE] Layer 24: loading 6 expert(s)
+[MoE] Layer 25: loading 6 expert(s)
+[MoE] Layer 26: loading 6 expert(s)
+[MoE] Layer 27: loading 6 expert(s)
+[MoE] Layer 28: loading 5 expert(s)
+[MoE] Layer 29: loading 4 expert(s)
+[MoE] Layer 30: loading 3 expert(s)
+[MoE] Layer 31: loading 2 expert(s)
+[MoE] Layer 32: loading 6 expert(s)
+[MoE] Layer 33: loading 5 expert(s)
+[MoE] Layer 34: loading 7 expert(s)
+[MoE] Layer 35: loading 6 expert(s)
+[MoE] Layer 36: loading 6 expert(s)
+[MoE] Layer 37: loading 7 expert(s)
+[MoE] Layer 38: loading 5 expert(s)
+[MoE] Layer 39: loading 3 expert(s)
+[MoE] Layer 40: loading 4 expert(s)
+[MoE] Layer 41: loading 4 expert(s)
+[MoE] Layer 42: loading 3 expert(s)
+[MoE] Layer 43: loading 4 expert(s)
+[MoE] Layer 44: loading 2 expert(s)
+[MoE] Layer 45: loading 4 expert(s)
+[MoE] Layer 46: loading 2 expert(s)
+[MoE] Layer 47: loading 8 expert(s)
+[MoE] Layer 0: loading 4 expert(s)
+[MoE] Layer 1: loading 4 expert(s)
+[MoE] Layer 2: loading 2 expert(s)
+[MoE] Layer 3: loading 2 expert(s)
+[MoE] Layer 4: loading 3 expert(s)
+[MoE] Layer 5: loading 4 expert(s)
+[MoE] Layer 6: loading 3 expert(s)
+[MoE] Layer 8: loading 2 expert(s)
+[MoE] Layer 9: loading 3 expert(s)
+[MoE] Layer 10: loading 5 expert(s)
+[MoE] Layer 11: loading 2 expert(s)
+[MoE] Layer 12: loading 4 expert(s)
+[MoE] Layer 13: loading 4 expert(s)
+[MoE] Layer 14: loading 2 expert(s)
+[MoE] Layer 15: loading 2 expert(s)
+[MoE] Layer 16: loading 2 expert(s)
+[MoE] Layer 17: loading 7 expert(s)
+[MoE] Layer 18: loading 2 expert(s)
+[MoE] Layer 19: loading 4 expert(s)
+[MoE] Layer 20: loading 3 expert(s)
+[MoE] Layer 21: loading 3 expert(s)
+[MoE] Layer 22: loading 6 expert(s)
+[MoE] Layer 23: loading 6 expert(s)
+[MoE] Layer 24: loading 6 expert(s)
+[MoE] Layer 25: loading 7 expert(s)
+[MoE] Layer 26: loading 4 expert(s)
+[MoE] Layer 27: loading 4 expert(s)
+[MoE] Layer 28: loading 2 expert(s)
+[MoE] Layer 29: loading 6 expert(s)
+[MoE] Layer 31: loading 1 expert(s)
+[MoE] Layer 32: loading 3 expert(s)
+[MoE] Layer 33: loading 1 expert(s)
+[MoE] Layer 34: loading 6 expert(s)
+[MoE] Layer 35: loading 4 expert(s)
+[MoE] Layer 36: loading 5 expert(s)
+[MoE] Layer 37: loading 4 expert(s)
+[MoE] Layer 38: loading 2 expert(s)
+[MoE] Layer 39: loading 3 expert(s)
+[MoE] Layer 40: loading 3 expert(s)
+[MoE] Layer 41: loading 4 expert(s)
+[MoE] Layer 42: loading 4 expert(s)
+[MoE] Layer 43: loading 5 expert(s)
+[MoE] Layer 44: loading 2 expert(s)
+[MoE] Layer 45: loading 4 expert(s)
+[MoE] Layer 46: loading 3 expert(s)
+[MoE] Layer 47: loading 6 expert(s)
+[gen 15/15] elapsed=2.0s  TPS=7.670
+Prefill time (summary): 1.278 seconds
+Total Generation Time: 1.956 seconds
+Average Time per Token: 0.130 seconds
+
+Expert Cache Statistics:
+Layer 0: Hits=31, Misses=89, HitRate=25.83%
+    Bandwidth: MissLoads=89, AvgLoadTime=0.34ms
+Layer 1: Hits=45, Misses=75, HitRate=37.50%
+    Bandwidth: MissLoads=75, AvgLoadTime=0.34ms
+Layer 2: Hits=53, Misses=67, HitRate=44.17%
+    Bandwidth: MissLoads=67, AvgLoadTime=0.35ms
+Layer 3: Hits=49, Misses=71, HitRate=40.83%
+    Bandwidth: MissLoads=71, AvgLoadTime=0.33ms
+Layer 4: Hits=73, Misses=47, HitRate=60.83%
+    Bandwidth: MissLoads=47, AvgLoadTime=0.37ms
+Layer 5: Hits=61, Misses=59, HitRate=50.83%
+    Bandwidth: MissLoads=59, AvgLoadTime=0.35ms
+Layer 6: Hits=81, Misses=39, HitRate=67.50%
+    Bandwidth: MissLoads=39, AvgLoadTime=0.39ms
+Layer 7: Hits=93, Misses=27, HitRate=77.50%
+    Bandwidth: MissLoads=27, AvgLoadTime=0.43ms
+Layer 8: Hits=73, Misses=47, HitRate=60.83%
+    Bandwidth: MissLoads=47, AvgLoadTime=0.38ms
+Layer 9: Hits=80, Misses=40, HitRate=66.67%
+    Bandwidth: MissLoads=40, AvgLoadTime=0.38ms
+Layer 10: Hits=56, Misses=64, HitRate=46.67%
+    Bandwidth: MissLoads=64, AvgLoadTime=0.36ms
+Layer 11: Hits=57, Misses=63, HitRate=47.50%
+    Bandwidth: MissLoads=63, AvgLoadTime=0.34ms
+Layer 12: Hits=63, Misses=57, HitRate=52.50%
+    Bandwidth: MissLoads=57, AvgLoadTime=0.35ms
+Layer 13: Hits=50, Misses=70, HitRate=41.67%
+    Bandwidth: MissLoads=70, AvgLoadTime=0.35ms
+Layer 14: Hits=75, Misses=45, HitRate=62.50%
+    Bandwidth: MissLoads=45, AvgLoadTime=0.37ms
+Layer 15: Hits=64, Misses=56, HitRate=53.33%
+    Bandwidth: MissLoads=56, AvgLoadTime=0.35ms
+Layer 16: Hits=73, Misses=47, HitRate=60.83%
+    Bandwidth: MissLoads=47, AvgLoadTime=0.39ms
+Layer 17: Hits=51, Misses=69, HitRate=42.50%
+    Bandwidth: MissLoads=69, AvgLoadTime=0.33ms
+Layer 18: Hits=82, Misses=38, HitRate=68.33%
+    Bandwidth: MissLoads=38, AvgLoadTime=0.39ms
+Layer 19: Hits=79, Misses=41, HitRate=65.83%
+    Bandwidth: MissLoads=41, AvgLoadTime=0.40ms
+Layer 20: Hits=72, Misses=48, HitRate=60.00%
+    Bandwidth: MissLoads=48, AvgLoadTime=0.37ms
+Layer 21: Hits=63, Misses=57, HitRate=52.50%
+    Bandwidth: MissLoads=57, AvgLoadTime=0.34ms
+Layer 22: Hits=59, Misses=61, HitRate=49.17%
+    Bandwidth: MissLoads=61, AvgLoadTime=0.36ms
+Layer 23: Hits=51, Misses=69, HitRate=42.50%
+    Bandwidth: MissLoads=69, AvgLoadTime=0.33ms
+Layer 24: Hits=57, Misses=63, HitRate=47.50%
+    Bandwidth: MissLoads=63, AvgLoadTime=0.34ms
+Layer 25: Hits=64, Misses=56, HitRate=53.33%
+    Bandwidth: MissLoads=56, AvgLoadTime=0.36ms
+Layer 26: Hits=60, Misses=60, HitRate=50.00%
+    Bandwidth: MissLoads=60, AvgLoadTime=0.35ms
+Layer 27: Hits=56, Misses=64, HitRate=46.67%
+    Bandwidth: MissLoads=64, AvgLoadTime=0.34ms
+Layer 28: Hits=67, Misses=53, HitRate=55.83%
+    Bandwidth: MissLoads=53, AvgLoadTime=0.36ms
+Layer 29: Hits=47, Misses=73, HitRate=39.17%
+    Bandwidth: MissLoads=73, AvgLoadTime=0.34ms
+Layer 30: Hits=86, Misses=34, HitRate=71.67%
+    Bandwidth: MissLoads=34, AvgLoadTime=0.40ms
+Layer 31: Hits=86, Misses=34, HitRate=71.67%
+    Bandwidth: MissLoads=34, AvgLoadTime=0.42ms
+Layer 32: Hits=74, Misses=46, HitRate=61.67%
+    Bandwidth: MissLoads=46, AvgLoadTime=0.38ms
+Layer 33: Hits=68, Misses=52, HitRate=56.67%
+    Bandwidth: MissLoads=52, AvgLoadTime=0.34ms
+Layer 34: Hits=51, Misses=69, HitRate=42.50%
+    Bandwidth: MissLoads=69, AvgLoadTime=0.35ms
+Layer 35: Hits=51, Misses=69, HitRate=42.50%
+    Bandwidth: MissLoads=69, AvgLoadTime=0.33ms
+Layer 36: Hits=53, Misses=67, HitRate=44.17%
+    Bandwidth: MissLoads=67, AvgLoadTime=0.35ms
+Layer 37: Hits=57, Misses=63, HitRate=47.50%
+    Bandwidth: MissLoads=63, AvgLoadTime=0.33ms
+Layer 38: Hits=71, Misses=49, HitRate=59.17%
+    Bandwidth: MissLoads=49, AvgLoadTime=0.36ms
+Layer 39: Hits=70, Misses=50, HitRate=58.33%
+    Bandwidth: MissLoads=50, AvgLoadTime=0.37ms
+Layer 40: Hits=64, Misses=56, HitRate=53.33%
+    Bandwidth: MissLoads=56, AvgLoadTime=0.35ms
+Layer 41: Hits=50, Misses=70, HitRate=41.67%
+    Bandwidth: MissLoads=70, AvgLoadTime=0.34ms
+Layer 42: Hits=63, Misses=57, HitRate=52.50%
+    Bandwidth: MissLoads=57, AvgLoadTime=0.35ms
+Layer 43: Hits=56, Misses=64, HitRate=46.67%
+    Bandwidth: MissLoads=64, AvgLoadTime=0.33ms
+Layer 44: Hits=68, Misses=52, HitRate=56.67%
+    Bandwidth: MissLoads=52, AvgLoadTime=0.37ms
+Layer 45: Hits=73, Misses=47, HitRate=60.83%
+    Bandwidth: MissLoads=47, AvgLoadTime=0.38ms
+Layer 46: Hits=68, Misses=52, HitRate=56.67%
+    Bandwidth: MissLoads=52, AvgLoadTime=0.39ms
+Layer 47: Hits=36, Misses=84, HitRate=30.00%
+    Bandwidth: MissLoads=84, AvgLoadTime=0.34ms
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.27 seconds
+Pre-warming expert cache with 16 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+
+Running sweep using prompts from JSON: /tmp/tmpzhefwnly.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ Paris. The capital of Germany is Berlin. The capital of the United States is
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.202578
+End-to-End TPS: 4.9364
+Cache Stats: Hits=3030, Misses=2730, HitRate=52.60%
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=43.17/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[GatingHeuristicPredictor Layer 1] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 2] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 3] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 4] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 5] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 6] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 7] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 8] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 9] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 10] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 11] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 12] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 13] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 14] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 15] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 16] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 17] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 18] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 19] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 20] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 21] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 22] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 23] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 24] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 25] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 26] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 27] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 28] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 29] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 30] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 31] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 32] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 33] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 34] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 35] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 36] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 37] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 38] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 39] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 40] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 41] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 42] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 43] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 44] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 45] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 46] prefetch_count=2 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 47] prefetch_count=2 softmax_before_topk=yes
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 16 experts for all layers...
+Layer 0: Pre-warming 16 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 16 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 16 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 16 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 16 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 16 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 16 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 16 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 16 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 16 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 16 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 16 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 16 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 16 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 16 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 16 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 16 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 16 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 16 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 16 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 16 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 16 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 16 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 16 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 16 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 16 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 16 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 16 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 16 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 16 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 16 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 16 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 16 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 16 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 16 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 16 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 16 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 16 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 16 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 16 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 16 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 16 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 16 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 16 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 16 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 16 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 16 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 16 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 5]
+Skipping warmup.
+Prefill time: 1.30418 seconds
+Generation phase
+[Layer 0 Step 0 Debug] Slots before check: 86 87 91 92 101 104 105 106 107 110 111 112 114 118 120 124 
+[Layer 0 Step 0 Debug] Requested: 75 91 64 33 87 110 0 82 
+[gen 5/15] elapsed=0.7s  TPS=6.789
+[gen 10/15] elapsed=1.4s  TPS=7.159
+[gen 15/15] elapsed=2.1s  TPS=7.237
+Prefill time (summary): 1.304 seconds
+Total Generation Time: 2.073 seconds
+Average Time per Token: 0.138173 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=31, Misses=89, HitRate=25.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=89, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=89, NotReadyStall=0
+    GlobalSpecLoad: PeakConcurrent=0
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 1 Cache Stats: Hits=46, Misses=74, HitRate=38.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=74, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=74, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 2 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 3 Cache Stats: Hits=49, Misses=71, HitRate=40.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=71, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=71, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 4 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 5 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 6 Cache Stats: Hits=81, Misses=39, HitRate=67.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=2, >1Load=12
+    Bandwidth: StallLoads=39, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=39, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 7 Cache Stats: Hits=92, Misses=28, HitRate=76.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=6, >1Load=8
+    Bandwidth: StallLoads=28, PrefetchLoads=0, AvgLoadTime=0.44ms
+    MissCause: NotPresent=28, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 8 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 9 Cache Stats: Hits=79, Misses=41, HitRate=65.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=2, 1Load=1, >1Load=12
+    Bandwidth: StallLoads=41, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=41, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 10 Cache Stats: Hits=56, Misses=64, HitRate=46.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=64, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=64, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 11 Cache Stats: Hits=58, Misses=62, HitRate=48.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=62, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=62, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 12 Cache Stats: Hits=62, Misses=58, HitRate=51.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=58, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=58, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 13 Cache Stats: Hits=50, Misses=70, HitRate=41.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=70, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=70, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 14 Cache Stats: Hits=75, Misses=45, HitRate=62.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=1, >1Load=13
+    Bandwidth: StallLoads=45, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=45, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 15 Cache Stats: Hits=61, Misses=59, HitRate=50.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=59, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=59, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 16 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 17 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 18 Cache Stats: Hits=82, Misses=38, HitRate=68.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=38, PrefetchLoads=0, AvgLoadTime=0.43ms
+    MissCause: NotPresent=38, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 19 Cache Stats: Hits=78, Misses=42, HitRate=65.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=42, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=42, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 20 Cache Stats: Hits=72, Misses=48, HitRate=60.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=48, PrefetchLoads=0, AvgLoadTime=0.40ms
+    MissCause: NotPresent=48, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 21 Cache Stats: Hits=61, Misses=59, HitRate=50.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=59, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=59, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 22 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=0, >1Load=14
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 23 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 24 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 25 Cache Stats: Hits=62, Misses=58, HitRate=51.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=58, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=58, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 26 Cache Stats: Hits=60, Misses=60, HitRate=50.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=60, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=60, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 27 Cache Stats: Hits=56, Misses=64, HitRate=46.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=64, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=64, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 28 Cache Stats: Hits=68, Misses=52, HitRate=56.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=0, >1Load=14
+    Bandwidth: StallLoads=52, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=52, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 29 Cache Stats: Hits=48, Misses=72, HitRate=40.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=72, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=72, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 30 Cache Stats: Hits=83, Misses=37, HitRate=69.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=3, >1Load=11
+    Bandwidth: StallLoads=37, PrefetchLoads=0, AvgLoadTime=0.40ms
+    MissCause: NotPresent=37, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 31 Cache Stats: Hits=85, Misses=35, HitRate=70.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=4, >1Load=11
+    Bandwidth: StallLoads=35, PrefetchLoads=0, AvgLoadTime=0.40ms
+    MissCause: NotPresent=35, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 32 Cache Stats: Hits=74, Misses=46, HitRate=61.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=46, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=46, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 33 Cache Stats: Hits=67, Misses=53, HitRate=55.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=53, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=53, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 34 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 35 Cache Stats: Hits=48, Misses=72, HitRate=40.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=72, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=72, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 36 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 37 Cache Stats: Hits=57, Misses=63, HitRate=47.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=63, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=63, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 38 Cache Stats: Hits=70, Misses=50, HitRate=58.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=1, >1Load=13
+    Bandwidth: StallLoads=50, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=50, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 39 Cache Stats: Hits=70, Misses=50, HitRate=58.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=50, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=50, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 40 Cache Stats: Hits=64, Misses=56, HitRate=53.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=56, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=56, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 41 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 42 Cache Stats: Hits=63, Misses=57, HitRate=52.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=57, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=57, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 43 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 44 Cache Stats: Hits=66, Misses=54, HitRate=55.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=54, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=54, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 45 Cache Stats: Hits=74, Misses=46, HitRate=61.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=46, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=46, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 46 Cache Stats: Hits=67, Misses=53, HitRate=55.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=53, PrefetchLoads=0, AvgLoadTime=0.40ms
+    MissCause: NotPresent=53, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 47 Cache Stats: Hits=34, Misses=86, HitRate=28.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=86, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=86, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.26 seconds
+Pre-warming expert cache with 16 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+
+Running sweep using prompts from JSON: /tmp/tmpzhefwnly.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ Paris. The capital of Germany is Berlin. The capital of the United States is
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.211539
+End-to-End TPS: 4.7273
+Cache Stats: Hits=3011, Misses=2749, HitRate=52.27%
+Predictor Stats: Hits=0, Total=0, HitRate=0.00%
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=43.17/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[GatingHeuristicPredictor Layer 1] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 2] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 3] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 4] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 5] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 6] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 7] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 8] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 9] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 10] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 11] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 12] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 13] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 14] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 15] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 16] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 17] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 18] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 19] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 20] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 21] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 22] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 23] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 24] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 25] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 26] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 27] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 28] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 29] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 30] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 31] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 32] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 33] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 34] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 35] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 36] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 37] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 38] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 39] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 40] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 41] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 42] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 43] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 44] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 45] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 46] prefetch_count=4 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 47] prefetch_count=4 softmax_before_topk=yes
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 16 experts for all layers...
+Layer 0: Pre-warming 16 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 16 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 16 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 16 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 16 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 16 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 16 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 16 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 16 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 16 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 16 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 16 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 16 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 16 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 16 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 16 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 16 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 16 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 16 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 16 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 16 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 16 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 16 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 16 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 16 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 16 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 16 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 16 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 16 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 16 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 16 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 16 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 16 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 16 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 16 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 16 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 16 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 16 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 16 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 16 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 16 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 16 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 16 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 16 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 16 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 16 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 16 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 16 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 5]
+Skipping warmup.
+Prefill time: 1.29995 seconds
+Generation phase
+[Layer 0 Step 0 Debug] Slots before check: 86 87 91 92 101 104 105 106 107 110 111 112 114 118 120 124 
+[Layer 0 Step 0 Debug] Requested: 75 91 64 33 87 110 0 82 
+[gen 5/15] elapsed=0.7s  TPS=6.863
+[gen 10/15] elapsed=1.4s  TPS=7.238
+[gen 15/15] elapsed=2.0s  TPS=7.342
+Prefill time (summary): 1.300 seconds
+Total Generation Time: 2.043 seconds
+Average Time per Token: 0.13621 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=31, Misses=89, HitRate=25.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=89, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=89, NotReadyStall=0
+    GlobalSpecLoad: PeakConcurrent=0
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 1 Cache Stats: Hits=46, Misses=74, HitRate=38.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=74, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=74, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 2 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 3 Cache Stats: Hits=49, Misses=71, HitRate=40.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=71, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=71, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 4 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 5 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 6 Cache Stats: Hits=81, Misses=39, HitRate=67.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=2, >1Load=12
+    Bandwidth: StallLoads=39, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=39, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 7 Cache Stats: Hits=92, Misses=28, HitRate=76.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=6, >1Load=8
+    Bandwidth: StallLoads=28, PrefetchLoads=0, AvgLoadTime=0.44ms
+    MissCause: NotPresent=28, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 8 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 9 Cache Stats: Hits=79, Misses=41, HitRate=65.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=2, 1Load=1, >1Load=12
+    Bandwidth: StallLoads=41, PrefetchLoads=0, AvgLoadTime=0.42ms
+    MissCause: NotPresent=41, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 10 Cache Stats: Hits=56, Misses=64, HitRate=46.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=64, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=64, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 11 Cache Stats: Hits=58, Misses=62, HitRate=48.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=62, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=62, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 12 Cache Stats: Hits=62, Misses=58, HitRate=51.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=58, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=58, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 13 Cache Stats: Hits=50, Misses=70, HitRate=41.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=70, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=70, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 14 Cache Stats: Hits=75, Misses=45, HitRate=62.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=1, >1Load=13
+    Bandwidth: StallLoads=45, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=45, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 15 Cache Stats: Hits=61, Misses=59, HitRate=50.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=59, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=59, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 16 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 17 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 18 Cache Stats: Hits=82, Misses=38, HitRate=68.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=38, PrefetchLoads=0, AvgLoadTime=0.40ms
+    MissCause: NotPresent=38, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 19 Cache Stats: Hits=78, Misses=42, HitRate=65.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=42, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=42, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 20 Cache Stats: Hits=72, Misses=48, HitRate=60.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=48, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=48, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 21 Cache Stats: Hits=61, Misses=59, HitRate=50.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=59, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=59, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 22 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=0, >1Load=14
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 23 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 24 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 25 Cache Stats: Hits=62, Misses=58, HitRate=51.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=58, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=58, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 26 Cache Stats: Hits=60, Misses=60, HitRate=50.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=60, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=60, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 27 Cache Stats: Hits=56, Misses=64, HitRate=46.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=64, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=64, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 28 Cache Stats: Hits=68, Misses=52, HitRate=56.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=0, >1Load=14
+    Bandwidth: StallLoads=52, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=52, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 29 Cache Stats: Hits=48, Misses=72, HitRate=40.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=72, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=72, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 30 Cache Stats: Hits=83, Misses=37, HitRate=69.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=3, >1Load=11
+    Bandwidth: StallLoads=37, PrefetchLoads=0, AvgLoadTime=0.41ms
+    MissCause: NotPresent=37, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 31 Cache Stats: Hits=85, Misses=35, HitRate=70.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=4, >1Load=11
+    Bandwidth: StallLoads=35, PrefetchLoads=0, AvgLoadTime=0.41ms
+    MissCause: NotPresent=35, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 32 Cache Stats: Hits=74, Misses=46, HitRate=61.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=46, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=46, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 33 Cache Stats: Hits=67, Misses=53, HitRate=55.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=53, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=53, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 34 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 35 Cache Stats: Hits=48, Misses=72, HitRate=40.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=72, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=72, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 36 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 37 Cache Stats: Hits=57, Misses=63, HitRate=47.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=63, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=63, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 38 Cache Stats: Hits=70, Misses=50, HitRate=58.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=1, >1Load=13
+    Bandwidth: StallLoads=50, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=50, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 39 Cache Stats: Hits=70, Misses=50, HitRate=58.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=50, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=50, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 40 Cache Stats: Hits=64, Misses=56, HitRate=53.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=56, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=56, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 41 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 42 Cache Stats: Hits=63, Misses=57, HitRate=52.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=57, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=57, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 43 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 44 Cache Stats: Hits=66, Misses=54, HitRate=55.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=54, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=54, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 45 Cache Stats: Hits=74, Misses=46, HitRate=61.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=46, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=46, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 46 Cache Stats: Hits=67, Misses=53, HitRate=55.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=53, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=53, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 47 Cache Stats: Hits=34, Misses=86, HitRate=28.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=86, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=86, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.26 seconds
+Pre-warming expert cache with 16 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+
+Running sweep using prompts from JSON: /tmp/tmpzhefwnly.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ Paris. The capital of Germany is Berlin. The capital of the United States is
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.209494
+End-to-End TPS: 4.7734
+Cache Stats: Hits=3011, Misses=2749, HitRate=52.27%
+Predictor Stats: Hits=0, Total=0, HitRate=0.00%
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=43.17/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[GatingHeuristicPredictor Layer 1] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 2] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 3] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 4] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 5] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 6] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 7] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 8] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 9] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 10] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 11] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 12] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 13] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 14] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 15] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 16] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 17] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 18] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 19] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 20] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 21] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 22] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 23] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 24] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 25] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 26] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 27] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 28] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 29] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 30] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 31] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 32] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 33] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 34] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 35] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 36] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 37] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 38] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 39] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 40] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 41] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 42] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 43] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 44] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 45] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 46] prefetch_count=6 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 47] prefetch_count=6 softmax_before_topk=yes
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 16 experts for all layers...
+Layer 0: Pre-warming 16 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 16 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 16 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 16 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 16 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 16 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 16 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 16 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 16 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 16 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 16 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 16 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 16 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 16 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 16 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 16 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 16 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 16 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 16 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 16 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 16 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 16 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 16 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 16 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 16 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 16 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 16 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 16 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 16 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 16 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 16 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 16 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 16 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 16 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 16 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 16 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 16 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 16 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 16 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 16 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 16 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 16 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 16 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 16 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 16 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 16 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 16 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 16 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 5]
+Skipping warmup.
+Prefill time: 1.29167 seconds
+Generation phase
+[Layer 0 Step 0 Debug] Slots before check: 86 87 91 92 101 104 105 106 107 110 111 112 114 118 120 124 
+[Layer 0 Step 0 Debug] Requested: 75 91 64 33 87 110 0 82 
+[gen 5/15] elapsed=0.7s  TPS=6.867
+[gen 10/15] elapsed=1.4s  TPS=7.239
+[gen 15/15] elapsed=2.1s  TPS=7.315
+Prefill time (summary): 1.292 seconds
+Total Generation Time: 2.051 seconds
+Average Time per Token: 0.136701 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=31, Misses=89, HitRate=25.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=89, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=89, NotReadyStall=0
+    GlobalSpecLoad: PeakConcurrent=0
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 1 Cache Stats: Hits=46, Misses=74, HitRate=38.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=74, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=74, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 2 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 3 Cache Stats: Hits=49, Misses=71, HitRate=40.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=71, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=71, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 4 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 5 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 6 Cache Stats: Hits=81, Misses=39, HitRate=67.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=2, >1Load=12
+    Bandwidth: StallLoads=39, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=39, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 7 Cache Stats: Hits=92, Misses=28, HitRate=76.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=6, >1Load=8
+    Bandwidth: StallLoads=28, PrefetchLoads=0, AvgLoadTime=0.45ms
+    MissCause: NotPresent=28, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 8 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 9 Cache Stats: Hits=79, Misses=41, HitRate=65.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=2, 1Load=1, >1Load=12
+    Bandwidth: StallLoads=41, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=41, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 10 Cache Stats: Hits=56, Misses=64, HitRate=46.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=64, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=64, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 11 Cache Stats: Hits=58, Misses=62, HitRate=48.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=62, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=62, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 12 Cache Stats: Hits=62, Misses=58, HitRate=51.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=58, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=58, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 13 Cache Stats: Hits=50, Misses=70, HitRate=41.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=70, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=70, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 14 Cache Stats: Hits=75, Misses=45, HitRate=62.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=1, >1Load=13
+    Bandwidth: StallLoads=45, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=45, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 15 Cache Stats: Hits=61, Misses=59, HitRate=50.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=59, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=59, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 16 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 17 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 18 Cache Stats: Hits=82, Misses=38, HitRate=68.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=38, PrefetchLoads=0, AvgLoadTime=0.41ms
+    MissCause: NotPresent=38, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 19 Cache Stats: Hits=78, Misses=42, HitRate=65.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=42, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=42, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 20 Cache Stats: Hits=72, Misses=48, HitRate=60.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=48, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=48, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 21 Cache Stats: Hits=61, Misses=59, HitRate=50.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=59, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=59, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 22 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=0, >1Load=14
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 23 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 24 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 25 Cache Stats: Hits=62, Misses=58, HitRate=51.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=58, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=58, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 26 Cache Stats: Hits=60, Misses=60, HitRate=50.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=60, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=60, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 27 Cache Stats: Hits=56, Misses=64, HitRate=46.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=64, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=64, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 28 Cache Stats: Hits=68, Misses=52, HitRate=56.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=0, >1Load=14
+    Bandwidth: StallLoads=52, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=52, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 29 Cache Stats: Hits=48, Misses=72, HitRate=40.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=72, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=72, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 30 Cache Stats: Hits=83, Misses=37, HitRate=69.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=3, >1Load=11
+    Bandwidth: StallLoads=37, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=37, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 31 Cache Stats: Hits=85, Misses=35, HitRate=70.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=4, >1Load=11
+    Bandwidth: StallLoads=35, PrefetchLoads=0, AvgLoadTime=0.42ms
+    MissCause: NotPresent=35, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 32 Cache Stats: Hits=74, Misses=46, HitRate=61.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=46, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=46, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 33 Cache Stats: Hits=67, Misses=53, HitRate=55.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=53, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=53, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 34 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 35 Cache Stats: Hits=48, Misses=72, HitRate=40.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=72, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=72, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 36 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 37 Cache Stats: Hits=57, Misses=63, HitRate=47.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=63, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=63, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 38 Cache Stats: Hits=70, Misses=50, HitRate=58.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=1, >1Load=13
+    Bandwidth: StallLoads=50, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=50, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 39 Cache Stats: Hits=70, Misses=50, HitRate=58.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=50, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=50, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 40 Cache Stats: Hits=64, Misses=56, HitRate=53.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=56, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=56, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 41 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 42 Cache Stats: Hits=63, Misses=57, HitRate=52.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=57, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=57, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 43 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 44 Cache Stats: Hits=66, Misses=54, HitRate=55.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=54, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=54, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 45 Cache Stats: Hits=74, Misses=46, HitRate=61.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=46, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=46, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 46 Cache Stats: Hits=67, Misses=53, HitRate=55.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=53, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=53, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 47 Cache Stats: Hits=34, Misses=86, HitRate=28.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=86, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=86, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.41 seconds
+Pre-warming expert cache with 16 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+
+Running sweep using prompts from JSON: /tmp/tmpzhefwnly.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ Paris. The capital of Germany is Berlin. The capital of the United States is
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.209352
+End-to-End TPS: 4.7766
+Cache Stats: Hits=3011, Misses=2749, HitRate=52.27%
+Predictor Stats: Hits=0, Total=0, HitRate=0.00%
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=43.17/88.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[GatingHeuristicPredictor Layer 1] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 2] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 3] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 4] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 5] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 6] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 7] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 8] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 9] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 10] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 11] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 12] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 13] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 14] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 15] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 16] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 17] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 18] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 19] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 20] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 21] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 22] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 23] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 24] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 25] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 26] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 27] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 28] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 29] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 30] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 31] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 32] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 33] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 34] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 35] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 36] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 37] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 38] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 39] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 40] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 41] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 42] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 43] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 44] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 45] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 46] prefetch_count=8 softmax_before_topk=yes
+[GatingHeuristicPredictor Layer 47] prefetch_count=8 softmax_before_topk=yes
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 16 experts for all layers...
+Layer 0: Pre-warming 16 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 16 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 16 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 16 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 16 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 16 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 16 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 16 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 16 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 16 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 16 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 16 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 16 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 16 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 16 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 16 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 16 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 16 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 16 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 16 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 16 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 16 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 16 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 16 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 16 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 16 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 16 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 16 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 16 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 16 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 16 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 16 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 16 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 16 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 16 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 16 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 16 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 16 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 16 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 16 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 16 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 16 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 16 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 16 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 16 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 16 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 16 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 16 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 5]
+Skipping warmup.
+Prefill time: 1.30453 seconds
+Generation phase
+[Layer 0 Step 0 Debug] Slots before check: 86 87 91 92 101 104 105 106 107 110 111 112 114 118 120 124 
+[Layer 0 Step 0 Debug] Requested: 75 91 64 33 87 110 0 82 
+[gen 5/15] elapsed=0.7s  TPS=6.881
+[gen 10/15] elapsed=1.4s  TPS=7.216
+[gen 15/15] elapsed=2.1s  TPS=7.250
+Prefill time (summary): 1.305 seconds
+Total Generation Time: 2.069 seconds
+Average Time per Token: 0.137933 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=31, Misses=89, HitRate=25.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=89, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=89, NotReadyStall=0
+    GlobalSpecLoad: PeakConcurrent=0
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 1 Cache Stats: Hits=46, Misses=74, HitRate=38.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=74, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=74, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 2 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 3 Cache Stats: Hits=49, Misses=71, HitRate=40.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=71, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=71, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 4 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.40ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 5 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 6 Cache Stats: Hits=81, Misses=39, HitRate=67.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=2, >1Load=12
+    Bandwidth: StallLoads=39, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=39, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 7 Cache Stats: Hits=92, Misses=28, HitRate=76.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=6, >1Load=8
+    Bandwidth: StallLoads=28, PrefetchLoads=0, AvgLoadTime=0.44ms
+    MissCause: NotPresent=28, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 8 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 9 Cache Stats: Hits=79, Misses=41, HitRate=65.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=2, 1Load=1, >1Load=12
+    Bandwidth: StallLoads=41, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=41, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 10 Cache Stats: Hits=56, Misses=64, HitRate=46.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=64, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=64, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 11 Cache Stats: Hits=58, Misses=62, HitRate=48.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=62, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=62, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 12 Cache Stats: Hits=62, Misses=58, HitRate=51.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=58, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=58, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 13 Cache Stats: Hits=50, Misses=70, HitRate=41.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=70, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=70, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 14 Cache Stats: Hits=75, Misses=45, HitRate=62.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=1, >1Load=13
+    Bandwidth: StallLoads=45, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=45, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 15 Cache Stats: Hits=61, Misses=59, HitRate=50.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=59, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=59, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 16 Cache Stats: Hits=73, Misses=47, HitRate=60.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=47, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=47, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 17 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 18 Cache Stats: Hits=82, Misses=38, HitRate=68.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=38, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=38, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 19 Cache Stats: Hits=78, Misses=42, HitRate=65.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=42, PrefetchLoads=0, AvgLoadTime=0.39ms
+    MissCause: NotPresent=42, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 20 Cache Stats: Hits=72, Misses=48, HitRate=60.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=48, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=48, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 21 Cache Stats: Hits=61, Misses=59, HitRate=50.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=59, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=59, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 22 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=0, >1Load=14
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 23 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 24 Cache Stats: Hits=59, Misses=61, HitRate=49.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=61, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=61, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 25 Cache Stats: Hits=62, Misses=58, HitRate=51.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=58, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=58, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 26 Cache Stats: Hits=60, Misses=60, HitRate=50.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=60, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=60, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 27 Cache Stats: Hits=56, Misses=64, HitRate=46.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=64, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=64, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 28 Cache Stats: Hits=68, Misses=52, HitRate=56.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=0, >1Load=14
+    Bandwidth: StallLoads=52, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=52, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 29 Cache Stats: Hits=48, Misses=72, HitRate=40.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=72, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=72, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 30 Cache Stats: Hits=83, Misses=37, HitRate=69.17%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=3, >1Load=11
+    Bandwidth: StallLoads=37, PrefetchLoads=0, AvgLoadTime=0.40ms
+    MissCause: NotPresent=37, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 31 Cache Stats: Hits=85, Misses=35, HitRate=70.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=4, >1Load=11
+    Bandwidth: StallLoads=35, PrefetchLoads=0, AvgLoadTime=0.41ms
+    MissCause: NotPresent=35, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 32 Cache Stats: Hits=74, Misses=46, HitRate=61.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=46, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=46, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 33 Cache Stats: Hits=67, Misses=53, HitRate=55.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=53, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=53, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 34 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 35 Cache Stats: Hits=48, Misses=72, HitRate=40.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=72, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=72, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 36 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 37 Cache Stats: Hits=57, Misses=63, HitRate=47.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=63, PrefetchLoads=0, AvgLoadTime=0.33ms
+    MissCause: NotPresent=63, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 38 Cache Stats: Hits=70, Misses=50, HitRate=58.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=1, 1Load=1, >1Load=13
+    Bandwidth: StallLoads=50, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=50, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 39 Cache Stats: Hits=70, Misses=50, HitRate=58.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=50, PrefetchLoads=0, AvgLoadTime=0.37ms
+    MissCause: NotPresent=50, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 40 Cache Stats: Hits=64, Misses=56, HitRate=53.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=56, PrefetchLoads=0, AvgLoadTime=0.35ms
+    MissCause: NotPresent=56, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 41 Cache Stats: Hits=51, Misses=69, HitRate=42.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=69, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=69, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 42 Cache Stats: Hits=63, Misses=57, HitRate=52.50%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=0, >1Load=15
+    Bandwidth: StallLoads=57, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=57, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 43 Cache Stats: Hits=54, Misses=66, HitRate=45.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=66, PrefetchLoads=0, AvgLoadTime=0.34ms
+    MissCause: NotPresent=66, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 44 Cache Stats: Hits=66, Misses=54, HitRate=55.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=2, >1Load=13
+    Bandwidth: StallLoads=54, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=54, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 45 Cache Stats: Hits=74, Misses=46, HitRate=61.67%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=46, PrefetchLoads=0, AvgLoadTime=0.38ms
+    MissCause: NotPresent=46, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 46 Cache Stats: Hits=67, Misses=53, HitRate=55.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=53, PrefetchLoads=0, AvgLoadTime=0.36ms
+    MissCause: NotPresent=53, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 47 Cache Stats: Hits=34, Misses=86, HitRate=28.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=0, 1Load=1, >1Load=14
+    Bandwidth: StallLoads=86, PrefetchLoads=0, AvgLoadTime=0.32ms
+    MissCause: NotPresent=86, NotReadyStall=0
+    GatingPrefetch Recall=0.00% (0/120)
+    Predictor TopK matches: 0=0 1=0 >=2=0
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.26 seconds
+Pre-warming expert cache with 16 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+
+Running sweep using prompts from JSON: /tmp/tmpzhefwnly.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ Paris. The capital of Germany is Berlin. The capital of the United States is
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.211322
+End-to-End TPS: 4.7321
+Cache Stats: Hits=3011, Misses=2749, HitRate=52.27%
+Predictor Stats: Hits=0, Total=0, HitRate=0.00%
