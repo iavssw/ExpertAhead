@@ -27,3 +27,10 @@ py/utils/final_results_runs_boyyyyyy/
 **/__pycache__/
 
 **/results/
+
+# Ignore large raw datasets and model weights
+*.safetensors
+*.qweight.bin
+trainingDataExtended/qwen3_30b/wikitext_*.pt
+__pycache__/
+*.pyc

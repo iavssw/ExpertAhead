@@ -12,7 +12,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DATA_ROOT="${SCRIPT_DIR}/../../trainingData"
+DATA_ROOT="${SCRIPT_DIR}/../../trainingDataExtended"
 
 # Activate ROCm/PyTorch environment (same as rest of project)
 source "${SCRIPT_DIR}/../../utils/setup.sh"
@@ -24,7 +24,7 @@ case "$MODEL" in
   sweep)
     TARGET="${EXTRA:-mixtral_8x7b}"
     echo "=== Sweep: $TARGET ==="
-    python "${SCRIPT_DIR}/expert_predictor.py" sweep \
+    python "${SCRIPT_DIR}/expert_predictor_cross_token.py" sweep \
         --data_dir   "${DATA_ROOT}/${TARGET}" \
         --output_dir "${DATA_ROOT}/${TARGET}/sweep_results" \
         --model      "${TARGET}" \
@@ -35,7 +35,7 @@ case "$MODEL" in
   ablation)
     TARGET="${EXTRA:-mixtral_8x7b}"
     echo "=== Ablation: $TARGET ==="
-    python "${SCRIPT_DIR}/expert_predictor.py" ablation \
+    python "${SCRIPT_DIR}/expert_predictor_cross_token.py" ablation \
         --data_dir   "${DATA_ROOT}/${TARGET}" \
         --output_dir "${DATA_ROOT}/${TARGET}/ablation_results" \
         --model      "${TARGET}" \
@@ -62,14 +62,14 @@ case "$MODEL" in
     OUT_DIR="${DATA_ROOT}/${MODEL}/predictor_models"
     if [[ -n "$EXTRA" && "$EXTRA" =~ ^[0-9]+$ ]]; then
         echo "=== Training layer $EXTRA of $MODEL ==="
-        python "${SCRIPT_DIR}/expert_predictor.py" train \
+        python "${SCRIPT_DIR}/expert_predictor_cross_token.py" train \
             --data_dir   "${DATA_ROOT}/${MODEL}" \
             --output_dir "${OUT_DIR}" \
             --model      "${MODEL}" \
             --layer_idx  "${EXTRA}"
     else
         echo "=== Training all layers of $MODEL ==="
-        python "${SCRIPT_DIR}/expert_predictor.py" train \
+        python "${SCRIPT_DIR}/expert_predictor_cross_token.py" train \
             --data_dir   "${DATA_ROOT}/${MODEL}" \
             --output_dir "${OUT_DIR}" \
             --model      "${MODEL}"
