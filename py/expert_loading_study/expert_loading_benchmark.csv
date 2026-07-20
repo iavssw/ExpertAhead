@@ -1,5 +1,0 @@
-Num_Experts,Config,Time_per_Expert_ms,Total_Time_ms
-8,Sequential (serial loop),3.2219,1237.20
-8,Parallel (IOThreadPool),1.8509,710.76
-24,Sequential (serial loop),3.2190,3708.34
-24,Parallel (IOThreadPool),1.7605,2028.09
