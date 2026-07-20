@@ -8,6 +8,7 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_predict/helper.hpp"
 #include "unified_llm_w4a16_predict/npuSetup.hpp"
+#include "unified_llm_w4a16_predict/onnx_predictor.h"
 #include "unified_llm_w4a16_common/io_thread_pool.hpp"
 #include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 #include <c10/hip/HIPFunctions.h>
@@ -175,6 +176,57 @@ static std::string find_predictor_model_path(const std::string& base_dir, int64_
     }
 
     return "";  // Not found
+}
+
+// Mirror of find_predictor_model_path but resolves the ONNX model for a layer.
+// Searches for best_model.onnx (and pre-optimised best_model.ort as a fallback).
+static std::string find_predictor_onnx_path(const std::string& base_dir, int64_t layer_idx) {
+    namespace fs = std::filesystem;
+
+    if (base_dir.empty()) return "";
+
+    fs::path layer_dir = fs::path(base_dir) / ("layer_" + std::to_string(layer_idx));
+    std::vector<std::string> model_files = {"best_model.onnx", "best_model.ort"};
+
+    // 1. Flat: base/layer_X/best_model.onnx
+    for (const auto& kModelFile : model_files) {
+        fs::path direct = layer_dir / kModelFile;
+        if (fs::exists(direct)) {
+            return direct.string();
+        }
+    }
+
+    // 2. One level deep: base/*/layer_X/best_model.onnx
+    if (fs::exists(base_dir) && fs::is_directory(base_dir)) {
+        for (const auto& entry : fs::directory_iterator(base_dir)) {
+            if (fs::is_directory(entry.status())) {
+                fs::path nested_layer_dir = entry.path() / ("layer_" + std::to_string(layer_idx));
+                for (const auto& kModelFile : model_files) {
+                    fs::path nested_model = nested_layer_dir / kModelFile;
+                    if (fs::exists(nested_model)) {
+                        return nested_model.string();
+                    }
+                }
+            }
+        }
+    }
+
+    return "";  // Not found
+}
+
+// Map NPUGlobalConfig to an ONNX Runtime execution provider name.
+// "npu"/"hetero" -> "vitisai", "gpu" -> "cuda", anything else -> "cpu"
+static std::string resolve_onnx_ep(const NPUGlobalConfig& cfg) {
+    // Explicit predictor_device override always wins
+    const std::string& pd = cfg.predictor_device;
+    if (pd == "cpu")  return "cpu";
+    if (pd == "gpu")  return "cuda";
+
+    // Infer from heterogeneity
+    const std::string& h = cfg.heterogeneity;
+    if (h == "npu" || h == "hetero") return "vitisai";
+    if (h == "gpu")                   return "cuda";
+    return "cpu";
 }
 
 template <typename Func> void time_op(const std::string &name, Func func) {
@@ -640,7 +692,8 @@ void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torc
 
 MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermediate_size, int64_t num_experts, int64_t num_experts_per_tok,
                                            int64_t max_cached_experts, int64_t layer_idx,
-                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device, int64_t prefetch_experts_count, const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union, float prefetch_threshold, const std::string& predictor_type, float gating_score_percentile, float speculative_cache_fraction, float oracle_routing_agreement, uint64_t oracle_noise_seed)
+                                           int64_t max_seq_len, bool use_softmax_before_topk, bool normalize_topk_prob, double lambda, const std::string& predictor_model_path, torch::Device predictor_device, int64_t prefetch_experts_count, const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union, float prefetch_threshold, const std::string& predictor_type, float gating_score_percentile, float speculative_cache_fraction, float oracle_routing_agreement, uint64_t oracle_noise_seed,
+                                           const std::string& onnx_ep_name, const std::string& onnx_vaip_config)
     : hidden_size_(hidden_size), intermediate_size_(intermediate_size), num_experts_(num_experts),
       num_experts_per_tok_(num_experts_per_tok), max_cached_experts_(max_cached_experts), layer_idx_(layer_idx),
       prefetch_experts_count_(prefetch_experts_count),
@@ -685,10 +738,32 @@ MixtureOfExpertsImpl::MixtureOfExpertsImpl(int64_t hidden_size, int64_t intermed
             std::cerr << "Failed to initialize oracle predictor: " << e.what() << std::endl;
         }
     } else if (!predictor_model_path.empty()) {
-        try {
-            predictor_ = std::make_unique<TorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
-        } catch (const std::exception& e) {
-            std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
+        if (predictor_type == "onnx") {
+            // ONNX Runtime path — looks for best_model.onnx alongside best_jit.pt
+#ifdef HETEROPREDICT_ONNXRUNTIME
+            try {
+                predictor_ = std::make_unique<OnnxPredictor>(
+                    predictor_model_path,
+                    static_cast<int>(layer_idx_),
+                    onnx_ep_name,
+                    onnx_vaip_config,
+                    prefetch_threshold);
+            } catch (const std::exception& e) {
+                std::cerr << "[OnnxPredictor Layer " << layer_idx_
+                          << "] Failed to initialize: " << e.what() << std::endl;
+            }
+#else
+            std::cerr << "[OnnxPredictor Layer " << layer_idx_
+                      << "] ONNX Runtime not compiled in. "
+                         "Rebuild with -DHETEROPREDICT_ONNXRUNTIME=ON.\n";
+#endif
+        } else {
+            // Default: TorchScript (.pt) path
+            try {
+                predictor_ = std::make_unique<TorchScriptPredictor>(predictor_model_path, layer_idx_, predictor_device);
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to initialize predictor: " << e.what() << std::endl;
+            }
         }
     }
 
@@ -1019,6 +1094,27 @@ void MixtureOfExpertsImpl::load_predicted_experts(const std::vector<int64_t>& pr
         // This prevents the predictor from picking its own "hits" as victims for its "misses".
         for (int64_t eid : predicted_expert_ids) {
             currently_selected_experts_.push_back(eid);
+        }
+
+        // Demote experts not in the current prediction window (or current decode) to LRU.
+        // This prevents past demand-loaded experts (which are MRU) from polluting the cache
+        // and causing future prefetched experts to be evicted.
+        // We ONLY do this for oracle_full_union to avoid destroying historical LRU utility for ML predictors.
+        if (predictor_ && predictor_->prefetch_full_union()) {
+            for (size_t s = 0; s < slot_meta_.size(); ++s) {
+                if (slot_meta_[s].expert_id >= 0) {
+                    bool needed = false;
+                    for (int64_t eid : currently_selected_experts_) {
+                        if (slot_meta_[s].expert_id == eid) {
+                            needed = true;
+                            break;
+                        }
+                    }
+                    if (!needed) {
+                        slot_meta_[s].last_access = 0; // Make it LRU
+                    }
+                }
+            }
         }
 
         for (int64_t global_e : predicted_expert_ids) {
@@ -1811,6 +1907,16 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
                 pred_set    = pending_predictions_.front().pred_set;
                 actual_union = std::move(pending_predictions_.front().actual_union);
                 pending_predictions_.pop_front();
+                
+                if (abort_late_prefetches_) {
+                    if (speculative_load_future_.valid() && 
+                        speculative_load_future_.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+                        abort_pending_prefetches_.store(true, std::memory_order_relaxed);
+                        if (debug_verbosity >= 2) {
+                            std::cout << "[Layer " << layer_idx_ << " SPECULATIVE] Aborting late prefetch that missed decode deadline." << std::endl;
+                        }
+                    }
+                }
             }
         }
 
@@ -2431,7 +2537,17 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
         bool use_qwen_router = (arch_type_ == ArchitectureType::QWEN);
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
             // Resolve predictor path for this layer (supports flat and hidden_dim subdirectory layouts).
-            std::string layer_predictor_path = find_predictor_model_path(predictor_model_path, i);
+            std::string layer_predictor_path;
+            if (predictor_type == "onnx") {
+                layer_predictor_path = find_predictor_onnx_path(predictor_model_path, i);
+                if (layer_predictor_path.empty()) {
+                    // Fallback: try JIT path in case directory has both
+                    layer_predictor_path = find_predictor_model_path(predictor_model_path, i);
+                }
+            } else {
+                layer_predictor_path = find_predictor_model_path(predictor_model_path, i);
+            }
+
             
             // Check if explicitly filtered out by predict_layers array
             if (!predict_layers.empty() && std::find(predict_layers.begin(), predict_layers.end(), static_cast<int>(i)) == predict_layers.end()) {
@@ -2492,7 +2608,8 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
             moe_layers.push_back(register_module("moe_" + std::to_string(i),
                                                  MixtureOfExperts(hidden_size_, intermediate_size_, num_experts_, num_experts_per_tok_,
                                                                   layer_cache_size, i,
-                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, pred_device, layer_prefetch_count, oracle_trace_path, oracle_lookahead, oracle_full_union, prefetch_threshold, predictor_type, gating_score_percentile_, speculative_cache_fraction_, oracle_routing_agreement, oracle_noise_seed)));
+                                                                  max_seq_len_, use_qwen_router, use_qwen_router, 0.0, layer_predictor_path, pred_device, layer_prefetch_count, oracle_trace_path, oracle_lookahead, oracle_full_union, prefetch_threshold, predictor_type, gating_score_percentile_, speculative_cache_fraction_, oracle_routing_agreement, oracle_noise_seed,
+                                                                  resolve_onnx_ep(npu_config_), npu_config_.vaip_config_path)));
             if (prefetch_non_evicting) {
                 moe_layers.back()->set_prefetch_non_evicting(true);
             }
@@ -4104,6 +4221,14 @@ void UnifiedLLMW4A16Impl::set_prefetch_non_evicting(bool v) {
     if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
         for (auto& layer : moe_layers) {
             layer->set_prefetch_non_evicting(v);
+        }
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_abort_late_prefetches(bool v) {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (auto& layer : moe_layers) {
+            layer->set_abort_late_prefetches(v);
         }
     }
 }

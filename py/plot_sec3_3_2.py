@@ -228,11 +228,11 @@ except Exception as e:
 
 ax1.set_xlabel("Natural Cache Hit Rate (%)")
 ax1.set_ylabel("Tokens Per Second (TPS)")
-ax1.set_title("Cache-Conditional Routing (J=5)", fontweight="bold")
+ax1.set_title("Cache-Conditional Routing (J=6)", fontweight="bold")
 ax1.legend(loc="upper left", framealpha=0.9, fontsize=9, ncol=2)
 
 fig1.tight_layout()
-out_path1 = "/home/michael/heteroPredict/py/cache_conditional_J5.png"
+out_path1 = "/home/michael/heteroPredict/py/cache_conditional_J6.png"
 fig1.savefig(out_path1, dpi=300, bbox_inches="tight")
 plt.close(fig1)
 

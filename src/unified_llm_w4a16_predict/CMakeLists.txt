@@ -60,6 +60,66 @@ endif()
 
 set_target_properties(unified_llm_w4a16_predict_lib PROPERTIES CXX_STANDARD 17)
 
+# ── Optional: ONNX Runtime predictor backend ──────────────────────────────────
+# Enable with:  cmake -B build -DHETEROPREDICT_ONNXRUNTIME=ON
+# The pip-installed onnxruntime wheel ships the .so but not the C++ headers.
+# We fetch the matching ORT prebuilt (v1.26.0) to get the include/ directory,
+# but link against the .so already present in the rocmPytorch venv.
+option(HETEROPREDICT_ONNXRUNTIME "Enable ONNX Runtime predictor backend" OFF)
+
+if(HETEROPREDICT_ONNXRUNTIME)
+    # ── Locate the .so from the venv (already installed via pip) ─────────────
+    set(ORT_VENV_CAPI_DIR
+        "${CMAKE_SOURCE_DIR}/utils/rocmPytorch/lib/python3.12/site-packages/onnxruntime/capi")
+
+    find_library(ORT_LIBRARY
+        NAMES onnxruntime
+        HINTS "${ORT_VENV_CAPI_DIR}" "$ENV{HOME_LIBS}/onnxruntime/lib" "/usr/local/lib"
+        NO_DEFAULT_PATH
+    )
+    # If the unversioned symlink isn't present, accept the versioned .so directly
+    if(NOT ORT_LIBRARY)
+        file(GLOB ORT_LIBRARY_GLOB "${ORT_VENV_CAPI_DIR}/libonnxruntime.so*")
+        if(ORT_LIBRARY_GLOB)
+            list(GET ORT_LIBRARY_GLOB 0 ORT_LIBRARY)
+        endif()
+    endif()
+
+    if(NOT ORT_LIBRARY)
+        message(FATAL_ERROR
+            "ONNX Runtime .so not found in venv or HOME_LIBS. "
+            "Run:  pip install onnxruntime   (already done in rocmPytorch venv).")
+    endif()
+    message(STATUS "OnnxRuntime .so: ${ORT_LIBRARY}")
+
+    # ── Fetch headers from the official ORT 1.26.0 prebuilt archive ──────────
+    # The prebuilt tgz contains include/ (C/C++ headers) + lib/ (same .so).
+    # We only need the headers — linking uses the venv .so found above.
+    include(FetchContent)
+    FetchContent_Declare(ort_prebuilt
+        URL      https://github.com/microsoft/onnxruntime/releases/download/v1.26.0/onnxruntime-linux-x64-1.26.0.tgz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    FetchContent_MakeAvailable(ort_prebuilt)
+
+    set(ORT_INCLUDE_DIR "${ort_prebuilt_SOURCE_DIR}/include")
+    message(STATUS "OnnxRuntime headers: ${ORT_INCLUDE_DIR}")
+
+    # ── Wire into the static lib ──────────────────────────────────────────────
+    target_compile_definitions(unified_llm_w4a16_predict_lib PUBLIC
+        HETEROPREDICT_ONNXRUNTIME=1)
+    target_include_directories(unified_llm_w4a16_predict_lib PUBLIC
+        "${ORT_INCLUDE_DIR}")
+    target_link_libraries(unified_llm_w4a16_predict_lib PUBLIC
+        "${ORT_LIBRARY}")
+
+    # Also expose to the pybind module (linked later)
+    set(HETEROPREDICT_ORT_INCLUDE_DIR "${ORT_INCLUDE_DIR}" CACHE INTERNAL "")
+    set(HETEROPREDICT_ORT_LIBRARY     "${ORT_LIBRARY}"     CACHE INTERNAL "")
+endif()
+
+
+
 # PyBind module (combined into this directory)
 find_package(pybind11 REQUIRED)
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
@@ -151,6 +211,21 @@ target_link_libraries(unified_llm_w4a16_predict_libtorch PRIVATE
     ${HSA_RUNTIME_LIB}
 )
 # Note: Don't use pybind11::lto with HIP - causes linking issues
+
+# If ORT is enabled, link it into the pybind module too and extend the RPATH
+if(HETEROPREDICT_ONNXRUNTIME AND HETEROPREDICT_ORT_LIBRARY)
+    target_link_libraries(unified_llm_w4a16_predict_libtorch PRIVATE
+        "${HETEROPREDICT_ORT_LIBRARY}")
+    target_include_directories(unified_llm_w4a16_predict_libtorch PRIVATE
+        "${HETEROPREDICT_ORT_INCLUDE_DIR}")
+    # Ensure the loader can find libonnxruntime.so at runtime from the venv
+    set(ORT_RPATH_DIR "${CMAKE_SOURCE_DIR}/utils/rocmPytorch/lib/python3.12/site-packages/onnxruntime/capi")
+    set_property(TARGET unified_llm_w4a16_predict_libtorch APPEND PROPERTY
+        INSTALL_RPATH "${ORT_RPATH_DIR}")
+    set_property(TARGET unified_llm_w4a16_predict_libtorch APPEND PROPERTY
+        BUILD_RPATH   "${ORT_RPATH_DIR}")
+endif()
+
 
 # Manually find and link torch_python for torch/extension.h support
 if(TORCH_PYTHON_PATH AND EXISTS "${TORCH_PYTHON_PATH}/lib")
