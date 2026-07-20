@@ -1,6 +1,0 @@
-run_final_sec5_collection.sh
-started: 2026-07-07T00:27:05-05:00
-OUT_DIR=py/utils/final_results_runs/final_sec5_collection/20260707_002705
-CSV=py/utils/final_results_runs/final_sec5_collection/20260707_002705/sweep.csv
-NUM_PROMPTS=5
-PRED=trainingData/qwen3_30b/transformer_final_pfill_markov_emb
