@@ -72,7 +72,7 @@ def main():
     if not plot_only:
         compile_benchmark()
 
-    expert_counts = [1,2,3,4,5,6,7,8,12,16,24,32,48,64]
+    expert_counts = [8, 24]
     fixed_threads = 16
 
     all_data = {
@@ -85,14 +85,12 @@ def main():
         csv_file = "expert_loading_benchmark.csv"
         print(f"Reading data from {csv_file}...")
         parsed = {"Seq": {}, "Par": {}}
-        expert_counts_set = set()
         
         try:
             with open(csv_file, "r") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
                     k = int(row["Num_Experts"])
-                    expert_counts_set.add(k)
                     config = "Seq" if "Seq" in row["Config"] else "Par"
                     
                     t_per_exp = float(row["Time_per_Expert_ms"])
@@ -104,7 +102,6 @@ def main():
                     
                     parsed[config][k] = (t_per_exp, t_total)
             
-            expert_counts = sorted(list(expert_counts_set))
             for k in expert_counts:
                 for key in ("Seq", "Par"):
                     if k in parsed[key]:

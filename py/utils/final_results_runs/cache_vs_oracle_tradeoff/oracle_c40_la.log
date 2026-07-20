@@ -1,0 +1,1693 @@
+Using ROCm 7.1.1 (/opt/rocm-7.1.1)
+Expert SSD I/O: sequential pread (HETEROPREDICT_SEQUENTIAL_EXPERT_IO=0)
+Autocomplete not enabled for XRT tools
+XILINX_XRT        : /opt/xilinx/xrt
+PATH              : /opt/xilinx/xrt/bin:/opt/rocm-7.1.1/bin:/home/michael/heteroPredict/utils/rocmPytorch/bin:/opt/xilinx/xrt/bin:/opt/rocm-7.1.1/bin:/home/michael/heteroPredict/utils/rocmPytorch/bin:/home/michael/.local/bin:/home/michael/.local/bin:/home/michael/.cursor-server/bin/linux-x64/cf80f4b937f3b9c48070d7085129a838ce7876a0/node_modules/@vscode/ripgrep/bin:/home/michael/.cursor-server/bin/linux-x64/cf80f4b937f3b9c48070d7085129a838ce7876a0/bin/remote-cli:/home/michael/.local/bin:/home/michael/.local/bin:/home/michael/.cursor-server/bin/linux-x64/cf80f4b937f3b9c48070d7085129a838ce7876a0/bin/remote-cli:/home/michael/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+LD_LIBRARY_PATH   : /opt/xilinx/xrt/lib:/opt/rocm-7.1.1/lib:/opt/rocm-7.1.1/lib64:/home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib:/opt/xilinx/xrt/lib:/opt/rocm-7.1.1/lib:/opt/rocm-7.1.1/lib64:/home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib:
+PYTHONPATH        : /opt/xilinx/xrt/python:/opt/xilinx/xrt/python
+[oracle-c40-la] Oracle Full Union @ C=40, LA=1..6 → py/utils/final_results_runs/cache_vs_oracle_tradeoff/20260702_233121/sweep.csv
+[sweep] --retry-failed: 1 configs already done, 5 to re-run.
+
+[sweep] Total runs : 5
+[sweep] Question   : oracle_baseline_sweep
+[sweep] CSV output : py/utils/final_results_runs/cache_vs_oracle_tradeoff/20260702_233121/sweep.csv
+[sweep] Timeout    : 1200s per run
+--------------------------------------------------------------------------------
+[sweep] Oracle trace /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt: using exact PROMPT TOKEN IDS for sweep.
+[sweep] Oracle trace /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt: using exact PROMPT TOKEN IDS for sweep.
+[sweep] Oracle trace /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt: using exact PROMPT TOKEN IDS for sweep.
+[sweep] Loaded 3 prompts from oracle traces.
+[sweep] Loaded 3 prompt(s), dataset=oracle
+
+================== ORACLE_BASELINE_SWEEP | Oracle Full Union LA=2 | C=40 λ=0.0 FN=0 LA=2 B=40 [1/5] ==================
+[sweep] Each config is a **new** qwen subprocess (full MoE load + kernels). Long silence after startup logs is often weight load / compile, not a hang.
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=1.59/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[sweep] Subprocess wall timeout (1200s); SIGKILL pid=158916
+[sweep_predict_cached_cache_metrics] Command timed out after 1200s
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=15.03/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[sweep] Subprocess wall timeout (1200s); SIGKILL pid=159665
+[sweep_predict_cached_cache_metrics] Command timed out after 1200s
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=9.14/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 2 (predictor fires every 2 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 22.57 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+
+================== ORACLE_BASELINE_SWEEP | Oracle Full Union LA=3 | C=40 λ=0.0 FN=0 LA=3 B=40 [2/5] ==================
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 3 (predictor fires every 3 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 25.10 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 3 (predictor fires every 3 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 24.21 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 3 (predictor fires every 3 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 40 experts.
+Layer 7: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 23.21 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+
+================== ORACLE_BASELINE_SWEEP | Oracle Full Union LA=4 | C=40 λ=0.0 FN=0 LA=4 B=40 [3/5] ==================
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=27.28/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 4 (predictor fires every 4 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 24.91 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 4 (predictor fires every 4 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 14.43 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 4 (predictor fires every 4 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 42.04 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+
+================== ORACLE_BASELINE_SWEEP | Oracle Full Union LA=5 | C=40 λ=0.0 FN=0 LA=5 B=40 [4/5] ==================
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 5 (predictor fires every 5 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 24.35 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 5 (predictor fires every 5 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 25.35 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 5 (predictor fires every 5 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 25.09 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+
+================== ORACLE_BASELINE_SWEEP | Oracle Full Union LA=6 | C=40 λ=0.0 FN=0 LA=6 B=40 [5/5] ==================
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00000.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 6 (predictor fires every 6 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 40 experts.
+Layer 7: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 23.05 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=14.35/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00001.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 6 (predictor fires every 6 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 40 experts.
+Layer 7: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 17.93 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+[sweep] Could not drop page cache (permission denied).
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=14.35/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/trace_00002.txt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+[Predictor] Lookahead stride set to 6 (predictor fires every 6 decode tokens)
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 40 experts.
+Layer 7: using packed expert format.
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1306, in main
+    model = Qwen3_30BA3BW4A16Model(run_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 401, in __init__
+    self.model.prewarm_experts(num_to_warm)
+torch.AcceleratorError: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 17.77 seconds
+Pre-warming expert cache with 40 experts...
+Error initializing model: CUDA error: out of memory
+Search for `hipErrorOutOfMemory' in https://rocm.docs.amd.com/projects/HIP/en/latest/index.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing AMD_SERIALIZE_KERNEL=3
+Device-side assertion tracking was not enabled by user.
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)
+[sweep_predict_cached_cache_metrics] exit code 1
+
+[sweep] Results saved to py/utils/final_results_runs/cache_vs_oracle_tradeoff/20260702_233121/sweep.csv
+[sweep] Runs with data: 25 / 30
+
+[sweep] Generating plots...
+[sweep] Done!

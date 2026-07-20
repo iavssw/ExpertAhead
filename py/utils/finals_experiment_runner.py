@@ -325,6 +325,27 @@ def _experiment_defs() -> Dict[str, Experiment]:
                 "--drop-page-cache-between-runs",
             ],
         ),
+        "final_10prompt_gen_ppl": Experiment(
+            key="final_10prompt_gen_ppl",
+            description=(
+                "Phase-2 greedy generation PPL on winner Cache-Cond + Hybrid rows in an "
+                "existing final_10prompt sweep.csv (prompt_gen_perplexity; no TPS)."
+            ),
+            script=METRICS_SWEEP_SCRIPT,
+            sweep_question="",
+            extra_args=[
+                "--model", "qwen",
+                "--dataset", "wikitext",
+                "--cold-per-prompt",
+                "--drop-page-cache-between-prompts",
+                "--drop-page-cache-between-runs",
+                "--non-baseline-cache-policy", "LFRU",
+                "--constraint-expert-reuse-csv", DEFAULT_REUSE_CSV,
+                "--gen-ppl-winners-only",
+                "--ppl-policies", "cache-cond,hybrid",
+                "--disable-measurement",
+            ],
+        ),
     }
 
 

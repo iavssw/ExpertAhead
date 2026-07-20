@@ -1,0 +1,1 @@
+python3 py/utils/sweep_cache_policy.py --model qwen --backend cached --dataset wikitext --policies LRU MRU LFU MFU RANDOM LFRU PREFILL --cache-sizes 64 --lambdas 0.0 --mode generation --num-prompts 3 --max-new-tokens 150 --output-prefix /home/michael/heteroPredict/py/utils/final_results_runs/sec1_cache_policy/20260716_170402/sweep

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Gating-heuristic prefetch sweep: B in {2,4,6,8} (paper baseline predictor).
+# Gating-heuristic prefetch sweep: B in {2,4,6,8} only (paper baseline; no budget-fraction union).
 #
 # Usage:
 #   bash py/utils/run_gating_budget_sweep.sh
@@ -30,8 +30,6 @@ python3 py/utils/sweep_predict_cached_cache_metrics.py \
   --sweep-question gating_budget_sweep \
   --model qwen \
   --cache-sizes "$CACHE_SIZE" \
-  --custom-explicit-prefetch-budgets \
-  --prefetch-budgets 2 4 6 8 \
   --dataset txt \
   --prompts-txt "$PROMPTS_TXT" \
   --num-prompts "$NUM_PROMPTS" \

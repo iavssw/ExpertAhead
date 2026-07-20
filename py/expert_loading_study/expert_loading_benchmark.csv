@@ -1,29 +1,5 @@
 Num_Experts,Config,Time_per_Expert_ms,Total_Time_ms
-1,Sequential (serial loop),0.6668,32.01
-1,Parallel (IOThreadPool),0.7651,36.72
-2,Sequential (serial loop),0.6254,60.04
-2,Parallel (IOThreadPool),0.4659,44.73
-3,Sequential (serial loop),0.6039,86.96
-3,Parallel (IOThreadPool),0.3778,54.41
-4,Sequential (serial loop),0.5918,113.62
-4,Parallel (IOThreadPool),0.3438,66.02
-5,Sequential (serial loop),0.6015,144.37
-5,Parallel (IOThreadPool),0.3361,80.65
-6,Sequential (serial loop),0.5848,168.42
-6,Parallel (IOThreadPool),0.3150,90.71
-7,Sequential (serial loop),0.5743,192.96
-7,Parallel (IOThreadPool),0.3101,104.19
-8,Sequential (serial loop),0.5754,220.95
-8,Parallel (IOThreadPool),0.3056,117.36
-12,Sequential (serial loop),0.5651,325.48
-12,Parallel (IOThreadPool),0.2861,164.81
-16,Sequential (serial loop),0.5661,434.74
-16,Parallel (IOThreadPool),0.2846,218.55
-24,Sequential (serial loop),0.5588,643.69
-24,Parallel (IOThreadPool),0.2739,315.59
-32,Sequential (serial loop),0.5573,855.95
-32,Parallel (IOThreadPool),0.2640,405.51
-48,Sequential (serial loop),0.5650,1301.83
-48,Parallel (IOThreadPool),0.2525,581.70
-64,Sequential (serial loop),0.5554,1706.19
-64,Parallel (IOThreadPool),0.2477,761.02
+8,Sequential (serial loop),3.2219,1237.20
+8,Parallel (IOThreadPool),1.8509,710.76
+24,Sequential (serial loop),3.2190,3708.34
+24,Parallel (IOThreadPool),1.7605,2028.09

@@ -1,3 +1,0 @@
-ts,model,backend,cache_size,prefetch_count,lambda_val,tps,cache_hits,cache_misses,hit_rate_pct,pred_hits,pred_total,pred_hit_rate_pct,stall_loads,prefetch_loads,avg_ms_per_expert_load,ok
-2026-04-19T21:05:09,qwen,cached,8,,0.0,1.203,866,1822,32.22,,,,,,,True
-2026-04-19T21:05:09,qwen,predict,8,1,0.0,1.3408,37,19,66.07,226,288,78.47,751,5202,1.1586460608096756,True

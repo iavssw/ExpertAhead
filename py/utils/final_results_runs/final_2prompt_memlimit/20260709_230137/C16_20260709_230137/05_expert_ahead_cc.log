@@ -1,0 +1,2344 @@
+Running as unit: run-r345f231a8a764393bb07fb5f3ebd39b2.scope; invocation ID: 58317ab72928426cbe1faa09a50afe94
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[Predictor] Layer 0 model path resolved to: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_0/best_jit.pt
+[Predictor] Running on device: CPU (NPU path) (heterogeneity="gpu", predictor_device="cpu")
+[ThreadedTorchScriptPredictor Layer 0] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_0/best.json
+[TorchScriptPredictor Layer 0] Loading model on CPU
+[TorchScriptPredictor Layer 0] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 0] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 0] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_0/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 1] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_1/best.json
+[TorchScriptPredictor Layer 1] Loading model on CPU
+[TorchScriptPredictor Layer 1] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 1] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 1] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_1/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 2] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_2/best.json
+[TorchScriptPredictor Layer 2] Loading model on CPU
+[TorchScriptPredictor Layer 2] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 2] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 2] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_2/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 3] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_3/best.json
+[TorchScriptPredictor Layer 3] Loading model on CPU
+[TorchScriptPredictor Layer 3] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 3] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 3] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_3/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 4] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_4/best.json
+[TorchScriptPredictor Layer 4] Loading model on CPU
+[TorchScriptPredictor Layer 4] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 4] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 4] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_4/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 5] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_5/best.json
+[TorchScriptPredictor Layer 5] Loading model on CPU
+[TorchScriptPredictor Layer 5] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 5] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 5] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_5/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 6] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_6/best.json
+[TorchScriptPredictor Layer 6] Loading model on CPU
+[TorchScriptPredictor Layer 6] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 6] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 6] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_6/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 7] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_7/best.json
+[TorchScriptPredictor Layer 7] Loading model on CPU
+[TorchScriptPredictor Layer 7] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 7] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 7] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_7/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 8] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_8/best.json
+[TorchScriptPredictor Layer 8] Loading model on CPU
+[TorchScriptPredictor Layer 8] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 8] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 8] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_8/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 9] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_9/best.json
+[TorchScriptPredictor Layer 9] Loading model on CPU
+[TorchScriptPredictor Layer 9] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 9] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 9] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_9/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 10] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_10/best.json
+[TorchScriptPredictor Layer 10] Loading model on CPU
+[TorchScriptPredictor Layer 10] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 10] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 10] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_10/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 11] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_11/best.json
+[TorchScriptPredictor Layer 11] Loading model on CPU
+[TorchScriptPredictor Layer 11] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 11] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 11] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_11/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 12] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_12/best.json
+[TorchScriptPredictor Layer 12] Loading model on CPU
+[TorchScriptPredictor Layer 12] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 12] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 12] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_12/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 13] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_13/best.json
+[TorchScriptPredictor Layer 13] Loading model on CPU
+[TorchScriptPredictor Layer 13] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 13] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 13] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_13/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 14] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_14/best.json
+[TorchScriptPredictor Layer 14] Loading model on CPU
+[TorchScriptPredictor Layer 14] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 14] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 14] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_14/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 15] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_15/best.json
+[TorchScriptPredictor Layer 15] Loading model on CPU
+[TorchScriptPredictor Layer 15] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 15] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 15] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_15/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 16] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_16/best.json
+[TorchScriptPredictor Layer 16] Loading model on CPU
+[TorchScriptPredictor Layer 16] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 16] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 16] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_16/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 17] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_17/best.json
+[TorchScriptPredictor Layer 17] Loading model on CPU
+[TorchScriptPredictor Layer 17] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 17] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 17] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_17/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 18] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_18/best.json
+[TorchScriptPredictor Layer 18] Loading model on CPU
+[TorchScriptPredictor Layer 18] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 18] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 18] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_18/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 19] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_19/best.json
+[TorchScriptPredictor Layer 19] Loading model on CPU
+[TorchScriptPredictor Layer 19] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 19] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 19] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_19/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 20] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_20/best.json
+[TorchScriptPredictor Layer 20] Loading model on CPU
+[TorchScriptPredictor Layer 20] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 20] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 20] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_20/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 21] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_21/best.json
+[TorchScriptPredictor Layer 21] Loading model on CPU
+[TorchScriptPredictor Layer 21] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 21] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 21] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_21/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 22] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_22/best.json
+[TorchScriptPredictor Layer 22] Loading model on CPU
+[TorchScriptPredictor Layer 22] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 22] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 22] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_22/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 23] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_23/best.json
+[TorchScriptPredictor Layer 23] Loading model on CPU
+[TorchScriptPredictor Layer 23] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 23] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 23] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_23/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 24] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_24/best.json
+[TorchScriptPredictor Layer 24] Loading model on CPU
+[TorchScriptPredictor Layer 24] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 24] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 24] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_24/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 25] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_25/best.json
+[TorchScriptPredictor Layer 25] Loading model on CPU
+[TorchScriptPredictor Layer 25] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 25] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 25] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_25/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 26] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_26/best.json
+[TorchScriptPredictor Layer 26] Loading model on CPU
+[TorchScriptPredictor Layer 26] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 26] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 26] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_26/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 27] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_27/best.json
+[TorchScriptPredictor Layer 27] Loading model on CPU
+[TorchScriptPredictor Layer 27] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 27] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 27] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_27/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 28] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_28/best.json
+[TorchScriptPredictor Layer 28] Loading model on CPU
+[TorchScriptPredictor Layer 28] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 28] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 28] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_28/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 29] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_29/best.json
+[TorchScriptPredictor Layer 29] Loading model on CPU
+[TorchScriptPredictor Layer 29] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 29] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 29] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_29/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 30] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_30/best.json
+[TorchScriptPredictor Layer 30] Loading model on CPU
+[TorchScriptPredictor Layer 30] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 30] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 30] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_30/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 31] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_31/best.json
+[TorchScriptPredictor Layer 31] Loading model on CPU
+[TorchScriptPredictor Layer 31] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 31] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 31] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_31/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 32] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_32/best.json
+[TorchScriptPredictor Layer 32] Loading model on CPU
+[TorchScriptPredictor Layer 32] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 32] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 32] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_32/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 33] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_33/best.json
+[TorchScriptPredictor Layer 33] Loading model on CPU
+[TorchScriptPredictor Layer 33] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 33] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 33] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_33/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 34] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_34/best.json
+[TorchScriptPredictor Layer 34] Loading model on CPU
+[TorchScriptPredictor Layer 34] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 34] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 34] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_34/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 35] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_35/best.json
+[TorchScriptPredictor Layer 35] Loading model on CPU
+[TorchScriptPredictor Layer 35] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 35] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 35] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_35/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 36] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_36/best.json
+[TorchScriptPredictor Layer 36] Loading model on CPU
+[TorchScriptPredictor Layer 36] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 36] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 36] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_36/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 37] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_37/best.json
+[TorchScriptPredictor Layer 37] Loading model on CPU
+[TorchScriptPredictor Layer 37] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 37] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 37] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_37/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 38] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_38/best.json
+[TorchScriptPredictor Layer 38] Loading model on CPU
+[TorchScriptPredictor Layer 38] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 38] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 38] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_38/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 39] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_39/best.json
+[TorchScriptPredictor Layer 39] Loading model on CPU
+[TorchScriptPredictor Layer 39] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 39] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 39] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_39/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 40] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_40/best.json
+[TorchScriptPredictor Layer 40] Loading model on CPU
+[TorchScriptPredictor Layer 40] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 40] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 40] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_40/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 41] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_41/best.json
+[TorchScriptPredictor Layer 41] Loading model on CPU
+[TorchScriptPredictor Layer 41] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 41] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 41] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_41/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 42] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_42/best.json
+[TorchScriptPredictor Layer 42] Loading model on CPU
+[TorchScriptPredictor Layer 42] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 42] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 42] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_42/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 43] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_43/best.json
+[TorchScriptPredictor Layer 43] Loading model on CPU
+[TorchScriptPredictor Layer 43] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 43] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 43] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_43/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 44] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_44/best.json
+[TorchScriptPredictor Layer 44] Loading model on CPU
+[TorchScriptPredictor Layer 44] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 44] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 44] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_44/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 45] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_45/best.json
+[TorchScriptPredictor Layer 45] Loading model on CPU
+[TorchScriptPredictor Layer 45] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 45] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 45] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_45/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 46] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_46/best.json
+[TorchScriptPredictor Layer 46] Loading model on CPU
+[TorchScriptPredictor Layer 46] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 46] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 46] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_46/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 47] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_47/best.json
+[TorchScriptPredictor Layer 47] Loading model on CPU
+[TorchScriptPredictor Layer 47] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 47] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 47] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_47/best_jit.pt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 16 experts for all layers...
+Layer 0: Pre-warming 16 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 16 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 16 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 16 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 16 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 16 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 16 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 16 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 16 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 16 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 16 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 16 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 16 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 16 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 16 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 16 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 16 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 16 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 16 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 16 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 16 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 16 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 16 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 16 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 16 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 16 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 16 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 16 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 16 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 16 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 16 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 16 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 16 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 16 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 16 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 16 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 16 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 16 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 16 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 16 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 16 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 16 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 16 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 16 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 16 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 16 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 16 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 16 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 814]
+Skipping warmup.
+Prefill time: 21.8838 seconds
+[Predictor] Prefill-end expert cache warmup (excluded from generation TPS).
+[Layer 0 Warmup Debug] predict_sync returned: 75 50 21 32 74 103 33 110 14 64 106 28 91 51 104 57 72 2 46 49 82 6 78 87 124 58 42 68 63 93 69 37 13 17 105 3 89 80 66 27 34 71 126 122 90 85 98 97 30 44 102 25 62 83 67 86 125 22 11 26 77 61 52 60 5 20 65 100 79 54 12 121 47 99 115 116 23 1 95 56 45 39 15 41 55 10 113 112 9 127 8 96 59 111 94 38 119 92 107 114 7 117 84 108 40 16 101 4 73 36 43 35 120 81 29 118 31 19 76 109 88 48 123 24 18 70 53 0 
+[Layer 0 Warmup Debug] experts_to_prefetch returned: 75 50 21 32 
+[Layer 0 Warmup Debug] After prefill-end warmup, slots are: 127 75 50 21 32 116 117 118 119 120 121 122 123 124 125 126 
+Generation phase
+[Layer 0 Step 0 Debug] Slots before check: 127 75 50 21 32 116 117 118 119 120 121 122 123 124 125 126 
+[Layer 0 Step 0 Debug] Requested: 50 75 69 93 21 32 125 116 
+[gen 5/149] elapsed=1.5s  TPS=3.302
+[gen 10/149] elapsed=3.0s  TPS=3.347
+[gen 15/149] elapsed=4.4s  TPS=3.447
+[gen 20/149] elapsed=5.8s  TPS=3.473
+[gen 25/149] elapsed=7.0s  TPS=3.571
+[gen 30/149] elapsed=8.3s  TPS=3.613
+[gen 35/149] elapsed=9.5s  TPS=3.680
+[gen 40/149] elapsed=10.7s  TPS=3.727
+[gen 45/149] elapsed=12.1s  TPS=3.718
+[gen 50/149] elapsed=13.5s  TPS=3.715
+[gen 55/149] elapsed=14.7s  TPS=3.751
+[gen 60/149] elapsed=16.0s  TPS=3.742
+[gen 65/149] elapsed=17.2s  TPS=3.774
+[gen 70/149] elapsed=18.6s  TPS=3.765
+[gen 75/149] elapsed=19.8s  TPS=3.782
+[gen 80/149] elapsed=21.0s  TPS=3.817
+[gen 85/149] elapsed=22.3s  TPS=3.815
+[gen 90/149] elapsed=23.6s  TPS=3.808
+[gen 95/149] elapsed=25.1s  TPS=3.783
+[gen 100/149] elapsed=26.5s  TPS=3.769
+[gen 105/149] elapsed=27.9s  TPS=3.765
+[gen 110/149] elapsed=29.0s  TPS=3.787
+[gen 115/149] elapsed=30.3s  TPS=3.800
+[gen 120/149] elapsed=31.5s  TPS=3.805
+[gen 125/149] elapsed=33.1s  TPS=3.777
+[gen 130/149] elapsed=34.4s  TPS=3.779
+[gen 135/149] elapsed=35.8s  TPS=3.768
+[gen 140/149] elapsed=37.2s  TPS=3.764
+[gen 145/149] elapsed=38.6s  TPS=3.761
+Prefill time (summary): 21.884 seconds
+Total Generation Time: 39.529 seconds
+Average Time per Token: 0.265298 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=837, Misses=355, HitRate=70.22%
+    Predictor Routed-Expert HitRate=41.22% (305/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=41.22% (305/740)
+    Predictor RoutedTopK HitRate=37.16% (440/1184)
+    Predicted RequestedByRouterForcedN Rate=51.52% (305/592)
+    Predicted RequestedByRouterTopK Rate=74.32% (440/592)
+    Predictor WindowRecall Rate=37.16% (440/1184)
+    Predictor WindowPrecision Rate=74.32% (440/592)
+    Loads Per Step: 0Loads=7, 1Load=34, >1Load=108
+    Bandwidth: StallLoads=355, PrefetchLoads=332, AvgLoadTime=3.31ms
+    PrefetchOverlap: HiddenReady=251, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=355, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=264, UsedBeforeEvict=251, EvictedBeforeUse=77
+    GlobalSpecLoad: PeakConcurrent=6
+    Predictor TopK matches: 0=23 1=30 >=2=95
+Layer 1 Cache Stats: Hits=925, Misses=267, HitRate=77.60%
+    Predictor Routed-Expert HitRate=49.86% (369/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=49.86% (369/740)
+    Predictor RoutedTopK HitRate=41.13% (487/1184)
+    Predicted RequestedByRouterForcedN Rate=62.33% (369/592)
+    Predicted RequestedByRouterTopK Rate=82.26% (487/592)
+    Predictor WindowRecall Rate=41.13% (487/1184)
+    Predictor WindowPrecision Rate=82.26% (487/592)
+    Loads Per Step: 0Loads=12, 1Load=52, >1Load=85
+    Bandwidth: StallLoads=267, PrefetchLoads=199, AvgLoadTime=3.74ms
+    PrefetchOverlap: HiddenReady=149, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=267, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=397, UsedBeforeEvict=149, EvictedBeforeUse=48
+    Predictor TopK matches: 0=5 1=26 >=2=117
+Layer 2 Cache Stats: Hits=967, Misses=225, HitRate=81.12%
+    Predictor Routed-Expert HitRate=48.65% (360/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=48.65% (360/740)
+    Predictor RoutedTopK HitRate=39.86% (472/1184)
+    Predicted RequestedByRouterForcedN Rate=60.81% (360/592)
+    Predicted RequestedByRouterTopK Rate=79.73% (472/592)
+    Predictor WindowRecall Rate=39.86% (472/1184)
+    Predictor WindowPrecision Rate=79.73% (472/592)
+    Loads Per Step: 0Loads=34, 1Load=42, >1Load=73
+    Bandwidth: StallLoads=225, PrefetchLoads=192, AvgLoadTime=3.74ms
+    PrefetchOverlap: HiddenReady=136, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=225, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=404, UsedBeforeEvict=136, EvictedBeforeUse=55
+    Predictor TopK matches: 0=7 1=32 >=2=109
+Layer 3 Cache Stats: Hits=932, Misses=260, HitRate=78.19%
+    Predictor Routed-Expert HitRate=45.54% (337/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=45.54% (337/740)
+    Predictor RoutedTopK HitRate=38.34% (454/1184)
+    Predicted RequestedByRouterForcedN Rate=56.93% (337/592)
+    Predicted RequestedByRouterTopK Rate=76.69% (454/592)
+    Predictor WindowRecall Rate=38.34% (454/1184)
+    Predictor WindowPrecision Rate=76.69% (454/592)
+    Loads Per Step: 0Loads=23, 1Load=40, >1Load=86
+    Bandwidth: StallLoads=260, PrefetchLoads=253, AvgLoadTime=3.38ms
+    PrefetchOverlap: HiddenReady=181, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=260, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=343, UsedBeforeEvict=181, EvictedBeforeUse=70
+    Predictor TopK matches: 0=9 1=29 >=2=110
+Layer 4 Cache Stats: Hits=1006, Misses=186, HitRate=84.40%
+    Predictor Routed-Expert HitRate=56.62% (419/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=56.62% (419/740)
+    Predictor RoutedTopK HitRate=45.02% (533/1184)
+    Predicted RequestedByRouterForcedN Rate=70.78% (419/592)
+    Predicted RequestedByRouterTopK Rate=90.03% (533/592)
+    Predictor WindowRecall Rate=45.02% (533/1184)
+    Predictor WindowPrecision Rate=90.03% (533/592)
+    Loads Per Step: 0Loads=31, 1Load=67, >1Load=51
+    Bandwidth: StallLoads=186, PrefetchLoads=161, AvgLoadTime=3.86ms
+    PrefetchOverlap: HiddenReady=141, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=186, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=435, UsedBeforeEvict=141, EvictedBeforeUse=19
+    Predictor TopK matches: 0=4 1=10 >=2=134
+Layer 5 Cache Stats: Hits=1034, Misses=158, HitRate=86.74%
+    Predictor Routed-Expert HitRate=54.32% (402/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=54.32% (402/740)
+    Predictor RoutedTopK HitRate=42.65% (505/1184)
+    Predicted RequestedByRouterForcedN Rate=67.91% (402/592)
+    Predicted RequestedByRouterTopK Rate=85.30% (505/592)
+    Predictor WindowRecall Rate=42.65% (505/1184)
+    Predictor WindowPrecision Rate=85.30% (505/592)
+    Loads Per Step: 0Loads=47, 1Load=56, >1Load=46
+    Bandwidth: StallLoads=158, PrefetchLoads=161, AvgLoadTime=4.09ms
+    PrefetchOverlap: HiddenReady=129, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=158, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=435, UsedBeforeEvict=129, EvictedBeforeUse=29
+    Predictor TopK matches: 0=6 1=12 >=2=130
+Layer 6 Cache Stats: Hits=1062, Misses=130, HitRate=89.09%
+    Predictor Routed-Expert HitRate=58.78% (435/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=58.78% (435/740)
+    Predictor RoutedTopK HitRate=45.69% (541/1184)
+    Predicted RequestedByRouterForcedN Rate=73.48% (435/592)
+    Predicted RequestedByRouterTopK Rate=91.39% (541/592)
+    Predictor WindowRecall Rate=45.69% (541/1184)
+    Predictor WindowPrecision Rate=91.39% (541/592)
+    Loads Per Step: 0Loads=55, 1Load=65, >1Load=29
+    Bandwidth: StallLoads=130, PrefetchLoads=79, AvgLoadTime=4.11ms
+    PrefetchOverlap: HiddenReady=67, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=130, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=517, UsedBeforeEvict=67, EvictedBeforeUse=12
+    Predictor TopK matches: 0=0 1=6 >=2=142
+Layer 7 Cache Stats: Hits=1113, Misses=79, HitRate=93.37%
+    Predictor Routed-Expert HitRate=65.27% (483/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=65.27% (483/740)
+    Predictor RoutedTopK HitRate=47.21% (559/1184)
+    Predicted RequestedByRouterForcedN Rate=81.59% (483/592)
+    Predicted RequestedByRouterTopK Rate=94.43% (559/592)
+    Predictor WindowRecall Rate=47.21% (559/1184)
+    Predictor WindowPrecision Rate=94.43% (559/592)
+    Loads Per Step: 0Loads=87, 1Load=49, >1Load=13
+    Bandwidth: StallLoads=79, PrefetchLoads=43, AvgLoadTime=4.22ms
+    PrefetchOverlap: HiddenReady=37, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=79, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=553, UsedBeforeEvict=37, EvictedBeforeUse=6
+    Predictor TopK matches: 0=0 1=2 >=2=146
+Layer 8 Cache Stats: Hits=1020, Misses=172, HitRate=85.57%
+    Predictor Routed-Expert HitRate=54.32% (402/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=54.32% (402/740)
+    Predictor RoutedTopK HitRate=44.43% (526/1184)
+    Predicted RequestedByRouterForcedN Rate=67.91% (402/592)
+    Predicted RequestedByRouterTopK Rate=88.85% (526/592)
+    Predictor WindowRecall Rate=44.43% (526/1184)
+    Predictor WindowPrecision Rate=88.85% (526/592)
+    Loads Per Step: 0Loads=39, 1Load=62, >1Load=48
+    Bandwidth: StallLoads=172, PrefetchLoads=109, AvgLoadTime=3.68ms
+    PrefetchOverlap: HiddenReady=95, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=172, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=487, UsedBeforeEvict=95, EvictedBeforeUse=14
+    Predictor TopK matches: 0=4 1=10 >=2=134
+Layer 9 Cache Stats: Hits=1063, Misses=129, HitRate=89.18%
+    Predictor Routed-Expert HitRate=61.08% (452/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=61.08% (452/740)
+    Predictor RoutedTopK HitRate=46.11% (546/1184)
+    Predicted RequestedByRouterForcedN Rate=76.35% (452/592)
+    Predicted RequestedByRouterTopK Rate=92.23% (546/592)
+    Predictor WindowRecall Rate=46.11% (546/1184)
+    Predictor WindowPrecision Rate=92.23% (546/592)
+    Loads Per Step: 0Loads=56, 1Load=62, >1Load=31
+    Bandwidth: StallLoads=129, PrefetchLoads=84, AvgLoadTime=4.07ms
+    PrefetchOverlap: HiddenReady=71, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=129, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=512, UsedBeforeEvict=71, EvictedBeforeUse=12
+    Predictor TopK matches: 0=1 1=4 >=2=143
+Layer 10 Cache Stats: Hits=1010, Misses=182, HitRate=84.73%
+    Predictor Routed-Expert HitRate=55.68% (412/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.68% (412/740)
+    Predictor RoutedTopK HitRate=44.51% (527/1184)
+    Predicted RequestedByRouterForcedN Rate=69.59% (412/592)
+    Predicted RequestedByRouterTopK Rate=89.02% (527/592)
+    Predictor WindowRecall Rate=44.51% (527/1184)
+    Predictor WindowPrecision Rate=89.02% (527/592)
+    Loads Per Step: 0Loads=37, 1Load=63, >1Load=49
+    Bandwidth: StallLoads=182, PrefetchLoads=129, AvgLoadTime=3.68ms
+    PrefetchOverlap: HiddenReady=113, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=182, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=467, UsedBeforeEvict=113, EvictedBeforeUse=16
+    Predictor TopK matches: 0=2 1=11 >=2=135
+Layer 11 Cache Stats: Hits=994, Misses=198, HitRate=83.39%
+    Predictor Routed-Expert HitRate=53.38% (395/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=53.38% (395/740)
+    Predictor RoutedTopK HitRate=43.33% (513/1184)
+    Predicted RequestedByRouterForcedN Rate=66.72% (395/592)
+    Predicted RequestedByRouterTopK Rate=86.66% (513/592)
+    Predictor WindowRecall Rate=43.33% (513/1184)
+    Predictor WindowPrecision Rate=86.66% (513/592)
+    Loads Per Step: 0Loads=34, 1Load=54, >1Load=61
+    Bandwidth: StallLoads=198, PrefetchLoads=179, AvgLoadTime=3.58ms
+    PrefetchOverlap: HiddenReady=144, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=198, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=417, UsedBeforeEvict=144, EvictedBeforeUse=35
+    Predictor TopK matches: 0=4 1=15 >=2=129
+Layer 12 Cache Stats: Hits=1037, Misses=155, HitRate=87.00%
+    Predictor Routed-Expert HitRate=53.38% (395/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=53.38% (395/740)
+    Predictor RoutedTopK HitRate=43.58% (516/1184)
+    Predicted RequestedByRouterForcedN Rate=66.72% (395/592)
+    Predicted RequestedByRouterTopK Rate=87.16% (516/592)
+    Predictor WindowRecall Rate=43.58% (516/1184)
+    Predictor WindowPrecision Rate=87.16% (516/592)
+    Loads Per Step: 0Loads=50, 1Load=59, >1Load=40
+    Bandwidth: StallLoads=155, PrefetchLoads=99, AvgLoadTime=4.09ms
+    PrefetchOverlap: HiddenReady=78, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=155, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=497, UsedBeforeEvict=78, EvictedBeforeUse=20
+    Predictor TopK matches: 0=1 1=14 >=2=133
+Layer 13 Cache Stats: Hits=1024, Misses=168, HitRate=85.91%
+    Predictor Routed-Expert HitRate=58.38% (432/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=58.38% (432/740)
+    Predictor RoutedTopK HitRate=45.52% (539/1184)
+    Predicted RequestedByRouterForcedN Rate=72.97% (432/592)
+    Predicted RequestedByRouterTopK Rate=91.05% (539/592)
+    Predictor WindowRecall Rate=45.52% (539/1184)
+    Predictor WindowPrecision Rate=91.05% (539/592)
+    Loads Per Step: 0Loads=37, 1Load=72, >1Load=40
+    Bandwidth: StallLoads=168, PrefetchLoads=166, AvgLoadTime=3.79ms
+    PrefetchOverlap: HiddenReady=147, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=168, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=430, UsedBeforeEvict=147, EvictedBeforeUse=18
+    Predictor TopK matches: 0=2 1=8 >=2=138
+Layer 14 Cache Stats: Hits=1051, Misses=141, HitRate=88.17%
+    Predictor Routed-Expert HitRate=59.05% (437/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=59.05% (437/740)
+    Predictor RoutedTopK HitRate=44.93% (532/1184)
+    Predicted RequestedByRouterForcedN Rate=73.82% (437/592)
+    Predicted RequestedByRouterTopK Rate=89.86% (532/592)
+    Predictor WindowRecall Rate=44.93% (532/1184)
+    Predictor WindowPrecision Rate=89.86% (532/592)
+    Loads Per Step: 0Loads=47, 1Load=72, >1Load=30
+    Bandwidth: StallLoads=141, PrefetchLoads=99, AvgLoadTime=4.13ms
+    PrefetchOverlap: HiddenReady=81, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=141, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=497, UsedBeforeEvict=81, EvictedBeforeUse=18
+    Predictor TopK matches: 0=1 1=8 >=2=139
+Layer 15 Cache Stats: Hits=1071, Misses=121, HitRate=89.85%
+    Predictor Routed-Expert HitRate=59.19% (438/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=59.19% (438/740)
+    Predictor RoutedTopK HitRate=46.96% (556/1184)
+    Predicted RequestedByRouterForcedN Rate=73.99% (438/592)
+    Predicted RequestedByRouterTopK Rate=93.92% (556/592)
+    Predictor WindowRecall Rate=46.96% (556/1184)
+    Predictor WindowPrecision Rate=93.92% (556/592)
+    Loads Per Step: 0Loads=55, 1Load=71, >1Load=23
+    Bandwidth: StallLoads=121, PrefetchLoads=44, AvgLoadTime=4.24ms
+    PrefetchOverlap: HiddenReady=41, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=121, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=552, UsedBeforeEvict=41, EvictedBeforeUse=2
+    Predictor TopK matches: 0=0 1=6 >=2=142
+Layer 16 Cache Stats: Hits=1054, Misses=138, HitRate=88.42%
+    Predictor Routed-Expert HitRate=57.30% (424/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=57.30% (424/740)
+    Predictor RoutedTopK HitRate=45.02% (533/1184)
+    Predicted RequestedByRouterForcedN Rate=71.62% (424/592)
+    Predicted RequestedByRouterTopK Rate=90.03% (533/592)
+    Predictor WindowRecall Rate=45.02% (533/1184)
+    Predictor WindowPrecision Rate=90.03% (533/592)
+    Loads Per Step: 0Loads=55, 1Load=58, >1Load=36
+    Bandwidth: StallLoads=138, PrefetchLoads=102, AvgLoadTime=3.88ms
+    PrefetchOverlap: HiddenReady=90, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=138, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=494, UsedBeforeEvict=90, EvictedBeforeUse=12
+    Predictor TopK matches: 0=0 1=7 >=2=141
+Layer 17 Cache Stats: Hits=1057, Misses=135, HitRate=88.67%
+    Predictor Routed-Expert HitRate=56.22% (416/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=56.22% (416/740)
+    Predictor RoutedTopK HitRate=44.17% (523/1184)
+    Predicted RequestedByRouterForcedN Rate=70.27% (416/592)
+    Predicted RequestedByRouterTopK Rate=88.34% (523/592)
+    Predictor WindowRecall Rate=44.17% (523/1184)
+    Predictor WindowPrecision Rate=88.34% (523/592)
+    Loads Per Step: 0Loads=49, 1Load=71, >1Load=29
+    Bandwidth: StallLoads=135, PrefetchLoads=97, AvgLoadTime=3.71ms
+    PrefetchOverlap: HiddenReady=86, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=135, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=499, UsedBeforeEvict=86, EvictedBeforeUse=11
+    Predictor TopK matches: 0=3 1=8 >=2=137
+Layer 18 Cache Stats: Hits=1106, Misses=86, HitRate=92.79%
+    Predictor Routed-Expert HitRate=56.89% (421/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=56.89% (421/740)
+    Predictor RoutedTopK HitRate=44.93% (532/1184)
+    Predicted RequestedByRouterForcedN Rate=71.11% (421/592)
+    Predicted RequestedByRouterTopK Rate=89.86% (532/592)
+    Predictor WindowRecall Rate=44.93% (532/1184)
+    Predictor WindowPrecision Rate=89.86% (532/592)
+    Loads Per Step: 0Loads=83, 1Load=49, >1Load=17
+    Bandwidth: StallLoads=86, PrefetchLoads=49, AvgLoadTime=4.24ms
+    PrefetchOverlap: HiddenReady=45, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=86, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=547, UsedBeforeEvict=45, EvictedBeforeUse=4
+    Predictor TopK matches: 0=0 1=8 >=2=140
+Layer 19 Cache Stats: Hits=1092, Misses=100, HitRate=91.61%
+    Predictor Routed-Expert HitRate=58.38% (432/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=58.38% (432/740)
+    Predictor RoutedTopK HitRate=44.26% (524/1184)
+    Predicted RequestedByRouterForcedN Rate=72.97% (432/592)
+    Predicted RequestedByRouterTopK Rate=88.51% (524/592)
+    Predictor WindowRecall Rate=44.26% (524/1184)
+    Predictor WindowPrecision Rate=88.51% (524/592)
+    Loads Per Step: 0Loads=72, 1Load=57, >1Load=20
+    Bandwidth: StallLoads=100, PrefetchLoads=43, AvgLoadTime=4.00ms
+    PrefetchOverlap: HiddenReady=39, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=100, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=553, UsedBeforeEvict=39, EvictedBeforeUse=4
+    Predictor TopK matches: 0=2 1=9 >=2=137
+Layer 20 Cache Stats: Hits=1062, Misses=130, HitRate=89.09%
+    Predictor Routed-Expert HitRate=50.27% (372/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=50.27% (372/740)
+    Predictor RoutedTopK HitRate=42.57% (504/1184)
+    Predicted RequestedByRouterForcedN Rate=62.84% (372/592)
+    Predicted RequestedByRouterTopK Rate=85.14% (504/592)
+    Predictor WindowRecall Rate=42.57% (504/1184)
+    Predictor WindowPrecision Rate=85.14% (504/592)
+    Loads Per Step: 0Loads=58, 1Load=59, >1Load=32
+    Bandwidth: StallLoads=130, PrefetchLoads=76, AvgLoadTime=3.61ms
+    PrefetchOverlap: HiddenReady=64, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=130, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=520, UsedBeforeEvict=64, EvictedBeforeUse=11
+    Predictor TopK matches: 0=8 1=19 >=2=121
+Layer 21 Cache Stats: Hits=1100, Misses=92, HitRate=92.28%
+    Predictor Routed-Expert HitRate=58.24% (431/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=58.24% (431/740)
+    Predictor RoutedTopK HitRate=45.78% (542/1184)
+    Predicted RequestedByRouterForcedN Rate=72.80% (431/592)
+    Predicted RequestedByRouterTopK Rate=91.55% (542/592)
+    Predictor WindowRecall Rate=45.78% (542/1184)
+    Predictor WindowPrecision Rate=91.55% (542/592)
+    Loads Per Step: 0Loads=74, 1Load=59, >1Load=16
+    Bandwidth: StallLoads=92, PrefetchLoads=69, AvgLoadTime=4.46ms
+    PrefetchOverlap: HiddenReady=62, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=92, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=527, UsedBeforeEvict=62, EvictedBeforeUse=7
+    Predictor TopK matches: 0=2 1=6 >=2=140
+Layer 22 Cache Stats: Hits=988, Misses=204, HitRate=82.89%
+    Predictor Routed-Expert HitRate=45.68% (338/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=45.68% (338/740)
+    Predictor RoutedTopK HitRate=40.62% (481/1184)
+    Predicted RequestedByRouterForcedN Rate=57.09% (338/592)
+    Predicted RequestedByRouterTopK Rate=81.25% (481/592)
+    Predictor WindowRecall Rate=40.62% (481/1184)
+    Predictor WindowPrecision Rate=81.25% (481/592)
+    Loads Per Step: 0Loads=33, 1Load=53, >1Load=63
+    Bandwidth: StallLoads=204, PrefetchLoads=134, AvgLoadTime=3.67ms
+    PrefetchOverlap: HiddenReady=113, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=204, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=462, UsedBeforeEvict=113, EvictedBeforeUse=19
+    Predictor TopK matches: 0=6 1=22 >=2=120
+Layer 23 Cache Stats: Hits=1004, Misses=188, HitRate=84.23%
+    Predictor Routed-Expert HitRate=45.41% (336/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=45.41% (336/740)
+    Predictor RoutedTopK HitRate=39.36% (466/1184)
+    Predicted RequestedByRouterForcedN Rate=56.76% (336/592)
+    Predicted RequestedByRouterTopK Rate=78.72% (466/592)
+    Predictor WindowRecall Rate=39.36% (466/1184)
+    Predictor WindowPrecision Rate=78.72% (466/592)
+    Loads Per Step: 0Loads=44, 1Load=49, >1Load=56
+    Bandwidth: StallLoads=188, PrefetchLoads=190, AvgLoadTime=3.64ms
+    PrefetchOverlap: HiddenReady=149, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=188, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=406, UsedBeforeEvict=149, EvictedBeforeUse=41
+    Predictor TopK matches: 0=7 1=31 >=2=110
+Layer 24 Cache Stats: Hits=991, Misses=201, HitRate=83.14%
+    Predictor Routed-Expert HitRate=40.68% (301/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=40.68% (301/740)
+    Predictor RoutedTopK HitRate=38.43% (455/1184)
+    Predicted RequestedByRouterForcedN Rate=50.84% (301/592)
+    Predicted RequestedByRouterTopK Rate=76.86% (455/592)
+    Predictor WindowRecall Rate=38.43% (455/1184)
+    Predictor WindowPrecision Rate=76.86% (455/592)
+    Loads Per Step: 0Loads=30, 1Load=63, >1Load=56
+    Bandwidth: StallLoads=201, PrefetchLoads=107, AvgLoadTime=4.05ms
+    PrefetchOverlap: HiddenReady=84, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=201, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=489, UsedBeforeEvict=84, EvictedBeforeUse=22
+    Predictor TopK matches: 0=16 1=25 >=2=107
+Layer 25 Cache Stats: Hits=1000, Misses=192, HitRate=83.89%
+    Predictor Routed-Expert HitRate=47.03% (348/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.03% (348/740)
+    Predictor RoutedTopK HitRate=40.37% (478/1184)
+    Predicted RequestedByRouterForcedN Rate=58.78% (348/592)
+    Predicted RequestedByRouterTopK Rate=80.74% (478/592)
+    Predictor WindowRecall Rate=40.37% (478/1184)
+    Predictor WindowPrecision Rate=80.74% (478/592)
+    Loads Per Step: 0Loads=31, 1Load=63, >1Load=55
+    Bandwidth: StallLoads=192, PrefetchLoads=152, AvgLoadTime=3.92ms
+    PrefetchOverlap: HiddenReady=129, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=192, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=444, UsedBeforeEvict=129, EvictedBeforeUse=23
+    Predictor TopK matches: 0=5 1=27 >=2=116
+Layer 26 Cache Stats: Hits=1014, Misses=178, HitRate=85.07%
+    Predictor Routed-Expert HitRate=49.19% (364/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=49.19% (364/740)
+    Predictor RoutedTopK HitRate=41.64% (493/1184)
+    Predicted RequestedByRouterForcedN Rate=61.49% (364/592)
+    Predicted RequestedByRouterTopK Rate=83.28% (493/592)
+    Predictor WindowRecall Rate=41.64% (493/1184)
+    Predictor WindowPrecision Rate=83.28% (493/592)
+    Loads Per Step: 0Loads=35, 1Load=67, >1Load=47
+    Bandwidth: StallLoads=178, PrefetchLoads=70, AvgLoadTime=3.83ms
+    PrefetchOverlap: HiddenReady=58, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=178, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=526, UsedBeforeEvict=58, EvictedBeforeUse=12
+    Predictor TopK matches: 0=3 1=23 >=2=122
+Layer 27 Cache Stats: Hits=1021, Misses=171, HitRate=85.65%
+    Predictor Routed-Expert HitRate=48.24% (357/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=48.24% (357/740)
+    Predictor RoutedTopK HitRate=41.22% (488/1184)
+    Predicted RequestedByRouterForcedN Rate=60.30% (357/592)
+    Predicted RequestedByRouterTopK Rate=82.43% (488/592)
+    Predictor WindowRecall Rate=41.22% (488/1184)
+    Predictor WindowPrecision Rate=82.43% (488/592)
+    Loads Per Step: 0Loads=46, 1Load=52, >1Load=51
+    Bandwidth: StallLoads=171, PrefetchLoads=69, AvgLoadTime=3.65ms
+    PrefetchOverlap: HiddenReady=52, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=171, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=527, UsedBeforeEvict=52, EvictedBeforeUse=15
+    Predictor TopK matches: 0=5 1=22 >=2=121
+Layer 28 Cache Stats: Hits=1012, Misses=180, HitRate=84.90%
+    Predictor Routed-Expert HitRate=50.81% (376/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=50.81% (376/740)
+    Predictor RoutedTopK HitRate=42.15% (499/1184)
+    Predicted RequestedByRouterForcedN Rate=63.51% (376/592)
+    Predicted RequestedByRouterTopK Rate=84.29% (499/592)
+    Predictor WindowRecall Rate=42.15% (499/1184)
+    Predictor WindowPrecision Rate=84.29% (499/592)
+    Loads Per Step: 0Loads=24, 1Load=85, >1Load=40
+    Bandwidth: StallLoads=180, PrefetchLoads=109, AvgLoadTime=3.85ms
+    PrefetchOverlap: HiddenReady=92, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=180, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=487, UsedBeforeEvict=92, EvictedBeforeUse=17
+    Predictor TopK matches: 0=6 1=14 >=2=128
+Layer 29 Cache Stats: Hits=973, Misses=219, HitRate=81.63%
+    Predictor Routed-Expert HitRate=47.03% (348/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.03% (348/740)
+    Predictor RoutedTopK HitRate=39.61% (469/1184)
+    Predicted RequestedByRouterForcedN Rate=58.78% (348/592)
+    Predicted RequestedByRouterTopK Rate=79.22% (469/592)
+    Predictor WindowRecall Rate=39.61% (469/1184)
+    Predictor WindowPrecision Rate=79.22% (469/592)
+    Loads Per Step: 0Loads=27, 1Load=49, >1Load=73
+    Bandwidth: StallLoads=219, PrefetchLoads=162, AvgLoadTime=3.51ms
+    PrefetchOverlap: HiddenReady=125, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=219, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=434, UsedBeforeEvict=125, EvictedBeforeUse=37
+    Predictor TopK matches: 0=3 1=28 >=2=117
+Layer 30 Cache Stats: Hits=1011, Misses=181, HitRate=84.82%
+    Predictor Routed-Expert HitRate=50.81% (376/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=50.81% (376/740)
+    Predictor RoutedTopK HitRate=41.22% (488/1184)
+    Predicted RequestedByRouterForcedN Rate=63.51% (376/592)
+    Predicted RequestedByRouterTopK Rate=82.43% (488/592)
+    Predictor WindowRecall Rate=41.22% (488/1184)
+    Predictor WindowPrecision Rate=82.43% (488/592)
+    Loads Per Step: 0Loads=35, 1Load=67, >1Load=47
+    Bandwidth: StallLoads=181, PrefetchLoads=75, AvgLoadTime=3.82ms
+    PrefetchOverlap: HiddenReady=63, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=181, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=521, UsedBeforeEvict=63, EvictedBeforeUse=12
+    Predictor TopK matches: 0=7 1=16 >=2=125
+Layer 31 Cache Stats: Hits=1071, Misses=121, HitRate=89.85%
+    Predictor Routed-Expert HitRate=55.27% (409/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.27% (409/740)
+    Predictor RoutedTopK HitRate=43.83% (519/1184)
+    Predicted RequestedByRouterForcedN Rate=69.09% (409/592)
+    Predicted RequestedByRouterTopK Rate=87.67% (519/592)
+    Predictor WindowRecall Rate=43.83% (519/1184)
+    Predictor WindowPrecision Rate=87.67% (519/592)
+    Loads Per Step: 0Loads=64, 1Load=57, >1Load=28
+    Bandwidth: StallLoads=121, PrefetchLoads=32, AvgLoadTime=3.75ms
+    PrefetchOverlap: HiddenReady=31, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=121, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=564, UsedBeforeEvict=31, EvictedBeforeUse=1
+    Predictor TopK matches: 0=2 1=12 >=2=134
+Layer 32 Cache Stats: Hits=1033, Misses=159, HitRate=86.66%
+    Predictor Routed-Expert HitRate=47.97% (355/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.97% (355/740)
+    Predictor RoutedTopK HitRate=39.95% (473/1184)
+    Predicted RequestedByRouterForcedN Rate=59.97% (355/592)
+    Predicted RequestedByRouterTopK Rate=79.90% (473/592)
+    Predictor WindowRecall Rate=39.95% (473/1184)
+    Predictor WindowPrecision Rate=79.90% (473/592)
+    Loads Per Step: 0Loads=44, 1Load=67, >1Load=38
+    Bandwidth: StallLoads=159, PrefetchLoads=104, AvgLoadTime=3.68ms
+    PrefetchOverlap: HiddenReady=87, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=159, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=492, UsedBeforeEvict=87, EvictedBeforeUse=17
+    Predictor TopK matches: 0=3 1=26 >=2=119
+Layer 33 Cache Stats: Hits=1031, Misses=161, HitRate=86.49%
+    Predictor Routed-Expert HitRate=50.54% (374/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=50.54% (374/740)
+    Predictor RoutedTopK HitRate=41.05% (486/1184)
+    Predicted RequestedByRouterForcedN Rate=63.18% (374/592)
+    Predicted RequestedByRouterTopK Rate=82.09% (486/592)
+    Predictor WindowRecall Rate=41.05% (486/1184)
+    Predictor WindowPrecision Rate=82.09% (486/592)
+    Loads Per Step: 0Loads=51, 1Load=53, >1Load=45
+    Bandwidth: StallLoads=161, PrefetchLoads=112, AvgLoadTime=3.71ms
+    PrefetchOverlap: HiddenReady=94, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=161, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=484, UsedBeforeEvict=94, EvictedBeforeUse=17
+    Predictor TopK matches: 0=8 1=13 >=2=127
+Layer 34 Cache Stats: Hits=995, Misses=197, HitRate=83.47%
+    Predictor Routed-Expert HitRate=47.43% (351/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.43% (351/740)
+    Predictor RoutedTopK HitRate=41.81% (495/1184)
+    Predicted RequestedByRouterForcedN Rate=59.29% (351/592)
+    Predicted RequestedByRouterTopK Rate=83.61% (495/592)
+    Predictor WindowRecall Rate=41.81% (495/1184)
+    Predictor WindowPrecision Rate=83.61% (495/592)
+    Loads Per Step: 0Loads=43, 1Load=43, >1Load=63
+    Bandwidth: StallLoads=197, PrefetchLoads=155, AvgLoadTime=3.54ms
+    PrefetchOverlap: HiddenReady=133, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=197, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=441, UsedBeforeEvict=133, EvictedBeforeUse=21
+    Predictor TopK matches: 0=8 1=27 >=2=113
+Layer 35 Cache Stats: Hits=999, Misses=193, HitRate=83.81%
+    Predictor Routed-Expert HitRate=47.84% (354/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.84% (354/740)
+    Predictor RoutedTopK HitRate=40.96% (485/1184)
+    Predicted RequestedByRouterForcedN Rate=59.80% (354/592)
+    Predicted RequestedByRouterTopK Rate=81.93% (485/592)
+    Predictor WindowRecall Rate=40.96% (485/1184)
+    Predictor WindowPrecision Rate=81.93% (485/592)
+    Loads Per Step: 0Loads=35, 1Load=60, >1Load=54
+    Bandwidth: StallLoads=193, PrefetchLoads=207, AvgLoadTime=3.66ms
+    PrefetchOverlap: HiddenReady=168, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=193, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=389, UsedBeforeEvict=168, EvictedBeforeUse=38
+    Predictor TopK matches: 0=7 1=23 >=2=118
+Layer 36 Cache Stats: Hits=987, Misses=205, HitRate=82.80%
+    Predictor Routed-Expert HitRate=49.86% (369/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=49.86% (369/740)
+    Predictor RoutedTopK HitRate=40.88% (484/1184)
+    Predicted RequestedByRouterForcedN Rate=62.33% (369/592)
+    Predicted RequestedByRouterTopK Rate=81.76% (484/592)
+    Predictor WindowRecall Rate=40.88% (484/1184)
+    Predictor WindowPrecision Rate=81.76% (484/592)
+    Loads Per Step: 0Loads=27, 1Load=68, >1Load=54
+    Bandwidth: StallLoads=205, PrefetchLoads=155, AvgLoadTime=4.00ms
+    PrefetchOverlap: HiddenReady=119, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=205, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=441, UsedBeforeEvict=119, EvictedBeforeUse=33
+    Predictor TopK matches: 0=9 1=18 >=2=121
+Layer 37 Cache Stats: Hits=998, Misses=194, HitRate=83.72%
+    Predictor Routed-Expert HitRate=54.32% (402/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=54.32% (402/740)
+    Predictor RoutedTopK HitRate=43.83% (519/1184)
+    Predicted RequestedByRouterForcedN Rate=67.91% (402/592)
+    Predicted RequestedByRouterTopK Rate=87.67% (519/592)
+    Predictor WindowRecall Rate=43.83% (519/1184)
+    Predictor WindowPrecision Rate=87.67% (519/592)
+    Loads Per Step: 0Loads=29, 1Load=60, >1Load=60
+    Bandwidth: StallLoads=194, PrefetchLoads=170, AvgLoadTime=3.73ms
+    PrefetchOverlap: HiddenReady=154, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=194, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=426, UsedBeforeEvict=154, EvictedBeforeUse=16
+    Predictor TopK matches: 0=5 1=14 >=2=129
+Layer 38 Cache Stats: Hits=1035, Misses=157, HitRate=86.83%
+    Predictor Routed-Expert HitRate=57.57% (426/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=57.57% (426/740)
+    Predictor RoutedTopK HitRate=44.59% (528/1184)
+    Predicted RequestedByRouterForcedN Rate=71.96% (426/592)
+    Predicted RequestedByRouterTopK Rate=89.19% (528/592)
+    Predictor WindowRecall Rate=44.59% (528/1184)
+    Predictor WindowPrecision Rate=89.19% (528/592)
+    Loads Per Step: 0Loads=46, 1Load=60, >1Load=43
+    Bandwidth: StallLoads=157, PrefetchLoads=121, AvgLoadTime=4.20ms
+    PrefetchOverlap: HiddenReady=110, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=157, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=475, UsedBeforeEvict=110, EvictedBeforeUse=9
+    Predictor TopK matches: 0=2 1=12 >=2=134
+Layer 39 Cache Stats: Hits=1042, Misses=150, HitRate=87.42%
+    Predictor Routed-Expert HitRate=55.68% (412/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.68% (412/740)
+    Predictor RoutedTopK HitRate=44.26% (524/1184)
+    Predicted RequestedByRouterForcedN Rate=69.59% (412/592)
+    Predicted RequestedByRouterTopK Rate=88.51% (524/592)
+    Predictor WindowRecall Rate=44.26% (524/1184)
+    Predictor WindowPrecision Rate=88.51% (524/592)
+    Loads Per Step: 0Loads=50, 1Load=62, >1Load=37
+    Bandwidth: StallLoads=150, PrefetchLoads=105, AvgLoadTime=3.93ms
+    PrefetchOverlap: HiddenReady=97, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=150, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=491, UsedBeforeEvict=97, EvictedBeforeUse=8
+    Predictor TopK matches: 0=3 1=14 >=2=131
+Layer 40 Cache Stats: Hits=1054, Misses=138, HitRate=88.42%
+    Predictor Routed-Expert HitRate=57.97% (429/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=57.97% (429/740)
+    Predictor RoutedTopK HitRate=45.35% (537/1184)
+    Predicted RequestedByRouterForcedN Rate=72.47% (429/592)
+    Predicted RequestedByRouterTopK Rate=90.71% (537/592)
+    Predictor WindowRecall Rate=45.35% (537/1184)
+    Predictor WindowPrecision Rate=90.71% (537/592)
+    Loads Per Step: 0Loads=53, 1Load=64, >1Load=32
+    Bandwidth: StallLoads=138, PrefetchLoads=151, AvgLoadTime=3.90ms
+    PrefetchOverlap: HiddenReady=138, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=138, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=445, UsedBeforeEvict=138, EvictedBeforeUse=13
+    Predictor TopK matches: 0=5 1=6 >=2=137
+Layer 41 Cache Stats: Hits=1003, Misses=189, HitRate=84.14%
+    Predictor Routed-Expert HitRate=55.54% (411/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.54% (411/740)
+    Predictor RoutedTopK HitRate=46.28% (548/1184)
+    Predicted RequestedByRouterForcedN Rate=69.43% (411/592)
+    Predicted RequestedByRouterTopK Rate=92.57% (548/592)
+    Predictor WindowRecall Rate=46.28% (548/1184)
+    Predictor WindowPrecision Rate=92.57% (548/592)
+    Loads Per Step: 0Loads=33, 1Load=66, >1Load=50
+    Bandwidth: StallLoads=189, PrefetchLoads=199, AvgLoadTime=3.59ms
+    PrefetchOverlap: HiddenReady=183, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=189, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=397, UsedBeforeEvict=183, EvictedBeforeUse=14
+    Predictor TopK matches: 0=0 1=15 >=2=133
+Layer 42 Cache Stats: Hits=1052, Misses=140, HitRate=88.26%
+    Predictor Routed-Expert HitRate=58.24% (431/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=58.24% (431/740)
+    Predictor RoutedTopK HitRate=46.71% (553/1184)
+    Predicted RequestedByRouterForcedN Rate=72.80% (431/592)
+    Predicted RequestedByRouterTopK Rate=93.41% (553/592)
+    Predictor WindowRecall Rate=46.71% (553/1184)
+    Predictor WindowPrecision Rate=93.41% (553/592)
+    Loads Per Step: 0Loads=49, 1Load=68, >1Load=32
+    Bandwidth: StallLoads=140, PrefetchLoads=167, AvgLoadTime=4.52ms
+    PrefetchOverlap: HiddenReady=160, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=140, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=429, UsedBeforeEvict=160, EvictedBeforeUse=7
+    Predictor TopK matches: 0=1 1=9 >=2=138
+Layer 43 Cache Stats: Hits=1024, Misses=168, HitRate=85.91%
+    Predictor Routed-Expert HitRate=59.32% (439/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=59.32% (439/740)
+    Predictor RoutedTopK HitRate=45.61% (540/1184)
+    Predicted RequestedByRouterForcedN Rate=74.16% (439/592)
+    Predicted RequestedByRouterTopK Rate=91.22% (540/592)
+    Predictor WindowRecall Rate=45.61% (540/1184)
+    Predictor WindowPrecision Rate=91.22% (540/592)
+    Loads Per Step: 0Loads=46, 1Load=58, >1Load=45
+    Bandwidth: StallLoads=168, PrefetchLoads=195, AvgLoadTime=4.02ms
+    PrefetchOverlap: HiddenReady=176, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=168, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=401, UsedBeforeEvict=176, EvictedBeforeUse=19
+    Predictor TopK matches: 0=3 1=10 >=2=135
+Layer 44 Cache Stats: Hits=1041, Misses=151, HitRate=87.33%
+    Predictor Routed-Expert HitRate=60.95% (451/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=60.95% (451/740)
+    Predictor RoutedTopK HitRate=47.04% (557/1184)
+    Predicted RequestedByRouterForcedN Rate=76.18% (451/592)
+    Predicted RequestedByRouterTopK Rate=94.09% (557/592)
+    Predictor WindowRecall Rate=47.04% (557/1184)
+    Predictor WindowPrecision Rate=94.09% (557/592)
+    Loads Per Step: 0Loads=45, 1Load=67, >1Load=37
+    Bandwidth: StallLoads=151, PrefetchLoads=122, AvgLoadTime=4.53ms
+    PrefetchOverlap: HiddenReady=115, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=151, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=474, UsedBeforeEvict=115, EvictedBeforeUse=5
+    Predictor TopK matches: 0=0 1=2 >=2=146
+Layer 45 Cache Stats: Hits=1011, Misses=181, HitRate=84.82%
+    Predictor Routed-Expert HitRate=60.54% (448/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=60.54% (448/740)
+    Predictor RoutedTopK HitRate=45.95% (544/1184)
+    Predicted RequestedByRouterForcedN Rate=75.68% (448/592)
+    Predicted RequestedByRouterTopK Rate=91.89% (544/592)
+    Predictor WindowRecall Rate=45.95% (544/1184)
+    Predictor WindowPrecision Rate=91.89% (544/592)
+    Loads Per Step: 0Loads=33, 1Load=67, >1Load=49
+    Bandwidth: StallLoads=181, PrefetchLoads=172, AvgLoadTime=3.94ms
+    PrefetchOverlap: HiddenReady=157, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=181, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=424, UsedBeforeEvict=157, EvictedBeforeUse=13
+    Predictor TopK matches: 0=2 1=7 >=2=139
+Layer 46 Cache Stats: Hits=1025, Misses=167, HitRate=85.99%
+    Predictor Routed-Expert HitRate=59.73% (442/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=59.73% (442/740)
+    Predictor RoutedTopK HitRate=45.27% (536/1184)
+    Predicted RequestedByRouterForcedN Rate=74.66% (442/592)
+    Predicted RequestedByRouterTopK Rate=90.54% (536/592)
+    Predictor WindowRecall Rate=45.27% (536/1184)
+    Predictor WindowPrecision Rate=90.54% (536/592)
+    Loads Per Step: 0Loads=38, 1Load=67, >1Load=44
+    Bandwidth: StallLoads=167, PrefetchLoads=214, AvgLoadTime=5.22ms
+    PrefetchOverlap: HiddenReady=195, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=167, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=382, UsedBeforeEvict=195, EvictedBeforeUse=17
+    Predictor TopK matches: 0=2 1=4 >=2=142
+Layer 47 Cache Stats: Hits=986, Misses=206, HitRate=82.72%
+    Predictor Routed-Expert HitRate=60.95% (451/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=60.95% (451/740)
+    Predictor RoutedTopK HitRate=47.13% (558/1184)
+    Predicted RequestedByRouterForcedN Rate=76.18% (451/592)
+    Predicted RequestedByRouterTopK Rate=94.26% (558/592)
+    Predictor WindowRecall Rate=47.13% (558/1184)
+    Predictor WindowPrecision Rate=94.26% (558/592)
+    Loads Per Step: 0Loads=25, 1Load=65, >1Load=59
+    Bandwidth: StallLoads=206, PrefetchLoads=303, AvgLoadTime=3.58ms
+    PrefetchOverlap: HiddenReady=295, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=206, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=289, UsedBeforeEvict=295, EvictedBeforeUse=8
+    Predictor TopK matches: 0=2 1=8 >=2=138
+============================================================
+[TorchScriptPredictor Layer 0] Shutdown complete
+[TorchScriptPredictor Layer 1] Shutdown complete
+[TorchScriptPredictor Layer 2] Shutdown complete
+[TorchScriptPredictor Layer 3] Shutdown complete
+[TorchScriptPredictor Layer 4] Shutdown complete
+[TorchScriptPredictor Layer 5] Shutdown complete
+[TorchScriptPredictor Layer 6] Shutdown complete
+[TorchScriptPredictor Layer 7] Shutdown complete
+[TorchScriptPredictor Layer 8] Shutdown complete
+[TorchScriptPredictor Layer 9] Shutdown complete
+[TorchScriptPredictor Layer 10] Shutdown complete
+[TorchScriptPredictor Layer 11] Shutdown complete
+[TorchScriptPredictor Layer 12] Shutdown complete
+[TorchScriptPredictor Layer 13] Shutdown complete
+[TorchScriptPredictor Layer 14] Shutdown complete
+[TorchScriptPredictor Layer 15] Shutdown complete
+[TorchScriptPredictor Layer 16] Shutdown complete
+[TorchScriptPredictor Layer 17] Shutdown complete
+[TorchScriptPredictor Layer 18] Shutdown complete
+[TorchScriptPredictor Layer 19] Shutdown complete
+[TorchScriptPredictor Layer 20] Shutdown complete
+[TorchScriptPredictor Layer 21] Shutdown complete
+[TorchScriptPredictor Layer 22] Shutdown complete
+[TorchScriptPredictor Layer 23] Shutdown complete
+[TorchScriptPredictor Layer 24] Shutdown complete
+[TorchScriptPredictor Layer 25] Shutdown complete
+[TorchScriptPredictor Layer 26] Shutdown complete
+[TorchScriptPredictor Layer 27] Shutdown complete
+[TorchScriptPredictor Layer 28] Shutdown complete
+[TorchScriptPredictor Layer 29] Shutdown complete
+[TorchScriptPredictor Layer 30] Shutdown complete
+[TorchScriptPredictor Layer 31] Shutdown complete
+[TorchScriptPredictor Layer 32] Shutdown complete
+[TorchScriptPredictor Layer 33] Shutdown complete
+[TorchScriptPredictor Layer 34] Shutdown complete
+[TorchScriptPredictor Layer 35] Shutdown complete
+[TorchScriptPredictor Layer 36] Shutdown complete
+[TorchScriptPredictor Layer 37] Shutdown complete
+[TorchScriptPredictor Layer 38] Shutdown complete
+[TorchScriptPredictor Layer 39] Shutdown complete
+[TorchScriptPredictor Layer 40] Shutdown complete
+[TorchScriptPredictor Layer 41] Shutdown complete
+[TorchScriptPredictor Layer 42] Shutdown complete
+[TorchScriptPredictor Layer 43] Shutdown complete
+[TorchScriptPredictor Layer 44] Shutdown complete
+[TorchScriptPredictor Layer 45] Shutdown complete
+[TorchScriptPredictor Layer 46] Shutdown complete
+[TorchScriptPredictor Layer 47] Shutdown complete
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.29 seconds
+Pre-warming expert cache with 16 experts...
+Model initialized successfully!
+Setting lambda to 1.0
+Forced top-5 experts into cache mask.
+Set expert cache policy to LFRU.
+
+Running sweep using prompts from JSON: /tmp/tmpl5ipsicv.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ In 2006 , Boulter starred alongside Whishaw in the play Citizenship written by Mark Ravenhill . He appeared on a 2006 episode of the television series , Doctors , followed by a role in the 2007 theatre production of How to Curse directed by Josie Rourke . How to Curse was performed at Bush Theatre in the London Borough of Hammersmith and Fulham . Boulter starred in two films in 2008 , Daylight Robbery by filmmaker Paris Leonti , and Donkey Punch directed by Olly Blackburn . In May 2008 , Boulter made a guest appearance on a two @-@ part episode arc of the television series W
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.416725
+End-to-End TPS: 2.3997
+Cache Stats: Hits=49018, Misses=8198, HitRate=85.67%
+Predictor Stats: Hits=19067, Total=35520, HitRate=53.68%
+Running as unit: run-rde4dd1ccb7704c419c6014fc26fad18a.scope; invocation ID: 7e57b2f10df64ba69033818db447997b
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[Predictor] Layer 0 model path resolved to: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_0/best_jit.pt
+[Predictor] Running on device: CPU (NPU path) (heterogeneity="gpu", predictor_device="cpu")
+[ThreadedTorchScriptPredictor Layer 0] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_0/best.json
+[TorchScriptPredictor Layer 0] Loading model on CPU
+[TorchScriptPredictor Layer 0] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 0] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 0] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_0/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 1] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_1/best.json
+[TorchScriptPredictor Layer 1] Loading model on CPU
+[TorchScriptPredictor Layer 1] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 1] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 1] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_1/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 2] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_2/best.json
+[TorchScriptPredictor Layer 2] Loading model on CPU
+[TorchScriptPredictor Layer 2] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 2] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 2] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_2/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 3] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_3/best.json
+[TorchScriptPredictor Layer 3] Loading model on CPU
+[TorchScriptPredictor Layer 3] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 3] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 3] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_3/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 4] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_4/best.json
+[TorchScriptPredictor Layer 4] Loading model on CPU
+[TorchScriptPredictor Layer 4] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 4] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 4] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_4/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 5] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_5/best.json
+[TorchScriptPredictor Layer 5] Loading model on CPU
+[TorchScriptPredictor Layer 5] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 5] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 5] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_5/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 6] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_6/best.json
+[TorchScriptPredictor Layer 6] Loading model on CPU
+[TorchScriptPredictor Layer 6] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 6] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 6] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_6/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 7] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_7/best.json
+[TorchScriptPredictor Layer 7] Loading model on CPU
+[TorchScriptPredictor Layer 7] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 7] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 7] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_7/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 8] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_8/best.json
+[TorchScriptPredictor Layer 8] Loading model on CPU
+[TorchScriptPredictor Layer 8] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 8] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 8] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_8/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 9] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_9/best.json
+[TorchScriptPredictor Layer 9] Loading model on CPU
+[TorchScriptPredictor Layer 9] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 9] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 9] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_9/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 10] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_10/best.json
+[TorchScriptPredictor Layer 10] Loading model on CPU
+[TorchScriptPredictor Layer 10] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 10] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 10] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_10/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 11] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_11/best.json
+[TorchScriptPredictor Layer 11] Loading model on CPU
+[TorchScriptPredictor Layer 11] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 11] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 11] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_11/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 12] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_12/best.json
+[TorchScriptPredictor Layer 12] Loading model on CPU
+[TorchScriptPredictor Layer 12] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 12] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 12] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_12/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 13] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_13/best.json
+[TorchScriptPredictor Layer 13] Loading model on CPU
+[TorchScriptPredictor Layer 13] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 13] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 13] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_13/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 14] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_14/best.json
+[TorchScriptPredictor Layer 14] Loading model on CPU
+[TorchScriptPredictor Layer 14] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 14] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 14] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_14/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 15] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_15/best.json
+[TorchScriptPredictor Layer 15] Loading model on CPU
+[TorchScriptPredictor Layer 15] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 15] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 15] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_15/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 16] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_16/best.json
+[TorchScriptPredictor Layer 16] Loading model on CPU
+[TorchScriptPredictor Layer 16] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 16] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 16] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_16/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 17] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_17/best.json
+[TorchScriptPredictor Layer 17] Loading model on CPU
+[TorchScriptPredictor Layer 17] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 17] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 17] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_17/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 18] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_18/best.json
+[TorchScriptPredictor Layer 18] Loading model on CPU
+[TorchScriptPredictor Layer 18] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 18] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 18] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_18/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 19] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_19/best.json
+[TorchScriptPredictor Layer 19] Loading model on CPU
+[TorchScriptPredictor Layer 19] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 19] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 19] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_19/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 20] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_20/best.json
+[TorchScriptPredictor Layer 20] Loading model on CPU
+[TorchScriptPredictor Layer 20] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 20] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 20] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_20/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 21] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_21/best.json
+[TorchScriptPredictor Layer 21] Loading model on CPU
+[TorchScriptPredictor Layer 21] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 21] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 21] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_21/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 22] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_22/best.json
+[TorchScriptPredictor Layer 22] Loading model on CPU
+[TorchScriptPredictor Layer 22] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 22] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 22] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_22/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 23] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_23/best.json
+[TorchScriptPredictor Layer 23] Loading model on CPU
+[TorchScriptPredictor Layer 23] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 23] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 23] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_23/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 24] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_24/best.json
+[TorchScriptPredictor Layer 24] Loading model on CPU
+[TorchScriptPredictor Layer 24] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 24] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 24] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_24/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 25] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_25/best.json
+[TorchScriptPredictor Layer 25] Loading model on CPU
+[TorchScriptPredictor Layer 25] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 25] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 25] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_25/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 26] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_26/best.json
+[TorchScriptPredictor Layer 26] Loading model on CPU
+[TorchScriptPredictor Layer 26] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 26] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 26] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_26/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 27] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_27/best.json
+[TorchScriptPredictor Layer 27] Loading model on CPU
+[TorchScriptPredictor Layer 27] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 27] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 27] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_27/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 28] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_28/best.json
+[TorchScriptPredictor Layer 28] Loading model on CPU
+[TorchScriptPredictor Layer 28] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 28] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 28] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_28/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 29] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_29/best.json
+[TorchScriptPredictor Layer 29] Loading model on CPU
+[TorchScriptPredictor Layer 29] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 29] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 29] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_29/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 30] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_30/best.json
+[TorchScriptPredictor Layer 30] Loading model on CPU
+[TorchScriptPredictor Layer 30] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 30] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 30] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_30/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 31] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_31/best.json
+[TorchScriptPredictor Layer 31] Loading model on CPU
+[TorchScriptPredictor Layer 31] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 31] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 31] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_31/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 32] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_32/best.json
+[TorchScriptPredictor Layer 32] Loading model on CPU
+[TorchScriptPredictor Layer 32] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 32] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 32] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_32/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 33] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_33/best.json
+[TorchScriptPredictor Layer 33] Loading model on CPU
+[TorchScriptPredictor Layer 33] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 33] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 33] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_33/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 34] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_34/best.json
+[TorchScriptPredictor Layer 34] Loading model on CPU
+[TorchScriptPredictor Layer 34] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 34] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 34] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_34/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 35] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_35/best.json
+[TorchScriptPredictor Layer 35] Loading model on CPU
+[TorchScriptPredictor Layer 35] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 35] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 35] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_35/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 36] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_36/best.json
+[TorchScriptPredictor Layer 36] Loading model on CPU
+[TorchScriptPredictor Layer 36] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 36] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 36] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_36/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 37] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_37/best.json
+[TorchScriptPredictor Layer 37] Loading model on CPU
+[TorchScriptPredictor Layer 37] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 37] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 37] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_37/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 38] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_38/best.json
+[TorchScriptPredictor Layer 38] Loading model on CPU
+[TorchScriptPredictor Layer 38] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 38] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 38] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_38/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 39] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_39/best.json
+[TorchScriptPredictor Layer 39] Loading model on CPU
+[TorchScriptPredictor Layer 39] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 39] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 39] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_39/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 40] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_40/best.json
+[TorchScriptPredictor Layer 40] Loading model on CPU
+[TorchScriptPredictor Layer 40] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 40] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 40] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_40/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 41] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_41/best.json
+[TorchScriptPredictor Layer 41] Loading model on CPU
+[TorchScriptPredictor Layer 41] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 41] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 41] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_41/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 42] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_42/best.json
+[TorchScriptPredictor Layer 42] Loading model on CPU
+[TorchScriptPredictor Layer 42] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 42] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 42] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_42/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 43] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_43/best.json
+[TorchScriptPredictor Layer 43] Loading model on CPU
+[TorchScriptPredictor Layer 43] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 43] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 43] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_43/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 44] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_44/best.json
+[TorchScriptPredictor Layer 44] Loading model on CPU
+[TorchScriptPredictor Layer 44] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 44] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 44] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_44/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 45] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_45/best.json
+[TorchScriptPredictor Layer 45] Loading model on CPU
+[TorchScriptPredictor Layer 45] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 45] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 45] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_45/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 46] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_46/best.json
+[TorchScriptPredictor Layer 46] Loading model on CPU
+[TorchScriptPredictor Layer 46] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 46] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 46] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_46/best_jit.pt
+[ThreadedTorchScriptPredictor Layer 47] Detected history_length=4 from /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_47/best.json
+[TorchScriptPredictor Layer 47] Loading model on CPU
+[TorchScriptPredictor Layer 47] Assuming prefill_dist, prev_expert_onehot, and prev_layers_feat support (v3 API).
+[TorchScriptPredictor Layer 47] prefill_dist support: yes, prev_expert_onehot support: yes, prev_layers_feat support: yes
+[TorchScriptPredictor Layer 47] Loaded model: /home/michael/heteroPredict/trainingData/qwen3_30b/transformer_final_pfill_markov_emb/transformer_eh4_h64_f1/layer_47/best_jit.pt
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 16 experts for all layers...
+Layer 0: Pre-warming 16 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 16 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 16 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 16 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 16 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 16 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 16 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 16 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 16 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 16 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 16 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 16 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 16 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 16 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 16 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 16 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 16 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 16 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 16 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 16 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 16 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 16 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 16 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 16 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 16 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 16 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 16 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 16 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 16 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 16 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 16 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 16 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 16 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 16 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 16 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 16 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 16 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 16 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 16 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 16 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 16 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 16 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 16 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 16 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 16 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 16 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 16 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 16 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 726]
+Skipping warmup.
+Prefill time: 22.559 seconds
+[Predictor] Prefill-end expert cache warmup (excluded from generation TPS).
+[Layer 0 Warmup Debug] predict_sync returned: 75 32 50 21 69 51 93 74 46 33 2 103 61 22 14 104 4 53 72 60 118 9 87 34 90 57 100 106 78 91 99 92 124 86 82 89 58 12 80 64 110 70 49 85 3 40 11 23 30 37 101 126 102 125 28 56 18 94 26 123 1 65 43 20 6 5 13 116 113 96 25 112 48 29 67 63 95 121 7 119 115 35 84 44 88 24 19 66 41 59 42 77 39 0 8 108 55 10 127 15 73 105 45 38 109 36 17 54 68 16 27 114 97 117 111 98 79 107 76 83 47 62 120 52 81 122 71 31 
+[Layer 0 Warmup Debug] experts_to_prefetch returned: 75 32 50 21 
+[Layer 0 Warmup Debug] After prefill-end warmup, slots are: 125 126 127 75 32 50 21 116 117 118 119 120 121 122 123 124 
+Generation phase
+[Layer 0 Step 0 Debug] Slots before check: 125 126 127 75 32 50 21 116 117 118 119 120 121 122 123 124 
+[Layer 0 Step 0 Debug] Requested: 93 69 50 21 75 32 125 116 
+[gen 5/149] elapsed=1.6s  TPS=3.217
+[gen 10/149] elapsed=2.8s  TPS=3.542
+[gen 15/149] elapsed=4.1s  TPS=3.664
+[gen 20/149] elapsed=5.4s  TPS=3.687
+[gen 25/149] elapsed=6.7s  TPS=3.743
+[gen 30/149] elapsed=8.1s  TPS=3.715
+[gen 35/149] elapsed=9.4s  TPS=3.732
+[gen 40/149] elapsed=10.6s  TPS=3.761
+[gen 45/149] elapsed=12.0s  TPS=3.747
+[gen 50/149] elapsed=13.3s  TPS=3.753
+[gen 55/149] elapsed=14.6s  TPS=3.768
+[gen 60/149] elapsed=16.1s  TPS=3.723
+[gen 65/149] elapsed=17.5s  TPS=3.724
+[gen 70/149] elapsed=18.6s  TPS=3.767
+[gen 75/149] elapsed=19.9s  TPS=3.767
+[gen 80/149] elapsed=21.4s  TPS=3.731
+[gen 85/149] elapsed=23.3s  TPS=3.650
+[gen 90/149] elapsed=24.8s  TPS=3.629
+[gen 95/149] elapsed=26.3s  TPS=3.618
+[gen 100/149] elapsed=27.4s  TPS=3.650
+[gen 105/149] elapsed=28.8s  TPS=3.647
+[gen 110/149] elapsed=30.1s  TPS=3.651
+[gen 115/149] elapsed=31.3s  TPS=3.670
+[gen 120/149] elapsed=32.6s  TPS=3.685
+[gen 125/149] elapsed=33.9s  TPS=3.689
+[gen 130/149] elapsed=35.0s  TPS=3.711
+[gen 135/149] elapsed=36.3s  TPS=3.717
+[gen 140/149] elapsed=37.7s  TPS=3.717
+[gen 145/149] elapsed=39.0s  TPS=3.721
+Prefill time (summary): 22.559 seconds
+Total Generation Time: 40.122 seconds
+Average Time per Token: 0.269274 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=808, Misses=384, HitRate=67.79%
+    Predictor Routed-Expert HitRate=37.57% (278/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=37.57% (278/740)
+    Predictor RoutedTopK HitRate=36.66% (434/1184)
+    Predicted RequestedByRouterForcedN Rate=46.96% (278/592)
+    Predicted RequestedByRouterTopK Rate=73.31% (434/592)
+    Predictor WindowRecall Rate=36.66% (434/1184)
+    Predictor WindowPrecision Rate=73.31% (434/592)
+    Loads Per Step: 0Loads=4, 1Load=28, >1Load=117
+    Bandwidth: StallLoads=384, PrefetchLoads=360, AvgLoadTime=3.16ms
+    PrefetchOverlap: HiddenReady=288, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=384, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=236, UsedBeforeEvict=288, EvictedBeforeUse=71
+    GlobalSpecLoad: PeakConcurrent=8
+    Predictor TopK matches: 0=24 1=27 >=2=97
+Layer 1 Cache Stats: Hits=928, Misses=264, HitRate=77.85%
+    Predictor Routed-Expert HitRate=47.70% (353/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.70% (353/740)
+    Predictor RoutedTopK HitRate=40.71% (482/1184)
+    Predicted RequestedByRouterForcedN Rate=59.63% (353/592)
+    Predicted RequestedByRouterTopK Rate=81.42% (482/592)
+    Predictor WindowRecall Rate=40.71% (482/1184)
+    Predictor WindowPrecision Rate=81.42% (482/592)
+    Loads Per Step: 0Loads=15, 1Load=56, >1Load=78
+    Bandwidth: StallLoads=264, PrefetchLoads=231, AvgLoadTime=3.86ms
+    PrefetchOverlap: HiddenReady=190, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=264, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=365, UsedBeforeEvict=190, EvictedBeforeUse=41
+    Predictor TopK matches: 0=8 1=31 >=2=109
+Layer 2 Cache Stats: Hits=945, Misses=247, HitRate=79.28%
+    Predictor Routed-Expert HitRate=46.76% (346/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=46.76% (346/740)
+    Predictor RoutedTopK HitRate=39.95% (473/1184)
+    Predicted RequestedByRouterForcedN Rate=58.45% (346/592)
+    Predicted RequestedByRouterTopK Rate=79.90% (473/592)
+    Predictor WindowRecall Rate=39.95% (473/1184)
+    Predictor WindowPrecision Rate=79.90% (473/592)
+    Loads Per Step: 0Loads=26, 1Load=45, >1Load=78
+    Bandwidth: StallLoads=247, PrefetchLoads=216, AvgLoadTime=3.72ms
+    PrefetchOverlap: HiddenReady=171, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=247, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=380, UsedBeforeEvict=171, EvictedBeforeUse=43
+    Predictor TopK matches: 0=12 1=27 >=2=109
+Layer 3 Cache Stats: Hits=972, Misses=220, HitRate=81.54%
+    Predictor Routed-Expert HitRate=51.35% (380/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=51.35% (380/740)
+    Predictor RoutedTopK HitRate=43.16% (511/1184)
+    Predicted RequestedByRouterForcedN Rate=64.19% (380/592)
+    Predicted RequestedByRouterTopK Rate=86.32% (511/592)
+    Predictor WindowRecall Rate=43.16% (511/1184)
+    Predictor WindowPrecision Rate=86.32% (511/592)
+    Loads Per Step: 0Loads=20, 1Load=65, >1Load=64
+    Bandwidth: StallLoads=220, PrefetchLoads=211, AvgLoadTime=3.70ms
+    PrefetchOverlap: HiddenReady=172, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=220, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=385, UsedBeforeEvict=172, EvictedBeforeUse=37
+    Predictor TopK matches: 0=5 1=18 >=2=125
+Layer 4 Cache Stats: Hits=1001, Misses=191, HitRate=83.98%
+    Predictor Routed-Expert HitRate=48.78% (361/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=48.78% (361/740)
+    Predictor RoutedTopK HitRate=40.71% (482/1184)
+    Predicted RequestedByRouterForcedN Rate=60.98% (361/592)
+    Predicted RequestedByRouterTopK Rate=81.42% (482/592)
+    Predictor WindowRecall Rate=40.71% (482/1184)
+    Predictor WindowPrecision Rate=81.42% (482/592)
+    Loads Per Step: 0Loads=40, 1Load=55, >1Load=54
+    Bandwidth: StallLoads=191, PrefetchLoads=191, AvgLoadTime=3.87ms
+    PrefetchOverlap: HiddenReady=159, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=191, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=405, UsedBeforeEvict=159, EvictedBeforeUse=29
+    Predictor TopK matches: 0=12 1=19 >=2=117
+Layer 5 Cache Stats: Hits=1001, Misses=191, HitRate=83.98%
+    Predictor Routed-Expert HitRate=53.24% (394/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=53.24% (394/740)
+    Predictor RoutedTopK HitRate=42.23% (500/1184)
+    Predicted RequestedByRouterForcedN Rate=66.55% (394/592)
+    Predicted RequestedByRouterTopK Rate=84.46% (500/592)
+    Predictor WindowRecall Rate=42.23% (500/1184)
+    Predictor WindowPrecision Rate=84.46% (500/592)
+    Loads Per Step: 0Loads=33, 1Load=65, >1Load=51
+    Bandwidth: StallLoads=191, PrefetchLoads=190, AvgLoadTime=3.87ms
+    PrefetchOverlap: HiddenReady=159, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=191, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=406, UsedBeforeEvict=159, EvictedBeforeUse=28
+    Predictor TopK matches: 0=2 1=17 >=2=129
+Layer 6 Cache Stats: Hits=1046, Misses=146, HitRate=87.75%
+    Predictor Routed-Expert HitRate=51.35% (380/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=51.35% (380/740)
+    Predictor RoutedTopK HitRate=40.88% (484/1184)
+    Predicted RequestedByRouterForcedN Rate=64.19% (380/592)
+    Predicted RequestedByRouterTopK Rate=81.76% (484/592)
+    Predictor WindowRecall Rate=40.88% (484/1184)
+    Predictor WindowPrecision Rate=81.76% (484/592)
+    Loads Per Step: 0Loads=49, 1Load=62, >1Load=38
+    Bandwidth: StallLoads=146, PrefetchLoads=59, AvgLoadTime=4.33ms
+    PrefetchOverlap: HiddenReady=40, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=146, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=537, UsedBeforeEvict=40, EvictedBeforeUse=16
+    Predictor TopK matches: 0=3 1=20 >=2=125
+Layer 7 Cache Stats: Hits=1091, Misses=101, HitRate=91.53%
+    Predictor Routed-Expert HitRate=56.35% (417/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=56.35% (417/740)
+    Predictor RoutedTopK HitRate=44.17% (523/1184)
+    Predicted RequestedByRouterForcedN Rate=70.44% (417/592)
+    Predicted RequestedByRouterTopK Rate=88.34% (523/592)
+    Predictor WindowRecall Rate=44.17% (523/1184)
+    Predictor WindowPrecision Rate=88.34% (523/592)
+    Loads Per Step: 0Loads=70, 1Load=59, >1Load=20
+    Bandwidth: StallLoads=101, PrefetchLoads=64, AvgLoadTime=4.14ms
+    PrefetchOverlap: HiddenReady=44, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=101, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=532, UsedBeforeEvict=44, EvictedBeforeUse=18
+    Predictor TopK matches: 0=1 1=0 >=2=147
+Layer 8 Cache Stats: Hits=1001, Misses=191, HitRate=83.98%
+    Predictor Routed-Expert HitRate=47.97% (355/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.97% (355/740)
+    Predictor RoutedTopK HitRate=40.71% (482/1184)
+    Predicted RequestedByRouterForcedN Rate=59.97% (355/592)
+    Predicted RequestedByRouterTopK Rate=81.42% (482/592)
+    Predictor WindowRecall Rate=40.71% (482/1184)
+    Predictor WindowPrecision Rate=81.42% (482/592)
+    Loads Per Step: 0Loads=43, 1Load=49, >1Load=57
+    Bandwidth: StallLoads=191, PrefetchLoads=134, AvgLoadTime=3.60ms
+    PrefetchOverlap: HiddenReady=98, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=191, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=462, UsedBeforeEvict=98, EvictedBeforeUse=32
+    Predictor TopK matches: 0=7 1=24 >=2=117
+Layer 9 Cache Stats: Hits=1071, Misses=121, HitRate=89.85%
+    Predictor Routed-Expert HitRate=57.03% (422/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=57.03% (422/740)
+    Predictor RoutedTopK HitRate=45.10% (534/1184)
+    Predicted RequestedByRouterForcedN Rate=71.28% (422/592)
+    Predicted RequestedByRouterTopK Rate=90.20% (534/592)
+    Predictor WindowRecall Rate=45.10% (534/1184)
+    Predictor WindowPrecision Rate=90.20% (534/592)
+    Loads Per Step: 0Loads=61, 1Load=61, >1Load=27
+    Bandwidth: StallLoads=121, PrefetchLoads=69, AvgLoadTime=4.32ms
+    PrefetchOverlap: HiddenReady=57, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=121, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=527, UsedBeforeEvict=57, EvictedBeforeUse=9
+    Predictor TopK matches: 0=3 1=8 >=2=137
+Layer 10 Cache Stats: Hits=1013, Misses=179, HitRate=84.98%
+    Predictor Routed-Expert HitRate=56.35% (417/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=56.35% (417/740)
+    Predictor RoutedTopK HitRate=45.44% (538/1184)
+    Predicted RequestedByRouterForcedN Rate=70.44% (417/592)
+    Predicted RequestedByRouterTopK Rate=90.88% (538/592)
+    Predictor WindowRecall Rate=45.44% (538/1184)
+    Predictor WindowPrecision Rate=90.88% (538/592)
+    Loads Per Step: 0Loads=37, 1Load=63, >1Load=49
+    Bandwidth: StallLoads=179, PrefetchLoads=144, AvgLoadTime=3.85ms
+    PrefetchOverlap: HiddenReady=125, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=179, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=452, UsedBeforeEvict=125, EvictedBeforeUse=17
+    Predictor TopK matches: 0=5 1=8 >=2=135
+Layer 11 Cache Stats: Hits=997, Misses=195, HitRate=83.64%
+    Predictor Routed-Expert HitRate=50.68% (375/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=50.68% (375/740)
+    Predictor RoutedTopK HitRate=42.65% (505/1184)
+    Predicted RequestedByRouterForcedN Rate=63.34% (375/592)
+    Predicted RequestedByRouterTopK Rate=85.30% (505/592)
+    Predictor WindowRecall Rate=42.65% (505/1184)
+    Predictor WindowPrecision Rate=85.30% (505/592)
+    Loads Per Step: 0Loads=36, 1Load=55, >1Load=58
+    Bandwidth: StallLoads=195, PrefetchLoads=189, AvgLoadTime=3.47ms
+    PrefetchOverlap: HiddenReady=161, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=195, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=407, UsedBeforeEvict=161, EvictedBeforeUse=25
+    Predictor TopK matches: 0=2 1=20 >=2=126
+Layer 12 Cache Stats: Hits=1069, Misses=123, HitRate=89.68%
+    Predictor Routed-Expert HitRate=55.41% (410/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.41% (410/740)
+    Predictor RoutedTopK HitRate=45.35% (537/1184)
+    Predicted RequestedByRouterForcedN Rate=69.26% (410/592)
+    Predicted RequestedByRouterTopK Rate=90.71% (537/592)
+    Predictor WindowRecall Rate=45.35% (537/1184)
+    Predictor WindowPrecision Rate=90.71% (537/592)
+    Loads Per Step: 0Loads=68, 1Load=52, >1Load=29
+    Bandwidth: StallLoads=123, PrefetchLoads=104, AvgLoadTime=4.33ms
+    PrefetchOverlap: HiddenReady=85, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=123, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=492, UsedBeforeEvict=85, EvictedBeforeUse=15
+    Predictor TopK matches: 0=3 1=9 >=2=136
+Layer 13 Cache Stats: Hits=1014, Misses=178, HitRate=85.07%
+    Predictor Routed-Expert HitRate=50.95% (377/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=50.95% (377/740)
+    Predictor RoutedTopK HitRate=43.16% (511/1184)
+    Predicted RequestedByRouterForcedN Rate=63.68% (377/592)
+    Predicted RequestedByRouterTopK Rate=86.32% (511/592)
+    Predictor WindowRecall Rate=43.16% (511/1184)
+    Predictor WindowPrecision Rate=86.32% (511/592)
+    Loads Per Step: 0Loads=37, 1Load=66, >1Load=46
+    Bandwidth: StallLoads=178, PrefetchLoads=189, AvgLoadTime=3.77ms
+    PrefetchOverlap: HiddenReady=163, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=178, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=407, UsedBeforeEvict=163, EvictedBeforeUse=24
+    Predictor TopK matches: 0=7 1=18 >=2=123
+Layer 14 Cache Stats: Hits=1052, Misses=140, HitRate=88.26%
+    Predictor Routed-Expert HitRate=56.62% (419/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=56.62% (419/740)
+    Predictor RoutedTopK HitRate=45.35% (537/1184)
+    Predicted RequestedByRouterForcedN Rate=70.78% (419/592)
+    Predicted RequestedByRouterTopK Rate=90.71% (537/592)
+    Predictor WindowRecall Rate=45.35% (537/1184)
+    Predictor WindowPrecision Rate=90.71% (537/592)
+    Loads Per Step: 0Loads=55, 1Load=58, >1Load=36
+    Bandwidth: StallLoads=140, PrefetchLoads=95, AvgLoadTime=4.32ms
+    PrefetchOverlap: HiddenReady=81, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=140, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=501, UsedBeforeEvict=81, EvictedBeforeUse=13
+    Predictor TopK matches: 0=0 1=8 >=2=140
+Layer 15 Cache Stats: Hits=1071, Misses=121, HitRate=89.85%
+    Predictor Routed-Expert HitRate=57.30% (424/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=57.30% (424/740)
+    Predictor RoutedTopK HitRate=45.44% (538/1184)
+    Predicted RequestedByRouterForcedN Rate=71.62% (424/592)
+    Predicted RequestedByRouterTopK Rate=90.88% (538/592)
+    Predictor WindowRecall Rate=45.44% (538/1184)
+    Predictor WindowPrecision Rate=90.88% (538/592)
+    Loads Per Step: 0Loads=56, 1Load=66, >1Load=27
+    Bandwidth: StallLoads=121, PrefetchLoads=63, AvgLoadTime=4.46ms
+    PrefetchOverlap: HiddenReady=49, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=121, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=533, UsedBeforeEvict=49, EvictedBeforeUse=13
+    Predictor TopK matches: 0=0 1=8 >=2=140
+Layer 16 Cache Stats: Hits=1021, Misses=171, HitRate=85.65%
+    Predictor Routed-Expert HitRate=47.70% (353/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.70% (353/740)
+    Predictor RoutedTopK HitRate=40.71% (482/1184)
+    Predicted RequestedByRouterForcedN Rate=59.63% (353/592)
+    Predicted RequestedByRouterTopK Rate=81.42% (482/592)
+    Predictor WindowRecall Rate=40.71% (482/1184)
+    Predictor WindowPrecision Rate=81.42% (482/592)
+    Loads Per Step: 0Loads=37, 1Load=66, >1Load=46
+    Bandwidth: StallLoads=171, PrefetchLoads=131, AvgLoadTime=3.83ms
+    PrefetchOverlap: HiddenReady=103, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=171, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=465, UsedBeforeEvict=103, EvictedBeforeUse=27
+    Predictor TopK matches: 0=7 1=19 >=2=122
+Layer 17 Cache Stats: Hits=1045, Misses=147, HitRate=87.67%
+    Predictor Routed-Expert HitRate=44.32% (328/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=44.32% (328/740)
+    Predictor RoutedTopK HitRate=40.54% (480/1184)
+    Predicted RequestedByRouterForcedN Rate=55.41% (328/592)
+    Predicted RequestedByRouterTopK Rate=81.08% (480/592)
+    Predictor WindowRecall Rate=40.54% (480/1184)
+    Predictor WindowPrecision Rate=81.08% (480/592)
+    Loads Per Step: 0Loads=48, 1Load=66, >1Load=35
+    Bandwidth: StallLoads=147, PrefetchLoads=166, AvgLoadTime=3.59ms
+    PrefetchOverlap: HiddenReady=134, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=147, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=430, UsedBeforeEvict=134, EvictedBeforeUse=29
+    Predictor TopK matches: 0=8 1=30 >=2=110
+Layer 18 Cache Stats: Hits=1080, Misses=112, HitRate=90.60%
+    Predictor Routed-Expert HitRate=52.16% (386/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=52.16% (386/740)
+    Predictor RoutedTopK HitRate=43.16% (511/1184)
+    Predicted RequestedByRouterForcedN Rate=65.20% (386/592)
+    Predicted RequestedByRouterTopK Rate=86.32% (511/592)
+    Predictor WindowRecall Rate=43.16% (511/1184)
+    Predictor WindowPrecision Rate=86.32% (511/592)
+    Loads Per Step: 0Loads=70, 1Load=53, >1Load=26
+    Bandwidth: StallLoads=112, PrefetchLoads=44, AvgLoadTime=4.01ms
+    PrefetchOverlap: HiddenReady=32, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=112, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=552, UsedBeforeEvict=32, EvictedBeforeUse=10
+    Predictor TopK matches: 0=4 1=12 >=2=132
+Layer 19 Cache Stats: Hits=1103, Misses=89, HitRate=92.53%
+    Predictor Routed-Expert HitRate=51.62% (382/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=51.62% (382/740)
+    Predictor RoutedTopK HitRate=42.40% (502/1184)
+    Predicted RequestedByRouterForcedN Rate=64.53% (382/592)
+    Predicted RequestedByRouterTopK Rate=84.80% (502/592)
+    Predictor WindowRecall Rate=42.40% (502/1184)
+    Predictor WindowPrecision Rate=84.80% (502/592)
+    Loads Per Step: 0Loads=86, 1Load=44, >1Load=19
+    Bandwidth: StallLoads=89, PrefetchLoads=60, AvgLoadTime=4.11ms
+    PrefetchOverlap: HiddenReady=50, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=89, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=536, UsedBeforeEvict=50, EvictedBeforeUse=9
+    Predictor TopK matches: 0=2 1=12 >=2=134
+Layer 20 Cache Stats: Hits=1073, Misses=119, HitRate=90.02%
+    Predictor Routed-Expert HitRate=49.32% (365/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=49.32% (365/740)
+    Predictor RoutedTopK HitRate=41.72% (494/1184)
+    Predicted RequestedByRouterForcedN Rate=61.66% (365/592)
+    Predicted RequestedByRouterTopK Rate=83.45% (494/592)
+    Predictor WindowRecall Rate=41.72% (494/1184)
+    Predictor WindowPrecision Rate=83.45% (494/592)
+    Loads Per Step: 0Loads=64, 1Load=55, >1Load=30
+    Bandwidth: StallLoads=119, PrefetchLoads=98, AvgLoadTime=3.94ms
+    PrefetchOverlap: HiddenReady=78, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=119, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=498, UsedBeforeEvict=78, EvictedBeforeUse=18
+    Predictor TopK matches: 0=2 1=23 >=2=123
+Layer 21 Cache Stats: Hits=1075, Misses=117, HitRate=90.18%
+    Predictor Routed-Expert HitRate=54.32% (402/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=54.32% (402/740)
+    Predictor RoutedTopK HitRate=44.26% (524/1184)
+    Predicted RequestedByRouterForcedN Rate=67.91% (402/592)
+    Predicted RequestedByRouterTopK Rate=88.51% (524/592)
+    Predictor WindowRecall Rate=44.26% (524/1184)
+    Predictor WindowPrecision Rate=88.51% (524/592)
+    Loads Per Step: 0Loads=60, 1Load=65, >1Load=24
+    Bandwidth: StallLoads=117, PrefetchLoads=61, AvgLoadTime=4.10ms
+    PrefetchOverlap: HiddenReady=52, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=117, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=535, UsedBeforeEvict=52, EvictedBeforeUse=7
+    Predictor TopK matches: 0=3 1=8 >=2=137
+Layer 22 Cache Stats: Hits=1011, Misses=181, HitRate=84.82%
+    Predictor Routed-Expert HitRate=51.89% (384/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=51.89% (384/740)
+    Predictor RoutedTopK HitRate=43.58% (516/1184)
+    Predicted RequestedByRouterForcedN Rate=64.86% (384/592)
+    Predicted RequestedByRouterTopK Rate=87.16% (516/592)
+    Predictor WindowRecall Rate=43.58% (516/1184)
+    Predictor WindowPrecision Rate=87.16% (516/592)
+    Loads Per Step: 0Loads=37, 1Load=62, >1Load=50
+    Bandwidth: StallLoads=181, PrefetchLoads=123, AvgLoadTime=3.80ms
+    PrefetchOverlap: HiddenReady=102, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=181, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=473, UsedBeforeEvict=102, EvictedBeforeUse=18
+    Predictor TopK matches: 0=7 1=15 >=2=126
+Layer 23 Cache Stats: Hits=993, Misses=199, HitRate=83.31%
+    Predictor Routed-Expert HitRate=50.41% (373/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=50.41% (373/740)
+    Predictor RoutedTopK HitRate=42.65% (505/1184)
+    Predicted RequestedByRouterForcedN Rate=63.01% (373/592)
+    Predicted RequestedByRouterTopK Rate=85.30% (505/592)
+    Predictor WindowRecall Rate=42.65% (505/1184)
+    Predictor WindowPrecision Rate=85.30% (505/592)
+    Loads Per Step: 0Loads=33, 1Load=61, >1Load=55
+    Bandwidth: StallLoads=199, PrefetchLoads=202, AvgLoadTime=3.54ms
+    PrefetchOverlap: HiddenReady=175, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=199, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=394, UsedBeforeEvict=175, EvictedBeforeUse=24
+    Predictor TopK matches: 0=6 1=20 >=2=122
+Layer 24 Cache Stats: Hits=1040, Misses=152, HitRate=87.25%
+    Predictor Routed-Expert HitRate=54.05% (400/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=54.05% (400/740)
+    Predictor RoutedTopK HitRate=44.59% (528/1184)
+    Predicted RequestedByRouterForcedN Rate=67.57% (400/592)
+    Predicted RequestedByRouterTopK Rate=89.19% (528/592)
+    Predictor WindowRecall Rate=44.59% (528/1184)
+    Predictor WindowPrecision Rate=89.19% (528/592)
+    Loads Per Step: 0Loads=50, 1Load=58, >1Load=41
+    Bandwidth: StallLoads=152, PrefetchLoads=112, AvgLoadTime=4.30ms
+    PrefetchOverlap: HiddenReady=97, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=152, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=484, UsedBeforeEvict=97, EvictedBeforeUse=13
+    Predictor TopK matches: 0=1 1=17 >=2=130
+Layer 25 Cache Stats: Hits=987, Misses=205, HitRate=82.80%
+    Predictor Routed-Expert HitRate=47.97% (355/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.97% (355/740)
+    Predictor RoutedTopK HitRate=42.65% (505/1184)
+    Predicted RequestedByRouterForcedN Rate=59.97% (355/592)
+    Predicted RequestedByRouterTopK Rate=85.30% (505/592)
+    Predictor WindowRecall Rate=42.65% (505/1184)
+    Predictor WindowPrecision Rate=85.30% (505/592)
+    Loads Per Step: 0Loads=35, 1Load=53, >1Load=61
+    Bandwidth: StallLoads=205, PrefetchLoads=197, AvgLoadTime=3.63ms
+    PrefetchOverlap: HiddenReady=168, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=205, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=399, UsedBeforeEvict=168, EvictedBeforeUse=26
+    Predictor TopK matches: 0=7 1=21 >=2=120
+Layer 26 Cache Stats: Hits=1043, Misses=149, HitRate=87.50%
+    Predictor Routed-Expert HitRate=55.95% (414/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.95% (414/740)
+    Predictor RoutedTopK HitRate=44.59% (528/1184)
+    Predicted RequestedByRouterForcedN Rate=69.93% (414/592)
+    Predicted RequestedByRouterTopK Rate=89.19% (528/592)
+    Predictor WindowRecall Rate=44.59% (528/1184)
+    Predictor WindowPrecision Rate=89.19% (528/592)
+    Loads Per Step: 0Loads=53, 1Load=56, >1Load=40
+    Bandwidth: StallLoads=149, PrefetchLoads=97, AvgLoadTime=4.12ms
+    PrefetchOverlap: HiddenReady=78, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=149, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=499, UsedBeforeEvict=78, EvictedBeforeUse=18
+    Predictor TopK matches: 0=2 1=11 >=2=135
+Layer 27 Cache Stats: Hits=1037, Misses=155, HitRate=87.00%
+    Predictor Routed-Expert HitRate=55.27% (409/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.27% (409/740)
+    Predictor RoutedTopK HitRate=43.92% (520/1184)
+    Predicted RequestedByRouterForcedN Rate=69.09% (409/592)
+    Predicted RequestedByRouterTopK Rate=87.84% (520/592)
+    Predictor WindowRecall Rate=43.92% (520/1184)
+    Predictor WindowPrecision Rate=87.84% (520/592)
+    Loads Per Step: 0Loads=42, 1Load=66, >1Load=41
+    Bandwidth: StallLoads=155, PrefetchLoads=71, AvgLoadTime=4.15ms
+    PrefetchOverlap: HiddenReady=63, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=155, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=525, UsedBeforeEvict=63, EvictedBeforeUse=6
+    Predictor TopK matches: 0=2 1=12 >=2=134
+Layer 28 Cache Stats: Hits=993, Misses=199, HitRate=83.31%
+    Predictor Routed-Expert HitRate=44.73% (331/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=44.73% (331/740)
+    Predictor RoutedTopK HitRate=40.62% (481/1184)
+    Predicted RequestedByRouterForcedN Rate=55.91% (331/592)
+    Predicted RequestedByRouterTopK Rate=81.25% (481/592)
+    Predictor WindowRecall Rate=40.62% (481/1184)
+    Predictor WindowPrecision Rate=81.25% (481/592)
+    Loads Per Step: 0Loads=37, 1Load=56, >1Load=56
+    Bandwidth: StallLoads=199, PrefetchLoads=140, AvgLoadTime=3.67ms
+    PrefetchOverlap: HiddenReady=107, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=199, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=456, UsedBeforeEvict=107, EvictedBeforeUse=31
+    Predictor TopK matches: 0=10 1=30 >=2=108
+Layer 29 Cache Stats: Hits=1014, Misses=178, HitRate=85.07%
+    Predictor Routed-Expert HitRate=46.76% (346/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=46.76% (346/740)
+    Predictor RoutedTopK HitRate=39.86% (472/1184)
+    Predicted RequestedByRouterForcedN Rate=58.45% (346/592)
+    Predicted RequestedByRouterTopK Rate=79.73% (472/592)
+    Predictor WindowRecall Rate=39.86% (472/1184)
+    Predictor WindowPrecision Rate=79.73% (472/592)
+    Loads Per Step: 0Loads=36, 1Load=67, >1Load=46
+    Bandwidth: StallLoads=178, PrefetchLoads=199, AvgLoadTime=3.78ms
+    PrefetchOverlap: HiddenReady=155, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=178, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=397, UsedBeforeEvict=155, EvictedBeforeUse=41
+    Predictor TopK matches: 0=5 1=30 >=2=113
+Layer 30 Cache Stats: Hits=1064, Misses=128, HitRate=89.26%
+    Predictor Routed-Expert HitRate=52.84% (391/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=52.84% (391/740)
+    Predictor RoutedTopK HitRate=43.50% (515/1184)
+    Predicted RequestedByRouterForcedN Rate=66.05% (391/592)
+    Predicted RequestedByRouterTopK Rate=86.99% (515/592)
+    Predictor WindowRecall Rate=43.50% (515/1184)
+    Predictor WindowPrecision Rate=86.99% (515/592)
+    Loads Per Step: 0Loads=61, 1Load=55, >1Load=33
+    Bandwidth: StallLoads=128, PrefetchLoads=65, AvgLoadTime=4.25ms
+    PrefetchOverlap: HiddenReady=50, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=128, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=531, UsedBeforeEvict=50, EvictedBeforeUse=14
+    Predictor TopK matches: 0=3 1=18 >=2=127
+Layer 31 Cache Stats: Hits=1096, Misses=96, HitRate=91.95%
+    Predictor Routed-Expert HitRate=55.95% (414/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.95% (414/740)
+    Predictor RoutedTopK HitRate=44.17% (523/1184)
+    Predicted RequestedByRouterForcedN Rate=69.93% (414/592)
+    Predicted RequestedByRouterTopK Rate=88.34% (523/592)
+    Predictor WindowRecall Rate=44.17% (523/1184)
+    Predictor WindowPrecision Rate=88.34% (523/592)
+    Loads Per Step: 0Loads=88, 1Load=38, >1Load=23
+    Bandwidth: StallLoads=96, PrefetchLoads=62, AvgLoadTime=4.25ms
+    PrefetchOverlap: HiddenReady=46, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=96, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=534, UsedBeforeEvict=46, EvictedBeforeUse=14
+    Predictor TopK matches: 0=3 1=8 >=2=137
+Layer 32 Cache Stats: Hits=1020, Misses=172, HitRate=85.57%
+    Predictor Routed-Expert HitRate=47.30% (350/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=47.30% (350/740)
+    Predictor RoutedTopK HitRate=40.88% (484/1184)
+    Predicted RequestedByRouterForcedN Rate=59.12% (350/592)
+    Predicted RequestedByRouterTopK Rate=81.76% (484/592)
+    Predictor WindowRecall Rate=40.88% (484/1184)
+    Predictor WindowPrecision Rate=81.76% (484/592)
+    Loads Per Step: 0Loads=42, 1Load=61, >1Load=46
+    Bandwidth: StallLoads=172, PrefetchLoads=114, AvgLoadTime=3.80ms
+    PrefetchOverlap: HiddenReady=84, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=172, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=482, UsedBeforeEvict=84, EvictedBeforeUse=27
+    Predictor TopK matches: 0=7 1=19 >=2=122
+Layer 33 Cache Stats: Hits=1058, Misses=134, HitRate=88.76%
+    Predictor Routed-Expert HitRate=52.16% (386/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=52.16% (386/740)
+    Predictor RoutedTopK HitRate=42.06% (498/1184)
+    Predicted RequestedByRouterForcedN Rate=65.20% (386/592)
+    Predicted RequestedByRouterTopK Rate=84.12% (498/592)
+    Predictor WindowRecall Rate=42.06% (498/1184)
+    Predictor WindowPrecision Rate=84.12% (498/592)
+    Loads Per Step: 0Loads=59, 1Load=61, >1Load=29
+    Bandwidth: StallLoads=134, PrefetchLoads=87, AvgLoadTime=3.85ms
+    PrefetchOverlap: HiddenReady=70, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=134, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=509, UsedBeforeEvict=70, EvictedBeforeUse=14
+    Predictor TopK matches: 0=5 1=17 >=2=126
+Layer 34 Cache Stats: Hits=1019, Misses=173, HitRate=85.49%
+    Predictor Routed-Expert HitRate=51.08% (378/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=51.08% (378/740)
+    Predictor RoutedTopK HitRate=43.07% (510/1184)
+    Predicted RequestedByRouterForcedN Rate=63.85% (378/592)
+    Predicted RequestedByRouterTopK Rate=86.15% (510/592)
+    Predictor WindowRecall Rate=43.07% (510/1184)
+    Predictor WindowPrecision Rate=86.15% (510/592)
+    Loads Per Step: 0Loads=38, 1Load=69, >1Load=42
+    Bandwidth: StallLoads=173, PrefetchLoads=139, AvgLoadTime=3.87ms
+    PrefetchOverlap: HiddenReady=114, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=173, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=457, UsedBeforeEvict=114, EvictedBeforeUse=22
+    Predictor TopK matches: 0=8 1=17 >=2=123
+Layer 35 Cache Stats: Hits=985, Misses=207, HitRate=82.63%
+    Predictor Routed-Expert HitRate=52.97% (392/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=52.97% (392/740)
+    Predictor RoutedTopK HitRate=42.15% (499/1184)
+    Predicted RequestedByRouterForcedN Rate=66.22% (392/592)
+    Predicted RequestedByRouterTopK Rate=84.29% (499/592)
+    Predictor WindowRecall Rate=42.15% (499/1184)
+    Predictor WindowPrecision Rate=84.29% (499/592)
+    Loads Per Step: 0Loads=30, 1Load=63, >1Load=56
+    Bandwidth: StallLoads=207, PrefetchLoads=240, AvgLoadTime=3.40ms
+    PrefetchOverlap: HiddenReady=200, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=207, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=356, UsedBeforeEvict=200, EvictedBeforeUse=37
+    Predictor TopK matches: 0=8 1=7 >=2=133
+Layer 36 Cache Stats: Hits=1009, Misses=183, HitRate=84.65%
+    Predictor Routed-Expert HitRate=51.35% (380/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=51.35% (380/740)
+    Predictor RoutedTopK HitRate=42.31% (501/1184)
+    Predicted RequestedByRouterForcedN Rate=64.19% (380/592)
+    Predicted RequestedByRouterTopK Rate=84.63% (501/592)
+    Predictor WindowRecall Rate=42.31% (501/1184)
+    Predictor WindowPrecision Rate=84.63% (501/592)
+    Loads Per Step: 0Loads=40, 1Load=61, >1Load=48
+    Bandwidth: StallLoads=183, PrefetchLoads=129, AvgLoadTime=4.22ms
+    PrefetchOverlap: HiddenReady=101, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=183, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=467, UsedBeforeEvict=101, EvictedBeforeUse=25
+    Predictor TopK matches: 0=10 1=17 >=2=121
+Layer 37 Cache Stats: Hits=962, Misses=230, HitRate=80.70%
+    Predictor Routed-Expert HitRate=51.76% (383/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=51.76% (383/740)
+    Predictor RoutedTopK HitRate=42.23% (500/1184)
+    Predicted RequestedByRouterForcedN Rate=64.70% (383/592)
+    Predicted RequestedByRouterTopK Rate=84.46% (500/592)
+    Predictor WindowRecall Rate=42.23% (500/1184)
+    Predictor WindowPrecision Rate=84.46% (500/592)
+    Loads Per Step: 0Loads=27, 1Load=49, >1Load=73
+    Bandwidth: StallLoads=230, PrefetchLoads=259, AvgLoadTime=3.44ms
+    PrefetchOverlap: HiddenReady=219, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=230, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=337, UsedBeforeEvict=219, EvictedBeforeUse=37
+    Predictor TopK matches: 0=7 1=19 >=2=122
+Layer 38 Cache Stats: Hits=1040, Misses=152, HitRate=87.25%
+    Predictor Routed-Expert HitRate=60.68% (449/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=60.68% (449/740)
+    Predictor RoutedTopK HitRate=45.69% (541/1184)
+    Predicted RequestedByRouterForcedN Rate=75.84% (449/592)
+    Predicted RequestedByRouterTopK Rate=91.39% (541/592)
+    Predictor WindowRecall Rate=45.69% (541/1184)
+    Predictor WindowPrecision Rate=91.39% (541/592)
+    Loads Per Step: 0Loads=45, 1Load=69, >1Load=35
+    Bandwidth: StallLoads=152, PrefetchLoads=113, AvgLoadTime=4.61ms
+    PrefetchOverlap: HiddenReady=95, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=152, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=483, UsedBeforeEvict=95, EvictedBeforeUse=15
+    Predictor TopK matches: 0=2 1=9 >=2=137
+Layer 39 Cache Stats: Hits=1024, Misses=168, HitRate=85.91%
+    Predictor Routed-Expert HitRate=57.03% (422/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=57.03% (422/740)
+    Predictor RoutedTopK HitRate=44.68% (529/1184)
+    Predicted RequestedByRouterForcedN Rate=71.28% (422/592)
+    Predicted RequestedByRouterTopK Rate=89.36% (529/592)
+    Predictor WindowRecall Rate=44.68% (529/1184)
+    Predictor WindowPrecision Rate=89.36% (529/592)
+    Loads Per Step: 0Loads=46, 1Load=58, >1Load=45
+    Bandwidth: StallLoads=168, PrefetchLoads=128, AvgLoadTime=4.10ms
+    PrefetchOverlap: HiddenReady=110, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=168, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=468, UsedBeforeEvict=110, EvictedBeforeUse=15
+    Predictor TopK matches: 0=7 1=6 >=2=135
+Layer 40 Cache Stats: Hits=1005, Misses=187, HitRate=84.31%
+    Predictor Routed-Expert HitRate=52.03% (385/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=52.03% (385/740)
+    Predictor RoutedTopK HitRate=43.07% (510/1184)
+    Predicted RequestedByRouterForcedN Rate=65.03% (385/592)
+    Predicted RequestedByRouterTopK Rate=86.15% (510/592)
+    Predictor WindowRecall Rate=43.07% (510/1184)
+    Predictor WindowPrecision Rate=86.15% (510/592)
+    Loads Per Step: 0Loads=45, 1Load=52, >1Load=52
+    Bandwidth: StallLoads=187, PrefetchLoads=188, AvgLoadTime=3.99ms
+    PrefetchOverlap: HiddenReady=159, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=187, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=408, UsedBeforeEvict=159, EvictedBeforeUse=26
+    Predictor TopK matches: 0=4 1=24 >=2=120
+Layer 41 Cache Stats: Hits=984, Misses=208, HitRate=82.55%
+    Predictor Routed-Expert HitRate=55.95% (414/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=55.95% (414/740)
+    Predictor RoutedTopK HitRate=44.43% (526/1184)
+    Predicted RequestedByRouterForcedN Rate=69.93% (414/592)
+    Predicted RequestedByRouterTopK Rate=88.85% (526/592)
+    Predictor WindowRecall Rate=44.43% (526/1184)
+    Predictor WindowPrecision Rate=88.85% (526/592)
+    Loads Per Step: 0Loads=32, 1Load=62, >1Load=55
+    Bandwidth: StallLoads=208, PrefetchLoads=264, AvgLoadTime=3.81ms
+    PrefetchOverlap: HiddenReady=236, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=208, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=332, UsedBeforeEvict=236, EvictedBeforeUse=24
+    Predictor TopK matches: 0=9 1=12 >=2=127
+Layer 42 Cache Stats: Hits=995, Misses=197, HitRate=83.47%
+    Predictor Routed-Expert HitRate=54.73% (405/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=54.73% (405/740)
+    Predictor RoutedTopK HitRate=44.09% (522/1184)
+    Predicted RequestedByRouterForcedN Rate=68.41% (405/592)
+    Predicted RequestedByRouterTopK Rate=88.18% (522/592)
+    Predictor WindowRecall Rate=44.09% (522/1184)
+    Predictor WindowPrecision Rate=88.18% (522/592)
+    Loads Per Step: 0Loads=33, 1Load=62, >1Load=54
+    Bandwidth: StallLoads=197, PrefetchLoads=256, AvgLoadTime=4.03ms
+    PrefetchOverlap: HiddenReady=230, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=197, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=340, UsedBeforeEvict=230, EvictedBeforeUse=24
+    Predictor TopK matches: 0=6 1=16 >=2=126
+Layer 43 Cache Stats: Hits=991, Misses=201, HitRate=83.14%
+    Predictor Routed-Expert HitRate=49.59% (367/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=49.59% (367/740)
+    Predictor RoutedTopK HitRate=41.30% (489/1184)
+    Predicted RequestedByRouterForcedN Rate=61.99% (367/592)
+    Predicted RequestedByRouterTopK Rate=82.60% (489/592)
+    Predictor WindowRecall Rate=41.30% (489/1184)
+    Predictor WindowPrecision Rate=82.60% (489/592)
+    Loads Per Step: 0Loads=35, 1Load=55, >1Load=59
+    Bandwidth: StallLoads=201, PrefetchLoads=241, AvgLoadTime=3.96ms
+    PrefetchOverlap: HiddenReady=197, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=201, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=355, UsedBeforeEvict=197, EvictedBeforeUse=40
+    Predictor TopK matches: 0=9 1=22 >=2=117
+Layer 44 Cache Stats: Hits=1040, Misses=152, HitRate=87.25%
+    Predictor Routed-Expert HitRate=51.49% (381/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=51.49% (381/740)
+    Predictor RoutedTopK HitRate=45.27% (536/1184)
+    Predicted RequestedByRouterForcedN Rate=64.36% (381/592)
+    Predicted RequestedByRouterTopK Rate=90.54% (536/592)
+    Predictor WindowRecall Rate=45.27% (536/1184)
+    Predictor WindowPrecision Rate=90.54% (536/592)
+    Loads Per Step: 0Loads=53, 1Load=59, >1Load=37
+    Bandwidth: StallLoads=152, PrefetchLoads=147, AvgLoadTime=4.69ms
+    PrefetchOverlap: HiddenReady=132, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=152, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=449, UsedBeforeEvict=132, EvictedBeforeUse=12
+    Predictor TopK matches: 0=2 1=20 >=2=126
+Layer 45 Cache Stats: Hits=1059, Misses=133, HitRate=88.84%
+    Predictor Routed-Expert HitRate=58.24% (431/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=58.24% (431/740)
+    Predictor RoutedTopK HitRate=45.61% (540/1184)
+    Predicted RequestedByRouterForcedN Rate=72.80% (431/592)
+    Predicted RequestedByRouterTopK Rate=91.22% (540/592)
+    Predictor WindowRecall Rate=45.61% (540/1184)
+    Predictor WindowPrecision Rate=91.22% (540/592)
+    Loads Per Step: 0Loads=61, 1Load=51, >1Load=37
+    Bandwidth: StallLoads=133, PrefetchLoads=147, AvgLoadTime=4.60ms
+    PrefetchOverlap: HiddenReady=131, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=133, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=449, UsedBeforeEvict=131, EvictedBeforeUse=15
+    Predictor TopK matches: 0=2 1=12 >=2=134
+Layer 46 Cache Stats: Hits=1034, Misses=158, HitRate=86.74%
+    Predictor Routed-Expert HitRate=58.92% (436/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=58.92% (436/740)
+    Predictor RoutedTopK HitRate=44.59% (528/1184)
+    Predicted RequestedByRouterForcedN Rate=73.65% (436/592)
+    Predicted RequestedByRouterTopK Rate=89.19% (528/592)
+    Predictor WindowRecall Rate=44.59% (528/1184)
+    Predictor WindowPrecision Rate=89.19% (528/592)
+    Loads Per Step: 0Loads=47, 1Load=60, >1Load=42
+    Bandwidth: StallLoads=158, PrefetchLoads=197, AvgLoadTime=5.55ms
+    PrefetchOverlap: HiddenReady=166, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=158, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=399, UsedBeforeEvict=166, EvictedBeforeUse=29
+    Predictor TopK matches: 0=4 1=8 >=2=136
+Layer 47 Cache Stats: Hits=968, Misses=224, HitRate=81.21%
+    Predictor Routed-Expert HitRate=54.73% (405/740, routed_n=5, horizon=1)
+    Predictor RoutedForcedN HitRate=54.73% (405/740)
+    Predictor RoutedTopK HitRate=44.93% (532/1184)
+    Predicted RequestedByRouterForcedN Rate=68.41% (405/592)
+    Predicted RequestedByRouterTopK Rate=89.86% (532/592)
+    Predictor WindowRecall Rate=44.93% (532/1184)
+    Predictor WindowPrecision Rate=89.86% (532/592)
+    Loads Per Step: 0Loads=24, 1Load=61, >1Load=64
+    Bandwidth: StallLoads=224, PrefetchLoads=303, AvgLoadTime=3.67ms
+    PrefetchOverlap: HiddenReady=270, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=224, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=293, UsedBeforeEvict=270, EvictedBeforeUse=31
+    Predictor TopK matches: 0=12 1=11 >=2=125
+============================================================
+[TorchScriptPredictor Layer 0] Shutdown complete
+[TorchScriptPredictor Layer 1] Shutdown complete
+[TorchScriptPredictor Layer 2] Shutdown complete
+[TorchScriptPredictor Layer 3] Shutdown complete
+[TorchScriptPredictor Layer 4] Shutdown complete
+[TorchScriptPredictor Layer 5] Shutdown complete
+[TorchScriptPredictor Layer 6] Shutdown complete
+[TorchScriptPredictor Layer 7] Shutdown complete
+[TorchScriptPredictor Layer 8] Shutdown complete
+[TorchScriptPredictor Layer 9] Shutdown complete
+[TorchScriptPredictor Layer 10] Shutdown complete
+[TorchScriptPredictor Layer 11] Shutdown complete
+[TorchScriptPredictor Layer 12] Shutdown complete
+[TorchScriptPredictor Layer 13] Shutdown complete
+[TorchScriptPredictor Layer 14] Shutdown complete
+[TorchScriptPredictor Layer 15] Shutdown complete
+[TorchScriptPredictor Layer 16] Shutdown complete
+[TorchScriptPredictor Layer 17] Shutdown complete
+[TorchScriptPredictor Layer 18] Shutdown complete
+[TorchScriptPredictor Layer 19] Shutdown complete
+[TorchScriptPredictor Layer 20] Shutdown complete
+[TorchScriptPredictor Layer 21] Shutdown complete
+[TorchScriptPredictor Layer 22] Shutdown complete
+[TorchScriptPredictor Layer 23] Shutdown complete
+[TorchScriptPredictor Layer 24] Shutdown complete
+[TorchScriptPredictor Layer 25] Shutdown complete
+[TorchScriptPredictor Layer 26] Shutdown complete
+[TorchScriptPredictor Layer 27] Shutdown complete
+[TorchScriptPredictor Layer 28] Shutdown complete
+[TorchScriptPredictor Layer 29] Shutdown complete
+[TorchScriptPredictor Layer 30] Shutdown complete
+[TorchScriptPredictor Layer 31] Shutdown complete
+[TorchScriptPredictor Layer 32] Shutdown complete
+[TorchScriptPredictor Layer 33] Shutdown complete
+[TorchScriptPredictor Layer 34] Shutdown complete
+[TorchScriptPredictor Layer 35] Shutdown complete
+[TorchScriptPredictor Layer 36] Shutdown complete
+[TorchScriptPredictor Layer 37] Shutdown complete
+[TorchScriptPredictor Layer 38] Shutdown complete
+[TorchScriptPredictor Layer 39] Shutdown complete
+[TorchScriptPredictor Layer 40] Shutdown complete
+[TorchScriptPredictor Layer 41] Shutdown complete
+[TorchScriptPredictor Layer 42] Shutdown complete
+[TorchScriptPredictor Layer 43] Shutdown complete
+[TorchScriptPredictor Layer 44] Shutdown complete
+[TorchScriptPredictor Layer 45] Shutdown complete
+[TorchScriptPredictor Layer 46] Shutdown complete
+[TorchScriptPredictor Layer 47] Shutdown complete
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 0.29 seconds
+Pre-warming expert cache with 16 experts...
+Model initialized successfully!
+Setting lambda to 1.0
+Forced top-5 experts into cache mask.
+Set expert cache policy to LFRU.
+
+Running sweep using prompts from JSON: /tmp/tmpy_5y0fgr.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ In the 19th century , his poetry was translated into French and English by the Jesuits and others . In the 20th century , his work was translated by the poet Ezra Pound and others . In the 21st century , his work is still being translated and studied .
+
+In the 2010s , the Chinese government has been promoting the study of Du Fu 's poetry as part of its cultural diplomacy . In 2012 , the Chinese government sponsored the " Du Fu Festival " in his hometown of Qinyuangou , Henan . In 2014 , the Chinese government sponsored the " Du Fu Festival " in his hometown of Qinyuangou , Henan .
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.424339
+End-to-End TPS: 2.3566
+Cache Stats: Hits=48948, Misses=8268, HitRate=85.55%
+Predictor Stats: Hits=18505, Total=35520, HitRate=52.10%

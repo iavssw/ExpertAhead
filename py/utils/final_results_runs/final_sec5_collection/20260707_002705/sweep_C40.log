@@ -1,0 +1,132 @@
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Pre-warming 40 experts for all layers...
+Layer 0: Pre-warming 40 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 40 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 40 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 40 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 40 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 40 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 40 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 40 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 40 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 40 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 40 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 40 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 40 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 40 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 40 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 40 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 40 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 40 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 40 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 40 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 40 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 40 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 40 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 40 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 40 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 40 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 40 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 40 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 40 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 40 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 40 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 40 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 40 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 40 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 40 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 40 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 40 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 40 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 40 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 40 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 40 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 40 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 40 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 40 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 40 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 40 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 40 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 40 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 814]
+Skipping warmup.

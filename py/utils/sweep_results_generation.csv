@@ -1,7 +1,0 @@
-cache_size,lambda,prompt_idx,mode,gen_perplexity,tps,ppl_hit_rate,gen_hit_rate,gen_hits,gen_misses
-2,0.0,0,generation,,1.0191113960093636,,30.0,576,1344
-2,0.2,0,generation,,1.1147712768032818,,37.29,716,1204
-2,0.4,0,generation,,1.2923269380380926,,43.44,834,1086
-2,0.6,0,generation,,1.6497539391999683,,53.59,1029,891
-2,0.8,0,generation,,1.4701947419955248,,48.28,927,993
-2,1.0,0,generation,,1.4252729397679655,,48.33,928,992

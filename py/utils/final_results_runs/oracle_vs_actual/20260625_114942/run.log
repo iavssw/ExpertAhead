@@ -1,0 +1,78 @@
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=5.58/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[OracleTracePredictor Layer 0] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 1] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 2] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 3] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 4] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 5] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 6] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 7] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 8] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 9] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 10] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 11] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 12] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 13] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 14] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 15] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 16] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 17] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 18] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 19] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 20] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 21] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 22] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 23] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 24] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 25] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 26] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 27] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 28] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 29] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 30] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 31] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 32] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 33] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 34] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 35] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 36] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 37] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 38] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 39] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 40] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 41] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 42] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 43] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 44] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 45] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 46] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+[OracleTracePredictor Layer 47] Loaded 149 tokens from /home/michael/heteroPredict/trainingData/wikitext_test_traces/oracle_trace_qwen3_30b_00000.txt (Prompt length parsed as: 512)
+Traceback (most recent call last):
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 1500, in main
+    model = Qwen3_30BA3BW4A16Model(
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/michael/heteroPredict/py/unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py", line 348, in __init__
+    self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.32 GiB. GPU 0 has a total capacity of 28.00 GiB of which 1.56 GiB is free. Of the allocated memory 3.27 GiB is allocated by PyTorch, and 20.65 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Error initializing model: CUDA out of memory. Tried to allocate 2.32 GiB. GPU 0 has a total capacity of 28.00 GiB of which 1.56 GiB is free. Of the allocated memory 3.27 GiB is allocated by PyTorch, and 20.65 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+Note: Make sure you have:
+  1. Built the C++ backend (run 'make' in build directory)
+  2. The unified_llm_w4a16_{predict,base}_libtorch module is in your Python path
+  3. Model weights are loaded (if required)

@@ -1,0 +1,1736 @@
+Running as unit: run-r8ba62da3743640739e96c223abe351eb.scope; invocation ID: 3e3c0331262b4b34bb1b16bf7e7e2b0b
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[Layer 1] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 1] prefetch_count=2 softmax_before_topk=yes
+[Layer 2] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 2] prefetch_count=2 softmax_before_topk=yes
+[Layer 3] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 3] prefetch_count=2 softmax_before_topk=yes
+[Layer 4] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 4] prefetch_count=2 softmax_before_topk=yes
+[Layer 5] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 5] prefetch_count=2 softmax_before_topk=yes
+[Layer 6] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 6] prefetch_count=2 softmax_before_topk=yes
+[Layer 7] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 7] prefetch_count=2 softmax_before_topk=yes
+[Layer 8] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 8] prefetch_count=2 softmax_before_topk=yes
+[Layer 9] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 9] prefetch_count=2 softmax_before_topk=yes
+[Layer 10] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 10] prefetch_count=2 softmax_before_topk=yes
+[Layer 11] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 11] prefetch_count=2 softmax_before_topk=yes
+[Layer 12] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 12] prefetch_count=2 softmax_before_topk=yes
+[Layer 13] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 13] prefetch_count=2 softmax_before_topk=yes
+[Layer 14] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 14] prefetch_count=2 softmax_before_topk=yes
+[Layer 15] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 15] prefetch_count=2 softmax_before_topk=yes
+[Layer 16] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 16] prefetch_count=2 softmax_before_topk=yes
+[Layer 17] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 17] prefetch_count=2 softmax_before_topk=yes
+[Layer 18] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 18] prefetch_count=2 softmax_before_topk=yes
+[Layer 19] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 19] prefetch_count=2 softmax_before_topk=yes
+[Layer 20] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 20] prefetch_count=2 softmax_before_topk=yes
+[Layer 21] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 21] prefetch_count=2 softmax_before_topk=yes
+[Layer 22] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 22] prefetch_count=2 softmax_before_topk=yes
+[Layer 23] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 23] prefetch_count=2 softmax_before_topk=yes
+[Layer 24] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 24] prefetch_count=2 softmax_before_topk=yes
+[Layer 25] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 25] prefetch_count=2 softmax_before_topk=yes
+[Layer 26] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 26] prefetch_count=2 softmax_before_topk=yes
+[Layer 27] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 27] prefetch_count=2 softmax_before_topk=yes
+[Layer 28] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 28] prefetch_count=2 softmax_before_topk=yes
+[Layer 29] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 29] prefetch_count=2 softmax_before_topk=yes
+[Layer 30] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 30] prefetch_count=2 softmax_before_topk=yes
+[Layer 31] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 31] prefetch_count=2 softmax_before_topk=yes
+[Layer 32] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 32] prefetch_count=2 softmax_before_topk=yes
+[Layer 33] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 33] prefetch_count=2 softmax_before_topk=yes
+[Layer 34] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 34] prefetch_count=2 softmax_before_topk=yes
+[Layer 35] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 35] prefetch_count=2 softmax_before_topk=yes
+[Layer 36] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 36] prefetch_count=2 softmax_before_topk=yes
+[Layer 37] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 37] prefetch_count=2 softmax_before_topk=yes
+[Layer 38] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 38] prefetch_count=2 softmax_before_topk=yes
+[Layer 39] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 39] prefetch_count=2 softmax_before_topk=yes
+[Layer 40] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 40] prefetch_count=2 softmax_before_topk=yes
+[Layer 41] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 41] prefetch_count=2 softmax_before_topk=yes
+[Layer 42] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 42] prefetch_count=2 softmax_before_topk=yes
+[Layer 43] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 43] prefetch_count=2 softmax_before_topk=yes
+[Layer 44] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 44] prefetch_count=2 softmax_before_topk=yes
+[Layer 45] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 45] prefetch_count=2 softmax_before_topk=yes
+[Layer 46] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 46] prefetch_count=2 softmax_before_topk=yes
+[Layer 47] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 47] prefetch_count=2 softmax_before_topk=yes
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 48 experts for all layers...
+Layer 0: Pre-warming 46 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 46 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 46 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 46 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 46 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 46 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 46 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 46 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 46 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 46 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 46 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 46 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 46 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 46 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 46 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 46 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 46 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 46 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 46 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 46 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 46 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 46 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 46 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 46 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 46 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 46 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 46 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 46 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 46 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 46 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 46 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 46 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 46 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 46 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 46 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 46 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 46 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 46 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 46 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 46 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 46 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 46 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 46 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 46 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 46 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 46 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 46 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 46 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 814]
+Skipping warmup.
+Prefill time: 18.9539 seconds
+Generation phase
+[Layer 0 Step 0 Debug] Slots before check: 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 116 117 118 119 120 121 122 123 124 125 126 127 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 -1 -1 
+[Layer 0 Step 0 Debug] Requested: 50 75 69 93 21 74 51 32 
+[gen 5/149] elapsed=1.7s  TPS=2.879
+[gen 10/149] elapsed=3.1s  TPS=3.199
+[gen 15/149] elapsed=4.3s  TPS=3.496
+[gen 20/149] elapsed=5.4s  TPS=3.720
+[gen 25/149] elapsed=6.2s  TPS=4.016
+[gen 30/149] elapsed=7.2s  TPS=4.189
+[gen 35/149] elapsed=8.2s  TPS=4.287
+[gen 40/149] elapsed=9.2s  TPS=4.364
+[gen 45/149] elapsed=10.0s  TPS=4.484
+[gen 50/149] elapsed=10.9s  TPS=4.580
+[gen 55/149] elapsed=11.8s  TPS=4.679
+[gen 60/149] elapsed=12.8s  TPS=4.694
+[gen 65/149] elapsed=13.6s  TPS=4.767
+[gen 70/149] elapsed=14.7s  TPS=4.776
+[gen 75/149] elapsed=15.5s  TPS=4.854
+[gen 80/149] elapsed=16.3s  TPS=4.915
+[gen 85/149] elapsed=17.1s  TPS=4.970
+[gen 90/149] elapsed=18.0s  TPS=5.010
+[gen 95/149] elapsed=19.0s  TPS=4.994
+[gen 100/149] elapsed=20.2s  TPS=4.941
+[gen 105/149] elapsed=21.2s  TPS=4.943
+[gen 110/149] elapsed=22.1s  TPS=4.985
+[gen 115/149] elapsed=22.9s  TPS=5.021
+[gen 120/149] elapsed=23.6s  TPS=5.079
+[gen 125/149] elapsed=24.7s  TPS=5.062
+[gen 130/149] elapsed=25.6s  TPS=5.078
+[gen 135/149] elapsed=26.8s  TPS=5.046
+[gen 140/149] elapsed=28.0s  TPS=4.994
+[gen 145/149] elapsed=29.1s  TPS=4.979
+Prefill time (summary): 18.954 seconds
+Total Generation Time: 29.862 seconds
+Average Time per Token: 0.200413 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=704, Misses=488, HitRate=59.06%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=11, 1Load=21, >1Load=117
+    Bandwidth: StallLoads=488, PrefetchLoads=0, AvgLoadTime=2.27ms
+    MissCause: NotPresent=488, NotReadyStall=0
+    GlobalSpecLoad: PeakConcurrent=2
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 1 Cache Stats: Hits=868, Misses=324, HitRate=72.82%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=12, 1Load=39, >1Load=98
+    Bandwidth: StallLoads=324, PrefetchLoads=65, AvgLoadTime=3.06ms
+    PrefetchOverlap: HiddenReady=59, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=324, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=233, UsedBeforeEvict=59, EvictedBeforeUse=5
+    GatingPredict Recall=21.31% (254/1192)
+    GatingPredict Precision=85.23% (254/298)
+    GatingPrefetch Delivery=21.39% (255/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 2 Cache Stats: Hits=1048, Misses=144, HitRate=87.92%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=60, 1Load=46, >1Load=43
+    Bandwidth: StallLoads=144, PrefetchLoads=71, AvgLoadTime=3.55ms
+    PrefetchOverlap: HiddenReady=65, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=144, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=227, UsedBeforeEvict=65, EvictedBeforeUse=5
+    GatingPredict Recall=23.83% (284/1192)
+    GatingPredict Precision=95.30% (284/298)
+    GatingPrefetch Delivery=23.83% (284/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 3 Cache Stats: Hits=930, Misses=262, HitRate=78.02%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=18, 1Load=43, >1Load=88
+    Bandwidth: StallLoads=262, PrefetchLoads=84, AvgLoadTime=2.98ms
+    PrefetchOverlap: HiddenReady=70, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=262, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=214, UsedBeforeEvict=70, EvictedBeforeUse=14
+    GatingPredict Recall=22.65% (270/1192)
+    GatingPredict Precision=90.60% (270/298)
+    GatingPrefetch Delivery=22.82% (272/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 4 Cache Stats: Hits=1028, Misses=164, HitRate=86.24%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=49, 1Load=56, >1Load=44
+    Bandwidth: StallLoads=164, PrefetchLoads=53, AvgLoadTime=3.33ms
+    PrefetchOverlap: HiddenReady=47, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=164, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=245, UsedBeforeEvict=47, EvictedBeforeUse=6
+    GatingPredict Recall=24.16% (288/1192)
+    GatingPredict Precision=96.64% (288/298)
+    GatingPrefetch Delivery=24.16% (288/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 5 Cache Stats: Hits=1053, Misses=139, HitRate=88.34%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=64, 1Load=44, >1Load=41
+    Bandwidth: StallLoads=139, PrefetchLoads=41, AvgLoadTime=3.30ms
+    PrefetchOverlap: HiddenReady=40, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=139, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=257, UsedBeforeEvict=40, EvictedBeforeUse=1
+    GatingPredict Recall=24.24% (289/1192)
+    GatingPredict Precision=96.98% (289/298)
+    GatingPrefetch Delivery=24.24% (289/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 6 Cache Stats: Hits=1095, Misses=97, HitRate=91.86%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=80, 1Load=52, >1Load=17
+    Bandwidth: StallLoads=97, PrefetchLoads=22, AvgLoadTime=3.43ms
+    PrefetchOverlap: HiddenReady=21, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=97, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=276, UsedBeforeEvict=21, EvictedBeforeUse=1
+    GatingPredict Recall=24.75% (295/1192)
+    GatingPredict Precision=98.99% (295/298)
+    GatingPrefetch Delivery=24.75% (295/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 7 Cache Stats: Hits=1147, Misses=45, HitRate=96.22%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=113, 1Load=27, >1Load=9
+    Bandwidth: StallLoads=45, PrefetchLoads=6, AvgLoadTime=3.73ms
+    PrefetchOverlap: HiddenReady=6, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=45, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=292, UsedBeforeEvict=6, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 8 Cache Stats: Hits=1071, Misses=121, HitRate=89.85%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=69, 1Load=53, >1Load=27
+    Bandwidth: StallLoads=121, PrefetchLoads=24, AvgLoadTime=3.10ms
+    PrefetchOverlap: HiddenReady=24, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=121, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=274, UsedBeforeEvict=24, EvictedBeforeUse=0
+    GatingPredict Recall=24.50% (292/1192)
+    GatingPredict Precision=97.99% (292/298)
+    GatingPrefetch Delivery=24.50% (292/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 9 Cache Stats: Hits=1116, Misses=76, HitRate=93.62%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=85, 1Load=53, >1Load=11
+    Bandwidth: StallLoads=76, PrefetchLoads=21, AvgLoadTime=3.80ms
+    PrefetchOverlap: HiddenReady=21, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=76, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=277, UsedBeforeEvict=21, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 10 Cache Stats: Hits=1035, Misses=157, HitRate=86.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=51, 1Load=54, >1Load=44
+    Bandwidth: StallLoads=157, PrefetchLoads=32, AvgLoadTime=3.28ms
+    PrefetchOverlap: HiddenReady=31, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=157, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=266, UsedBeforeEvict=31, EvictedBeforeUse=1
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 11 Cache Stats: Hits=1004, Misses=188, HitRate=84.23%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=40, 1Load=55, >1Load=54
+    Bandwidth: StallLoads=188, PrefetchLoads=48, AvgLoadTime=3.09ms
+    PrefetchOverlap: HiddenReady=48, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=188, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=250, UsedBeforeEvict=48, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 12 Cache Stats: Hits=1096, Misses=96, HitRate=91.95%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=76, 1Load=58, >1Load=15
+    Bandwidth: StallLoads=96, PrefetchLoads=26, AvgLoadTime=3.67ms
+    PrefetchOverlap: HiddenReady=26, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=96, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=272, UsedBeforeEvict=26, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 13 Cache Stats: Hits=1011, Misses=181, HitRate=84.82%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=42, 1Load=53, >1Load=54
+    Bandwidth: StallLoads=181, PrefetchLoads=34, AvgLoadTime=3.03ms
+    PrefetchOverlap: HiddenReady=34, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=181, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=264, UsedBeforeEvict=34, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 14 Cache Stats: Hits=1097, Misses=95, HitRate=92.03%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=83, 1Load=42, >1Load=24
+    Bandwidth: StallLoads=95, PrefetchLoads=15, AvgLoadTime=3.43ms
+    PrefetchOverlap: HiddenReady=15, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=95, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=283, UsedBeforeEvict=15, EvictedBeforeUse=0
+    GatingPredict Recall=24.75% (295/1192)
+    GatingPredict Precision=98.99% (295/298)
+    GatingPrefetch Delivery=24.75% (295/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 15 Cache Stats: Hits=1102, Misses=90, HitRate=92.45%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=85, 1Load=42, >1Load=22
+    Bandwidth: StallLoads=90, PrefetchLoads=17, AvgLoadTime=3.33ms
+    PrefetchOverlap: HiddenReady=17, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=90, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=281, UsedBeforeEvict=17, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 16 Cache Stats: Hits=1101, Misses=91, HitRate=92.37%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=72, 1Load=63, >1Load=14
+    Bandwidth: StallLoads=91, PrefetchLoads=22, AvgLoadTime=3.56ms
+    PrefetchOverlap: HiddenReady=22, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=91, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=276, UsedBeforeEvict=22, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 17 Cache Stats: Hits=1089, Misses=103, HitRate=91.36%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=70, 1Load=60, >1Load=19
+    Bandwidth: StallLoads=103, PrefetchLoads=26, AvgLoadTime=3.31ms
+    PrefetchOverlap: HiddenReady=26, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=103, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=272, UsedBeforeEvict=26, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 18 Cache Stats: Hits=1140, Misses=52, HitRate=95.64%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=111, 1Load=29, >1Load=9
+    Bandwidth: StallLoads=52, PrefetchLoads=5, AvgLoadTime=3.22ms
+    PrefetchOverlap: HiddenReady=5, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=52, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=293, UsedBeforeEvict=5, EvictedBeforeUse=0
+    GatingPredict Recall=24.58% (293/1192)
+    GatingPredict Precision=98.32% (293/298)
+    GatingPrefetch Delivery=24.58% (293/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 19 Cache Stats: Hits=1159, Misses=33, HitRate=97.23%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=121, 1Load=23, >1Load=5
+    Bandwidth: StallLoads=33, PrefetchLoads=5, AvgLoadTime=3.77ms
+    PrefetchOverlap: HiddenReady=5, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=33, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=293, UsedBeforeEvict=5, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 20 Cache Stats: Hits=1132, Misses=60, HitRate=94.97%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=103, 1Load=35, >1Load=11
+    Bandwidth: StallLoads=60, PrefetchLoads=16, AvgLoadTime=3.32ms
+    PrefetchOverlap: HiddenReady=16, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=60, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=282, UsedBeforeEvict=16, EvictedBeforeUse=0
+    GatingPredict Recall=24.66% (294/1192)
+    GatingPredict Precision=98.66% (294/298)
+    GatingPrefetch Delivery=24.66% (294/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 21 Cache Stats: Hits=1131, Misses=61, HitRate=94.88%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=99, 1Load=40, >1Load=10
+    Bandwidth: StallLoads=61, PrefetchLoads=5, AvgLoadTime=3.43ms
+    PrefetchOverlap: HiddenReady=5, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=61, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=293, UsedBeforeEvict=5, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 22 Cache Stats: Hits=1081, Misses=111, HitRate=90.69%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=79, 1Load=44, >1Load=26
+    Bandwidth: StallLoads=111, PrefetchLoads=19, AvgLoadTime=3.15ms
+    PrefetchOverlap: HiddenReady=19, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=111, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=279, UsedBeforeEvict=19, EvictedBeforeUse=0
+    GatingPredict Recall=24.66% (294/1192)
+    GatingPredict Precision=98.66% (294/298)
+    GatingPrefetch Delivery=24.66% (294/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 23 Cache Stats: Hits=1052, Misses=140, HitRate=88.26%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=62, 1Load=51, >1Load=36
+    Bandwidth: StallLoads=140, PrefetchLoads=25, AvgLoadTime=3.07ms
+    PrefetchOverlap: HiddenReady=25, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=140, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=273, UsedBeforeEvict=25, EvictedBeforeUse=0
+    GatingPredict Recall=23.74% (283/1192)
+    GatingPredict Precision=94.97% (283/298)
+    GatingPrefetch Delivery=23.74% (283/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 24 Cache Stats: Hits=1086, Misses=106, HitRate=91.11%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=76, 1Load=50, >1Load=23
+    Bandwidth: StallLoads=106, PrefetchLoads=12, AvgLoadTime=3.50ms
+    PrefetchOverlap: HiddenReady=12, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=106, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=286, UsedBeforeEvict=12, EvictedBeforeUse=0
+    GatingPredict Recall=24.58% (293/1192)
+    GatingPredict Precision=98.32% (293/298)
+    GatingPrefetch Delivery=24.58% (293/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 25 Cache Stats: Hits=990, Misses=202, HitRate=83.05%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=33, 1Load=56, >1Load=60
+    Bandwidth: StallLoads=202, PrefetchLoads=36, AvgLoadTime=3.17ms
+    PrefetchOverlap: HiddenReady=35, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=202, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=262, UsedBeforeEvict=35, EvictedBeforeUse=1
+    GatingPredict Recall=24.24% (289/1192)
+    GatingPredict Precision=96.98% (289/298)
+    GatingPrefetch Delivery=24.24% (289/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 26 Cache Stats: Hits=1085, Misses=107, HitRate=91.02%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=69, 1Load=58, >1Load=22
+    Bandwidth: StallLoads=107, PrefetchLoads=37, AvgLoadTime=3.55ms
+    PrefetchOverlap: HiddenReady=37, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=107, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=261, UsedBeforeEvict=37, EvictedBeforeUse=0
+    GatingPredict Recall=24.41% (291/1192)
+    GatingPredict Precision=97.65% (291/298)
+    GatingPrefetch Delivery=24.50% (292/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 27 Cache Stats: Hits=1091, Misses=101, HitRate=91.53%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=80, 1Load=44, >1Load=25
+    Bandwidth: StallLoads=101, PrefetchLoads=22, AvgLoadTime=3.34ms
+    PrefetchOverlap: HiddenReady=22, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=101, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=276, UsedBeforeEvict=22, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 28 Cache Stats: Hits=1074, Misses=118, HitRate=90.10%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=60, 1Load=63, >1Load=26
+    Bandwidth: StallLoads=118, PrefetchLoads=18, AvgLoadTime=3.49ms
+    PrefetchOverlap: HiddenReady=18, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=118, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=280, UsedBeforeEvict=18, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 29 Cache Stats: Hits=1012, Misses=180, HitRate=84.90%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=42, 1Load=56, >1Load=51
+    Bandwidth: StallLoads=180, PrefetchLoads=43, AvgLoadTime=3.10ms
+    PrefetchOverlap: HiddenReady=43, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=180, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=255, UsedBeforeEvict=43, EvictedBeforeUse=0
+    GatingPredict Recall=24.75% (295/1192)
+    GatingPredict Precision=98.99% (295/298)
+    GatingPrefetch Delivery=24.75% (295/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 30 Cache Stats: Hits=1121, Misses=71, HitRate=94.04%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=103, 1Load=32, >1Load=14
+    Bandwidth: StallLoads=71, PrefetchLoads=8, AvgLoadTime=3.16ms
+    PrefetchOverlap: HiddenReady=8, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=71, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=290, UsedBeforeEvict=8, EvictedBeforeUse=0
+    GatingPredict Recall=24.66% (294/1192)
+    GatingPredict Precision=98.66% (294/298)
+    GatingPrefetch Delivery=24.66% (294/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 31 Cache Stats: Hits=1118, Misses=74, HitRate=93.79%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=101, 1Load=31, >1Load=17
+    Bandwidth: StallLoads=74, PrefetchLoads=6, AvgLoadTime=3.10ms
+    PrefetchOverlap: HiddenReady=6, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=74, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=292, UsedBeforeEvict=6, EvictedBeforeUse=0
+    GatingPredict Recall=24.16% (288/1192)
+    GatingPredict Precision=96.64% (288/298)
+    GatingPrefetch Delivery=24.16% (288/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 32 Cache Stats: Hits=1098, Misses=94, HitRate=92.11%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=80, 1Load=51, >1Load=18
+    Bandwidth: StallLoads=94, PrefetchLoads=22, AvgLoadTime=3.38ms
+    PrefetchOverlap: HiddenReady=22, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=94, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=276, UsedBeforeEvict=22, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 33 Cache Stats: Hits=1085, Misses=107, HitRate=91.02%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=76, 1Load=48, >1Load=25
+    Bandwidth: StallLoads=107, PrefetchLoads=14, AvgLoadTime=3.36ms
+    PrefetchOverlap: HiddenReady=12, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=107, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=284, UsedBeforeEvict=12, EvictedBeforeUse=2
+    GatingPredict Recall=24.58% (293/1192)
+    GatingPredict Precision=98.32% (293/298)
+    GatingPrefetch Delivery=24.58% (293/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 34 Cache Stats: Hits=1035, Misses=157, HitRate=86.83%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=56, 1Load=48, >1Load=45
+    Bandwidth: StallLoads=157, PrefetchLoads=45, AvgLoadTime=3.11ms
+    PrefetchOverlap: HiddenReady=45, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=157, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=253, UsedBeforeEvict=45, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 35 Cache Stats: Hits=1007, Misses=185, HitRate=84.48%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=44, 1Load=56, >1Load=49
+    Bandwidth: StallLoads=185, PrefetchLoads=40, AvgLoadTime=3.03ms
+    PrefetchOverlap: HiddenReady=39, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=185, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=258, UsedBeforeEvict=39, EvictedBeforeUse=0
+    GatingPredict Recall=24.50% (292/1192)
+    GatingPredict Precision=97.99% (292/298)
+    GatingPrefetch Delivery=24.50% (292/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 36 Cache Stats: Hits=978, Misses=214, HitRate=82.05%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=33, 1Load=52, >1Load=64
+    Bandwidth: StallLoads=214, PrefetchLoads=37, AvgLoadTime=3.06ms
+    PrefetchOverlap: HiddenReady=37, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=214, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=261, UsedBeforeEvict=37, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 37 Cache Stats: Hits=962, Misses=230, HitRate=80.70%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=34, 1Load=42, >1Load=73
+    Bandwidth: StallLoads=230, PrefetchLoads=31, AvgLoadTime=2.98ms
+    PrefetchOverlap: HiddenReady=30, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=230, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=267, UsedBeforeEvict=30, EvictedBeforeUse=1
+    GatingPredict Recall=24.66% (294/1192)
+    GatingPredict Precision=98.66% (294/298)
+    GatingPrefetch Delivery=24.66% (294/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 38 Cache Stats: Hits=1072, Misses=120, HitRate=89.93%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=67, 1Load=55, >1Load=27
+    Bandwidth: StallLoads=120, PrefetchLoads=26, AvgLoadTime=3.39ms
+    PrefetchOverlap: HiddenReady=26, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=120, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=272, UsedBeforeEvict=26, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 39 Cache Stats: Hits=1084, Misses=108, HitRate=90.94%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=82, 1Load=37, >1Load=30
+    Bandwidth: StallLoads=108, PrefetchLoads=22, AvgLoadTime=3.36ms
+    PrefetchOverlap: HiddenReady=22, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=108, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=276, UsedBeforeEvict=22, EvictedBeforeUse=0
+    GatingPredict Recall=24.58% (293/1192)
+    GatingPredict Precision=98.32% (293/298)
+    GatingPrefetch Delivery=24.66% (294/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 40 Cache Stats: Hits=1090, Misses=102, HitRate=91.44%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=76, 1Load=45, >1Load=28
+    Bandwidth: StallLoads=102, PrefetchLoads=37, AvgLoadTime=3.62ms
+    PrefetchOverlap: HiddenReady=37, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=102, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=261, UsedBeforeEvict=37, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 41 Cache Stats: Hits=1038, Misses=154, HitRate=87.08%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=60, 1Load=45, >1Load=44
+    Bandwidth: StallLoads=154, PrefetchLoads=40, AvgLoadTime=3.26ms
+    PrefetchOverlap: HiddenReady=40, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=154, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=258, UsedBeforeEvict=40, EvictedBeforeUse=0
+    GatingPredict Recall=24.66% (294/1192)
+    GatingPredict Precision=98.66% (294/298)
+    GatingPrefetch Delivery=24.66% (294/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 42 Cache Stats: Hits=1065, Misses=127, HitRate=89.35%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=64, 1Load=56, >1Load=29
+    Bandwidth: StallLoads=127, PrefetchLoads=31, AvgLoadTime=3.45ms
+    PrefetchOverlap: HiddenReady=30, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=127, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=267, UsedBeforeEvict=30, EvictedBeforeUse=1
+    GatingPredict Recall=24.16% (288/1192)
+    GatingPredict Precision=96.64% (288/298)
+    GatingPrefetch Delivery=24.16% (288/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 43 Cache Stats: Hits=1087, Misses=105, HitRate=91.19%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=72, 1Load=55, >1Load=22
+    Bandwidth: StallLoads=105, PrefetchLoads=37, AvgLoadTime=3.61ms
+    PrefetchOverlap: HiddenReady=37, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=105, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=261, UsedBeforeEvict=37, EvictedBeforeUse=0
+    GatingPredict Recall=24.75% (295/1192)
+    GatingPredict Precision=98.99% (295/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 44 Cache Stats: Hits=1091, Misses=101, HitRate=91.53%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=78, 1Load=48, >1Load=23
+    Bandwidth: StallLoads=101, PrefetchLoads=27, AvgLoadTime=3.51ms
+    PrefetchOverlap: HiddenReady=27, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=101, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=271, UsedBeforeEvict=27, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 45 Cache Stats: Hits=1081, Misses=111, HitRate=90.69%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=69, 1Load=57, >1Load=23
+    Bandwidth: StallLoads=111, PrefetchLoads=32, AvgLoadTime=3.40ms
+    PrefetchOverlap: HiddenReady=32, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=111, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=266, UsedBeforeEvict=32, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 46 Cache Stats: Hits=1037, Misses=155, HitRate=87.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=52, 1Load=54, >1Load=43
+    Bandwidth: StallLoads=155, PrefetchLoads=50, AvgLoadTime=3.54ms
+    PrefetchOverlap: HiddenReady=49, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=155, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=248, UsedBeforeEvict=49, EvictedBeforeUse=1
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 47 Cache Stats: Hits=945, Misses=247, HitRate=79.28%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=31, 1Load=44, >1Load=74
+    Bandwidth: StallLoads=247, PrefetchLoads=81, AvgLoadTime=2.92ms
+    PrefetchOverlap: HiddenReady=78, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=247, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=217, UsedBeforeEvict=78, EvictedBeforeUse=3
+    GatingPredict Recall=23.66% (282/1192)
+    GatingPredict Precision=94.63% (282/298)
+    GatingPrefetch Delivery=23.74% (283/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 6.62 seconds
+Pre-warming expert cache with 48 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+
+Running sweep using prompts from JSON: /tmp/tmp_dzwz1bq.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ In 2006 , Boulter starred alongside Whishaw in the play Citizenship written by Mark Ravenhill . He appeared on a 2006 episode of the television series , Doctors , followed by a role in the 2007 theatre production of How to Curse directed by Josie Rourke . How to Curse was performed at Bush Theatre in the London Borough of Hammersmith and Fulham . Boulter starred in two films in 2008 , Daylight Robbery by filmmaker Paris Leonti , and Donkey Punch directed by Olly Blackburn . In May 2008 , Boulter made a guest appearance on a two @-@ part episode arc of the television series W
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.325485
+End-to-End TPS: 3.0723
+Cache Stats: Hits=50622, Misses=6594, HitRate=88.48%
+Predictor Stats: Hits=0, Total=0, HitRate=0.00%
+Running as unit: run-r5ce038b3481949eb8af90d195e495e53.scope; invocation ID: 8b32d53dccac4779aba95ac94a8bf561
+Initializing UnifiedLLMW4A16Impl_base
+Using NPU config struct.
+Configuring NPU (Base):
+  Heterogeneity: gpu
+  GPU Count: 1
+  Debug Verbosity: 1
+  Dummy Weights: false
+  Warmup: false
+  Preload MoE: true
+  Minimal PDI: true
+[GPU SELECT] Free VRAM ranking: gpu0=28.00/28.00 GiB
+[GPU SELECT] Selected GPUs for gpu-count=1: [0]
+[GPU MAP] Single-GPU placement on gpu0
+[Layer 1] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 1] prefetch_count=2 softmax_before_topk=yes
+[Layer 2] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 2] prefetch_count=2 softmax_before_topk=yes
+[Layer 3] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 3] prefetch_count=2 softmax_before_topk=yes
+[Layer 4] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 4] prefetch_count=2 softmax_before_topk=yes
+[Layer 5] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 5] prefetch_count=2 softmax_before_topk=yes
+[Layer 6] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 6] prefetch_count=2 softmax_before_topk=yes
+[Layer 7] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 7] prefetch_count=2 softmax_before_topk=yes
+[Layer 8] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 8] prefetch_count=2 softmax_before_topk=yes
+[Layer 9] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 9] prefetch_count=2 softmax_before_topk=yes
+[Layer 10] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 10] prefetch_count=2 softmax_before_topk=yes
+[Layer 11] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 11] prefetch_count=2 softmax_before_topk=yes
+[Layer 12] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 12] prefetch_count=2 softmax_before_topk=yes
+[Layer 13] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 13] prefetch_count=2 softmax_before_topk=yes
+[Layer 14] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 14] prefetch_count=2 softmax_before_topk=yes
+[Layer 15] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 15] prefetch_count=2 softmax_before_topk=yes
+[Layer 16] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 16] prefetch_count=2 softmax_before_topk=yes
+[Layer 17] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 17] prefetch_count=2 softmax_before_topk=yes
+[Layer 18] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 18] prefetch_count=2 softmax_before_topk=yes
+[Layer 19] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 19] prefetch_count=2 softmax_before_topk=yes
+[Layer 20] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 20] prefetch_count=2 softmax_before_topk=yes
+[Layer 21] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 21] prefetch_count=2 softmax_before_topk=yes
+[Layer 22] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 22] prefetch_count=2 softmax_before_topk=yes
+[Layer 23] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 23] prefetch_count=2 softmax_before_topk=yes
+[Layer 24] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 24] prefetch_count=2 softmax_before_topk=yes
+[Layer 25] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 25] prefetch_count=2 softmax_before_topk=yes
+[Layer 26] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 26] prefetch_count=2 softmax_before_topk=yes
+[Layer 27] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 27] prefetch_count=2 softmax_before_topk=yes
+[Layer 28] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 28] prefetch_count=2 softmax_before_topk=yes
+[Layer 29] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 29] prefetch_count=2 softmax_before_topk=yes
+[Layer 30] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 30] prefetch_count=2 softmax_before_topk=yes
+[Layer 31] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 31] prefetch_count=2 softmax_before_topk=yes
+[Layer 32] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 32] prefetch_count=2 softmax_before_topk=yes
+[Layer 33] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 33] prefetch_count=2 softmax_before_topk=yes
+[Layer 34] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 34] prefetch_count=2 softmax_before_topk=yes
+[Layer 35] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 35] prefetch_count=2 softmax_before_topk=yes
+[Layer 36] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 36] prefetch_count=2 softmax_before_topk=yes
+[Layer 37] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 37] prefetch_count=2 softmax_before_topk=yes
+[Layer 38] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 38] prefetch_count=2 softmax_before_topk=yes
+[Layer 39] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 39] prefetch_count=2 softmax_before_topk=yes
+[Layer 40] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 40] prefetch_count=2 softmax_before_topk=yes
+[Layer 41] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 41] prefetch_count=2 softmax_before_topk=yes
+[Layer 42] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 42] prefetch_count=2 softmax_before_topk=yes
+[Layer 43] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 43] prefetch_count=2 softmax_before_topk=yes
+[Layer 44] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 44] prefetch_count=2 softmax_before_topk=yes
+[Layer 45] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 45] prefetch_count=2 softmax_before_topk=yes
+[Layer 46] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 46] prefetch_count=2 softmax_before_topk=yes
+[Layer 47] cache partition: main=46 speculative=2 (fraction=0.0416667)
+[GatingHeuristicPredictor Layer 47] prefetch_count=2 softmax_before_topk=yes
+UnifiedLLMW4A16 moved to device: cuda:0
+Preloading MoE kernels...
+MoE kernels preloaded.
+UnifiedLLMW4A16 initialized on device: cuda:0 with w4a16 quantization
+Loading non-quantized weights from safetensors (mmap): /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Loaded 243 non-quantized parameters, skipped 0
+Loading quantized weights from bins: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+  Expert weights dir override: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed
+Pre-warming 48 experts for all layers...
+Layer 0: Pre-warming 46 experts.
+Layer 0: using packed expert format.
+[MoE I/O] Expert weight reads require O_DIRECT (no buffered fallback).
+Layer 1: Pre-warming 46 experts.
+Layer 1: using packed expert format.
+Layer 2: Pre-warming 46 experts.
+Layer 2: using packed expert format.
+Layer 3: Pre-warming 46 experts.
+Layer 3: using packed expert format.
+Prewarmed experts for layer 4/48
+Layer 4: Pre-warming 46 experts.
+Layer 4: using packed expert format.
+Layer 5: Pre-warming 46 experts.
+Layer 5: using packed expert format.
+Layer 6: Pre-warming 46 experts.
+Layer 6: using packed expert format.
+Layer 7: Pre-warming 46 experts.
+Layer 7: using packed expert format.
+Prewarmed experts for layer 8/48
+Layer 8: Pre-warming 46 experts.
+Layer 8: using packed expert format.
+Layer 9: Pre-warming 46 experts.
+Layer 9: using packed expert format.
+Layer 10: Pre-warming 46 experts.
+Layer 10: using packed expert format.
+Layer 11: Pre-warming 46 experts.
+Layer 11: using packed expert format.
+Prewarmed experts for layer 12/48
+Layer 12: Pre-warming 46 experts.
+Layer 12: using packed expert format.
+Layer 13: Pre-warming 46 experts.
+Layer 13: using packed expert format.
+Layer 14: Pre-warming 46 experts.
+Layer 14: using packed expert format.
+Layer 15: Pre-warming 46 experts.
+Layer 15: using packed expert format.
+Prewarmed experts for layer 16/48
+Layer 16: Pre-warming 46 experts.
+Layer 16: using packed expert format.
+Layer 17: Pre-warming 46 experts.
+Layer 17: using packed expert format.
+Layer 18: Pre-warming 46 experts.
+Layer 18: using packed expert format.
+Layer 19: Pre-warming 46 experts.
+Layer 19: using packed expert format.
+Prewarmed experts for layer 20/48
+Layer 20: Pre-warming 46 experts.
+Layer 20: using packed expert format.
+Layer 21: Pre-warming 46 experts.
+Layer 21: using packed expert format.
+Layer 22: Pre-warming 46 experts.
+Layer 22: using packed expert format.
+Layer 23: Pre-warming 46 experts.
+Layer 23: using packed expert format.
+Prewarmed experts for layer 24/48
+Layer 24: Pre-warming 46 experts.
+Layer 24: using packed expert format.
+Layer 25: Pre-warming 46 experts.
+Layer 25: using packed expert format.
+Layer 26: Pre-warming 46 experts.
+Layer 26: using packed expert format.
+Layer 27: Pre-warming 46 experts.
+Layer 27: using packed expert format.
+Prewarmed experts for layer 28/48
+Layer 28: Pre-warming 46 experts.
+Layer 28: using packed expert format.
+Layer 29: Pre-warming 46 experts.
+Layer 29: using packed expert format.
+Layer 30: Pre-warming 46 experts.
+Layer 30: using packed expert format.
+Layer 31: Pre-warming 46 experts.
+Layer 31: using packed expert format.
+Prewarmed experts for layer 32/48
+Layer 32: Pre-warming 46 experts.
+Layer 32: using packed expert format.
+Layer 33: Pre-warming 46 experts.
+Layer 33: using packed expert format.
+Layer 34: Pre-warming 46 experts.
+Layer 34: using packed expert format.
+Layer 35: Pre-warming 46 experts.
+Layer 35: using packed expert format.
+Prewarmed experts for layer 36/48
+Layer 36: Pre-warming 46 experts.
+Layer 36: using packed expert format.
+Layer 37: Pre-warming 46 experts.
+Layer 37: using packed expert format.
+Layer 38: Pre-warming 46 experts.
+Layer 38: using packed expert format.
+Layer 39: Pre-warming 46 experts.
+Layer 39: using packed expert format.
+Prewarmed experts for layer 40/48
+Layer 40: Pre-warming 46 experts.
+Layer 40: using packed expert format.
+Layer 41: Pre-warming 46 experts.
+Layer 41: using packed expert format.
+Layer 42: Pre-warming 46 experts.
+Layer 42: using packed expert format.
+Layer 43: Pre-warming 46 experts.
+Layer 43: using packed expert format.
+Prewarmed experts for layer 44/48
+Layer 44: Pre-warming 46 experts.
+Layer 44: using packed expert format.
+Layer 45: Pre-warming 46 experts.
+Layer 45: using packed expert format.
+Layer 46: Pre-warming 46 experts.
+Layer 46: using packed expert format.
+Layer 47: Pre-warming 46 experts.
+Layer 47: using packed expert format.
+Prewarmed experts for layer 48/48
+Libtorch input_ids shape: [1, 726]
+Skipping warmup.
+Prefill time: 19.0785 seconds
+Generation phase
+[Layer 0 Step 0 Debug] Slots before check: 93 94 95 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 81 82 83 84 85 86 87 88 89 90 91 92 -1 -1 
+[Layer 0 Step 0 Debug] Requested: 93 69 50 21 75 51 74 33 
+[gen 5/149] elapsed=1.7s  TPS=2.913
+[gen 10/149] elapsed=3.1s  TPS=3.229
+[gen 15/149] elapsed=4.3s  TPS=3.483
+[gen 20/149] elapsed=5.4s  TPS=3.720
+[gen 25/149] elapsed=6.4s  TPS=3.915
+[gen 30/149] elapsed=7.3s  TPS=4.090
+[gen 35/149] elapsed=8.1s  TPS=4.339
+[gen 40/149] elapsed=8.7s  TPS=4.603
+[gen 45/149] elapsed=9.2s  TPS=4.882
+[gen 50/149] elapsed=9.9s  TPS=5.026
+[gen 55/149] elapsed=10.7s  TPS=5.130
+[gen 60/149] elapsed=11.8s  TPS=5.068
+[gen 65/149] elapsed=12.7s  TPS=5.103
+[gen 70/149] elapsed=13.5s  TPS=5.195
+[gen 75/149] elapsed=14.2s  TPS=5.267
+[gen 80/149] elapsed=14.8s  TPS=5.398
+[gen 85/149] elapsed=16.0s  TPS=5.308
+[gen 90/149] elapsed=16.9s  TPS=5.313
+[gen 95/149] elapsed=18.0s  TPS=5.271
+[gen 100/149] elapsed=18.9s  TPS=5.282
+[gen 105/149] elapsed=19.6s  TPS=5.365
+[gen 110/149] elapsed=20.3s  TPS=5.428
+[gen 115/149] elapsed=21.2s  TPS=5.429
+[gen 120/149] elapsed=21.9s  TPS=5.484
+[gen 125/149] elapsed=22.6s  TPS=5.535
+[gen 130/149] elapsed=23.2s  TPS=5.601
+[gen 135/149] elapsed=23.8s  TPS=5.673
+[gen 140/149] elapsed=24.6s  TPS=5.687
+[gen 145/149] elapsed=25.6s  TPS=5.661
+Prefill time (summary): 19.078 seconds
+Total Generation Time: 26.322 seconds
+Average Time per Token: 0.176659 seconds
+
+Expert Cache Statistics:
+Layer 0 Cache Stats: Hits=731, Misses=461, HitRate=61.33%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=14, 1Load=30, >1Load=105
+    Bandwidth: StallLoads=461, PrefetchLoads=0, AvgLoadTime=2.33ms
+    MissCause: NotPresent=461, NotReadyStall=0
+    GlobalSpecLoad: PeakConcurrent=2
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 1 Cache Stats: Hits=926, Misses=266, HitRate=77.68%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=23, 1Load=45, >1Load=81
+    Bandwidth: StallLoads=266, PrefetchLoads=80, AvgLoadTime=2.92ms
+    PrefetchOverlap: HiddenReady=75, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=266, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=218, UsedBeforeEvict=75, EvictedBeforeUse=5
+    GatingPredict Recall=19.21% (229/1192)
+    GatingPredict Precision=76.85% (229/298)
+    GatingPrefetch Delivery=19.21% (229/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 2 Cache Stats: Hits=1017, Misses=175, HitRate=85.32%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=52, 1Load=45, >1Load=52
+    Bandwidth: StallLoads=175, PrefetchLoads=56, AvgLoadTime=3.16ms
+    PrefetchOverlap: HiddenReady=55, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=175, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=242, UsedBeforeEvict=55, EvictedBeforeUse=1
+    GatingPredict Recall=24.24% (289/1192)
+    GatingPredict Precision=96.98% (289/298)
+    GatingPrefetch Delivery=24.24% (289/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 3 Cache Stats: Hits=935, Misses=257, HitRate=78.44%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=22, 1Load=46, >1Load=81
+    Bandwidth: StallLoads=257, PrefetchLoads=62, AvgLoadTime=2.98ms
+    PrefetchOverlap: HiddenReady=56, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=257, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=236, UsedBeforeEvict=56, EvictedBeforeUse=6
+    GatingPredict Recall=23.57% (281/1192)
+    GatingPredict Precision=94.30% (281/298)
+    GatingPrefetch Delivery=23.57% (281/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 4 Cache Stats: Hits=1042, Misses=150, HitRate=87.42%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=59, 1Load=45, >1Load=45
+    Bandwidth: StallLoads=150, PrefetchLoads=43, AvgLoadTime=3.42ms
+    PrefetchOverlap: HiddenReady=40, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=150, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=255, UsedBeforeEvict=40, EvictedBeforeUse=3
+    GatingPredict Recall=24.24% (289/1192)
+    GatingPredict Precision=96.98% (289/298)
+    GatingPrefetch Delivery=24.24% (289/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 5 Cache Stats: Hits=1071, Misses=121, HitRate=89.85%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=75, 1Load=41, >1Load=33
+    Bandwidth: StallLoads=121, PrefetchLoads=46, AvgLoadTime=3.30ms
+    PrefetchOverlap: HiddenReady=44, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=121, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=252, UsedBeforeEvict=44, EvictedBeforeUse=2
+    GatingPredict Recall=24.66% (294/1192)
+    GatingPredict Precision=98.66% (294/298)
+    GatingPrefetch Delivery=24.66% (294/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 6 Cache Stats: Hits=1127, Misses=65, HitRate=94.55%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=102, 1Load=35, >1Load=12
+    Bandwidth: StallLoads=65, PrefetchLoads=13, AvgLoadTime=3.30ms
+    PrefetchOverlap: HiddenReady=10, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=65, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=285, UsedBeforeEvict=10, EvictedBeforeUse=3
+    GatingPredict Recall=24.24% (289/1192)
+    GatingPredict Precision=96.98% (289/298)
+    GatingPrefetch Delivery=24.24% (289/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 7 Cache Stats: Hits=1160, Misses=32, HitRate=97.32%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=122, 1Load=23, >1Load=4
+    Bandwidth: StallLoads=32, PrefetchLoads=8, AvgLoadTime=3.51ms
+    PrefetchOverlap: HiddenReady=8, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=32, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=290, UsedBeforeEvict=8, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 8 Cache Stats: Hits=1090, Misses=102, HitRate=91.44%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=84, 1Load=36, >1Load=29
+    Bandwidth: StallLoads=102, PrefetchLoads=22, AvgLoadTime=3.12ms
+    PrefetchOverlap: HiddenReady=22, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=102, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=276, UsedBeforeEvict=22, EvictedBeforeUse=0
+    GatingPredict Recall=24.58% (293/1192)
+    GatingPredict Precision=98.32% (293/298)
+    GatingPrefetch Delivery=24.58% (293/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 9 Cache Stats: Hits=1128, Misses=64, HitRate=94.63%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=99, 1Load=38, >1Load=12
+    Bandwidth: StallLoads=64, PrefetchLoads=13, AvgLoadTime=3.41ms
+    PrefetchOverlap: HiddenReady=13, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=64, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=285, UsedBeforeEvict=13, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 10 Cache Stats: Hits=1091, Misses=101, HitRate=91.53%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=79, 1Load=48, >1Load=22
+    Bandwidth: StallLoads=101, PrefetchLoads=15, AvgLoadTime=3.24ms
+    PrefetchOverlap: HiddenReady=15, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=101, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=283, UsedBeforeEvict=15, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 11 Cache Stats: Hits=1037, Misses=155, HitRate=87.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=52, 1Load=58, >1Load=39
+    Bandwidth: StallLoads=155, PrefetchLoads=23, AvgLoadTime=3.01ms
+    PrefetchOverlap: HiddenReady=23, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=155, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=275, UsedBeforeEvict=23, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 12 Cache Stats: Hits=1093, Misses=99, HitRate=91.69%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=77, 1Load=49, >1Load=23
+    Bandwidth: StallLoads=99, PrefetchLoads=14, AvgLoadTime=3.57ms
+    PrefetchOverlap: HiddenReady=14, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=99, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=284, UsedBeforeEvict=14, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 13 Cache Stats: Hits=1037, Misses=155, HitRate=87.00%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=50, 1Load=59, >1Load=40
+    Bandwidth: StallLoads=155, PrefetchLoads=46, AvgLoadTime=3.18ms
+    PrefetchOverlap: HiddenReady=46, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=155, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=252, UsedBeforeEvict=46, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 14 Cache Stats: Hits=1107, Misses=85, HitRate=92.87%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=83, 1Load=51, >1Load=15
+    Bandwidth: StallLoads=85, PrefetchLoads=20, AvgLoadTime=3.47ms
+    PrefetchOverlap: HiddenReady=20, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=85, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=278, UsedBeforeEvict=20, EvictedBeforeUse=0
+    GatingPredict Recall=24.58% (293/1192)
+    GatingPredict Precision=98.32% (293/298)
+    GatingPrefetch Delivery=24.66% (294/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 15 Cache Stats: Hits=1117, Misses=75, HitRate=93.71%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=88, 1Load=49, >1Load=12
+    Bandwidth: StallLoads=75, PrefetchLoads=5, AvgLoadTime=3.60ms
+    PrefetchOverlap: HiddenReady=4, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=75, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=293, UsedBeforeEvict=4, EvictedBeforeUse=1
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 16 Cache Stats: Hits=1088, Misses=104, HitRate=91.28%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=69, 1Load=60, >1Load=20
+    Bandwidth: StallLoads=104, PrefetchLoads=18, AvgLoadTime=3.47ms
+    PrefetchOverlap: HiddenReady=18, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=104, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=280, UsedBeforeEvict=18, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 17 Cache Stats: Hits=1073, Misses=119, HitRate=90.02%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=68, 1Load=56, >1Load=25
+    Bandwidth: StallLoads=119, PrefetchLoads=25, AvgLoadTime=3.26ms
+    PrefetchOverlap: HiddenReady=25, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=119, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=273, UsedBeforeEvict=25, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 18 Cache Stats: Hits=1150, Misses=42, HitRate=96.48%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=117, 1Load=26, >1Load=6
+    Bandwidth: StallLoads=42, PrefetchLoads=8, AvgLoadTime=3.50ms
+    PrefetchOverlap: HiddenReady=8, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=42, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=290, UsedBeforeEvict=8, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 19 Cache Stats: Hits=1158, Misses=34, HitRate=97.15%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=120, 1Load=25, >1Load=4
+    Bandwidth: StallLoads=34, PrefetchLoads=5, AvgLoadTime=3.66ms
+    PrefetchOverlap: HiddenReady=5, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=34, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=293, UsedBeforeEvict=5, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 20 Cache Stats: Hits=1142, Misses=50, HitRate=95.81%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=109, 1Load=32, >1Load=8
+    Bandwidth: StallLoads=50, PrefetchLoads=10, AvgLoadTime=3.34ms
+    PrefetchOverlap: HiddenReady=10, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=50, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=288, UsedBeforeEvict=10, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 21 Cache Stats: Hits=1153, Misses=39, HitRate=96.73%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=116, 1Load=27, >1Load=6
+    Bandwidth: StallLoads=39, PrefetchLoads=6, AvgLoadTime=3.72ms
+    PrefetchOverlap: HiddenReady=6, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=39, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=292, UsedBeforeEvict=6, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 22 Cache Stats: Hits=1095, Misses=97, HitRate=91.86%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=81, 1Load=44, >1Load=24
+    Bandwidth: StallLoads=97, PrefetchLoads=15, AvgLoadTime=3.33ms
+    PrefetchOverlap: HiddenReady=15, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=97, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=283, UsedBeforeEvict=15, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 23 Cache Stats: Hits=1028, Misses=164, HitRate=86.24%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=56, 1Load=47, >1Load=46
+    Bandwidth: StallLoads=164, PrefetchLoads=30, AvgLoadTime=2.97ms
+    PrefetchOverlap: HiddenReady=30, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=164, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=268, UsedBeforeEvict=30, EvictedBeforeUse=0
+    GatingPredict Recall=24.75% (295/1192)
+    GatingPredict Precision=98.99% (295/298)
+    GatingPrefetch Delivery=24.75% (295/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 24 Cache Stats: Hits=1113, Misses=79, HitRate=93.37%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=89, 1Load=44, >1Load=16
+    Bandwidth: StallLoads=79, PrefetchLoads=10, AvgLoadTime=3.55ms
+    PrefetchOverlap: HiddenReady=10, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=79, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=288, UsedBeforeEvict=10, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 25 Cache Stats: Hits=1015, Misses=177, HitRate=85.15%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=47, 1Load=52, >1Load=50
+    Bandwidth: StallLoads=177, PrefetchLoads=48, AvgLoadTime=3.01ms
+    PrefetchOverlap: HiddenReady=48, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=177, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=250, UsedBeforeEvict=48, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 26 Cache Stats: Hits=1121, Misses=71, HitRate=94.04%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=91, 1Load=47, >1Load=11
+    Bandwidth: StallLoads=71, PrefetchLoads=19, AvgLoadTime=3.58ms
+    PrefetchOverlap: HiddenReady=19, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=71, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=279, UsedBeforeEvict=19, EvictedBeforeUse=0
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 27 Cache Stats: Hits=1114, Misses=78, HitRate=93.46%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=90, 1Load=43, >1Load=16
+    Bandwidth: StallLoads=78, PrefetchLoads=8, AvgLoadTime=3.56ms
+    PrefetchOverlap: HiddenReady=8, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=78, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=290, UsedBeforeEvict=8, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 28 Cache Stats: Hits=1095, Misses=97, HitRate=91.86%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=76, 1Load=55, >1Load=18
+    Bandwidth: StallLoads=97, PrefetchLoads=27, AvgLoadTime=3.61ms
+    PrefetchOverlap: HiddenReady=27, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=97, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=271, UsedBeforeEvict=27, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 29 Cache Stats: Hits=1059, Misses=133, HitRate=88.84%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=64, 1Load=48, >1Load=37
+    Bandwidth: StallLoads=133, PrefetchLoads=27, AvgLoadTime=3.13ms
+    PrefetchOverlap: HiddenReady=26, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=133, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=271, UsedBeforeEvict=26, EvictedBeforeUse=1
+    GatingPredict Recall=24.83% (296/1192)
+    GatingPredict Precision=99.33% (296/298)
+    GatingPrefetch Delivery=24.83% (296/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 30 Cache Stats: Hits=1150, Misses=42, HitRate=96.48%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=117, 1Load=27, >1Load=5
+    Bandwidth: StallLoads=42, PrefetchLoads=4, AvgLoadTime=3.28ms
+    PrefetchOverlap: HiddenReady=4, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=42, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=294, UsedBeforeEvict=4, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 31 Cache Stats: Hits=1149, Misses=43, HitRate=96.39%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=117, 1Load=26, >1Load=6
+    Bandwidth: StallLoads=43, PrefetchLoads=2, AvgLoadTime=3.24ms
+    PrefetchOverlap: HiddenReady=2, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=43, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=296, UsedBeforeEvict=2, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 32 Cache Stats: Hits=1109, Misses=83, HitRate=93.04%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=94, 1Load=34, >1Load=21
+    Bandwidth: StallLoads=83, PrefetchLoads=14, AvgLoadTime=3.14ms
+    PrefetchOverlap: HiddenReady=14, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=83, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=284, UsedBeforeEvict=14, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 33 Cache Stats: Hits=1142, Misses=50, HitRate=95.81%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=105, 1Load=38, >1Load=6
+    Bandwidth: StallLoads=50, PrefetchLoads=6, AvgLoadTime=3.55ms
+    PrefetchOverlap: HiddenReady=6, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=50, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=292, UsedBeforeEvict=6, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 34 Cache Stats: Hits=1085, Misses=107, HitRate=91.02%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=74, 1Load=50, >1Load=25
+    Bandwidth: StallLoads=107, PrefetchLoads=26, AvgLoadTime=3.33ms
+    PrefetchOverlap: HiddenReady=26, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=107, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=272, UsedBeforeEvict=26, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 35 Cache Stats: Hits=1030, Misses=162, HitRate=86.41%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=50, 1Load=60, >1Load=39
+    Bandwidth: StallLoads=162, PrefetchLoads=39, AvgLoadTime=3.13ms
+    PrefetchOverlap: HiddenReady=39, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=162, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=259, UsedBeforeEvict=39, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 36 Cache Stats: Hits=1091, Misses=101, HitRate=91.53%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=82, 1Load=40, >1Load=27
+    Bandwidth: StallLoads=101, PrefetchLoads=27, AvgLoadTime=3.61ms
+    PrefetchOverlap: HiddenReady=26, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=101, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=271, UsedBeforeEvict=26, EvictedBeforeUse=1
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 37 Cache Stats: Hits=1000, Misses=192, HitRate=83.89%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=43, 1Load=49, >1Load=57
+    Bandwidth: StallLoads=192, PrefetchLoads=54, AvgLoadTime=3.09ms
+    PrefetchOverlap: HiddenReady=54, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=192, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=244, UsedBeforeEvict=54, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 38 Cache Stats: Hits=1085, Misses=107, HitRate=91.02%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=76, 1Load=49, >1Load=24
+    Bandwidth: StallLoads=107, PrefetchLoads=19, AvgLoadTime=3.41ms
+    PrefetchOverlap: HiddenReady=19, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=107, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=279, UsedBeforeEvict=19, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 39 Cache Stats: Hits=1116, Misses=76, HitRate=93.62%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=95, 1Load=38, >1Load=16
+    Bandwidth: StallLoads=76, PrefetchLoads=15, AvgLoadTime=3.57ms
+    PrefetchOverlap: HiddenReady=15, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=76, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=283, UsedBeforeEvict=15, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 40 Cache Stats: Hits=1110, Misses=82, HitRate=93.12%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=96, 1Load=33, >1Load=20
+    Bandwidth: StallLoads=82, PrefetchLoads=34, AvgLoadTime=3.54ms
+    PrefetchOverlap: HiddenReady=34, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=82, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=264, UsedBeforeEvict=34, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 41 Cache Stats: Hits=1062, Misses=130, HitRate=89.09%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=73, 1Load=42, >1Load=34
+    Bandwidth: StallLoads=130, PrefetchLoads=44, AvgLoadTime=3.32ms
+    PrefetchOverlap: HiddenReady=44, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=130, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=254, UsedBeforeEvict=44, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 42 Cache Stats: Hits=1068, Misses=124, HitRate=89.60%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=78, 1Load=37, >1Load=34
+    Bandwidth: StallLoads=124, PrefetchLoads=37, AvgLoadTime=3.32ms
+    PrefetchOverlap: HiddenReady=37, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=124, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=261, UsedBeforeEvict=37, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 43 Cache Stats: Hits=1108, Misses=84, HitRate=92.95%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=91, 1Load=37, >1Load=21
+    Bandwidth: StallLoads=84, PrefetchLoads=33, AvgLoadTime=3.54ms
+    PrefetchOverlap: HiddenReady=33, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=84, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=265, UsedBeforeEvict=33, EvictedBeforeUse=0
+    GatingPredict Recall=24.92% (297/1192)
+    GatingPredict Precision=99.66% (297/298)
+    GatingPrefetch Delivery=24.92% (297/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 44 Cache Stats: Hits=1108, Misses=84, HitRate=92.95%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=91, 1Load=40, >1Load=18
+    Bandwidth: StallLoads=84, PrefetchLoads=12, AvgLoadTime=3.18ms
+    PrefetchOverlap: HiddenReady=12, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=84, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=286, UsedBeforeEvict=12, EvictedBeforeUse=0
+    GatingPredict Recall=24.75% (295/1192)
+    GatingPredict Precision=98.99% (295/298)
+    GatingPrefetch Delivery=24.75% (295/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 45 Cache Stats: Hits=1128, Misses=64, HitRate=94.63%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=102, 1Load=34, >1Load=13
+    Bandwidth: StallLoads=64, PrefetchLoads=14, AvgLoadTime=3.49ms
+    PrefetchOverlap: HiddenReady=14, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=64, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=284, UsedBeforeEvict=14, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 46 Cache Stats: Hits=1096, Misses=96, HitRate=91.95%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=81, 1Load=45, >1Load=23
+    Bandwidth: StallLoads=96, PrefetchLoads=34, AvgLoadTime=3.50ms
+    PrefetchOverlap: HiddenReady=34, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=96, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=264, UsedBeforeEvict=34, EvictedBeforeUse=0
+    GatingPredict Recall=25.00% (298/1192)
+    GatingPredict Precision=100.00% (298/298)
+    GatingPrefetch Delivery=25.00% (298/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+Layer 47 Cache Stats: Hits=1063, Misses=129, HitRate=89.18%
+    Predictor Routed-Expert HitRate=N/A
+    Loads Per Step: 0Loads=75, 1Load=42, >1Load=32
+    Bandwidth: StallLoads=129, PrefetchLoads=53, AvgLoadTime=3.10ms
+    PrefetchOverlap: HiddenReady=50, HiddenWait=0, TicksSkipped=0
+    MissCause: NotPresent=129, NotReadyStall=0
+    PrefetchEff: Dropped=0, AlreadyCached=245, UsedBeforeEvict=50, EvictedBeforeUse=3
+    GatingPredict Recall=23.99% (286/1192)
+    GatingPredict Precision=95.97% (286/298)
+    GatingPrefetch Delivery=24.08% (287/1192)
+    GatingPrefetch Triggers=149
+    Predictor TopK matches: 0=0 1=0 >=2=0
+============================================================
+============================================================
+Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...
+============================================================
+Loading quantized weights from QuixiAI/Qwen3-30B-A3B-AWQ...
+Using saved safetensors: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ.safetensors
+Expert weights dir: /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_packed  (format: packed)
+Using existing attention weights in /home/michael/heteroPredict/py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked
+Weights loaded (expert dir override) in 8.08 seconds
+Pre-warming expert cache with 48 experts...
+Model initialized successfully!
+Set expert cache policy to LRU.
+
+Running sweep using prompts from JSON: /tmp/tmpoyv5x7e4.json
+Loaded 1 prompts for sweeping.
+
+Processing Prompt 1/1...
+
+============================================================
+Generated text only:
+============================================================
+ In the 19th century , his poetry was translated into English by the American poet Witter Bynde , and in the 20th century , by the British poet Ezra Pound and the American poet Arthur Waley . In the 21st century , his poetry has been translated into English by many scholars and poets , including the American poet Stephen Owen and the British poet Jonathan Chaves .
+
+The 2011 film Mercenaries was directed by Paris Leonti and written by Leonti and David Hargreaves . The film stars Robert Boulter as " Daniel " and also features actors such as John Hannah and Stephen Tompkinson . The film is a crime thriller that follows the story of a group of
+============================================================
+
+============================================================
+Sweep Complete.
+Average Time per Token: 0.302716
+End-to-End TPS: 3.3034
+Cache Stats: Hits=51813, Misses=5403, HitRate=90.56%
+Predictor Stats: Hits=0, Total=0, HitRate=0.00%
