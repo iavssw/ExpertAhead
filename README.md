@@ -185,6 +185,10 @@ Use the Python plotting scripts to recreate the graphs from the paper based on y
 # Example: Generate Chapter 3 theoretical throughput plots
 python3 py/utils/plot_sec3_3_2.py
 
+# Example: Generate best lookahead scaling plots
+python3 py/utils/plot_oracle_best_lookahead.py
+python3 py/utils/plot_predictor_best_lookahead.py
+
 # Example: Generate final end-to-end evaluation plots
 python3 py/utils/plot_thesis_finals.py \
     --csv-sec2 py/utils/final_results_runs/<your_sec2_dir>/sweep.csv \
