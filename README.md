@@ -1,3 +1,11 @@
+# ExpertAhead
+
+ExpertAhead is a research runtime for Mixture-of-Experts (MoE) LLM inference on AMD Ryzen AI. It keeps expert weights primarily on SSD, stages them through a small unified memory expert cache, and uses lightweight predictors (ML, gating heuristics, or oracle) to prefetch experts ahead of decode—so large MoE models can run under tight memory budgets.
+
+This repository includes the W4A16 C++/HIP inference backends, expert packing and SSD loading, predictor training, and the scripts used for the ExpertAhead paper experiments.
+
+---
+
 # Libraries Setup Guide
 
 This guide describes how to replicate the `libraries` directory in a directory of your choosing, which contains the necessary external dependencies for building and running the project.
@@ -5,7 +13,7 @@ This guide describes how to replicate the `libraries` directory in a directory o
 ## Prerequisites
 
 ### 1. ROCm 7.1.1
-Ensure ROCm 7.1.1 is installed on your system.
+Ensure ROCm 7.1.1 is installed.
 Reference: [ROCm Quick Start Guide](https://rocm.docs.amd.com/projects/install-on-linux/en/docs-7.1.1/install/quick-start.html)
 
 ### 2. AOCL (AMD Optimizing CPU Libraries)
@@ -13,29 +21,25 @@ Instructions and downloads can be found here:
 - [AOCL Archives](https://www.amd.com/en/developer/aocl/aocl-archives.html)
 - [AOCL Building from Source](https://docs.amd.com/r/en-US/57404-AOCL-user-guide/3.1.-Building-from-Source)
 
+### 3. CMake
+CMake **3.25+** is required (installed into the project venv by `utils/new_setup.sh`).
+
 ---
 
-## Environment Configuration
+## External libraries (`HOME_LIBS`)
 
 Before setting up the dependencies, choose a location where you want to install the `libraries`. You should export the `HOME_LIBS` environment variable to point to this directory.
 
 Add the following to your `~/.bashrc` or equivalent:
 
 ```bash
-export HOME_LIBS="/path/to/your/libraries"  # Replace with your desired path
+export HOME_LIBS="/path/to/your/libraries"  # Replace with your path
 mkdir -p "$HOME_LIBS"
 ```
 
-Then reload your shell or run:
-```bash
-source ~/.bashrc
-```
+Add that export to `~/.bashrc` (or equivalent), then `source ~/.bashrc`.
 
----
-
-## Setup Steps
-
-### 1. Setup LibTorch
+### 1. LibTorch
 ```bash
 cd "$HOME_LIBS"
 wget https://download.pytorch.org/libtorch/rocm7.1/libtorch-shared-with-deps-2.10.0%2Brocm7.1.zip
@@ -110,43 +114,51 @@ Log in to your Hugging Face account:
 hf auth login
 ```
 
-### 2. Run the Python Script
-
-Navigate to the Python directory and run the model script:
+### 2. Run Qwen3-30B-A3B
 ```bash
 cd py/unified_llm_w4a16
-python3 mixtral_8x7B_w4a16_model.py
+python3 qwen3_30B-A3B_w4a16_model.py
 ```
 
 **Common Arguments:**
 
 - `--text "Your prompt here"`: The input text to process.
-- `--model-path "TheBloke/mixtral-8x7b-v0.1-AWQ"`: The Hugging Face repository ID or local path to the model.
-- `--config-path "configs/configs_strixH_mixtral7x8B.json5"`: Path to the NPU configuration file. This file controls heterogeneity settings.
+- `--model-path "QuixiAI/Qwen3-30B-A3B-AWQ"`: The Hugging Face repository ID or local path to the model.
+- `--config-path "configs/configs_strixH_qwen3_30B_A3B.json5"`: Path to the configuration file. This file controls heterogeneity settings.
 - `--device "cuda"`: The device to run on (`cuda` or `cpu`).
 - `--max-new-tokens 16`: The maximum number of new tokens to generate.
 
 **Example Command:**
 
 ```bash
-python3 mixtral_8x7B_w4a16_model.py \
+python3 qwen3_30B-A3B_w4a16_model.py \
     --text "What is the meaning of life?" \
-    --config-path "configs/configs_strixH_mixtral7x8B.json5" \
+    --config-path "configs/configs_strixH_qwen3_30B_A3B.json5" \
     --max-new-tokens 32
 ```
 
-### 3. Configuration
+**Common arguments:**
 
-Runtime behavior is controlled by the JSON5 config file at `py/unified_llm_w4a16/configs/configs_strixH_mixtral7x8B.json5`. See this file for available options such as heterogeneity mode, warmup, MoE kernel preloading, debug verbosity, and more.
+| Flag | Meaning |
+|------|---------|
+| `--text "..."` | Prompt |
+| `--model-path "..."` | HF repo ID or local model path (default AWQ checkpoint) |
+| `--config-path "..."` | Device / heterogeneity JSON5 (under `configs/`) |
+| `--device cuda\|cpu` | Execution device |
+| `--max-new-tokens N` | Generation length |
+
+Device configs live at `py/unified_llm_w4a16/configs/` (e.g. `configs_strixH_qwen3_30B_A3B.json5`). For ExpertAhead cache / prefetch behavior, use a **run config** JSON (`backend`, `max_cached_experts`, `predictor_type`, …) as described in `README_run_config.md`.
 
 > [!NOTE]
-> The HIP kernels in this project are primarily optimized for **RDNA (gfx11)** architectures. While they support CDNA (gfx9) devices via Wave64 adaptation, performance on CDNA may not be optimal compared to RDNA.
+> HIP kernels are primarily optimized for **RDNA (gfx11)**. CDNA (gfx9) is supported via Wave64 adaptation but may be slower.
 
 ---
 
-## Reproducing ExpertAhead (Paper Experiments)
+## Reproducing ExpertAhead (paper experiments)
 
-Follow these steps to reproduce the evaluation and analysis found in the ExpertAhead paper from scratch.
+### 1. Pack experts for SSD loading
+Download and unpack Qwen3-30B-A3B-AWQ weights to  
+`py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked`, then:
 
 ### 1. Model Preparation & Expert Packing
 The inference runtime requires expert weights to be packed into a custom binary format for efficient SSD loading.
@@ -155,7 +167,8 @@ After downloading the Qwen3-30B-A3B-AWQ weights and extracting them to `py/unifi
 cd py/unified_llm_w4a16
 python3 pack_experts.py
 ```
-This script relies on default arguments to process the 48 layers and 128 experts, outputting to the `Qwen3-30B-A3B-AWQ_packed` directory.
+
+Default packing covers 48 MoE layers × 128 experts and writes `Qwen3-30B-A3B-AWQ_packed`.
 
 ### 2. Training Data Collection
 Generate the training traces for the predictor using the WikiText dataset.
@@ -170,7 +183,11 @@ Train the lightweight cross-token transformer predictors for all layers.
 cd py/expert_predictor
 bash run_train.sh qwen3_30b
 ```
-The resulting predictor models will be saved to the training data directory.
+
+Trained models are written under the training-data tree.
+
+### 4. End-to-end evaluation
+Scripts under `sh_scripts/` drive sweeps and paper tables, for example:
 
 ### 4. End-to-End Evaluation (Sweeps)
 Execute the inference evaluation scripts located in the `sh_scripts/` directory to generate the final performance metrics (e.g., Tokens Per Second).
@@ -179,20 +196,8 @@ Execute the inference evaluation scripts located in the `sh_scripts/` directory 
 CACHE_SIZES="16 32 48 64" ./sh_scripts/run_final_best_10prompt_oracle.sh
 ```
 
-### 5. Generating Plots
-Use the Python plotting scripts to recreate the graphs from the paper based on your collected CSV data.
-```bash
-# Example: Generate Chapter 3 theoretical throughput plots
-python3 py/utils/modeling_cache_conditional.py
+---
 
-# Example: Generate best lookahead scaling plots
-python3 py/utils/plot_oracle_best_lookahead.py
-python3 py/utils/plot_predictor_best_lookahead.py
+## License
 
-# Example: Generate final end-to-end evaluation plots
-python3 py/utils/plot_thesis_finals.py \
-    --csv-sec2 py/utils/final_results_runs/<your_sec2_dir>/sweep.csv \
-    --csv-sec4 py/utils/final_results_runs/<your_sec4_dir>/sweep.csv \
-    --csv-sec5 py/utils/final_results_runs/<your_sec5_dir>/sweep.csv \
-    --out-dir py/utils/final_results_runs/thesis_plots
-```
+This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
