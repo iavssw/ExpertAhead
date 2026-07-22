@@ -1170,6 +1170,8 @@ def iter_custom_prefetch_budgets(args: argparse.Namespace, cache_size: int) -> L
     """Prefetch budgets for CUSTOM_1_16 family: explicit list, fractions, or their union."""
     budgets: set[int] = set()
     fractions = list(getattr(args, "budget_fractions", []) or [])
+    if getattr(args, "no_budget_fractions", False):
+        fractions = []
     if getattr(args, "custom_explicit_prefetch_budgets", False):
         budgets.update(int(b) for b in args.prefetch_budgets if 1 <= int(b) <= int(cache_size))
         for f in fractions:
@@ -1178,6 +1180,44 @@ def iter_custom_prefetch_budgets(args: argparse.Namespace, cache_size: int) -> L
         for f in fractions:
             budgets.add(max(1, int(cache_size * float(f))))
     return sorted(budgets)
+
+
+def apply_row_selection_flags(
+    configs: List[Dict[str, Any]],
+    args: argparse.Namespace,
+) -> List[Dict[str, Any]]:
+    """Filter configs for --cache-cond-only / --both-only / --prefetch-only / --skip-baselines."""
+    cache_cond_only = bool(getattr(args, "cache_cond_only", False))
+    both_only = bool(getattr(args, "both_only", False))
+    prefetch_only = bool(getattr(args, "prefetch_only", False))
+    skip_baselines = bool(getattr(args, "skip_baselines", False))
+
+    mode_count = sum(bool(x) for x in (cache_cond_only, both_only, prefetch_only))
+    if mode_count > 1:
+        raise ValueError(
+            "Use only one of --cache-cond-only, --both-only, --prefetch-only"
+        )
+
+    def label(c: Dict[str, Any]) -> str:
+        return str(c.get("label", ""))
+
+    def is_baseline(c: Dict[str, Any]) -> bool:
+        return label(c).startswith("Neither")
+
+    if cache_cond_only:
+        configs = [c for c in configs if label(c).startswith("Cache-Cond")]
+    elif both_only:
+        configs = [c for c in configs if label(c).startswith("Both")]
+    elif prefetch_only:
+        configs = [
+            c for c in configs
+            if label(c).startswith("Prefetch Only") or is_baseline(c)
+        ]
+
+    if skip_baselines:
+        configs = [c for c in configs if not is_baseline(c)]
+
+    return configs
 
 
 def gating_routed_top_k(model: str) -> int:
@@ -4122,8 +4162,8 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             "lru_vs_gating": lambda: _make_custom_configs(lru_vs_gating_sweep_configs, "LRU_VS_GATING"),
         }
         configs = question_builders[args.sweep_question]()
-        # When --prefetch-only, also include RANDOM baseline in the same run
-        if getattr(args, "prefetch_only", False):
+        # When --prefetch-only without --skip-baselines, also include RANDOM/LRU baselines.
+        if getattr(args, "prefetch_only", False) and not getattr(args, "skip_baselines", False):
             configs.extend(random_baseline_configs(args, min_cache_map))
             _append_lru_baselines_once_per_cache(
                 configs,
@@ -4134,6 +4174,7 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
                 mode_perplexity=False,
                 predictor_tag="",
             )
+    configs = apply_row_selection_flags(configs, args)
     apply_non_baseline_cache_policy(configs, getattr(args, "non_baseline_cache_policy", None))
 
     append_existing = getattr(args, "append", False)
@@ -4151,12 +4192,22 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             existing_rows.append(row_dict)
             if row_has_data(row_dict):
                 done_keys.add(cfg_key(row_dict))
-        if args.retry_failed:
+        if args.retry_failed or append_existing:
             before = len(configs)
             configs = [c for c in configs if cfg_key(c) not in done_keys]
-            print(f"[sweep] --retry-failed: {before - len(configs)} configs already done, {len(configs)} to re-run.", flush=True)
-        elif append_existing:
-            print(f"[sweep] --append: keeping {len(existing_rows)} existing row(s), adding {len(configs)} new config(s).", flush=True)
+            skipped = before - len(configs)
+            if args.retry_failed:
+                print(
+                    f"[sweep] --retry-failed: {skipped} configs already done, "
+                    f"{len(configs)} to re-run.",
+                    flush=True,
+                )
+            else:
+                print(
+                    f"[sweep] --append: keeping {len(existing_rows)} existing row(s), "
+                    f"skipping {skipped} already-done, adding {len(configs)} new.",
+                    flush=True,
+                )
 
     expanded_runs: List[Dict[str, Any]] = []
     for config_id, config in enumerate(configs):
@@ -4298,6 +4349,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="Budget as a fraction of cache size for custom_1_16/lambda_fn/top_p sweeps. "
                         "Sweeps the sweet spot between cache thrashing (high fraction) and under-utilisation (low fraction). "
                         "With --custom-explicit-prefetch-budgets, unions these fractions with --prefetch-budgets.")
+    p.add_argument(
+        "--no-budget-fractions",
+        action="store_true",
+        help="Ignore --budget-fractions so only --prefetch-budgets are used "
+             "(with --custom-explicit-prefetch-budgets).",
+    )
     p.add_argument(
         "--custom-explicit-prefetch-budgets",
         action="store_true",
@@ -4480,10 +4537,26 @@ def build_arg_parser() -> argparse.ArgumentParser:
              "Merges into an existing --csv-file when present.",
     )
     p.add_argument(
+        "--skip-baselines",
+        action="store_true",
+        help="Drop Neither (LRU/RANDOM) baseline rows. Use when appending to a CSV that "
+             "already has baselines from a prior step.",
+    )
+    p.add_argument(
+        "--cache-cond-only",
+        action="store_true",
+        help="Run only Cache-Cond Only rows (no baselines / prefetch / hybrid).",
+    )
+    p.add_argument(
+        "--both-only",
+        action="store_true",
+        help="Run only hybrid Both (prefetch + cache-cond) rows.",
+    )
+    p.add_argument(
         "--prefetch-only",
         action="store_true",
         help="Skip cache-cond and hybrid (Both λ>0) rows. Only runs Prefetch Only rows for "
-             "each predictor, plus LRU and RANDOM baselines.",
+             "each predictor, plus LRU and RANDOM baselines (unless --skip-baselines).",
     )
     p.add_argument(
         "--lru-only", action="store_true",

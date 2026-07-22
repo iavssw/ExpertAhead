@@ -163,6 +163,7 @@ run_one_cache() {
   run_step "02_cross_layer" \
     --sweep-question gating_budget_sweep \
     --custom-explicit-prefetch-budgets \
+    --no-budget-fractions \
     --prefetch-budgets "$XL_B"
 
   run_step "03_cache_cond" \

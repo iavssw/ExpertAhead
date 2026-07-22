@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Re-run best comparison configs on oracle traces (wikitext_test_traces), 10 prompts.
-# Same 5 methods as run_final_best_10prompt.sh, plus Oracle Full Union at S=1 and
-# per-cache best S from the other machine.
+# Same 5 methods as run_final_best_10prompt.sh, plus Oracle Full Union at S=1.
 #
 # Usage:
 #   CACHE_SIZE=16 ./run_final_best_10prompt_oracle.sh
@@ -43,36 +42,30 @@ run_one_cache() {
 
   # Best configs from comparison sweeps (ML predictor + gating / cache-cond).
   local XL_B CC_J EA_S EA_B EACC_S EACC_B EACC_J
-  # Oracle Full Union "best S" from the other machine.
-  local ORACLE_BEST_S
   case "$C" in
     16)
       XL_B=8
       CC_J=5
       EA_S=2; EA_B=4
       EACC_S=1; EACC_B=4; EACC_J=5
-      ORACLE_BEST_S=2
       ;;
     32)
       XL_B=6
       CC_J=5
       EA_S=2; EA_B=8
       EACC_S=1; EACC_B=8; EACC_J=5
-      ORACLE_BEST_S=6
       ;;
     48)
       XL_B=2
       CC_J=5
       EA_S=5; EA_B=24
       EACC_S=4; EACC_B=20; EACC_J=5
-      ORACLE_BEST_S=10
       ;;
     64)
       XL_B=2
       CC_J=5
       EA_S=6; EA_B=36
       EACC_S=6; EACC_B=36; EACC_J=5
-      ORACLE_BEST_S=16
       ;;
     *)
       echo "No best-config table for C=$C" >&2
@@ -137,7 +130,7 @@ run_one_cache() {
       echo "Cache-Cond J=$CC_J"
       echo "ExpertAhead S=$EA_S B=$EA_B"
       echo "ExpertAhead-CC S=$EACC_S B=$EACC_B J=$EACC_J"
-      echo "Oracle Full Union S=1, S=$ORACLE_BEST_S"
+      echo "Oracle Full Union S=1"
     } > "$OUT_DIR/command.txt"
   fi
 
@@ -150,6 +143,7 @@ run_one_cache() {
   run_step "02_cross_layer" \
     --sweep-question gating_budget_sweep \
     --custom-explicit-prefetch-budgets \
+    --no-budget-fractions \
     --prefetch-budgets "$XL_B"
 
   run_step "03_cache_cond" \
@@ -187,7 +181,7 @@ run_one_cache() {
       --skip-baselines \
       --oracle-full-union-only \
       --no-actual-predictor \
-      --lookaheads 1 "$ORACLE_BEST_S" \
+      --lookaheads 1 \
       --disable-measurement
   fi
 
