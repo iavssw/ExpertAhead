@@ -17,3 +17,34 @@
 
 trainingData/**/*.pt
 trainingData/
+
+# py/utils/final_results_runs/  # explicitly un-ignored
+py/utils/final_results_runs_boyyyyyy/
+
+**/*.png
+**/*.csv
+**/*.log
+**/__pycache__/
+
+**/results/
+
+# Ignore large raw datasets and model weights
+*.safetensors
+*.qweight.bin
+trainingDataExtended/qwen3_30b/wikitext_*.pt
+__pycache__/
+*.pyc
+
+# Ignore older model runs
+trainingDataExtended/qwen3_30b_sharded/transformer_full_*/
+trainingDataExtended/qwen3_30b_sharded/transformer_study/
+trainingDataExtended/qwen3_30b_sharded/mlp_*/
+trainingDataExtended/qwen3_30b_sharded/layer_*/
+trainingDataExtended/qwen3_30b/
+.venv/
+*.nohup
+max_cache.json
+
+# Explicitly track results in these directories
+!py/utils/final_results_runs/**
+!py/utils/section_5_2/**

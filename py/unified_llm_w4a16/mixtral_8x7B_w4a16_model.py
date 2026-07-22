@@ -11,7 +11,7 @@ import re
 import math
 import subprocess
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Any
 from urllib.request import urlopen
 
 import torch
@@ -33,6 +33,45 @@ else:
         sys.path.insert(0, str(_local_build.resolve()))
 
 ArchitectureType = None
+
+
+def _apply_routing_and_cache_cli(model: Any, args: Any) -> None:
+    """Apply lambda / forced routing / cache policy from argparse (shared by main and WikiText eval)."""
+    if args.lambda_val != 0.0 and hasattr(model, "set_lambda"):
+        print(f"Setting lambda to {args.lambda_val}")
+        model.set_lambda(args.lambda_val)
+
+    if getattr(args, "forced_top_n", 0) > 0 and hasattr(model, "set_forced_top_n"):
+        model.set_forced_top_n(args.forced_top_n)
+        print(f"Forced top-{args.forced_top_n} experts into cache mask.")
+
+    if getattr(args, "forced_top_p", -1.0) >= 0.0 and hasattr(model, "set_forced_top_p"):
+        model.set_forced_top_p(args.forced_top_p)
+        print(f"Forced top-p={args.forced_top_p} experts into cache mask.")
+
+    if getattr(args, "mass_threshold_substitution_p", -1.0) >= 0.0 and hasattr(model, "set_mass_threshold_substitution_p"):
+        model.set_mass_threshold_substitution_p(args.mass_threshold_substitution_p)
+        print(
+            f"Probability-mass prefix p={args.mass_threshold_substitution_p} OR'd into cache mask "
+            f"(same λ-biased top-k as forced_top_n; use --lambda-val e.g. 1.0 for cache-conditional routing)."
+        )
+        if args.lambda_val == 0.0:
+            print("Warning: --mass-threshold-substitution-p has no effect while --lambda-val is 0.")
+
+    if getattr(args, "prefill_top_n", 0) > 0 and hasattr(model, "set_prefill_top_n"):
+        model.set_prefill_top_n(args.prefill_top_n)
+        print(f"Set prefill top-{args.prefill_top_n} locked experts.")
+
+    if hasattr(args, "cache_policy") and args.cache_policy and hasattr(model, "set_cache_policy"):
+        model.set_cache_policy(args.cache_policy)
+        print(f"Set expert cache policy to {args.cache_policy}.")
+
+    if getattr(args, "suppress_predictor_stats", False):
+        if hasattr(model, "set_suppress_predictor_stats"):
+            model.set_suppress_predictor_stats(True)
+            print("Suppressing predictor stats.")
+        else:
+            print("Warning: --suppress-predictor-stats ignored (backend has no set_suppress_predictor_stats).")
 
 
 def load_config_with_comments(path: str) -> dict:
@@ -176,7 +215,7 @@ class Mixtral8x7BW4A16Model:
         num_key_value_heads: int = 8,
         head_dim: int = 128,
         rms_norm_eps: float = 1e-5,
-        rope_theta: float = 10000.0,
+        rope_theta: float = 1000000.0,
         max_seq_len: int = 5120,
         max_batch_size: int = 1,
         groupsize: int = 128,
@@ -193,6 +232,10 @@ class Mixtral8x7BW4A16Model:
         prefetch_experts_count: int = 1,
         predict_layers: Optional[List[int]] = None,
         per_layer_cache_sizes: Optional[List[int]] = None,
+        expert_reuse_csv: Optional[str] = None,
+        expert_weights_dir: Optional[str] = None,
+        prewarm_experts: bool = True,
+        predictor_lookahead: int = 1,
     ):
         """
         Initialize Mixtral 8x7B v0.1 AWQ w4a16 quantized model.
@@ -223,6 +266,7 @@ class Mixtral8x7BW4A16Model:
         self.device = device
         self.model_path = model_path
         self.vocab_size = vocab_size
+        self.expert_weights_dir = expert_weights_dir
         self.hidden_size = hidden_size
         self.intermediate_size = intermediate_size
         self.num_hidden_layers = num_hidden_layers
@@ -283,11 +327,22 @@ class Mixtral8x7BW4A16Model:
         else:
             constructor_args.append(config_path)
         if backend == "predict":
+            # If CSV provided, calibrate fair metrics
+            if expert_reuse_csv and predictor_models_dir:
+                per_layer_cache_sizes, per_layer_prefetch_counts = self._calibrate_from_csv(expert_reuse_csv, predictor_models_dir)
+                print(f"[Calibration] Loaded per-layer counts from {expert_reuse_csv}")
+            else:
+                per_layer_prefetch_counts = []
+
             constructor_args.append(prefetch_experts_count)
             constructor_args.append(predict_layers if predict_layers is not None else [])
             constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
+            constructor_args.append(per_layer_prefetch_counts)
             
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
+
+        if backend == "predict" and predictor_lookahead > 1 and hasattr(self.model, "set_predictor_lookahead"):
+            self.model.set_predictor_lookahead(predictor_lookahead)
 
         # Clean up temp config after C++ has read it
         if _temp_config_path:
@@ -319,12 +374,18 @@ class Mixtral8x7BW4A16Model:
             print("Initializing dummy weights...")
             self.model.initialize_dummy_weights()
         elif model_path:
-            self._load_quantized_weights(model_path, weights_folder="model_weights")
+            self._load_quantized_weights(
+                model_path,
+                weights_folder="model_weights",
+                expert_weights_dir=self.expert_weights_dir,
+            )
 
-        if backend in ["cached", "predict"]:
+        if backend in ["cached", "predict"] and prewarm_experts:
             num_to_warm = max(per_layer_cache_sizes) if per_layer_cache_sizes else max_cached_experts_per_layer
             print(f"Pre-warming expert cache with {num_to_warm} experts...")
             self.model.prewarm_experts(num_to_warm)
+        elif backend in ["cached", "predict"]:
+            print("Skipping expert prewarm (--no-prewarm); experts load on first use.")
 
         tokenizer_path = tokenizer_path or model_path
         if tokenizer_path:
@@ -333,8 +394,64 @@ class Mixtral8x7BW4A16Model:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
         else:
             self.tokenizer = None
+    def _calibrate_from_csv(self, csv_path: str, predictor_path: str):
+        """
+        Calibrate global 'fair' cache and prefetch counts from an expert reuse CSV file.
+        Matches window_size in CSV with 'fN' in predictor_path.
+        Formula:
+          cache_size = ceil(1.2 * max(unique_experts_per_layer))
+          prefetch_budget = round(avg(unique_experts_per_layer))
+        """
+        import csv
+        import math
 
-    def _load_quantized_weights(self, model_path: str, weights_folder: str = "model_weights"):
+        # 1. Detect window size (fN) from predictor_path
+        window_size = 1
+        match = re.search(r"f(\d+)", predictor_path)
+        if match:
+            window_size = int(match.group(1))
+            print(f"[Calibration] Detected window_size {window_size} from predictor path")
+        else:
+            print(f"[Calibration] Warning: Could not detect window_size from path '{predictor_path}', defaulting to f1")
+
+        raw_counts = None
+        try:
+            with open(csv_path, mode='r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if int(row['window_size']) == window_size:
+                        raw_counts = []
+                        for k, v in row.items():
+                            if k.startswith('layer_'):
+                                raw_counts.append(float(v))
+                        break
+        except Exception as e:
+            print(f"[Calibration] Error reading CSV {csv_path}: {e}")
+
+        if not raw_counts:
+            print(f"[Calibration] Warning: window_size {window_size} not found in CSV, using fallback defaults")
+            return [8] * self.num_hidden_layers, [8] * self.num_hidden_layers
+
+        # Formula:
+        # 1. Cache Size: 1.2 * max(unique experts)
+        fair_cache = int(math.ceil(1.2 * max(raw_counts)))
+        # 2. Prefetch Budget: avg(unique experts)
+        fair_prefetch = int(round(sum(raw_counts) / len(raw_counts)))
+        
+        print(f"[Calibration] Calculated Fair Metrics: Cache={fair_cache}, Prefetch={fair_prefetch}")
+
+        # Return flat lists to satisfy the predict backend's per-layer requirement
+        cache_list = [fair_cache] * self.num_hidden_layers
+        prefetch_list = [fair_prefetch] * self.num_hidden_layers
+        
+        return cache_list, prefetch_list
+
+    def _load_quantized_weights(
+        self,
+        model_path: str,
+        weights_folder: str = "model_weights",
+        expert_weights_dir: Optional[str] = None,
+    ):
         """Load quantized weights from safetensors and pass to the C++ backend."""
         print(f"Loading quantized weights from {model_path}...")
         try:
@@ -379,8 +496,27 @@ class Mixtral8x7BW4A16Model:
 
             use_presaved = self.use_pre_saved_weights
 
-            if use_presaved:
+            if expert_weights_dir is not None:
+                expert_path = Path(expert_weights_dir)
+                probe = expert_path / "layer_0_expert_0.bin"
+                fmt = "packed" if probe.exists() else "unpacked"
+                print(f"Expert weights dir: {expert_path}  (format: {fmt})")
+
                 presaved_dir = weights_dir / f"{model_name}_unpacked"
+                self._prepare_presaved_weights(saved_safetensors, presaved_dir, attention_only=True)
+
+                t0 = time.time()
+                self.model.load_non_quantized_weights_from_safetensors(str(saved_safetensors))
+                self.model.load_quantized_weights_from_bins(str(presaved_dir), str(expert_path))
+                t1 = time.time()
+                self.load_time = t1 - t0
+                print(f"Weights loaded (expert dir override) in {self.load_time:.2f} seconds")
+            elif use_presaved:
+                if self.expert_weights_dir is not None:
+                    presaved_dir = Path(self.expert_weights_dir)
+                else:
+                    presaved_dir = weights_dir / f"{model_name}_unpacked"
+                
                 self._prepare_presaved_weights(saved_safetensors, presaved_dir)
 
                 t0 = time.time()
@@ -403,7 +539,9 @@ class Mixtral8x7BW4A16Model:
             print("\nNote: Falling back to randomly initialized weights.")
             print("The model will not produce meaningful output without proper weights.")
 
-    def _prepare_presaved_weights(self, saved_safetensors: Path, presaved_dir: Path) -> None:
+    def _prepare_presaved_weights(
+        self, saved_safetensors: Path, presaved_dir: Path, *, attention_only: bool = False
+    ) -> None:
         manifest_path = presaved_dir / "manifest.json"
         model_name = saved_safetensors.stem
         hetero_mode = str(self.config.get("heterogeneity", "")).lower() if isinstance(self.config, dict) else ""
@@ -424,7 +562,7 @@ class Mixtral8x7BW4A16Model:
         }
         expected_manifest["unpacked_layout"] = "out_groups_v2"
 
-        def _bins_exist() -> bool:
+        def _attention_bins_exist() -> bool:
             if not presaved_dir.exists():
                 return False
             for layer_idx in range(self.num_hidden_layers):
@@ -435,6 +573,14 @@ class Mixtral8x7BW4A16Model:
                         return False
                     if not (presaved_dir / f"layer_{layer_idx}_{short_name}.zeros.bin").exists():
                         return False
+            return True
+
+        def _bins_exist() -> bool:
+            if not _attention_bins_exist():
+                return False
+            if attention_only:
+                return True
+            for layer_idx in range(self.num_hidden_layers):
                 for e in range(self.num_experts):
                     for short_name in ["gate", "up", "down"]:
                         if not (presaved_dir / f"layer_{layer_idx}_expert_{e}_{short_name}.qweight.bin").exists():
@@ -446,9 +592,17 @@ class Mixtral8x7BW4A16Model:
             return True
 
         if _bins_exist():
+            label = "attention" if attention_only else "pre-saved"
             if self.debug_verbosity >= 1:
-                print(f"Using existing pre-saved weights in {presaved_dir}")
+                print(f"Using existing {label} weights in {presaved_dir}")
             return
+
+        if attention_only:
+            raise FileNotFoundError(
+                f"Missing attention weight bins in {presaved_dir}. "
+                f"When using --expert-weights-dir (packed experts), the unpacked dir must "
+                f"contain layer_*_{{q,k,v,o}}.{{qweight,scales,zeros}}.bin for all layers."
+            )
 
         print(f"Preprocessing weights into bin files under {presaved_dir}...")
         from safetensors.torch import load_file
@@ -576,13 +730,20 @@ class Mixtral8x7BW4A16Model:
         Raises:
             ValueError: If lambda_value is not in [0, 1]
         """
-        if lambda_value < 0.0 or lambda_value > 2.0:
-            raise ValueError(f"Lambda must be in range [0, 2], got: {lambda_value}")
+        if lambda_value < 0.0 or lambda_value > 100.0:
+            raise ValueError(f"Lambda must be in range [0, 100], got: {lambda_value}")
         self.model.set_lambda(lambda_value, layer_idx)
 
     def get_lambda(self, layer_idx: int = 0) -> float:
         """Get lambda parameter for specified layer."""
         return self.model.get_lambda(layer_idx)
+
+    def set_cache_policy(self, policy: str, layer_idx: int = -1):
+        """Set the eviction policy for the expert cache (e.g., 'LRU', 'LFU', 'CLOCK', etc.)"""
+        if hasattr(self.model, "set_cache_policy"):
+            self.model.set_cache_policy(policy, layer_idx)
+        else:
+            print(f"Warning: Backend does not support set_cache_policy.")
 
     def set_layer_correlation_constants(self, constants: List[float]):
         """Set the correlation constant for each layer."""
@@ -625,6 +786,29 @@ class Mixtral8x7BW4A16Model:
             return self.model.get_cache_stats()
         return (0, 0)
 
+    def set_forced_top_n(self, n: int):
+        """Set how many unbiased top-K experts are forced into the lambda bias mask."""
+        if hasattr(self.model, "set_forced_top_n"):
+            self.model.set_forced_top_n(n)
+
+    def set_forced_top_p(self, p: float):
+        if hasattr(self.model, "set_forced_top_p"):
+            self.model.set_forced_top_p(p)
+
+    def set_mass_threshold_substitution_p(self, p: float):
+        if hasattr(self.model, "set_mass_threshold_substitution_p"):
+            self.model.set_mass_threshold_substitution_p(p)
+
+    def set_prefill_top_n(self, n: int):
+        """Lock the top n most used experts from prefill into the cache under PREFILL policy."""
+        if hasattr(self.model, "set_prefill_top_n"):
+            self.model.set_prefill_top_n(n)
+
+    def set_random_fill_mode(self, on: bool):
+        """Experiment mode: keep top forced_top_n correct experts; fill remaining with random experts."""
+        if hasattr(self.model, "set_random_fill_mode"):
+            self.model.set_random_fill_mode(on)
+
     def get_predictor_stats(self):
         """
         Get per-layer predictor hit-rate stats.
@@ -641,6 +825,10 @@ class Mixtral8x7BW4A16Model:
         """Reset predictor hit-rate counters across all layers."""
         if hasattr(self.model, "reset_predictor_stats"):
             self.model.reset_predictor_stats()
+
+    def set_suppress_predictor_stats(self, v: bool) -> None:
+        if hasattr(self.model, "set_suppress_predictor_stats"):
+            self.model.set_suppress_predictor_stats(v)
 
     def get_sequential_top1_stats(self):
         """Get sequential top1 expert hit stats across all layers."""
@@ -910,46 +1098,35 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
     return 0
 
 
-def _load_wikitext2_raw_text(model_weights_dir: Path, split: str = "test") -> str:
+def _load_wikitext103_raw_text(model_weights_dir: Path, split: str = "test") -> str:
     """
-    Load WikiText-2 raw split and cache the plain text under model_weights_dir.
-    Tries Hugging Face datasets first, then falls back to raw text URL.
+    Load WikiText-103 raw split and cache the plain text under model_weights_dir.
+    Tries Hugging Face datasets first.
     """
     model_weights_dir.mkdir(parents=True, exist_ok=True)
-    text_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}.txt"
+    text_cache_path = model_weights_dir / f"wikitext-103-raw-v1_{split}.txt"
 
     if text_cache_path.exists():
-        print(f"Using cached WikiText-2 text: {text_cache_path}")
+        print(f"Using cached WikiText-103 text: {text_cache_path}")
         return text_cache_path.read_text(encoding="utf-8")
 
     text = None
     try:
         from datasets import load_dataset
-        ds = load_dataset("wikitext", "wikitext-2-raw-v1", split=split)
+        ds = load_dataset("wikitext", "wikitext-103-raw-v1", split=split)
         lines = [line for line in ds["text"] if line and line.strip()]
         text = "\n\n".join(lines)
-        print(f"Downloaded WikiText-2 via datasets ({split} split).")
+        print(f"Downloaded WikiText-103 via datasets ({split} split).")
     except Exception as e:
-        print(f"Could not load WikiText-2 via datasets ({e}). Falling back to raw text URL.")
-        fallback_urls = {
-            "train": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/train.txt",
-            "validation": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
-            "valid": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
-            "test": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/test.txt",
-        }
-        if split not in fallback_urls:
-            raise ValueError(f"Unsupported WikiText-2 split '{split}'. Use one of train/valid/validation/test.")
-        with urlopen(fallback_urls[split]) as resp:
-            text = resp.read().decode("utf-8")
-        text = "\n\n".join([line for line in text.splitlines() if line.strip()])
-        print(f"Downloaded WikiText-2 from fallback URL ({split} split).")
+        print(f"Could not load WikiText-103 via datasets ({e}).")
+        raise RuntimeError("Failed to load WikiText-103 dataset.")
 
     text_cache_path.write_text(text, encoding="utf-8")
-    print(f"Saved WikiText-2 text cache: {text_cache_path}")
+    print(f"Saved WikiText-103 text cache: {text_cache_path}")
     return text
 
 
-def run_wikitext2_perplexity(
+def run_wikitext103_perplexity(
     model_path=None,
     tokenizer_path=None,
     device="cuda",
@@ -960,7 +1137,7 @@ def run_wikitext2_perplexity(
     stride: int = 2048,
 ):
     """
-    Evaluate perplexity on WikiText-2 with sliding-window evaluation.
+    Evaluate perplexity on WikiText-103 with sliding-window evaluation.
     Saves fetched text and tokenized IDs under model_weights.
     """
     if max_length < 2:
@@ -973,10 +1150,10 @@ def run_wikitext2_perplexity(
     model_weights_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 60)
-    print(f"WIKITEXT-2 PERPLEXITY ({split} split)")
+    print(f"WIKITEXT-103 PERPLEXITY ({split} split)")
     print("=" * 60 + "\n")
 
-    text = _load_wikitext2_raw_text(model_weights_dir, split=split)
+    text = _load_wikitext103_raw_text(model_weights_dir, split=split)
 
     if model_path is None:
         model_path = "TheBloke/mixtral-8x7b-v0.1-AWQ"
@@ -998,19 +1175,19 @@ def run_wikitext2_perplexity(
         return 1
 
     if model.tokenizer is None:
-        print("Error: tokenizer is required for WikiText-2 perplexity.")
+        print("Error: tokenizer is required for WikiText-103 perplexity.")
         return 1
 
-    print("Tokenizing WikiText-2 corpus...")
+    print("Tokenizing WikiText-103 corpus...")
     encoded = model.tokenizer(text, return_tensors="pt", add_special_tokens=False)
     input_ids_full = encoded["input_ids"]
     if input_ids_full.size(1) < 2:
-        print("Error: tokenized WikiText-2 corpus is too short.")
+        print("Error: tokenized WikiText-103 corpus is too short.")
         return 1
 
-    token_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}_tokens.pt"
+    token_cache_path = model_weights_dir / f"wikitext-103-raw-v1_{split}_tokens.pt"
     torch.save(input_ids_full.cpu(), token_cache_path)
-    print(f"Saved tokenized WikiText-2 tensor: {token_cache_path}")
+    print(f"Saved tokenized WikiText-103 tensor: {token_cache_path}")
     print(f"Total tokens: {input_ids_full.size(1)}")
     print(f"Eval max_length: {max_length}, stride: {stride}")
     backend_prefill_chunk = None
@@ -1177,6 +1354,11 @@ def main():
         help="Maximum number of cached experts per layer (for cached backend)"
     )
     parser.add_argument(
+        "--no-prewarm",
+        action="store_true",
+        help="Skip loading experts into cache slots at init (cached/predict; lowers peak VRAM)",
+    )
+    parser.add_argument(
         "--config-path",
         type=str,
         default=os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_mixtral7x8B.json5")),
@@ -1238,46 +1420,50 @@ def main():
         help="Lambda value for router logit biasing (range [0, 1])"
     )
     parser.add_argument(
+        "--cache-policy",
+        type=str,
+        default="LRU",
+        choices=["LRU", "MRU", "LFU", "MFU", "CLOCK", "RANDOM", "LFRU", "PREFILL", "lru", "mru", "lfu", "mfu", "clock", "random", "lfru", "prefill"],
+        help="Cache eviction policy for experts"
+    )
+    parser.add_argument(
         "--expert-correlation-csv",
         type=str,
         default=None,
         help="Path to CSV containing layer correlation multipliers."
     )
     parser.add_argument(
+        "--expert-weights-dir", type=str, default=None,
+        help="Optional directory for MoE expert weight files. Supports both unpacked and packed layouts."
+    )
+    parser.add_argument(
         "--perplexity",
         action="store_true",
-        default=False,
-        help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
+        help="Compute perplexity for the input text instead of generation."
     )
     parser.add_argument(
-        "--wikitext2-perplexity",
+        "--wikitext103-perplexity",
         action="store_true",
-        help="Compute perplexity on WikiText-2 and save downloaded/tokenized files under model_weights."
+        help="Compute perplexity on WikiText-103 and save downloaded/tokenized files under model_weights."
     )
     parser.add_argument(
-        "--wikitext2-split",
+        "--wikitext103-split",
         type=str,
         default="test",
         choices=["train", "valid", "validation", "test"],
-        help="WikiText-2 split to evaluate."
+        help="WikiText-103 split to evaluate."
     )
     parser.add_argument(
-        "--wikitext2-max-length",
+        "--wikitext103-max-length",
         type=int,
         default=2048,
-        help="Max context length per evaluation window for WikiText-2 perplexity."
+        help="Max context length per evaluation window for WikiText-103 perplexity."
     )
     parser.add_argument(
-        "--wikitext2-stride",
+        "--wikitext103-stride",
         type=int,
         default=2048,
-        help="Stride for sliding-window WikiText-2 perplexity."
-    )
-    parser.add_argument(
-        "--generation-perplexity",
-        action="store_true",
-        default=False,
-        help="Calculate generation-time perplexity (slower, token-by-token)"
+        help="Stride for sliding-window WikiText-103 perplexity."
     )
     parser.add_argument(
         "--benchmark-prompts",
@@ -1311,24 +1497,64 @@ def main():
         help="Number of top experts for the predictor engine to proactively prefetch."
     )
     parser.add_argument(
+        "--forced-top-n",
+        type=int,
+        default=0,
+        help="Force the top-N unbiased router experts into the cache-conditional bias mask.",
+    )
+    parser.add_argument(
+        "--forced-top-p",
+        type=float,
+        default=-1.0,
+        help="Force experts whose cumulative softmax probability mass >= p into the cache mask.",
+    )
+    parser.add_argument(
+        "--mass-threshold-substitution-p",
+        type=float,
+        default=-1.0,
+        help="Alternate routing: smallest probability-mass prefix with sum >= p OR'd into cache mask.",
+    )
+    parser.add_argument(
+        "--predictor-lookahead",
+        type=int,
+        default=1,
+        help="Fire the predictor every N decode tokens (match fN in predictor path).",
+    )
+    parser.add_argument(
+        "--suppress-predictor-stats",
+        action="store_true",
+        default=False,
+        help="Disable predictor hit-rate accounting (measurement mode).",
+    )
+    parser.add_argument(
         "--sweep-prompts-file",
         type=str,
         default=None,
         help="Path to a JSON file containing a list of prompts. Runs all prompts sequentially without reloading."
     )
+    parser.add_argument(
+        "--generation-perplexity",
+        action="store_true",
+        default=False,
+        help="Score generation perplexity during sweep runs (requires generation).",
+    )
+    parser.add_argument(
+        "--prefill-top-n", type=int, default=0,
+        help="(cached backend) Under PREFILL policy, lock the top-N experts from prefill into the cache."
+    )
     
     args = parser.parse_args()
 
-    if args.wikitext2_perplexity:
-        return run_wikitext2_perplexity(
+    if args.wikitext103_perplexity:
+        return run_wikitext103_perplexity(
             model_path=args.model_path,
             tokenizer_path=args.tokenizer_path,
             device=args.device,
             backend=args.backend,
             config_path=args.config_path,
-            split=args.wikitext2_split,
-            max_length=args.wikitext2_max_length,
-            stride=args.wikitext2_stride,
+            split=args.wikitext103_split,
+            max_length=args.wikitext103_max_length,
+            stride=args.wikitext103_stride,
         )
 
     if args.prompt_test is not None:
@@ -1343,7 +1569,6 @@ def main():
             top_p=args.top_p,
             top_k=args.top_k,
             generate=args.generate,
-            perplexity=args.perplexity,
             config_path=args.config_path
         )
 
@@ -1363,9 +1588,15 @@ def main():
             predictor_device=args.predictor_device,
             prefetch_experts_count=args.prefetch_experts_count,
             predict_layers=args.predict_layers,
+            expert_weights_dir=args.expert_weights_dir,
+            prewarm_experts=not args.no_prewarm,
+            predictor_lookahead=args.predictor_lookahead,
         )
-
         print("Model initialized successfully!")
+
+        if getattr(args, "prefill_top_n", 0) > 0 and hasattr(model, 'set_prefill_top_n'):
+            model.set_prefill_top_n(args.prefill_top_n)
+            print(f"Set prefill top-{args.prefill_top_n} locked experts.")
     except Exception as e:
         print(f"Error initializing model: {e}")
         import traceback
@@ -1376,10 +1607,7 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
-    # Set lambda if specified
-    if args.lambda_val != 0.0:
-        print(f"Setting lambda to {args.lambda_val}")
-        model.set_lambda(args.lambda_val)
+    _apply_routing_and_cache_cli(model, args)
 
     if args.expert_correlation_csv:
         print(f"Loading correlations from {args.expert_correlation_csv}")
@@ -1693,5 +1921,5 @@ def main():
 if __name__ == "__main__":
     exit(main())
 
-    # Perplexity test for wikitext2
-    # python3 mixtral_8x7B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
+    # Perplexity test for wikitext103
+    # python3 mixtral_8x7B_w4a16_model.py   --wikitext103-perplexity   --wikitext103-split test   --wikitext103-max-length 4096   --wikitext103-stride 2048

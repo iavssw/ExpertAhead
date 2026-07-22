@@ -71,8 +71,6 @@ cd ..
 
 Follow these steps to build the project. Note that a GPU (ROCm) setup and **CMake 3.25 or higher** are required.
 
-> [!WARNING]
-> The `heteroPredict` (NPU/Heterogeneous) backend is currently non-functional and under development. The `predict` backend should be considered experimental and may not work as expected.
 
 
 ### 1. Initial Environment Setup
@@ -143,3 +141,58 @@ Runtime behavior is controlled by the JSON5 config file at `py/unified_llm_w4a16
 
 > [!NOTE]
 > The HIP kernels in this project are primarily optimized for **RDNA (gfx11)** architectures. While they support CDNA (gfx9) devices via Wave64 adaptation, performance on CDNA may not be optimal compared to RDNA.
+
+---
+
+## Reproducing ExpertAhead (Paper Experiments)
+
+Follow these steps to reproduce the evaluation and analysis found in the ExpertAhead paper from scratch.
+
+### 1. Model Preparation & Expert Packing
+The inference runtime requires expert weights to be packed into a custom binary format for efficient SSD loading.
+After downloading the Qwen3-30B-A3B-AWQ weights and extracting them to `py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked`, run the packing script to generate the SSD-optimized binaries:
+```bash
+cd py/unified_llm_w4a16
+python3 pack_experts.py
+```
+This script relies on default arguments to process the 48 layers and 128 experts, outputting to the `Qwen3-30B-A3B-AWQ_packed` directory.
+
+### 2. Training Data Collection
+Generate the training traces for the predictor using the WikiText dataset.
+```bash
+cd py/utils
+bash run_collect_training_data.sh qwen3_30b
+```
+
+### 3. Predictor Training
+Train the lightweight cross-token transformer predictors for all layers.
+```bash
+cd py/expert_predictor
+bash run_train.sh qwen3_30b
+```
+The resulting predictor models will be saved to the training data directory.
+
+### 4. End-to-End Evaluation (Sweeps)
+Execute the inference evaluation scripts located in the `sh_scripts/` directory to generate the final performance metrics (e.g., Tokens Per Second).
+```bash
+# Run the 10-prompt Oracle sweep across all configurations
+CACHE_SIZES="16 32 48 64" ./sh_scripts/run_final_best_10prompt_oracle.sh
+```
+
+### 5. Generating Plots
+Use the Python plotting scripts to recreate the graphs from the paper based on your collected CSV data.
+```bash
+# Example: Generate Chapter 3 theoretical throughput plots
+python3 py/utils/modeling_cache_conditional.py
+
+# Example: Generate best lookahead scaling plots
+python3 py/utils/plot_oracle_best_lookahead.py
+python3 py/utils/plot_predictor_best_lookahead.py
+
+# Example: Generate final end-to-end evaluation plots
+python3 py/utils/plot_thesis_finals.py \
+    --csv-sec2 py/utils/final_results_runs/<your_sec2_dir>/sweep.csv \
+    --csv-sec4 py/utils/final_results_runs/<your_sec4_dir>/sweep.csv \
+    --csv-sec5 py/utils/final_results_runs/<your_sec5_dir>/sweep.csv \
+    --out-dir py/utils/final_results_runs/thesis_plots
+```

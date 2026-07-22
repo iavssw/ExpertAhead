@@ -1,0 +1,6 @@
+run_final_best_10prompt_memlimit.sh C=64
+NUM_PROMPTS=2 MAX_NEW_TOKENS=150
+TRACK_MEMORY_ONLY=0
+MEMORY_MAX=
+MEMORY_MAX_BY_CACHE=16:5274M,32:7014M,48:8753M,64:10497M
+OUT_DIR=py/utils/final_results_runs/final_2prompt_memlimit_validate/20260709_212856/C64_20260709_212856

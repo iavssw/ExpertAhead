@@ -6,9 +6,9 @@ Collects per-layer embeddings (post-attention-norm, pre-router) and router logit
 during the **generation (decode) phase** of inference. Also captures the prefill
 expert distribution as a summary feature per layer. Supported models:
   - mixtral_8x7b  : Mixtral 8x7B   (TheBloke/mixtral-8x7b-v0.1-AWQ)
-  - mixtral_8x22b : Mixtral 8x22B  (TheBloke/Mixtral-8x22B-v0.1-AWQ)
+  - mixtral_8x22b : Mixtral 8x22B  (MaziyarPanahi/Mixtral-8x22B-v0.1-AWQ)
   - qwen3_30b     : Qwen3 30B-A3B  (QuixiAI/Qwen3-30B-A3B-AWQ)
-  - qwen3_480b    : Qwen3 480B-A35B (Qwen/Qwen3-480B-A35B-AWQ)
+  - qwen3_480b    : Qwen3 480B-A35B (QuantTrio/Qwen3-Coder-480B-A35B-Instruct-AWQ)
 
 To add a new model, add one entry to MODEL_REGISTRY below — no other changes needed.
 
@@ -122,10 +122,10 @@ def _stream_texts(dataset_name: str, min_tokens: int, max_tokens: int, tokenizer
 # ─────────────────────────────────────────────────────────────────────────────
 
 MODEL_REGISTRY = {
-    "mixtral_8x7b":  ("mixtral_8x7B_w4a16_model.py",       "Mixtral8x7BW4A16Model",      "TheBloke/mixtral-8x7b-v0.1-AWQ"),
-    "mixtral_8x22b": ("mixtral_8x22B_w4a16_model.py",      "Mixtral8x22BW4A16Model",     "TheBloke/Mixtral-8x22B-v0.1-AWQ"),
-    "qwen3_30b":     ("qwen3_30B-A3B_w4a16_model.py",      "Qwen3_30BA3BW4A16Model",     "QuixiAI/Qwen3-30B-A3B-AWQ"),
-    "qwen3_480b":    ("qwen3_480B-A35B_w4a16_model.py",    "Qwen3_480BA35BW4A16Model",   "Qwen/Qwen3-480B-A35B-AWQ"),
+    "mixtral_8x7b":  ("unified_llm_w4a16/mixtral_8x7B_w4a16_model.py",       "Mixtral8x7BW4A16Model",      "TheBloke/mixtral-8x7b-v0.1-AWQ"),
+    "mixtral_8x22b": ("unified_llm_w4a16/mixtral_8x22B_w4a16_model.py",      "Mixtral8x22BW4A16Model",     "MaziyarPanahi/Mixtral-8x22B-v0.1-AWQ"),
+    "qwen3_30b":     ("unified_llm_w4a16/qwen3_30B-A3B_w4a16_model.py",      "Qwen3_30BA3BW4A16Model",     "QuixiAI/Qwen3-30B-A3B-AWQ"),
+    "qwen3_480b":    ("unified_llm_w4a16/qwen3_480B-A35B_w4a16_model.py",    "Qwen3_480BA35BW4A16Model",   "Qwen/Qwen3-480B-A35B-AWQ"),
 }
 
 
@@ -142,7 +142,9 @@ def _load_model_from_registry(model_tag: str, model_path: str, config_path=None,
         )
 
     filename, class_name, _ = MODEL_REGISTRY[model_tag]
-    wrapper_path = Path(__file__).parent / filename
+    # Wrapper paths are relative to py/ (one level above this utils/ script)
+    py_root = Path(__file__).parent.parent
+    wrapper_path = py_root / filename
 
     if not wrapper_path.exists():
         raise FileNotFoundError(
@@ -156,12 +158,17 @@ def _load_model_from_registry(model_tag: str, model_path: str, config_path=None,
     spec.loader.exec_module(mod)
     ModelClass = getattr(mod, class_name)
 
-    print(f"Loading {model_tag} from {model_path} …")
+    if "qwen" in model_tag:
+        cache_size = 128
+    else:
+        cache_size = 8
+
+    print(f"Loading {model_tag} from {model_path} with cache_size={cache_size} …")
     model = ModelClass(
         model_path=model_path,
         backend="cached",           # 'base' doesn't expose training data collection API;
                                     # 'cached' does, and caching is a bonus during collection.
-        max_cached_experts_per_layer=8,
+        max_cached_experts_per_layer=cache_size,
         device=device,
         config_path=config_path,
     )
@@ -406,15 +413,15 @@ def main():
         help="Directory where per-sample .pt files will be saved."
     )
     parser.add_argument(
-        "--num-fineweb", type=int, default=100,
+        "--num-fineweb", type=int, default=0,
         help="Number of samples from FineWeb (default: 100)."
     )
     parser.add_argument(
-        "--num-orca", type=int, default=100,
+        "--num-orca", type=int, default=0,
         help="Number of samples from OpenOrca (default: 100)."
     )
     parser.add_argument(
-        "--num-wikitext", type=int, default=0,
+        "--num-wikitext", type=int, default=1000,
         help="Number of samples from Wikitext-103 (default: 0)."
     )
     parser.add_argument(

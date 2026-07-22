@@ -130,12 +130,40 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     
     // Lambda parameter control (router logit biasing)
     void set_lambda(double lambda) { 
-        if (lambda < 0.0 || lambda > 1.0) {
-            throw std::invalid_argument("Lambda must be in range [0, 1], got: " + std::to_string(lambda));
+        if (lambda < 0.0 || lambda > 100.0) {
+            throw std::invalid_argument("Lambda must be in range [0, 100], got: " + std::to_string(lambda));
         }
         lambda_ = lambda; 
     }
     double get_lambda() const { return lambda_; }
+
+    // Forced top-N guarantee: how many unbiased top experts are always kept in the bias mask.
+    void set_forced_top_n(int64_t n) { forced_top_n_ = std::max(int64_t(0), n); }
+    int64_t get_forced_top_n() const { return forced_top_n_; }
+
+    // Forced top-P: force the minimum set of experts whose softmax probabilities sum to >= p.
+    // Adapts to routing confidence: peaked distributions force fewer experts than flat ones.
+    // Set to -1.0 to disable (default). Mutually composable with forced_top_n_.
+    void set_forced_top_p(double p) { forced_top_p_ = p; }
+    double get_forced_top_p() const { return forced_top_p_; }
+
+    // Per-token probability-mass prefix threshold p: smallest sorted-prob prefix with mass >= p is
+    // OR'd into the cache-conditional bias mask (with forced_top_n / forced_top_p). Experts in the
+    // mask get +lambda*delta_avg; remaining top-k slots come from biased top-k (same path as FN).
+    // Requires lambda>0 for effect. Set to -1.0 to disable.
+    void set_mass_threshold_substitution_p(double p) { mass_threshold_substitution_p_ = p; }
+    double get_mass_threshold_substitution_p() const { return mass_threshold_substitution_p_; }
+
+    // Number of top experts to lock into cache during prefill.
+    void set_prefill_top_n(int64_t n) { prefill_top_n_ = std::max(int64_t(0), n); }
+    int64_t get_prefill_top_n() const { return prefill_top_n_; }
+
+    // Experiment mode: keep top forced_top_n_ correct experts, fill remaining slots with random experts.
+    void set_random_fill_mode(bool on) { random_fill_mode_ = on; }
+    
+    // Cache policy control
+    enum class CachePolicy { LRU, MRU, LFU, MFU, CLOCK, RANDOM, LFRU, PREFILL };
+    void set_cache_policy(CachePolicy policy) { cache_policy_ = policy; }
     
     // Training data collection
     torch::Tensor get_last_router_logits() const { return last_router_logits_; }
@@ -177,20 +205,59 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     double lambda_ = 0.0;                        // Bias parameter [0, 1]
     double delta_avg_ = 0.0;                     // Running average of logit ranges
     std::vector<int64_t> expert_cache_bitmask_;  // Binary mask of cached experts
+    int64_t forced_top_n_ = 1;                   // How many unbiased top-k experts are forced into the mask
+    double  forced_top_p_ = -1.0;               // Cumulative prob mass threshold for forced experts (-1 = disabled)
+    double  mass_threshold_substitution_p_ = -1.0; // Alternate routing threshold (-1 = disabled)
+    int64_t prefill_top_n_ = 0;                  // How many top experts from prefill to lock in cache
+    bool random_fill_mode_ = false;               // Experiment: substitute non-top-N slots with random experts
 
     // Cache State
     std::vector<int64_t> expert_slots_indices; // Maps Slot ID [0..max_cached] -> Global Expert ID. -1 if empty.
-    std::vector<size_t> expert_lru_order_;       // List of Slot IDs, ordered by usage (LRU at front, MRU at back).
+    std::vector<int64_t> locked_experts_;      // Experts that are locked in the cache by the PREFILL policy
+    std::vector<int64_t> currently_selected_experts_; // Experts currently selected to prevent their eviction
+    
+    struct ExpertSlotMeta {
+        int64_t expert_id = -1;    // global expert in this slot (-1 = empty)
+        uint64_t access_count = 0; // for LFU/MFU/LFRU
+        uint64_t last_access = 0;  // for LRU/MRU/LFRU
+        uint8_t clock_bit = 0;     // for CLOCK algorithm
+    };
+
+    std::vector<ExpertSlotMeta> slot_meta_; // Per-slot metadata
+    uint64_t access_clock_ = 0;             // global logical clock for recency
+    size_t clock_hand_ = 0;                 // clock hands for CLOCK eviction
+    CachePolicy cache_policy_ = CachePolicy::LRU;
     
     int64_t cache_hits_ = 0;
     int64_t cache_misses_ = 0;
     double total_expert_load_time_ms_ = 0.0;  // cumulative time spent in load_expert_weights()
+    std::atomic<bool> abort_pending_prefetches_{false};
 
     // Training data collection
     mutable torch::Tensor last_router_logits_;  // Store last router logits for training data collection
     
+    // Expert file format (auto-detected on first load)
+    enum class ExpertFormat { UNKNOWN, UNPACKED, PACKED };
+
+    // Pinned staging buffer reused across packed loads (avoids per-call allocation)
+    torch::Tensor expert_staging_buf_;
+    ExpertFormat  expert_format_ = ExpertFormat::UNKNOWN;
+
     void load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
+    void load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir);
+    void load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir, bool is_prefetch = false);
+    void load_experts_weights_packed(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir, bool is_prefetch = false);
     int64_t ensure_expert_cached(int64_t global_expert_idx, bool update_stats = true);
+    std::vector<int64_t> ensure_experts_cached(const std::vector<int64_t>& global_expert_indices, bool update_stats = true);
+    size_t pick_victim_ready();
+    size_t pick_victim();
+    size_t pick_lru();
+    size_t pick_mru();
+    size_t pick_lfu();
+    size_t pick_mfu();
+    size_t pick_clock();
+    size_t pick_random();
+    size_t pick_lfru();
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);
@@ -219,14 +286,16 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
                            int64_t top_k = 50, int64_t eos_token_id = -1);
 
     // Calculate generation perplexity (NLL) by simulating sequential token generation (step-by-step)
-    double calculate_generation_perplexity(torch::Tensor input_ids);
 
     // Load quantized weights from safetensors file
     void load_quantized_weights_from_safetensors(const std::string &filename);
     // Load non-quantized weights only (embeddings, norms, lm_head) from safetensors
     void load_non_quantized_weights_from_safetensors(const std::string &filename);
-    // Load quantized weights from preprocessed bin directory
-    void load_quantized_weights_from_bins(const std::string &weights_dir);
+    // Load quantized weights from preprocessed bin directory.
+    // If expert_weights_dir is non-empty it overrides weights_dir for MoE expert
+    // files (supports both packed and unpacked formats — auto-detected at runtime).
+    void load_quantized_weights_from_bins(const std::string &weights_dir,
+                                          const std::string &expert_weights_dir = "");
 
     // Pre-warm expert cache
     void prewarm_experts(int64_t num_to_warm, bool verbose = true);
@@ -235,7 +304,16 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void set_lambda(double lambda, int64_t layer_idx = -1);
     double get_lambda(int64_t layer_idx = 0) const;
 
-    // Move model to device
+    // Forced top-N / top-P and random-fill experiment controls (applied to all layers)
+    void set_forced_top_n(int64_t n);
+    void set_forced_top_p(double p);
+    void set_mass_threshold_substitution_p(double p);
+    void set_prefill_top_n(int64_t n);
+    void set_random_fill_mode(bool on);
+
+    // Cache Policy Control
+    void set_cache_policy(const std::string& policy_name, int64_t layer_idx = -1);
+
     // Move model to device
     UnifiedLLMW4A16Impl &to(torch::Device device);
 

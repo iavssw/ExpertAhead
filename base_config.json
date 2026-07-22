@@ -1,0 +1,1 @@
+{"backend": "base", "device": "cuda", "generate": true, "max_new_tokens": 10, "temperature": 0.0, "prompts": ["The meaning of life is"]}

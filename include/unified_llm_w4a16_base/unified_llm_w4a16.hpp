@@ -124,10 +124,23 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
 
     torch::Tensor forward(const torch::Tensor &x);
 
+    // Runtime setters for the forced-top-N / random-fill experiment.
+    void set_forced_top_n(int64_t n) {
+        random_replace_rank_start_idx_ = (n < num_experts_per_tok_) ? n : -1;
+    }
+    void set_random_fill_mode(bool on) {
+        if (!on) random_replace_rank_start_idx_ = -1;
+    }
+
     // Exposed for weight loading
     LinearMatmul router{nullptr};
     std::vector<QuantizedLinear> gate_up_experts;
     std::vector<QuantizedLinear> down_experts;
+
+    void print_moe_timing_stats() const;
+    void reset_moe_timing_stats();
+    int64_t get_moe_expert_invocations() const { return moe_expert_invocations_; }
+    double get_total_moe_compute_time_ms() const { return total_moe_compute_time_ms_; }
 
   private:
     int64_t hidden_size_;
@@ -137,6 +150,8 @@ class MixtureOfExpertsImpl : public torch::nn::Module {
     bool use_softmax_before_topk_;
     bool normalize_topk_prob_;
     int64_t random_replace_rank_start_idx_;
+    int64_t moe_expert_invocations_ = 0;
+    double total_moe_compute_time_ms_ = 0.0;
 
     torch::Tensor forward_cpu(const torch::Tensor &x_flat, const torch::Tensor &topk_vals, const torch::Tensor &topk_idx,
                               torch::Tensor &output);
@@ -179,6 +194,14 @@ class UnifiedLLMW4A16Impl : public torch::nn::Module {
     void initialize_dummy_weights(int seed = 42);
     int64_t get_prefill_chunk_size() const { return prefill_chunk_size_; }
     int64_t get_sliding_window_size() const { return sliding_window_size_; }
+
+    // Runtime control for the forced-top-N / random-fill experiment.
+    // Propagates to all MoE layers. Call before perplexity evaluation.
+    void set_forced_top_n(int64_t n);
+    void set_random_fill_mode(bool on);
+
+    void print_cache_stats() const;
+    void reset_cache_stats();
 
     // NPU Helper functions
     // We declare them as friends or static/global if they are not members

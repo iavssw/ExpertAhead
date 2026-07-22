@@ -1,0 +1,8 @@
+run_final_best_10prompt.sh C=16
+NUM_PROMPTS=10
+OUT_DIR=py/utils/final_results_runs/final_10prompt/C16_20260709_001606
+RANDOM baseline
+Cross-Layer B=8
+Cache-Cond J=5
+ExpertAhead S=2 B=4
+ExpertAhead-CC S=1 B=4 J=5

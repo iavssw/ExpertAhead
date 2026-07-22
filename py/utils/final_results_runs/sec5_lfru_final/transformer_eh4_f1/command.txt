@@ -1,0 +1,29 @@
+# Transformer predictor: eh4 + prefill dist, future_steps=1 (LA=1 only)
+# Path: trainingData/qwen3_30b/transformer/layer_X/best_jit.pt
+#
+# PREREQUISITE — export TorchScript (once, after training checkpoints exist):
+#   cd /home/michael/heteroPredict && source utils/setup.sh
+#   python py/expert_predictor/export_jit.py trainingData/qwen3_30b/transformer
+# Requires layer_X/best.pt under transformer/ (export reads best.pt → writes best_jit.pt).
+#
+# Smoke test (2 prompts, C32 LA1, best budget B=8 from sec5):
+#   see ab_overnight_LA1/command.txt for full overnight A/B grid
+#
+# Quick smoke — single predictor, 2 prompts:
+cd /home/michael/heteroPredict && source utils/setup.sh
+python py/utils/sweep_predict_cached_cache_metrics.py \
+  --model qwen --dataset wikitext \
+  --cache-sizes 32 \
+  --lookaheads 1 \
+  --custom-explicit-prefetch-budgets \
+  --prefetch-budgets 8 \
+  --routing-bias-top-n 5 \
+  --predictor-base-dir trainingData/qwen3_30b/transformer \
+  --sweep-question custom_1_16_no_ppl \
+  --lambdas 0 1 \
+  --num-prompts 2 \
+  --prompt-max-chars 4096 --max-new-tokens 256 --temperature 0.0 \
+  --non-baseline-cache-policy LFRU \
+  --disable-measurement \
+  --out-dir py/utils/final_results_runs/sec5_lfru_final/transformer_eh4_f1/smoke_C32_LA1 \
+  --csv-file py/utils/final_results_runs/sec5_lfru_final/transformer_eh4_f1/smoke_C32_LA1/sweep.csv

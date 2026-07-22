@@ -1,0 +1,171 @@
+The capital of France is
+
+The capital of Japan is
+
+The capital of Germany is
+
+The capital of Italy is
+
+The largest planet in our solar system is
+
+The chemical formula for water is
+
+Photosynthesis converts sunlight into chemical energy in plants. The primary pigment responsible is
+
+DNA stores genetic information using four bases: adenine, thymine, guanine, and
+
+The speed of light in a vacuum is approximately
+
+Newton's second law of motion states that force equals
+
+The boiling point of water at standard atmospheric pressure is
+
+An element with atomic number 6 is called
+
+The process by which liquids turn into gases at the surface is called
+
+If a car travels 120 miles in 2 hours, its average speed is
+
+To convert 50 degrees Celsius to Fahrenheit, we use the formula F = (9/5)C + 32, which gives
+
+The sum of the interior angles of a triangle is
+
+If x + 7 = 15, then x equals
+
+A rectangle has length 8 and width 5. Its area is
+
+To find 15% of 200, we calculate
+
+The square root of 144 is
+
+Write a Python function that merges two sorted lists. Here is the implementation:
+
+def merge_sorted(a, b):
+
+Write a Python function to check if a string is a palindrome. Here is the implementation:
+
+def is_palindrome(s):
+
+Write a Python function that returns the factorial of n. Here is the implementation:
+
+def factorial(n):
+
+Write a Python function that finds the maximum value in a list. Here is the implementation:
+
+def find_max(nums):
+
+Write a Python function that reverses a list in place. Here is the implementation:
+
+def reverse_in_place(arr):
+
+In Python, a dictionary maps keys to values. To get a value safely with a default, we use
+
+In Python, reading a text file line by line is commonly done with
+
+The time complexity of binary search on a sorted array is
+
+World War II ended in Europe in the year
+
+The first President of the United States was
+
+The author of the play Romeo and Juliet was
+
+The theory of relativity was developed primarily by
+
+The ancient civilization that built the pyramids at Giza was the
+
+The Pacific Ocean is the largest ocean on Earth because
+
+A democracy is a system of government in which
+
+Inflation refers to a sustained increase in
+
+The mitochondrion is often called the powerhouse of the cell because
+
+An algorithm is a step-by-step procedure for
+
+Machine learning models learn patterns from
+
+What is the capital of France?
+A) London
+B) Berlin
+C) Paris
+D) Madrid
+The correct answer is
+
+Which planet is known as the Red Planet?
+A) Venus
+B) Mars
+C) Jupiter
+D) Saturn
+The correct answer is
+
+What is 9 x 7?
+A) 56
+B) 63
+C) 72
+D) 81
+The correct answer is
+
+Which gas do plants absorb from the atmosphere during photosynthesis?
+A) Oxygen
+B) Nitrogen
+C) Carbon dioxide
+D) Hydrogen
+The correct answer is
+
+Which data structure uses first-in-first-out ordering?
+A) Stack
+B) Queue
+C) Tree
+D) Graph
+The correct answer is
+
+Which sorting algorithm has average time complexity O(n log n)?
+A) Bubble sort
+B) Insertion sort
+C) Merge sort
+D) Selection sort
+The correct answer is
+
+If all cats are mammals and all mammals are animals, then all cats are
+
+A train leaves Boston at 9am traveling 60 mph toward NYC. Another leaves NYC at 10am traveling 80 mph toward Boston. If the cities are 400 miles apart, the distance covered by the first train after t hours is
+
+To sort a list of names alphabetically in Python, a simple approach is
+
+France is a country in Western Europe. Its capital city is
+
+The human heart has four chambers: two atria and two
+
+In object-oriented programming, encapsulation means hiding
+
+A balanced chemical equation must have the same number of each type of
+
+The main difference between RAM and ROM is that RAM
+
+When debugging a program, the first step is usually to
+
+The Pythagorean theorem states that for a right triangle with legs a and b and hypotenuse c,
+
+A binary number system uses only the digits
+
+The greenhouse effect occurs because certain gases in the atmosphere
+
+In economics, supply and demand interact to determine
+
+A recursive function is one that
+
+The Internet protocol responsible for reliable ordered delivery of packets is
+
+To merge two sorted lists without using built-in sort, we compare the heads of both lists and
+
+Answer briefly: The capital of Australia is
+
+Answer briefly: The freezing point of water in Celsius is
+
+Answer briefly: The largest mammal on Earth is the
+
+Answer briefly: The programming language created by Guido van Rossum is
+
+Answer briefly: The process of converting source code into machine code is called

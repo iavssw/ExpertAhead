@@ -1,6 +1,8 @@
 #include "unified_llm_w4a16_cached/helper.hpp"
 #include "unified_llm_w4a16_cached/npuSetup.hpp"
 #include "unified_llm_w4a16_cached/unified_llm_w4a16.hpp"
+#include "unified_llm_w4a16_common/io_thread_pool.hpp"
+#include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -18,6 +20,8 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/uio.h>
+#include <future>
 #include <vector>
 
 // Helper function to sample from logits
@@ -984,53 +988,11 @@ static torch::Tensor read_bin_tensor(const std::string &path, torch::ScalarType 
     return tensor;
 }
 
-static void read_bin_tensor_pread(const std::string &path, void* dest_ptr, size_t copy_size) {
-    // Open with O_DIRECT to bypass the OS page cache — expert weights must come
-    // from SSD, not from a silent RAM buffer that would give unrealistically fast
-    // load times on machines with plenty of free RAM.
-    int flags = O_RDONLY | O_DIRECT;
-    int fd = open(path.c_str(), flags);
-    if (fd == -1 && errno == EINVAL) {
-        // O_DIRECT not supported by this filesystem (e.g. tmpfs) — fall back.
-        fd = open(path.c_str(), O_RDONLY);
-    }
-    if (fd == -1) {
-        throw std::runtime_error("Could not open file: " + path + " (" + strerror(errno) + ")");
-    }
+#include "unified_llm_w4a16_common/moe_expert_io.inl"
 
-    struct stat sb;
-    if (fstat(fd, &sb) == -1) {
-        close(fd);
-        throw std::runtime_error("fstat failed for: " + path);
-    }
-    size_t file_size = static_cast<size_t>(sb.st_size);
-    if (file_size != copy_size) {
-        close(fd);
-        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(copy_size) +
-                                 ", got " + std::to_string(file_size) + ")");
-    }
-
-    bool is_direct = (fcntl(fd, F_GETFL) & O_DIRECT) != 0;
-    char* ptr = static_cast<char*>(dest_ptr);
-
-    // O_DIRECT requires 512-byte alignment for both the destination pointer and
-    // the transfer size. Pinned memory is usually aligned, but check and fall
-    // back gracefully if not.
-    if (is_direct && (((uintptr_t)ptr % 512 != 0) || (copy_size % 512 != 0))) {
-        int current_flags = fcntl(fd, F_GETFL);
-        fcntl(fd, F_SETFL, current_flags & ~O_DIRECT);
-    }
-
-    size_t bytes_read = 0;
-    while (bytes_read < copy_size) {
-        ssize_t ret = pread(fd, ptr + bytes_read, copy_size - bytes_read, bytes_read);
-        if (ret <= 0) break;
-        bytes_read += ret;
-    }
-    close(fd);
-}
-
-void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir) {
+void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir,
+                                                            const std::string &expert_weights_dir) {
+    const std::string &moe_dir = expert_weights_dir.empty() ? weights_dir : expert_weights_dir;
     if (debug_verbosity >= 1) {
         std::cout << "Loading quantized weights from bins: " << weights_dir << std::endl;
     }
@@ -1098,18 +1060,8 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &we
              // For cached backend, we rely on on-demand loading.
              // We just set the directory for each MoE layer.
              for (int64_t lay = 0; lay < num_hidden_layers_; ++lay) {
-                  moe_layers[lay]->set_weights_dir(weights_dir);
+                  moe_layers[lay]->set_weights_dir(moe_dir);
              }
-             
-             // If we wanted to pre-load some, we could do it here, but let's stick to pure lazy loading for now.
-             // The original code loaded all experts:
-             /*
-             for (int64_t e = 0; e < num_experts_; ++e) {
-                 std::string expert_prefix = "layer_" + std::to_string(i) + "_expert_" + std::to_string(e);
-                 load_gate_up_from_bins(moe_layers[i]->gate_up_experts[e], expert_prefix + "_gate", expert_prefix + "_up");
-                 load_layer(moe_layers[i]->down_experts[e], expert_prefix + "_down");
-             }
-             */
         }
     }
 }
@@ -1222,131 +1174,77 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
         load_expert_weights(i, i, weights_dir_);
         expert_slots_indices[i] = i;
         
-        // Ensure slot i is in LRU order (as MRU)
-        bool found = false;
-        for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
-            if (*it == (size_t)i) {
-                expert_lru_order_.erase(it);
-                found = true;
-                break;
-            }
+        // Ensure slot i is initialized properly in metadata
+        ++access_clock_;
+        slot_meta_[i].expert_id = i;
+        slot_meta_[i].access_count = 1;
+        slot_meta_[i].last_access = access_clock_;
+        slot_meta_[i].clock_bit = 1;
+
+        if (expert_cache_bitmask_.size() == num_experts_) {
+            expert_cache_bitmask_[i] = 1;
         }
-        expert_lru_order_.push_back(i);
     }
 }
 
-void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
+void MixtureOfExpertsImpl::load_experts_weights_packed(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts,
+                                                       const std::string& weights_dir, bool is_prefetch) {
+#include "unified_llm_w4a16_common/moe_expert_load_packed.inl"
+}
+
+void MixtureOfExpertsImpl::load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx,
+                                                      const std::string& weights_dir) {
+    load_experts_weights_packed({{slot_idx, expert_idx}}, weights_dir);
+}
+
+void MixtureOfExpertsImpl::load_experts_weights(const std::vector<std::pair<int64_t, int64_t>>& slots_and_experts, const std::string& weights_dir, bool is_prefetch) {
     auto start_time = std::chrono::high_resolution_clock::now();
+    
     if (weights_dir.empty()) {
         throw std::runtime_error("Weights directory not set for MoE layer " + std::to_string(layer_idx_));
     }
 
     if (weights_dir == "DUMMY") {
         if (debug_verbosity >= 2)
-            std::cout << "DUMMY load for expert " << expert_idx << " into slot " << slot_idx << std::endl;
+            std::cout << "DUMMY load for " << slots_and_experts.size() << " experts." << std::endl;
         return;
     }
 
-    std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
-    std::string gate_prefix   = expert_prefix + "_gate";
-    std::string up_prefix     = expert_prefix + "_up";
-    std::string down_prefix   = expert_prefix + "_down";
-
-    auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot, const std::vector<int64_t>& shape, torch::ScalarType dtype) {
-        if (bufs.size() <= static_cast<size_t>(slot)) bufs.resize(max_cached_experts_);
-        if (!bufs[slot].defined()) {
-            bufs[slot] = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU).pinned_memory(true));
-        } else if (bufs[slot].sizes() != shape) {
-            bufs[slot].resize_(shape);
-        }
-        return bufs[slot];
-    };
-
-    // ---- gate_up slot ----
-    {
-        int64_t out_feat   = intermediate_size_;
-        int64_t in_feat    = hidden_size_;
-        int64_t packed_in  = (in_feat + 1) / 2;
-
-        std::string gq = weights_dir + "/" + gate_prefix + ".qweight.bin";
-        std::string gs = weights_dir + "/" + gate_prefix + ".scales.bin";
-        std::string gz = weights_dir + "/" + gate_prefix + ".zeros.bin";
-        std::string uq = weights_dir + "/" + up_prefix   + ".qweight.bin";
-        std::string us = weights_dir + "/" + up_prefix   + ".scales.bin";
-        std::string uz = weights_dir + "/" + up_prefix   + ".zeros.bin";
-
-        // Determine scales/zeros shape from file sizes.
-        size_t gs_bytes  = std::filesystem::file_size(gs);
-        int64_t gs_numel = static_cast<int64_t>(gs_bytes / 2); // bf16
-        int64_t gs_grps  = gs_numel / out_feat;
-        std::vector<int64_t> s_shape = (gs_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, gs_grps};
-        size_t gz_bytes  = std::filesystem::file_size(gz);
-        int64_t gz_numel = static_cast<int64_t>(gz_bytes);
-        int64_t gz_grps  = gz_numel / out_feat;
-        std::vector<int64_t> z_shape = (gz_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, gz_grps};
-
-        auto dest_q = ensure_pinned_buffer(gate_up_q_pinned_, slot_idx, {out_feat * 2, packed_in}, torch::kUInt8);
-        auto dest_s = ensure_pinned_buffer(gate_up_s_pinned_, slot_idx, {s_shape[0] * 2, s_shape.size() > 1 ? s_shape[1] : 1}, torch::kBFloat16);
-        auto dest_z = ensure_pinned_buffer(gate_up_z_pinned_, slot_idx, {z_shape[0] * 2, z_shape.size() > 1 ? z_shape[1] : 1}, torch::kInt8);
-
-        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
-        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
-        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
-
-        char* ptr_q = static_cast<char*>(dest_q.data_ptr());
-        char* ptr_s = static_cast<char*>(dest_s.data_ptr());
-        char* ptr_z = static_cast<char*>(dest_z.data_ptr());
-
-        read_bin_tensor_pread(gq, ptr_q, expected_q);
-        read_bin_tensor_pread(uq, ptr_q + expected_q, expected_q);
-        read_bin_tensor_pread(gs, ptr_s, expected_s);
-        read_bin_tensor_pread(us, ptr_s + expected_s, expected_s);
-        read_bin_tensor_pread(gz, ptr_z, expected_z);
-        read_bin_tensor_pread(uz, ptr_z + expected_z, expected_z);
-
-        gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+    // Auto-detect format on first real load: packed wins if layer_0_expert_0.bin exists.
+    if (expert_format_ == ExpertFormat::UNKNOWN) {
+        std::string probe = weights_dir + "/layer_" + std::to_string(layer_idx_) + "_expert_0.bin";
+        expert_format_ = std::filesystem::exists(probe) ? ExpertFormat::PACKED : ExpertFormat::UNPACKED;
+        if (debug_verbosity >= 1)
+            std::cout << "Layer " << layer_idx_ << ": using "
+                      << (expert_format_ == ExpertFormat::PACKED ? "packed" : "unpacked")
+                      << " expert format." << std::endl;
     }
 
-    // ---- down slot ----
-    {
-        auto &down_layer = down_experts[slot_idx];
-        int64_t out_feat  = down_layer->out_features();
-        int64_t in_feat   = down_layer->in_features();
-        int64_t packed_in = (in_feat + 1) / 2;
+    if (expert_format_ == ExpertFormat::PACKED) {
+        load_experts_weights_packed(slots_and_experts, weights_dir, is_prefetch);
+        auto end_time = std::chrono::high_resolution_clock::now();
+        double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
+        total_expert_load_time_ms_ += ms;
+        return;
+    }
 
-        std::string dq = weights_dir + "/" + down_prefix + ".qweight.bin";
-        std::string ds = weights_dir + "/" + down_prefix + ".scales.bin";
-        std::string dz = weights_dir + "/" + down_prefix + ".zeros.bin";
+    for (const auto& se : slots_and_experts) {
+        int64_t slot_idx = se.first;
+        int64_t expert_idx = se.second;
+        const std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
+        const std::string gate_prefix = expert_prefix + "_gate";
+        const std::string up_prefix = expert_prefix + "_up";
+        const std::string down_prefix = expert_prefix + "_down";
 
-        size_t ds_bytes  = std::filesystem::file_size(ds);
-        int64_t ds_numel = static_cast<int64_t>(ds_bytes / 2);
-        int64_t ds_grps  = ds_numel / out_feat;
-        std::vector<int64_t> s_shape = (ds_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, ds_grps};
-        size_t dz_bytes  = std::filesystem::file_size(dz);
-        int64_t dz_numel = static_cast<int64_t>(dz_bytes);
-        int64_t dz_grps  = dz_numel / out_feat;
-        std::vector<int64_t> z_shape = (dz_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, dz_grps};
-
-        auto dest_q = ensure_pinned_buffer(down_q_pinned_, slot_idx, {out_feat, packed_in}, torch::kUInt8);
-        auto dest_s = ensure_pinned_buffer(down_s_pinned_, slot_idx, s_shape, torch::kBFloat16);
-        auto dest_z = ensure_pinned_buffer(down_z_pinned_, slot_idx, z_shape, torch::kInt8);
-
-        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
-        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
-        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
-
-        read_bin_tensor_pread(dq, dest_q.data_ptr(), expected_q);
-        read_bin_tensor_pread(ds, dest_s.data_ptr(), expected_s);
-        read_bin_tensor_pread(dz, dest_z.data_ptr(), expected_z);
-
-        down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
+#include "unified_llm_w4a16_common/moe_expert_load_unpacked.inl"
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();
     double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
+    
     total_expert_load_time_ms_ += ms;
+}
+
+void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
+    load_experts_weights({{slot_idx, expert_idx}}, weights_dir);
 }

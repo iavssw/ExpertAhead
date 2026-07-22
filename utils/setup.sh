@@ -27,16 +27,18 @@ source "$HETEROMOSAIC_ROOT/utils/rocmPytorch/bin/activate"
 
 # Add local torch lib to LD_LIBRARY_PATH
 if [ -d "$HETEROMOSAIC_ROOT/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib" ]; then
-    export LD_LIBRARY_PATH="$HETEROMOSAIC_ROOT/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib:$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH="$HETEROMOSAIC_ROOT/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib:${LD_LIBRARY_PATH:-}"
 fi
 
 export ROCM_PATH=/opt/rocm-7.1.1
 echo "Using ROCm 7.1.1 ($ROCM_PATH)"
+export HETEROPREDICT_SEQUENTIAL_EXPERT_IO=${HETEROPREDICT_SEQUENTIAL_EXPERT_IO:-0}
+echo "Expert SSD I/O: sequential pread (HETEROPREDICT_SEQUENTIAL_EXPERT_IO=${HETEROPREDICT_SEQUENTIAL_EXPERT_IO})"
 
 export PATH=$ROCM_PATH/bin:$PATH
-export LD_LIBRARY_PATH=$ROCM_PATH/lib:$ROCM_PATH/lib64:$LD_LIBRARY_PATH
-export CPATH=$ROCM_PATH/include:$CPATH
-export LIBRARY_PATH=$ROCM_PATH/lib:$ROCM_PATH/lib64:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$ROCM_PATH/lib:$ROCM_PATH/lib64:${LD_LIBRARY_PATH:-}
+export CPATH=$ROCM_PATH/include:${CPATH:-}
+export LIBRARY_PATH=$ROCM_PATH/lib:$ROCM_PATH/lib64:${LIBRARY_PATH:-}
 
 if [ -f "/opt/xilinx/xrt/setup.sh" ]; then
     source /opt/xilinx/xrt/setup.sh

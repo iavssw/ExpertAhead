@@ -1,6 +1,9 @@
 #include "unified_llm_w4a16_predict/helper.hpp"
 #include "unified_llm_w4a16_predict/npuSetup.hpp"
 #include "unified_llm_w4a16_predict/unified_llm_w4a16.hpp"
+#define HETEROPREDICT_SUPPORT_LOGICAL_ABORT 1
+#include "unified_llm_w4a16_common/io_thread_pool.hpp"
+#include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -18,6 +21,8 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/uio.h>
+#include <future>
 #include <vector>
 
 // Helper function to sample from logits
@@ -984,52 +989,16 @@ static torch::Tensor read_bin_tensor(const std::string &path, torch::ScalarType 
     return tensor;
 }
 
-static void read_bin_tensor_pread(const std::string &path, void* dest_ptr, size_t copy_size) {
-    int flags = O_RDONLY | O_DIRECT;
-    int fd = open(path.c_str(), flags);
-    if (fd == -1 && errno == EINVAL) {
-        // Fallback if the filesystem (e.g. tmpfs) doesn't support O_DIRECT
-        fd = open(path.c_str(), O_RDONLY);
-    }
-    
-    if (fd == -1) {
-        throw std::runtime_error("Could not open file: " + path + " (" + strerror(errno) + ")");
-    }
-    
-    struct stat sb;
-    if (fstat(fd, &sb) == -1) {
-        close(fd);
-        throw std::runtime_error("fstat failed for: " + path);
-    }
-    size_t file_size = static_cast<size_t>(sb.st_size);
-    if (file_size != copy_size) {
-        close(fd);
-        throw std::runtime_error("File size mismatch for " + path + " (expected " + std::to_string(copy_size) +
-                                 ", got " + std::to_string(file_size) + ")");
-    }
+#include "unified_llm_w4a16_common/moe_expert_io.inl"
 
-    bool is_direct = (fcntl(fd, F_GETFL) & O_DIRECT) != 0;
-    char* ptr = static_cast<char*>(dest_ptr);
+void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir,
+                                                            const std::string &expert_weights_dir) {
+    const std::string &moe_dir = expert_weights_dir.empty() ? weights_dir : expert_weights_dir;
 
-    // O_DIRECT explicitly requires 512-byte block alignment for both the target RAM pointer and the read size.
-    // If PyTorch's memory allocator doesn't give us perfect OS alignment, we disable O_DIRECT on the fly.
-    if (is_direct && (((uintptr_t)ptr % 512 != 0) || (copy_size % 512 != 0))) {
-        int current_flags = fcntl(fd, F_GETFL);
-        fcntl(fd, F_SETFL, current_flags & ~O_DIRECT);
-    }
-
-    size_t bytes_read = 0;
-    while (bytes_read < copy_size) {
-        ssize_t ret = pread(fd, ptr + bytes_read, copy_size - bytes_read, bytes_read);
-        if (ret <= 0) break;
-        bytes_read += ret;
-    }
-    close(fd);
-}
-
-void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &weights_dir) {
     if (debug_verbosity >= 1) {
         std::cout << "Loading quantized weights from bins: " << weights_dir << std::endl;
+        if (!expert_weights_dir.empty())
+            std::cout << "  Expert weights dir override: " << moe_dir << std::endl;
     }
 
     this->eval();
@@ -1091,22 +1060,9 @@ void UnifiedLLMW4A16Impl::load_quantized_weights_from_bins(const std::string &we
         load_layer(v_layers[i], "layer_" + std::to_string(i) + "_v");
         load_layer(o_layers[i], "layer_" + std::to_string(i) + "_o");
         if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
-             // For cached backend, we rely on on-demand loading.
-             // For cached backend, we rely on on-demand loading.
-             // We just set the directory for each MoE layer.
              for (int64_t lay = 0; lay < num_hidden_layers_; ++lay) {
-                  moe_layers[lay]->set_weights_dir(weights_dir);
+                  moe_layers[lay]->set_weights_dir(moe_dir);
              }
-             
-             // If we wanted to pre-load some, we could do it here, but let's stick to pure lazy loading for now.
-             // The original code loaded all experts:
-             /*
-             for (int64_t e = 0; e < num_experts_; ++e) {
-                 std::string expert_prefix = "layer_" + std::to_string(i) + "_expert_" + std::to_string(e);
-                 load_gate_up_from_bins(moe_layers[i]->gate_up_experts[e], expert_prefix + "_gate", expert_prefix + "_up");
-                 load_layer(moe_layers[i]->down_experts[e], expert_prefix + "_down");
-             }
-             */
         }
     }
 }
@@ -1202,9 +1158,166 @@ void MixtureOfExpertsImpl::prefill_cache_for_testing() {
     }
 }
 
+void MixtureOfExpertsImpl::print_cache_stats() const {
+    double hit_rate = 0.0;
+    if (cache_hits_ + cache_misses_ > 0) {
+        hit_rate = 100.0 * cache_hits_ / (cache_hits_ + cache_misses_);
+    }
+    std::cout << "Layer " << layer_idx_ << " Cache Stats: "
+              << "Hits=" << cache_hits_ << ", Misses=" << cache_misses_ 
+              << ", HitRate=" << std::fixed << std::setprecision(2) << hit_rate << "%\n"
+              << "    Predictor Routed-Expert HitRate=";
+
+    if (pred_total_ > 0) {
+        double pred_rate = 100.0 * pred_hits_no_bias_ / pred_total_;
+        int64_t routed_eval_n = (forced_top_n_ > 0) ? std::min(forced_top_n_, num_experts_per_tok_) : num_experts_per_tok_;
+        std::cout << pred_rate << "% (" << pred_hits_no_bias_ << "/" << pred_total_
+                  << ", routed_n=" << routed_eval_n << ", horizon=" << lookahead_stride_ << ")\n";
+        if (pred_total_routed_forced_n_ > 0) {
+            double r_forced = 100.0 * pred_hits_routed_forced_n_ / pred_total_routed_forced_n_;
+            std::cout << "    Predictor RoutedForcedN HitRate=" << r_forced
+                      << "% (" << pred_hits_routed_forced_n_ << "/" << pred_total_routed_forced_n_ << ")\n";
+        }
+        if (pred_total_routed_topk_ > 0) {
+            double r_topk = 100.0 * pred_hits_routed_topk_ / pred_total_routed_topk_;
+            std::cout << "    Predictor RoutedTopK HitRate=" << r_topk
+                      << "% (" << pred_hits_routed_topk_ << "/" << pred_total_routed_topk_ << ")\n";
+        }
+        if (pred_requested_total_forced_n_ > 0) {
+            double p_forced = 100.0 * pred_requested_hits_forced_n_ / pred_requested_total_forced_n_;
+            std::cout << "    Predicted RequestedByRouterForcedN Rate=" << p_forced
+                      << "% (" << pred_requested_hits_forced_n_ << "/" << pred_requested_total_forced_n_ << ")\n";
+        }
+        if (pred_requested_total_topk_ > 0) {
+            double p_topk = 100.0 * pred_requested_hits_topk_ / pred_requested_total_topk_;
+            std::cout << "    Predicted RequestedByRouterTopK Rate=" << p_topk
+                      << "% (" << pred_requested_hits_topk_ << "/" << pred_requested_total_topk_ << ")\n";
+        }
+        // Window-aware metrics (denominator = union of experts across the full lookahead window)
+        if (pred_total_window_recall_ > 0) {
+            double wr = 100.0 * pred_hits_window_recall_ / pred_total_window_recall_;
+            std::cout << "    Predictor WindowRecall Rate=" << wr
+                      << "% (" << pred_hits_window_recall_ << "/" << pred_total_window_recall_ << ")\n";
+        }
+        if (pred_total_window_precision_ > 0) {
+            double wp = 100.0 * pred_hits_window_precision_ / pred_total_window_precision_;
+            std::cout << "    Predictor WindowPrecision Rate=" << wp
+                      << "% (" << pred_hits_window_precision_ << "/" << pred_total_window_precision_ << ")\n";
+        }
+    } else {
+        std::cout << "N/A\n";
+    }
+
+    int64_t total_loads = stall_loads_ + prefetch_loads_;
+    double avg_load_time = total_loads > 0 ? (total_expert_load_time_ms_.load() / total_loads) : 0.0;
+
+    std::cout << "    Loads Per Step: 0Loads=" << total_steps_0_loaded_
+              << ", 1Load=" << total_steps_1_loaded_
+              << ", >1Load=" << total_steps_gt1_loaded_ << "\n";
+    unified_llm_w4a16_common::print_moe_stall_bandwidth(std::cout, stall_loads_, prefetch_loads_, avg_load_time);
+    unified_llm_w4a16_common::print_moe_prefetch_overlap(
+        std::cout, prefetch_hits_ready_, prefetch_hits_wait_, prefetch_ticks_skipped_);
+
+    // Miss-cause breakdown
+    if (miss_not_present_ + miss_not_ready_stall_ > 0) {
+        std::cout << "    MissCause: NotPresent=" << miss_not_present_
+                  << ", NotReadyStall=" << miss_not_ready_stall_ << "\n";
+    }
+    // Prefetch efficiency / gating scheduling diagnostics
+    if (prefetch_loads_ > 0 || gating_prefetch_total_ > 0) {
+        std::cout << "    PrefetchEff: Dropped=" << prefetch_dropped_no_victim_
+                  << ", AlreadyCached=" << prefetch_already_cached_
+                  << ", UsedBeforeEvict=" << prefetch_used_before_eviction_
+                  << ", EvictedBeforeUse=" << prefetch_evicted_before_use_ << "\n";
+    }
+    if (gating_pred_recall_total_ > 0) {
+        double gating_pred_recall = 100.0 * static_cast<double>(gating_pred_recall_hits_) /
+                                    static_cast<double>(gating_pred_recall_total_);
+        std::cout << "    GatingPredict Recall=" << gating_pred_recall << "% ("
+                  << gating_pred_recall_hits_ << "/" << gating_pred_recall_total_ << ")\n";
+    }
+    if (gating_pred_precision_total_ > 0) {
+        double gating_pred_precision = 100.0 * static_cast<double>(gating_pred_precision_hits_) /
+                                       static_cast<double>(gating_pred_precision_total_);
+        std::cout << "    GatingPredict Precision=" << gating_pred_precision << "% ("
+                  << gating_pred_precision_hits_ << "/" << gating_pred_precision_total_ << ")\n";
+    }
+    if (gating_prefetch_total_ > 0) {
+        double gating_delivery = 100.0 * static_cast<double>(gating_prefetch_hits_) /
+                                 static_cast<double>(gating_prefetch_total_);
+        std::cout << "    GatingPrefetch Delivery=" << gating_delivery << "% ("
+                  << gating_prefetch_hits_ << "/" << gating_prefetch_total_ << ")\n";
+    }
+    if (gating_prefetch_triggers_ > 0) {
+        std::cout << "    GatingPrefetch Triggers=" << gating_prefetch_triggers_ << "\n";
+    }
+    // Global concurrency peak (reported from layer 0 only to avoid duplicate prints)
+    if (layer_idx_ == 0) {
+        std::cout << "    GlobalSpecLoad: PeakConcurrent="
+                  << global_max_active_speculative_loads().load(std::memory_order_relaxed) << "\n";
+    }
+    std::cout
+              << "    Predictor TopK matches: 0=" << pred_match_0_
+              << " 1=" << pred_match_1_
+              << " >=2=" << pred_match_2_
+              << std::endl;
+}
+
+void MixtureOfExpertsImpl::reset_cache_stats() {
+    cache_hits_ = 0;
+    cache_misses_ = 0;
+    total_expert_load_time_ms_.store(0.0);
+    pred_hits_no_bias_ = 0;
+    pred_total_ = 0;
+    pred_hits_routed_forced_n_ = 0;
+    pred_total_routed_forced_n_ = 0;
+    pred_hits_routed_topk_ = 0;
+    pred_total_routed_topk_ = 0;
+    pred_requested_hits_forced_n_ = 0;
+    pred_requested_total_forced_n_ = 0;
+    pred_requested_hits_topk_ = 0;
+    pred_requested_total_topk_ = 0;
+    pred_hits_window_recall_    = 0;
+    pred_total_window_recall_   = 0;
+    pred_hits_window_precision_ = 0;
+    pred_total_window_precision_= 0;
+    last_true_top1_expert_ = -1;
+    total_steps_0_loaded_ = 0;
+    total_steps_1_loaded_ = 0;
+    total_steps_gt1_loaded_ = 0;
+    stall_loads_ = 0;
+    prefetch_loads_ = 0;
+    prefetch_hits_ready_ = 0;
+    prefetch_hits_wait_ = 0;
+    prefetch_ticks_skipped_ = 0;
+    pred_match_0_ = 0;
+    pred_match_1_ = 0;
+    pred_match_2_ = 0;
+    // Miss-cause breakdown
+    miss_not_present_ = 0;
+    miss_not_ready_stall_ = 0;
+    prefetch_dropped_no_victim_ = 0;
+    prefetch_already_cached_ = 0;
+    // Prefetch efficiency
+    prefetch_used_before_eviction_ = 0;
+    prefetch_evicted_before_use_ = 0;
+    gating_prefetch_hits_ = 0;
+    gating_prefetch_total_ = 0;
+    last_gating_prefetch_experts_.clear();
+    gating_pred_recall_hits_ = 0;
+    gating_pred_recall_total_ = 0;
+    gating_pred_precision_hits_ = 0;
+    gating_pred_precision_total_ = 0;
+    gating_prefetch_triggers_ = 0;
+    // Reset slot load origins and prefetch pin list
+    std::fill(slot_load_origin_.begin(), slot_load_origin_.end(), 0);
+    prefetched_experts_.clear();
+}
+
 void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
-    if (num_to_warm > max_cached_experts_) {
-        num_to_warm = max_cached_experts_;
+    const int64_t main_slots = speculative_slot_count_ > 0 ? main_cache_slot_count_ : max_cached_experts_;
+    if (num_to_warm > main_slots) {
+        num_to_warm = main_slots;
     }
     if (num_to_warm > num_experts_) {
         num_to_warm = num_experts_;
@@ -1215,35 +1328,40 @@ void MixtureOfExpertsImpl::prewarm_experts(int64_t num_to_warm) {
     }
 
     for (int64_t i = 0; i < num_to_warm; ++i) {
-        // Load global expert i into slot i
-        load_expert_weights(i, i, weights_dir_);
+        uint64_t new_load_id = slot_load_id_[i].fetch_add(1, std::memory_order_relaxed) + 1;
+        load_expert_weights(i, i, new_load_id, weights_dir_);
         expert_slots_indices[i] = i;
-        
-        // Ensure slot i is in LRU order (as MRU)
-        bool found = false;
-        for (auto it = expert_lru_order_.begin(); it != expert_lru_order_.end(); ++it) {
-            if (*it == (size_t)i) {
-                expert_lru_order_.erase(it);
-                found = true;
-                break;
-            }
-        }
-        expert_lru_order_.push_back(i);
+        slot_meta_[i].expert_id = i;
+        slot_meta_[i].access_count = 1;
+        slot_meta_[i].last_access = ++access_clock_;
+        slot_meta_[i].clock_bit = 1;
     }
 
-    // Update cache bitmask so the main thread routing knows these experts are loaded
-    if (expert_cache_bitmask_.size() == num_experts_) {
+    if (expert_cache_bitmask_.size() == static_cast<size_t>(num_experts_)) {
         std::fill(expert_cache_bitmask_.begin(), expert_cache_bitmask_.end(), 0);
-        for (auto current_eid : expert_slots_indices) {
-            if (current_eid >= 0 && current_eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
-                expert_cache_bitmask_[current_eid] = 1;
+        for (size_t s = 0; s < slot_meta_.size(); ++s) {
+            int64_t eid = slot_meta_[s].expert_id;
+            if (eid >= 0 && eid < static_cast<int64_t>(expert_cache_bitmask_.size())) {
+                expert_cache_bitmask_[eid] = 1;
             }
         }
     }
 }
 
-void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, const std::string& weights_dir) {
+void MixtureOfExpertsImpl::load_experts_weights_packed(const std::vector<ExpertLoadRequest>& slots_and_experts,
+                                                       const std::string& weights_dir, bool is_prefetch) {
+#include "unified_llm_w4a16_common/moe_expert_load_packed.inl"
+}
+
+void MixtureOfExpertsImpl::load_expert_weights_packed(int64_t slot_idx, int64_t expert_idx, uint64_t load_id,
+                                                      const std::string& weights_dir) {
+    load_experts_weights_packed({{slot_idx, expert_idx, load_id}}, weights_dir);
+}
+
+void MixtureOfExpertsImpl::load_experts_weights(const std::vector<ExpertLoadRequest>& slots_and_experts, const std::string& weights_dir, bool is_prefetch) {
     auto start_time = std::chrono::high_resolution_clock::now();
+    
+    experts_loaded_this_step_ += slots_and_experts.size();
 
     if (weights_dir.empty()) {
         throw std::runtime_error("Weights directory not set for MoE layer " + std::to_string(layer_idx_));
@@ -1251,110 +1369,51 @@ void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_
 
     if (weights_dir == "DUMMY") {
         if (debug_verbosity >= 2)
-            std::cout << "DUMMY load for expert " << expert_idx << " into slot " << slot_idx << std::endl;
+            std::cout << "DUMMY load for " << slots_and_experts.size() << " experts." << std::endl;
         return;
     }
 
-    std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
-    std::string gate_prefix   = expert_prefix + "_gate";
-    std::string up_prefix     = expert_prefix + "_up";
-    std::string down_prefix   = expert_prefix + "_down";
-
-    auto ensure_pinned_buffer = [&](std::vector<torch::Tensor>& bufs, int64_t slot, const std::vector<int64_t>& shape, torch::ScalarType dtype) {
-        if (bufs.size() <= static_cast<size_t>(slot)) bufs.resize(max_cached_experts_);
-        if (!bufs[slot].defined()) {
-            bufs[slot] = torch::empty(shape, torch::TensorOptions().dtype(dtype).device(torch::kCPU).pinned_memory(true));
-        } else if (bufs[slot].sizes() != shape) {
-            bufs[slot].resize_(shape);
-        }
-        return bufs[slot];
-    };
-
-    // ---- gate_up slot ----
-    {
-        int64_t out_feat   = intermediate_size_;
-        int64_t in_feat    = hidden_size_;
-        int64_t packed_in  = (in_feat + 1) / 2;
-
-        std::string gq = weights_dir + "/" + gate_prefix + ".qweight.bin";
-        std::string gs = weights_dir + "/" + gate_prefix + ".scales.bin";
-        std::string gz = weights_dir + "/" + gate_prefix + ".zeros.bin";
-        std::string uq = weights_dir + "/" + up_prefix   + ".qweight.bin";
-        std::string us = weights_dir + "/" + up_prefix   + ".scales.bin";
-        std::string uz = weights_dir + "/" + up_prefix   + ".zeros.bin";
-
-        // Determine scales/zeros shape from file sizes.
-        size_t gs_bytes  = std::filesystem::file_size(gs);
-        int64_t gs_numel = static_cast<int64_t>(gs_bytes / 2); // bf16
-        int64_t gs_grps  = gs_numel / out_feat;
-        std::vector<int64_t> s_shape = (gs_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, gs_grps};
-        size_t gz_bytes  = std::filesystem::file_size(gz);
-        int64_t gz_numel = static_cast<int64_t>(gz_bytes);
-        int64_t gz_grps  = gz_numel / out_feat;
-        std::vector<int64_t> z_shape = (gz_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, gz_grps};
-
-        auto dest_q = ensure_pinned_buffer(gate_up_q_pinned_, slot_idx, {out_feat * 2, packed_in}, torch::kUInt8);
-        auto dest_s = ensure_pinned_buffer(gate_up_s_pinned_, slot_idx, {s_shape[0] * 2, s_shape.size() > 1 ? s_shape[1] : 1}, torch::kBFloat16);
-        auto dest_z = ensure_pinned_buffer(gate_up_z_pinned_, slot_idx, {z_shape[0] * 2, z_shape.size() > 1 ? z_shape[1] : 1}, torch::kInt8);
-
-        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
-        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
-        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
-
-        char* ptr_q = static_cast<char*>(dest_q.data_ptr());
-        char* ptr_s = static_cast<char*>(dest_s.data_ptr());
-        char* ptr_z = static_cast<char*>(dest_z.data_ptr());
-
-        read_bin_tensor_pread(gq, ptr_q, expected_q);
-        read_bin_tensor_pread(uq, ptr_q + expected_q, expected_q);
-        read_bin_tensor_pread(gs, ptr_s, expected_s);
-        read_bin_tensor_pread(us, ptr_s + expected_s, expected_s);
-        read_bin_tensor_pread(gz, ptr_z, expected_z);
-        read_bin_tensor_pread(uz, ptr_z + expected_z, expected_z);
-
-        gate_up_experts[slot_idx]->set_unpacked_params(dest_q, dest_s, dest_z);
+    // Auto-detect format on first real load.
+    if (expert_format_ == ExpertFormat::UNKNOWN) {
+        std::string probe = weights_dir + "/layer_" + std::to_string(layer_idx_) + "_expert_0.bin";
+        expert_format_ = std::filesystem::exists(probe) ? ExpertFormat::PACKED : ExpertFormat::UNPACKED;
+        if (debug_verbosity >= 1)
+            std::cout << "Layer " << layer_idx_ << ": using "
+                      << (expert_format_ == ExpertFormat::PACKED ? "packed" : "unpacked")
+                      << " expert format." << std::endl;
     }
 
-    // ---- down slot ----
-    {
-        auto &down_layer = down_experts[slot_idx];
-        int64_t out_feat  = down_layer->out_features();
-        int64_t in_feat   = down_layer->in_features();
-        int64_t packed_in = (in_feat + 1) / 2;
+    if (expert_format_ == ExpertFormat::PACKED) {
+        load_experts_weights_packed(slots_and_experts, weights_dir, is_prefetch);
+        auto end_time = std::chrono::high_resolution_clock::now();
+        double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
+        double current_time = total_expert_load_time_ms_.load();
+        while (!total_expert_load_time_ms_.compare_exchange_weak(current_time, current_time + ms)) {}
+        return;
+    }
 
-        std::string dq = weights_dir + "/" + down_prefix + ".qweight.bin";
-        std::string ds = weights_dir + "/" + down_prefix + ".scales.bin";
-        std::string dz = weights_dir + "/" + down_prefix + ".zeros.bin";
+    for (const auto& se : slots_and_experts) {
+        int64_t slot_idx = se.slot_idx;
+        int64_t expert_idx = se.expert_idx;
+        uint64_t load_id = se.load_id;
+        const std::string expert_prefix = "layer_" + std::to_string(layer_idx_) + "_expert_" + std::to_string(expert_idx);
+        const std::string gate_prefix = expert_prefix + "_gate";
+        const std::string up_prefix = expert_prefix + "_up";
+        const std::string down_prefix = expert_prefix + "_down";
 
-        size_t ds_bytes  = std::filesystem::file_size(ds);
-        int64_t ds_numel = static_cast<int64_t>(ds_bytes / 2);
-        int64_t ds_grps  = ds_numel / out_feat;
-        std::vector<int64_t> s_shape = (ds_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, ds_grps};
-        size_t dz_bytes  = std::filesystem::file_size(dz);
-        int64_t dz_numel = static_cast<int64_t>(dz_bytes);
-        int64_t dz_grps  = dz_numel / out_feat;
-        std::vector<int64_t> z_shape = (dz_grps <= 1) ? std::vector<int64_t>{out_feat}
-                                                       : std::vector<int64_t>{out_feat, dz_grps};
-
-        auto dest_q = ensure_pinned_buffer(down_q_pinned_, slot_idx, {out_feat, packed_in}, torch::kUInt8);
-        auto dest_s = ensure_pinned_buffer(down_s_pinned_, slot_idx, s_shape, torch::kBFloat16);
-        auto dest_z = ensure_pinned_buffer(down_z_pinned_, slot_idx, z_shape, torch::kInt8);
-
-        size_t expected_q = out_feat * packed_in * sizeof(uint8_t);
-        size_t expected_s = s_shape[0] * (s_shape.size() > 1 ? s_shape[1] : 1) * sizeof(uint16_t);
-        size_t expected_z = z_shape[0] * (z_shape.size() > 1 ? z_shape[1] : 1) * sizeof(int8_t);
-
-        read_bin_tensor_pread(dq, dest_q.data_ptr(), expected_q);
-        read_bin_tensor_pread(ds, dest_s.data_ptr(), expected_s);
-        read_bin_tensor_pread(dz, dest_z.data_ptr(), expected_z);
-
-        down_layer->set_unpacked_params(dest_q, dest_s, dest_z);
+#include "unified_llm_w4a16_common/moe_expert_load_unpacked.inl"
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();
     double ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
-    total_expert_load_time_ms_ += ms;
+    
+    // Thread-safe accumulation of total load time
+    double current_time = total_expert_load_time_ms_.load();
+    while(!total_expert_load_time_ms_.compare_exchange_weak(current_time, current_time + ms)) {
+        // loop until successful
+    }
+}
+
+void MixtureOfExpertsImpl::load_expert_weights(int64_t slot_idx, int64_t expert_idx, uint64_t load_id, const std::string& weights_dir) {
+    load_experts_weights({{slot_idx, expert_idx, load_id}}, weights_dir);
 }

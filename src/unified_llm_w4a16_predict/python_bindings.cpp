@@ -22,7 +22,7 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
                         int64_t num_hidden_layers, int64_t num_attention_heads, int64_t num_key_value_heads, int64_t head_dim,
                         float rms_norm_eps, float rope_theta, int64_t max_seq_len, int64_t max_batch_size, int64_t groupsize,
                         int64_t num_experts, int64_t num_experts_per_tok, const std::string &device_str,
-                        int64_t max_cached_experts_per_layer, const std::string predictor_model_path, const std::string &config_path, int64_t prefetch_experts_count, std::vector<int> predict_layers, std::vector<int64_t> per_layer_cache_sizes) {
+                        int64_t max_cached_experts_per_layer, const std::string predictor_model_path, const std::string &config_path, int64_t prefetch_experts_count, std::vector<int> predict_layers, std::vector<int64_t> per_layer_cache_sizes, std::vector<int64_t> per_layer_prefetch_counts, const std::string& oracle_trace_path, int64_t oracle_lookahead, bool oracle_full_union, float prefetch_threshold, const std::string& predictor_type, int64_t gating_lookahead, bool prefetch_non_evicting, float gating_score_percentile, float speculative_cache_fraction, float oracle_routing_agreement, uint64_t oracle_noise_seed) {
                 torch::Device device = (device_str == "cuda") ? torch::kCUDA : torch::kCPU;
 
                 NPUGlobalConfig config;
@@ -120,7 +120,7 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
                 return std::make_shared<UnifiedLLMW4A16Impl>(arch_type, vocab_size, hidden_size, intermediate_size, num_hidden_layers,
                                                              num_attention_heads, num_key_value_heads, head_dim, rms_norm_eps, rope_theta,
                                                              config, max_seq_len, max_batch_size, groupsize, num_experts,
-                                                             num_experts_per_tok, device, max_cached_experts_per_layer, predictor_model_path, prefetch_experts_count, predict_layers, per_layer_cache_sizes);
+                                                             num_experts_per_tok, device, max_cached_experts_per_layer, predictor_model_path, prefetch_experts_count, predict_layers, per_layer_cache_sizes, per_layer_prefetch_counts, oracle_trace_path, oracle_lookahead, oracle_full_union, prefetch_threshold, predictor_type, gating_lookahead, prefetch_non_evicting, gating_score_percentile, speculative_cache_fraction, oracle_routing_agreement, oracle_noise_seed);
             }),
             py::arg("arch_type"), py::arg("vocab_size"), py::arg("hidden_size"), py::arg("intermediate_size"), py::arg("num_hidden_layers"),
             py::arg("num_attention_heads"), py::arg("num_key_value_heads"), py::arg("head_dim"), py::arg("rms_norm_eps"),
@@ -128,7 +128,13 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
             py::arg("num_experts") = 0, py::arg("num_experts_per_tok") = 0, py::arg("device") = "cpu",
             py::arg("max_cached_experts_per_layer") = 0, py::arg("predictor_model_path") = "", py::arg("config_path") = "",
             py::arg("prefetch_experts_count") = 1, py::arg("predict_layers") = std::vector<int>(),
-            py::arg("per_layer_cache_sizes") = std::vector<int64_t>())
+            py::arg("per_layer_cache_sizes") = std::vector<int64_t>(),
+            py::arg("per_layer_prefetch_counts") = std::vector<int64_t>(),
+            py::arg("oracle_trace_path") = "", py::arg("oracle_lookahead") = 0, py::arg("oracle_full_union") = false,
+            py::arg("prefetch_threshold") = 0.0f, py::arg("predictor_type") = "torchscript",
+            py::arg("gating_lookahead") = 1, py::arg("prefetch_non_evicting") = false,
+            py::arg("gating_score_percentile") = 0.0f, py::arg("speculative_cache_fraction") = 0.0f,
+            py::arg("oracle_routing_agreement") = 1.0f, py::arg("oracle_noise_seed") = 42)
         .def(
             "forward",
             [](UnifiedLLMW4A16Impl &self, torch::Tensor input_ids, int64_t start_pos) -> torch::Tensor {
@@ -153,18 +159,46 @@ PYBIND11_MODULE(unified_llm_w4a16_predict_libtorch, m) {
         .def("load_quantized_weights_from_safetensors", &UnifiedLLMW4A16Impl::load_quantized_weights_from_safetensors, py::arg("filename"))
         .def("load_non_quantized_weights_from_safetensors", &UnifiedLLMW4A16Impl::load_non_quantized_weights_from_safetensors,
              py::arg("filename"))
-        .def("load_quantized_weights_from_bins", &UnifiedLLMW4A16Impl::load_quantized_weights_from_bins, py::arg("weights_dir"))
+        .def("load_quantized_weights_from_bins", &UnifiedLLMW4A16Impl::load_quantized_weights_from_bins,
+             py::arg("weights_dir"), py::arg("expert_weights_dir") = "",
+             "Load bins from weights_dir (attention) and optionally expert_weights_dir (MoE experts). "
+             "Expert dir auto-detects packed (layer_L_expert_E.bin) vs unpacked format.")
         .def("set_lambda", &UnifiedLLMW4A16Impl::set_lambda, py::arg("lambda"), py::arg("layer_idx") = -1)
         .def("get_lambda", &UnifiedLLMW4A16Impl::get_lambda, py::arg("layer_idx") = 0)
+        .def("set_forced_top_n", &UnifiedLLMW4A16Impl::set_forced_top_n, py::arg("n"))
+        .def("set_forced_top_p", &UnifiedLLMW4A16Impl::set_forced_top_p, py::arg("p"),
+             "Force the minimum set of experts whose cumulative softmax probability >= p into the cache mask. "
+             "Set to -1.0 to disable (default).")
+        .def("set_mass_threshold_substitution_p", &UnifiedLLMW4A16Impl::set_mass_threshold_substitution_p, py::arg("p"),
+             "Alternate routing mode: keep the smallest top-k prefix with cumulative probability >= p, "
+             "then substitute the remaining routed slots.")
+        .def("set_prefill_top_n", &UnifiedLLMW4A16Impl::set_prefill_top_n, py::arg("n"))
+        .def("set_cache_policy", &UnifiedLLMW4A16Impl::set_cache_policy, py::arg("policy_name"), py::arg("layer_idx") = -1)
+        .def("set_random_fill_mode", &UnifiedLLMW4A16Impl::set_random_fill_mode, py::arg("on"))
         .def("calculate_generation_perplexity", &UnifiedLLMW4A16Impl::calculate_generation_perplexity, py::arg("input_ids"))
         .def("print_cache_stats", &UnifiedLLMW4A16Impl::print_cache_stats)
         .def("reset_cache_stats", &UnifiedLLMW4A16Impl::reset_cache_stats)
         .def("get_cache_stats", &UnifiedLLMW4A16Impl::get_cache_stats)
         .def("get_predictor_stats", &UnifiedLLMW4A16Impl::get_predictor_stats)
         .def("reset_predictor_stats", &UnifiedLLMW4A16Impl::reset_predictor_stats)
-        .def("get_sequential_top1_stats", &UnifiedLLMW4A16Impl::get_sequential_top1_stats)
-        .def("reset_sequential_top1_stats", &UnifiedLLMW4A16Impl::reset_sequential_top1_stats)
+        .def("set_suppress_predictor_stats", &UnifiedLLMW4A16Impl::set_suppress_predictor_stats, py::arg("v"))
+        .def("set_predictor_lookahead", &UnifiedLLMW4A16Impl::set_predictor_lookahead, py::arg("stride"),
+             "Fire the predictor every `stride` decode tokens (set to lookahead depth fN).")
+        .def("set_prefetch_non_evicting", &UnifiedLLMW4A16Impl::set_prefetch_non_evicting, py::arg("enabled"),
+             "When true, speculative prefetch only uses empty cache slots (paper non-evicting mode).")
         .def("prewarm_experts", &UnifiedLLMW4A16Impl::prewarm_experts, py::arg("num_to_warm"), py::arg("verbose") = true)
+
+        .def("begin_oracle_trace_capture", &UnifiedLLMW4A16Impl::begin_oracle_trace_capture,
+             "Begin recording routed expert IDs on each decode forward in generate().")
+        .def("cancel_oracle_trace_capture", &UnifiedLLMW4A16Impl::cancel_oracle_trace_capture)
+        .def(
+            "write_oracle_trace_file",
+            [](UnifiedLLMW4A16Impl& self, const std::string& path, torch::Tensor prompt_ids, torch::Tensor output_ids,
+               const std::string& prompt_text, const std::string& generated_text, const std::string& model_name) {
+                return self.write_oracle_trace_file(path, prompt_ids, output_ids, prompt_text, generated_text, model_name);
+            },
+            py::arg("path"), py::arg("prompt_ids"), py::arg("output_ids"), py::arg("prompt_text") = "",
+            py::arg("generated_text") = "", py::arg("model_name") = "qwen3_30b")
 
         .def("initialize_dummy_weights", &UnifiedLLMW4A16Impl::initialize_dummy_weights, py::arg("seed") = 42,
              "Initialize dummy weights for testing");

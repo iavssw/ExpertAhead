@@ -11,7 +11,7 @@ import re
 import math
 import subprocess
 from pathlib import Path
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Any
 from urllib.request import urlopen
 
 import torch
@@ -19,6 +19,7 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer
 
 _script_dir = Path(__file__).parent.resolve()
+DEFAULT_EXPERT_WEIGHTS_DIR = str(_script_dir / "model_weights" / "Qwen3-30B-A3B-AWQ_packed")
 _project_root = _script_dir.parent.parent
 _build_dir = _project_root / "build" / "py" / "unified_llm_w4a16"
 
@@ -33,6 +34,55 @@ else:
         sys.path.insert(0, str(_local_build.resolve()))
 
 ArchitectureType = None
+
+
+def _apply_routing_and_cache_cli(model: Any, run_config: dict) -> None:
+    """Apply lambda / forced routing / cache policy from config."""
+    lambda_val = run_config.get("lambda_val", 0.0)
+    if lambda_val != 0.0 and hasattr(model, "set_lambda"):
+        print(f"Setting lambda to {lambda_val}")
+        model.set_lambda(lambda_val)
+
+    forced_top_n = run_config.get("forced_top_n", 0)
+    if forced_top_n > 0 and hasattr(model, "set_forced_top_n"):
+        model.set_forced_top_n(forced_top_n)
+        print(f"Forced top-{forced_top_n} experts into cache mask.")
+
+    forced_top_p = run_config.get("forced_top_p", -1.0)
+    if forced_top_p >= 0.0 and hasattr(model, "set_forced_top_p"):
+        model.set_forced_top_p(forced_top_p)
+        print(f"Forced top-p={forced_top_p} experts into cache mask.")
+
+    mass_p = run_config.get("mass_threshold_substitution_p", -1.0)
+    if mass_p >= 0.0 and hasattr(model, "set_mass_threshold_substitution_p"):
+        model.set_mass_threshold_substitution_p(mass_p)
+        print(
+            f"Probability-mass prefix p={mass_p} OR'd into cache mask "
+            f"(same λ-biased top-k as forced_top_n; use --lambda-val e.g. 1.0 for cache-conditional routing)."
+        )
+        if lambda_val == 0.0:
+            print("Warning: mass_threshold_substitution_p has no effect while lambda_val is 0.")
+
+    prefill_top_n = run_config.get("prefill_top_n", 0)
+    if prefill_top_n > 0 and hasattr(model, "set_prefill_top_n"):
+        model.set_prefill_top_n(prefill_top_n)
+        print(f"Set prefill top-{prefill_top_n} locked experts.")
+
+    cache_policy = run_config.get("cache_policy")
+    if cache_policy and hasattr(model, "set_cache_policy"):
+        model.set_cache_policy(cache_policy)
+        print(f"Set expert cache policy to {cache_policy}.")
+
+    if run_config.get("suppress_predictor_stats", False):
+        if hasattr(model, "set_suppress_predictor_stats"):
+            model.set_suppress_predictor_stats(True)
+            print("Suppressing predictor stats.")
+        else:
+            print("Warning: suppress_predictor_stats ignored (backend has no set_suppress_predictor_stats).")
+
+    if run_config.get("prefetch_non_evicting", False) and hasattr(model, "set_prefetch_non_evicting"):
+        model.set_prefetch_non_evicting(True)
+        print("Enabled non-evicting speculative prefetch (paper mode).")
 
 
 def load_config_with_comments(path: str) -> dict:
@@ -161,52 +211,72 @@ def _get_quantized_tensors(state_dict, base_name: str):
     return qweight, scales, qzeros, g_idx
 
 
+QWEN3_30B_CONFIG = {
+    "vocab_size": 151936,
+    "hidden_size": 2048,
+    "intermediate_size": 768,
+    "num_hidden_layers": 48,
+    "num_attention_heads": 32,
+    "num_key_value_heads": 4,
+    "head_dim": 128,
+    "rms_norm_eps": 1e-6,
+    "rope_theta": 1000000.0,
+    "max_seq_len": 8192,
+    "max_batch_size": 1,
+    "groupsize": 128,
+    "num_experts": 128,
+    "num_experts_per_tok": 8,
+}
+
 class Qwen3_30BA3BW4A16Model:
     """Qwen3 30B-A3B AWQ w4a16 quantized model wrapper."""
 
     def __init__(
         self,
-        model_path: Optional[str] = "QuixiAI/Qwen3-30B-A3B-AWQ",
-        tokenizer_path: Optional[str] = None,
-        vocab_size: int = 151936,
-        hidden_size: int = 2048,
-        intermediate_size: int = 768,
-        num_hidden_layers: int = 48,
-        num_attention_heads: int = 32,
-        num_key_value_heads: int = 4,
-        head_dim: int = 128,
-        rms_norm_eps: float = 1e-6,
-        rope_theta: float = 1000000.0,
-        max_seq_len: int = 8192,
-        max_batch_size: int = 1,
-        groupsize: int = 128,
-        num_experts: int = 128,
-        num_experts_per_tok: int = 8,
-        device: str = "cuda",
-        backend: str = "base",
-        max_cached_experts_per_layer: int = 0,
-        config_path: Optional[str] = None,
-        predictor_models_dir: str = "",
-        predictor_device: str = "gpu",
-        prefetch_experts_count: int = 1,
-        predict_layers: Optional[List[int]] = None,
-        per_layer_cache_sizes: Optional[List[int]] = None,
+        run_config: dict,
     ):
         """
-        Initialize Qwen3 30B-A3B AWQ w4a16 quantized model.
+        Initialize Qwen3 30B-A3B AWQ w4a16 quantized model using a single JSON config.
         """
+        
+        # Extract core config with defaults
+        model_path = run_config.get("model_path", "QuixiAI/Qwen3-30B-A3B-AWQ")
+        tokenizer_path = run_config.get("tokenizer_path", model_path)
+        device = run_config.get("device", "cuda")
+        backend = run_config.get("backend", "base")
+        config_path = run_config.get("config_path", None)
+        expert_weights_dir = run_config.get("expert_weights_dir", DEFAULT_EXPERT_WEIGHTS_DIR)
 
         if backend not in ["base", "predict", "cached"]:
             raise ValueError(f"Invalid backend: {backend}. Choose from: base, predict, cached")
 
+        if not expert_weights_dir:
+            expert_weights_dir = None
+
+        predictor_lookahead = run_config.get("predictor_lookahead", 1)
+        oracle_trace_path = run_config.get("oracle_trace_path", "")
+        oracle_lookahead = run_config.get("oracle_lookahead", 0)
+        predictor_type = run_config.get("predictor_type", "torchscript")
+        gating_lookahead = run_config.get("gating_lookahead", 1)
+        gating_score_percentile = float(run_config.get("gating_score_percentile", 0.0))
+        speculative_cache_fraction = float(run_config.get("speculative_cache_fraction", 0.0))
+        prefetch_non_evicting = bool(run_config.get("prefetch_non_evicting", False))
+        
+        if oracle_trace_path and oracle_lookahead <= 0:
+            oracle_lookahead = predictor_lookahead if predictor_lookahead > 0 else 1
+
         try:
+            old_flags = sys.getdlopenflags()
+            sys.setdlopenflags(os.RTLD_GLOBAL | os.RTLD_LAZY)
             if backend == "base":
                 import unified_llm_w4a16_base_libtorch as backend_module
             elif backend == "predict":
                 import unified_llm_w4a16_predict_libtorch as backend_module
             elif backend == "cached":
                 import unified_llm_w4a16_cached_libtorch as backend_module
+            sys.setdlopenflags(old_flags)
         except ImportError as e:
+            sys.setdlopenflags(old_flags)
             raise ImportError(f"Could not import {backend} backend: {e}")
 
         global ArchitectureType
@@ -214,35 +284,31 @@ class Qwen3_30BA3BW4A16Model:
 
         self.device = device
         self.model_path = model_path
-        self.vocab_size = vocab_size
-        self.hidden_size = hidden_size
-        self.intermediate_size = intermediate_size
-        self.num_hidden_layers = num_hidden_layers
-        self.num_attention_heads = num_attention_heads
-        self.num_key_value_heads = num_key_value_heads
-        self.head_dim = head_dim
-        self.max_seq_len = max_seq_len
-        self.groupsize = groupsize
-        self.num_experts = num_experts
-        self.num_experts_per_tok = num_experts_per_tok
+        
+        # Apply the static architecture config
+        for k, v in QWEN3_30B_CONFIG.items():
+            setattr(self, k, v)
 
         constructor_args = [
             ArchitectureType.QWEN,
-            vocab_size,
-            hidden_size,
-            intermediate_size,
-            num_hidden_layers,
-            num_attention_heads,
-            num_key_value_heads,
-            head_dim,
-            rms_norm_eps,
-            rope_theta,
-            max_seq_len,
-            max_batch_size,
-            groupsize,
-            num_experts,
-            num_experts_per_tok,
+            self.vocab_size,
+            self.hidden_size,
+            self.intermediate_size,
+            self.num_hidden_layers,
+            self.num_attention_heads,
+            self.num_key_value_heads,
+            self.head_dim,
+            self.rms_norm_eps,
+            self.rope_theta,
+            self.max_seq_len,
+            self.max_batch_size,
+            self.groupsize,
+            self.num_experts,
+            self.num_experts_per_tok,
         ]
+
+        max_cached_experts_per_layer = run_config.get("max_cached_experts", 0)
+        per_layer_cache_sizes = run_config.get("per_layer_cache_sizes", None)
 
         if backend == "cached":
             constructor_args.append(max_cached_experts_per_layer)
@@ -259,6 +325,11 @@ class Qwen3_30BA3BW4A16Model:
             # predict backend arg order: device, max_cached, predictor_path, config, prefetch, predict_layers, per_layer_cache_sizes
             import tempfile, json as _json
             _temp_config_path = None
+            
+            predictor_device = run_config.get("predictor_device", "gpu")
+            predictor_models_dir = run_config.get("predictor_model", "")
+            expert_reuse_csv = run_config.get("expert_reuse_csv", None)
+            
             if predictor_device != "auto" and predictor_models_dir:
                 base_cfg = load_config_with_comments(config_path) if config_path else {}
                 base_cfg["predictor_device"] = predictor_device
@@ -266,18 +337,50 @@ class Qwen3_30BA3BW4A16Model:
                 _json.dump(base_cfg, tmp)
                 tmp.close()
                 _temp_config_path = tmp.name
-                constructor_args.append(_temp_config_path)
+                config_to_pass = _temp_config_path
             else:
-                constructor_args.append(config_path)
+                config_to_pass = config_path
+            
+            per_layer_cache_sizes = run_config.get("per_layer_cache_sizes", None)
+            if expert_reuse_csv and predictor_models_dir:
+                per_layer_cache_sizes, per_layer_prefetch_counts = self._calibrate_from_csv(expert_reuse_csv, predictor_models_dir)
+                print(f"[Calibration] Loaded per-layer counts from {expert_reuse_csv}")
+            else:
+                per_layer_prefetch_counts = []
+
             constructor_args.append(max_cached_experts_per_layer)
             constructor_args.append(predictor_models_dir)
-            constructor_args.append(prefetch_experts_count)
-            constructor_args.append(predict_layers if predict_layers is not None else [])
+            constructor_args.append(config_to_pass)
+            constructor_args.append(run_config.get("prefetch_experts_count", 1))
+            constructor_args.append(run_config.get("predict_layers", []) or [])
             constructor_args.append(per_layer_cache_sizes if per_layer_cache_sizes is not None else [])
+            constructor_args.append(per_layer_prefetch_counts)
+            constructor_args.append(oracle_trace_path)
+            constructor_args.append(oracle_lookahead)
+            constructor_args.append(run_config.get("oracle_full_union", False))
+            constructor_args.append(run_config.get("prefetch_threshold", 0.0))
+            constructor_args.append(predictor_type)
+            constructor_args.append(gating_lookahead)
+            constructor_args.append(prefetch_non_evicting)
+            constructor_args.append(gating_score_percentile)
+            constructor_args.append(speculative_cache_fraction)
+            constructor_args.append(run_config.get("oracle_routing_agreement", 1.0))
+            constructor_args.append(run_config.get("oracle_noise_seed", 42))
         else:
             constructor_args.append(config_path)
 
         self.model = backend_module.UnifiedLLMW4A16(*constructor_args)
+
+        if backend == "predict" and hasattr(self.model, "set_predictor_lookahead"):
+            if predictor_type == "gating":
+                self.model.set_predictor_lookahead(gating_lookahead)
+            else:
+                la = oracle_lookahead if oracle_trace_path else predictor_lookahead
+                if la > 0:
+                    self.model.set_predictor_lookahead(la)
+
+        if backend == "predict" and prefetch_non_evicting and hasattr(self.model, "set_prefetch_non_evicting"):
+            self.model.set_prefetch_non_evicting(True)
 
         # Clean up temp config
         if backend == "predict" and 'tmp' in dir() and hasattr(tmp, 'name'):
@@ -289,6 +392,7 @@ class Qwen3_30BA3BW4A16Model:
         self.config = {}
         self.use_pre_saved_weights = False
         self.debug_verbosity = 0
+        self.expert_weights_dir = expert_weights_dir
 
         use_dummy = False
         if config_path:
@@ -308,7 +412,8 @@ class Qwen3_30BA3BW4A16Model:
             print("Initializing dummy weights...")
             self.model.initialize_dummy_weights()
         elif model_path:
-            self._load_quantized_weights(model_path, weights_folder="model_weights")
+            self._load_quantized_weights(model_path, weights_folder="model_weights",
+                                         expert_weights_dir=expert_weights_dir)
 
         if backend in ["cached", "predict"]:
             num_to_warm = max(per_layer_cache_sizes) if per_layer_cache_sizes else max_cached_experts_per_layer
@@ -324,8 +429,77 @@ class Qwen3_30BA3BW4A16Model:
         else:
             self.tokenizer = None
 
-    def _load_quantized_weights(self, model_path: str, weights_folder: str = "model_weights"):
-        """Load quantized weights from safetensors and pass to the C++ backend."""
+    def _calibrate_from_csv(self, csv_path: str, predictor_path: str):
+        """
+        Calibrate global 'fair' cache and prefetch counts from an expert reuse CSV file.
+        Matches window_size in CSV with 'fN' in predictor_path.
+        Formula:
+          cache_size = ceil(1.2 * max(unique_experts_per_layer))
+          prefetch_budget = round(avg(unique_experts_per_layer))
+        """
+        import csv
+        import math
+
+        # 1. Detect window size (fN) from predictor_path
+        window_size = 1
+        match = re.search(r"f(\d+)", predictor_path)
+        if match:
+            window_size = int(match.group(1))
+            print(f"[Calibration] Detected window_size {window_size} from predictor path")
+        else:
+            print(f"[Calibration] Warning: Could not detect window_size from path '{predictor_path}', defaulting to f1")
+
+        raw_counts = None
+        try:
+            with open(csv_path, mode='r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if int(row['window_size']) == window_size:
+                        raw_counts = []
+                        for k, v in row.items():
+                            if k.startswith('layer_'):
+                                raw_counts.append(float(v))
+                        break
+        except Exception as e:
+            print(f"[Calibration] Error reading CSV {csv_path}: {e}")
+
+        if not raw_counts:
+            print(f"[Calibration] Warning: window_size {window_size} not found in CSV, using fallback defaults")
+            # Default to 8 experts per layer if CSV fails
+            return [8] * self.num_hidden_layers, [8] * self.num_hidden_layers
+
+        # Formula:
+        # 1. Cache Size: 1.2 * max(unique experts)
+        fair_cache = int(math.ceil(1.2 * max(raw_counts)))
+        # 2. Prefetch Budget: avg(unique experts)
+        fair_prefetch = int(round(sum(raw_counts) / len(raw_counts)))
+        
+        print(f"[Calibration] Calculated Fair Metrics: Cache={fair_cache}, Prefetch={fair_prefetch}")
+
+        # Return flat lists to satisfy the predict backend's per-layer requirement
+        cache_list = [fair_cache] * self.num_hidden_layers
+        prefetch_list = [fair_prefetch] * self.num_hidden_layers
+        
+        return cache_list, prefetch_list
+
+    def _load_quantized_weights(self, model_path: str, weights_folder: str = "model_weights",
+                               expert_weights_dir: Optional[str] = None):
+        """Load quantized weights from safetensors and pass to the C++ backend.
+
+        Args:
+            model_path: HuggingFace repo ID or local path to the quantized model.
+            weights_folder: Sub-folder under the script directory used to cache
+                downloaded safetensors and pre-saved bins.
+            expert_weights_dir: Optional path to a directory containing either
+                unpacked expert bins (``layer_{L}_expert_{E}_gate.qweight.bin``
+                etc.) or packed expert bins (``layer_{L}_expert_{E}.bin``).
+                When supplied the C++ backend will point each MoE layer at this
+                directory for on-demand expert loading, while the attention
+                weights continue to be served from ``--bin-dir`` / safetensors.
+                The backend auto-detects packed vs unpacked by probing for the
+                packed filename.  When omitted the standard presaved-bins path
+                (``{model_name}_unpacked``) is used as before.
+        """
         print(f"Loading quantized weights from {model_path}...")
         try:
             from huggingface_hub import snapshot_download
@@ -369,7 +543,30 @@ class Qwen3_30BA3BW4A16Model:
 
             use_presaved = self.use_pre_saved_weights
 
-            if use_presaved:
+            if expert_weights_dir is not None:
+                # Explicit expert directory supplied (packed or unpacked).
+                # Detect format by probing for a packed file.
+                expert_path = Path(expert_weights_dir)
+                probe = expert_path / f"layer_0_expert_0.bin"
+                fmt = "packed" if probe.exists() else "unpacked"
+                print(f"Expert weights dir: {expert_path}  (format: {fmt})")
+
+                # Load non-MoE weights from safetensors, then set the expert
+                # directory so the C++ backend can load experts on demand.
+                presaved_dir = weights_dir / f"{model_name}_unpacked"
+                self._prepare_presaved_weights(saved_safetensors, presaved_dir, attention_only=True)
+
+                t0 = time.time()
+                self.model.load_non_quantized_weights_from_safetensors(str(saved_safetensors))
+                # Load attention weights from the unpacked presaved dir.
+                # Expert weights are served from expert_weights_dir (auto-detect packed/unpacked in C++).
+                self.model.load_quantized_weights_from_bins(str(presaved_dir),
+                                                            str(expert_path))
+                t1 = time.time()
+                self.load_time = t1 - t0
+                print(f"Weights loaded (expert dir override) in {self.load_time:.2f} seconds")
+
+            elif use_presaved:
                 presaved_dir = weights_dir / f"{model_name}_unpacked"
                 self._prepare_presaved_weights(saved_safetensors, presaved_dir)
 
@@ -393,7 +590,9 @@ class Qwen3_30BA3BW4A16Model:
             print("\nNote: Falling back to randomly initialized weights.")
             print("The model will not produce meaningful output without proper weights.")
 
-    def _prepare_presaved_weights(self, saved_safetensors: Path, presaved_dir: Path) -> None:
+    def _prepare_presaved_weights(
+        self, saved_safetensors: Path, presaved_dir: Path, *, attention_only: bool = False
+    ) -> None:
         manifest_path = presaved_dir / "manifest.json"
         model_name = saved_safetensors.stem
         hetero_mode = str(self.config.get("heterogeneity", "")).lower() if isinstance(self.config, dict) else ""
@@ -414,7 +613,7 @@ class Qwen3_30BA3BW4A16Model:
         }
         expected_manifest["unpacked_layout"] = "out_groups_v2"
 
-        def _bins_exist() -> bool:
+        def _attention_bins_exist() -> bool:
             if not presaved_dir.exists():
                 return False
             for layer_idx in range(self.num_hidden_layers):
@@ -425,6 +624,14 @@ class Qwen3_30BA3BW4A16Model:
                         return False
                     if not (presaved_dir / f"layer_{layer_idx}_{short_name}.zeros.bin").exists():
                         return False
+            return True
+
+        def _bins_exist() -> bool:
+            if not _attention_bins_exist():
+                return False
+            if attention_only:
+                return True
+            for layer_idx in range(self.num_hidden_layers):
                 for e in range(self.num_experts):
                     for short_name in ["gate", "up", "down"]:
                         if not (presaved_dir / f"layer_{layer_idx}_expert_{e}_{short_name}.qweight.bin").exists():
@@ -436,9 +643,17 @@ class Qwen3_30BA3BW4A16Model:
             return True
 
         if _bins_exist():
+            label = "attention" if attention_only else "pre-saved"
             if self.debug_verbosity >= 1:
-                print(f"Using existing pre-saved weights in {presaved_dir}")
+                print(f"Using existing {label} weights in {presaved_dir}")
             return
+
+        if attention_only:
+            raise FileNotFoundError(
+                f"Missing attention weight bins in {presaved_dir}. "
+                f"When using --expert-weights-dir (packed experts), the unpacked dir must "
+                f"contain layer_*_{{q,k,v,o}}.{{qweight,scales,zeros}}.bin for all layers."
+            )
 
         print(f"Preprocessing weights into bin files under {presaved_dir}...")
         from safetensors.torch import load_file
@@ -550,6 +765,49 @@ class Qwen3_30BA3BW4A16Model:
             eos_token_id
         )
 
+    def generation_perplexity(
+        self,
+        prompt_ids: torch.Tensor,
+        full_ids: torch.Tensor,
+    ) -> dict:
+        """Token NLL on the generated suffix using the M=1 decode forward path."""
+        if prompt_ids.dim() != 2 or full_ids.dim() != 2:
+            raise ValueError("Expected prompt_ids and full_ids with shape [batch, seq_len]")
+        if prompt_ids.size(0) != 1 or full_ids.size(0) != 1:
+            raise ValueError("generation_perplexity currently supports batch size 1")
+        if full_ids.size(1) < prompt_ids.size(1):
+            raise ValueError("full_ids must be at least as long as prompt_ids")
+
+        prompt_len = int(prompt_ids.size(1))
+        seq_len = int(full_ids.size(1))
+        num_gen_tokens = seq_len - prompt_len
+        if num_gen_tokens <= 0:
+            return {"sum_nll": 0.0, "num_gen_tokens": 0}
+
+        if full_ids.device != self.device:
+            full_ids = full_ids.to(self.device)
+
+        self.reset_cache_stats()
+        sum_nll = 0.0
+        counted = 0
+
+        with torch.no_grad():
+            for i in range(seq_len - 1):
+                input_token = full_ids[:, i : i + 1]
+                logits = self.model.forward(input_token, start_pos=i)
+                target = full_ids[0, i + 1]
+                if i + 1 < prompt_len:
+                    continue
+                nll = F.cross_entropy(
+                    logits[:, -1, :].float(),
+                    target.unsqueeze(0),
+                    reduction="sum",
+                )
+                sum_nll += float(nll.item())
+                counted += 1
+
+        return {"sum_nll": sum_nll, "num_gen_tokens": counted}
+
     def __call__(self, input_ids: torch.Tensor, start_pos: int = 0) -> torch.Tensor:
         """Forward pass."""
         if isinstance(input_ids, str):
@@ -577,7 +835,7 @@ class Qwen3_30BA3BW4A16Model:
             self.model.print_cache_stats()
 
     def get_predictor_stats(self):
-        """Return per-layer (no_bias_hits, with_bias_hits, total) tuples."""
+        """Return per-layer (hits, total) tuples for unbiased top-1 predictor accuracy."""
         if hasattr(self.model, "get_predictor_stats"):
             return self.model.get_predictor_stats()
         return []
@@ -585,62 +843,81 @@ class Qwen3_30BA3BW4A16Model:
     def reset_predictor_stats(self):
         if hasattr(self.model, "reset_predictor_stats"):
             self.model.reset_predictor_stats()
-    def perplexity(self, input_ids: Union[str, torch.Tensor]) -> dict:
+
+    def set_cache_policy(self, policy: str):
+        """Set the expert cache eviction policy."""
+        if hasattr(self.model, "set_cache_policy"):
+            self.model.set_cache_policy(policy)
+
+    def set_lambda(self, lambda_value: float, layer_idx: int = -1):
+        """Set the cache-conditional routing bias strength (λ).
+
+        When λ > 0 the router logits are biased toward currently-cached experts,
+        increasing cache hit rate without a predictor.
+
+        Args:
+            lambda_value: Bias strength in range [0, 100].
+            layer_idx: Layer to target (-1 = all layers).
         """
-        Compute causal-LM perplexity for the provided sequence(s).
-        Returns: loss, perplexity, num_tokens.
+        if lambda_value < 0.0 or lambda_value > 100.0:
+            raise ValueError(f"Lambda must be in range [0, 100], got: {lambda_value}")
+        if hasattr(self.model, "set_lambda"):
+            self.model.set_lambda(lambda_value, layer_idx)
+
+    def set_forced_top_n(self, n: int):
+        """Set how many unbiased top-K experts are forced into the lambda bias mask."""
+        if hasattr(self.model, "set_forced_top_n"):
+            self.model.set_forced_top_n(n)
+
+    def set_forced_top_p(self, p: float):
+        """Force the minimum set of experts whose cumulative softmax probability >= p.
+
+        Unlike forced_top_n (fixed count), this adapts to routing confidence: a peaked
+        distribution forces fewer experts than a flat one. Set to -1.0 to disable.
         """
-        if isinstance(input_ids, str):
-            input_ids = self.tokenize(input_ids)
+        if hasattr(self.model, "set_forced_top_p"):
+            self.model.set_forced_top_p(p)
 
-        if input_ids.dim() != 2:
-            raise ValueError(f"Expected input_ids with shape [batch, seq_len], got {tuple(input_ids.shape)}")
-        if input_ids.size(1) < 2:
-            raise ValueError("Need at least 2 tokens to compute perplexity.")
+    def set_mass_threshold_substitution_p(self, p: float):
+        """Enable probability-mass routing with tail substitution.
 
-        with torch.no_grad():
-            logits = self.model.forward(input_ids, 0)
+        Keeps the smallest top-k prefix whose cumulative router probability >= p,
+        then substitutes the remaining routed slots (instead of dropping tail experts).
+        Set to -1.0 to disable.
+        """
+        if hasattr(self.model, "set_mass_threshold_substitution_p"):
+            self.model.set_mass_threshold_substitution_p(p)
 
-        shift_logits = logits[:, :-1, :].float().contiguous()
-        shift_labels = input_ids[:, 1:].to(shift_logits.device).contiguous()
-        vocab_size = shift_logits.size(-1)
+    def set_prefill_top_n(self, n: int):
+        """Lock the top n most used experts from prefill into the cache under PREFILL policy."""
+        if hasattr(self.model, "set_prefill_top_n"):
+            self.model.set_prefill_top_n(n)
 
-        pad_token_id = self.tokenizer.pad_token_id if self.tokenizer is not None else None
-        if pad_token_id is not None:
-            valid_mask = shift_labels.ne(pad_token_id)
-            num_tokens = int(valid_mask.sum().item())
-            if num_tokens == 0:
-                raise ValueError("No non-pad tokens available for perplexity computation.")
-            labels_for_loss = shift_labels.masked_fill(~valid_mask, -100)
-            loss = F.cross_entropy(
-                shift_logits.view(-1, vocab_size),
-                labels_for_loss.view(-1),
-                ignore_index=-100,
-                reduction="mean",
-            )
-        else:
-            num_tokens = int(shift_labels.numel())
-            loss = F.cross_entropy(
-                shift_logits.view(-1, vocab_size),
-                shift_labels.view(-1),
-                reduction="mean",
-            )
+    def set_random_fill_mode(self, on: bool):
+        """Experiment mode: keep top forced_top_n correct experts; fill remaining with random experts."""
+        if hasattr(self.model, "set_random_fill_mode"):
+            self.model.set_random_fill_mode(on)
 
-        ppl = torch.exp(loss)
-        return {
-            "loss": float(loss.item()),
-            "perplexity": float(ppl.item()),
-            "num_tokens": num_tokens,
-        }
+    def set_suppress_predictor_stats(self, v: bool) -> None:
+        """Disable predictor/prefetch measurement (predict backend only)."""
+        if hasattr(self.model, "set_suppress_predictor_stats"):
+            self.model.set_suppress_predictor_stats(v)
 
-
-def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device="cuda", backend="base",
-                    max_new_tokens=512, temperature=0.7, top_p=0.9, top_k=50,
-                    generate=True, perplexity=False, config_path=None):
+def run_prompt_test(run_config: dict):
     """
     Run prompt test case: load single long prompt from prompts.txt,
     concatenate base prompt, truncate to requested token count, and generate output.
     """
+    target_tokens = run_config.get("prompt_test", 256)
+    model_path = run_config.get("model_path", "QuixiAI/Qwen3-30B-A3B-AWQ")
+    tokenizer_path = run_config.get("tokenizer_path", model_path)
+    device = run_config.get("device", "cuda")
+    max_new_tokens = run_config.get("max_new_tokens", 512)
+    temperature = run_config.get("temperature", 0.7)
+    top_p = run_config.get("top_p", 0.9)
+    top_k = run_config.get("top_k", 50)
+    generate = run_config.get("generate", True)
+    perplexity = run_config.get("perplexity", False)
     from pathlib import Path
 
     script_dir = Path(__file__).parent
@@ -725,13 +1002,8 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
 
     print("Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...")
     try:
-        model = Qwen3_30BA3BW4A16Model(
-            model_path=model_path,
-            tokenizer_path=tokenizer_path,
-            device=device,
-            backend=backend,
-            config_path=config_path
-        )
+        model = Qwen3_30BA3BW4A16Model(run_config)
+        _apply_routing_and_cache_cli(model, run_config)
         print("Model initialized successfully!")
     except Exception as e:
         print(f"Error initializing model: {e}")
@@ -814,59 +1086,47 @@ def run_prompt_test(target_tokens, model_path=None, tokenizer_path=None, device=
     return 0
 
 
-def _load_wikitext2_raw_text(model_weights_dir: Path, split: str = "test") -> str:
+def _load_wikitext103_raw_text(model_weights_dir: Path, split: str = "test") -> str:
     """
-    Load WikiText-2 raw split and cache the plain text under model_weights_dir.
-    Tries Hugging Face datasets first, then falls back to raw text URL.
+    Load WikiText-103 raw split and cache the plain text under model_weights_dir.
+    Tries Hugging Face datasets first.
     """
     model_weights_dir.mkdir(parents=True, exist_ok=True)
-    text_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}.txt"
+    text_cache_path = model_weights_dir / f"wikitext-103-raw-v1_{split}.txt"
 
     if text_cache_path.exists():
-        print(f"Using cached WikiText-2 text: {text_cache_path}")
+        print(f"Using cached WikiText-103 text: {text_cache_path}")
         return text_cache_path.read_text(encoding="utf-8")
 
     text = None
     try:
         from datasets import load_dataset
-        ds = load_dataset("wikitext", "wikitext-2-raw-v1", split=split)
+        ds = load_dataset("wikitext", "wikitext-103-raw-v1", split=split)
         lines = [line for line in ds["text"] if line and line.strip()]
         text = "\n\n".join(lines)
-        print(f"Downloaded WikiText-2 via datasets ({split} split).")
+        print(f"Downloaded WikiText-103 via datasets ({split} split).")
     except Exception as e:
-        print(f"Could not load WikiText-2 via datasets ({e}). Falling back to raw text URL.")
-        fallback_urls = {
-            "train": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/train.txt",
-            "validation": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
-            "valid": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt",
-            "test": "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/test.txt",
-        }
-        if split not in fallback_urls:
-            raise ValueError(f"Unsupported WikiText-2 split '{split}'. Use one of train/valid/validation/test.")
-        with urlopen(fallback_urls[split]) as resp:
-            text = resp.read().decode("utf-8")
-        text = "\n\n".join([line for line in text.splitlines() if line.strip()])
-        print(f"Downloaded WikiText-2 from fallback URL ({split} split).")
+        print(f"Could not load WikiText-103 via datasets ({e}).")
+        raise RuntimeError("Failed to load WikiText-103 dataset.")
 
     text_cache_path.write_text(text, encoding="utf-8")
-    print(f"Saved WikiText-2 text cache: {text_cache_path}")
+    print(f"Saved WikiText-103 text cache: {text_cache_path}")
     return text
 
 
-def run_wikitext2_perplexity(
-    model_path=None,
-    tokenizer_path=None,
-    device="cuda",
-    backend="base",
-    config_path=None,
-    split: str = "test",
-    max_length: int = 2048,
-    stride: int = 2048,
-):
+def run_wikitext103_perplexity(run_config: dict):
     """
-    Evaluate perplexity on WikiText-2 with sliding-window evaluation.
+    Evaluate perplexity on WikiText-103 with sliding-window evaluation.
     Saves fetched text and tokenized IDs under model_weights.
     """
+    model_path = run_config.get("model_path", "QuixiAI/Qwen3-30B-A3B-AWQ")
+    tokenizer_path = run_config.get("tokenizer_path", model_path)
+    device = run_config.get("device", "cuda")
+    split = run_config.get("wikitext103_split", "test")
+    max_length = run_config.get("wikitext103_max_length", 2048)
+    stride = run_config.get("wikitext103_stride", 2048)
+    max_windows = run_config.get("wikitext103_max_windows", 0)
+
     if max_length < 2:
         raise ValueError("max_length must be >= 2")
     if stride < 1:
@@ -877,23 +1137,15 @@ def run_wikitext2_perplexity(
     model_weights_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 60)
-    print(f"WIKITEXT-2 PERPLEXITY ({split} split)")
+    print(f"WIKITEXT-103 PERPLEXITY ({split} split)")
     print("=" * 60 + "\n")
 
-    text = _load_wikitext2_raw_text(model_weights_dir, split=split)
-
-    if model_path is None:
-        model_path = "QuixiAI/Qwen3-30B-A3B-AWQ"
+    text = _load_wikitext103_raw_text(model_weights_dir, split=split)
 
     print("Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...")
     try:
-        model = Qwen3_30BA3BW4A16Model(
-            model_path=model_path,
-            tokenizer_path=tokenizer_path,
-            device=device,
-            backend=backend,
-            config_path=config_path,
-        )
+        model = Qwen3_30BA3BW4A16Model(run_config)
+        _apply_routing_and_cache_cli(model, run_config)
         print("Model initialized successfully!")
     except Exception as e:
         print(f"Error initializing model: {e}")
@@ -912,11 +1164,13 @@ def run_wikitext2_perplexity(
         print("Error: tokenized WikiText-2 corpus is too short.")
         return 1
 
-    token_cache_path = model_weights_dir / f"wikitext-2-raw-v1_{split}_tokens.pt"
+    token_cache_path = model_weights_dir / f"wikitext-103-raw-v1_{split}_tokens.pt"
     torch.save(input_ids_full.cpu(), token_cache_path)
     print(f"Saved tokenized WikiText-2 tensor: {token_cache_path}")
     print(f"Total tokens: {input_ids_full.size(1)}")
     print(f"Eval max_length: {max_length}, stride: {stride}")
+    if max_windows > 0:
+        print(f"Quick test: evaluating at most {max_windows} sliding window(s).")
     backend_prefill_chunk = None
     if hasattr(model, "model") and hasattr(model.model, "get_prefill_chunk_size"):
         try:
@@ -937,6 +1191,8 @@ def run_wikitext2_perplexity(
     total_windows = len(window_starts)
 
     for window_idx, begin_loc in enumerate(window_starts):
+        if max_windows > 0 and window_idx >= max_windows:
+            break
         end_loc = min(begin_loc + max_length, seq_len)
         trg_len = end_loc - prev_end_loc
         input_ids_window = input_ids_full[:, begin_loc:end_loc]
@@ -1040,174 +1296,83 @@ def main():
     """Example usage of Qwen3_30BA3BW4A16Model when run as a script."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Qwen3 30B-A3B AWQ W4A16 Quantized Model - Unified LibTorch Backend")
+    parser = argparse.ArgumentParser(description="Qwen3 30B-A3B AWQ W4A16 Quantized Model")
     parser.add_argument(
-        "--text",
+        "--run-config",
         type=str,
-        default="What is the meaning of life the universe and everything?",
-        help="Input text to process (default: 'What is the meaning of life?')"
+        required=True,
+        help="Path to JSON run configuration file"
     )
-    parser.add_argument(
-        "--tokenizer-path",
-        type=str,
-        default=None,
-        help="Path to tokenizer or HuggingFace model name"
-    )
-    parser.add_argument(
-        "--model-path",
-        type=str,
-        default="QuixiAI/Qwen3-30B-A3B-AWQ",
-        help="Path to quantized model (default: QuixiAI/Qwen3-30B-A3B-AWQ)"
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default="cuda",
-        choices=["cpu", "cuda"],
-        help="Device to run on (default: cuda)"
-    )
-    parser.add_argument(
-        "--backend",
-        type=str,
-        default="base",
-        choices=["base", "predict", "cached"],
-        help="Backend to use: base (all experts), predict (heterogeneous), cached (selective loading)"
-    )
-    parser.add_argument(
-        "--config-path",
-        type=str,
-        default=os.path.abspath(os.path.join(os.path.dirname(__file__), "configs/configs_strixH_qwen3_30B_A3B.json5")),
-        help="Path to NPU config JSON"
-    )
-    parser.add_argument(
-        "--generate",
-        dest="generate",
-        action="store_true",
-        default=True,
-        help="Generate text instead of just getting logits (default: True)"
-    )
-    parser.add_argument(
-        "--no-generate",
-        dest="generate",
-        action="store_false",
-        help="Disable generation, just get logits"
-    )
-    parser.add_argument(
-        "--max-new-tokens",
-        type=int,
-        default=16,
-        help="Maximum number of tokens to generate (if --generate is used, default: 16)"
-    )
-    parser.add_argument(
-        "--temperature",
-        type=float,
-        default=0.0,
-        help="Sampling temperature (0.0 = greedy decoding)"
-    )
-    parser.add_argument(
-        "--top-p",
-        type=float,
-        default=0.9,
-        help="Nucleus sampling parameter (0.0-1.0)"
-    )
-    parser.add_argument(
-        "--top-k",
-        type=int,
-        default=50,
-        help="Top-k sampling parameter: only considers the top k most likely tokens."
-    )
-    parser.add_argument(
-        "--prompt-test",
-        type=int,
-        default=None,
-        help="Run prompt test case with specified token count."
-    )
-    parser.add_argument(
-        "--max-cached-experts",
-        type=int,
-        default=8,
-        help="Maximum number of experts to cache per layer (cached/predict backends only, default: 8)"
-    )
-    parser.add_argument(
-        "--prefetch-experts-count",
-        type=int,
-        default=1,
-        help="Number of experts to speculatively prefetch (predict backend only, default: 1)"
-    )
-    parser.add_argument(
-        "--perplexity",
-        action="store_true",
-        help="Compute perplexity for the input text (or prompt-test sequence) instead of generation."
-    )
-    parser.add_argument(
-        "--wikitext2-perplexity",
-        action="store_true",
-        help="Compute perplexity on WikiText-2 and save downloaded/tokenized files under model_weights."
-    )
-    parser.add_argument(
-        "--wikitext2-split",
-        type=str,
-        default="test",
-        choices=["train", "valid", "validation", "test"],
-        help="WikiText-2 split to evaluate."
-    )
-    parser.add_argument(
-        "--wikitext2-max-length",
-        type=int,
-        default=2048,
-        help="Max context length per evaluation window for WikiText-2 perplexity."
-    )
-    parser.add_argument(
-        "--wikitext2-stride",
-        type=int,
-        default=2048,
-        help="Stride for sliding-window WikiText-2 perplexity."
-    )
+    cli_args = parser.parse_args()
+    
+    with open(cli_args.run_config, 'r') as f:
+        run_config = json.load(f)
+        
+    class Args:
+        pass
+    args = Args()
+    for k, v in run_config.items():
+        setattr(args, k, v)
+        
+    args.text = getattr(args, "text", "What is the meaning of life the universe and everything?")
+    args.tokenizer_path = getattr(args, "tokenizer_path", None)
+    args.model_path = getattr(args, "model_path", "QuixiAI/Qwen3-30B-A3B-AWQ")
+    args.device = getattr(args, "device", "cuda")
+    args.backend = getattr(args, "backend", "base")
+    args.config_path = getattr(args, "config_path", None)
+    args.generate = getattr(args, "generate", True)
+    args.max_new_tokens = getattr(args, "max_new_tokens", 16)
+    args.temperature = getattr(args, "temperature", 0.0)
+    args.top_p = getattr(args, "top_p", 0.9)
+    args.top_k = getattr(args, "top_k", 50)
+    args.prompt_test = getattr(args, "prompt_test", None)
+    args.max_cached_experts = getattr(args, "max_cached_experts", 8)
+    args.prefetch_experts_count = getattr(args, "prefetch_experts_count", 1)
+    args.prefetch_threshold = getattr(args, "prefetch_threshold", 0.0)
+    args.perplexity = getattr(args, "perplexity", False)
+    args.wikitext103_perplexity = getattr(args, "wikitext103_perplexity", False)
+    args.wikitext103_split = getattr(args, "wikitext103_split", "test")
+    args.wikitext103_max_length = getattr(args, "wikitext103_max_length", 2048)
+    args.wikitext103_stride = getattr(args, "wikitext103_stride", 2048)
+    args.wikitext103_max_windows = getattr(args, "wikitext103_max_windows", 0)
+    args.sweep_prompts_file = getattr(args, "sweep_prompts_file", None)
+    args.generation_perplexity = getattr(args, "generation_perplexity", False)
+    args.lambda_val = getattr(args, "lambda_val", 0.0)
+    args.predict_layers = getattr(args, "predict_layers", None)
+    args.predictor_model = getattr(args, "predictor_model", "")
+    args.predictor_device = getattr(args, "predictor_device", "gpu")
+    args.predictor_lookahead = getattr(args, "predictor_lookahead", 1)
+    args.predictor_type = getattr(args, "predictor_type", "torchscript")
+    args.gating_lookahead = getattr(args, "gating_lookahead", 1)
+    args.gating_score_percentile = getattr(args, "gating_score_percentile", 0.0)
+    args.speculative_cache_fraction = getattr(args, "speculative_cache_fraction", 0.0)
+    args.prefetch_non_evicting = getattr(args, "prefetch_non_evicting", False)
+    args.expert_reuse_csv = getattr(args, "expert_reuse_csv", None)
+    args.forced_top_n = getattr(args, "forced_top_n", 0)
+    args.forced_top_p = getattr(args, "forced_top_p", -1.0)
+    args.mass_threshold_substitution_p = getattr(args, "mass_threshold_substitution_p", -1.0)
+    args.expert_weights_dir = getattr(args, "expert_weights_dir", DEFAULT_EXPERT_WEIGHTS_DIR)
+    args.cache_policy = getattr(args, "cache_policy", "LRU")
+    args.prefill_top_n = getattr(args, "prefill_top_n", 0)
+    args.suppress_predictor_stats = getattr(args, "suppress_predictor_stats", False)
+    args.oracle_trace = getattr(args, "oracle_trace", "")
+    args.oracle_lookahead = getattr(args, "oracle_lookahead", 0)
+    args.oracle_full_union = getattr(args, "oracle_full_union", False)
+    args.capture_oracle_trace = getattr(args, "capture_oracle_trace", "")
+    args.oracle_prompt_token_ids = None
 
-    args = parser.parse_args()
-
-    if args.wikitext2_perplexity:
-        return run_wikitext2_perplexity(
-            model_path=args.model_path,
-            tokenizer_path=args.tokenizer_path,
-            device=args.device,
-            backend=args.backend,
-            config_path=args.config_path,
-            split=args.wikitext2_split,
-            max_length=args.wikitext2_max_length,
-            stride=args.wikitext2_stride,
-        )
+    if args.wikitext103_perplexity:
+        return run_wikitext103_perplexity(run_config)
 
     if args.prompt_test is not None:
-        return run_prompt_test(
-            args.prompt_test,
-            model_path=args.model_path,
-            tokenizer_path=args.tokenizer_path,
-            device=args.device,
-            backend=args.backend,
-            max_new_tokens=args.max_new_tokens,
-            temperature=args.temperature,
-            top_p=args.top_p,
-            top_k=args.top_k,
-            generate=args.generate,
-            perplexity=args.perplexity,
-            config_path=args.config_path
-        )
+        return run_prompt_test(run_config)
 
     print("=" * 60)
     print("Initializing Qwen3 30B-A3B AWQ w4a16 quantized model...")
     print("=" * 60)
 
     try:
-        model = Qwen3_30BA3BW4A16Model(
-            model_path=args.model_path,
-            tokenizer_path=args.tokenizer_path,
-            device=args.device,
-            backend=args.backend,
-            config_path=args.config_path,
-            max_cached_experts_per_layer=args.max_cached_experts,
-            prefetch_experts_count=args.prefetch_experts_count,
-        )
+        model = Qwen3_30BA3BW4A16Model(run_config)
 
         print("Model initialized successfully!")
     except Exception as e:
@@ -1220,17 +1385,222 @@ def main():
         print("  3. Model weights are loaded (if required)")
         return 1
 
-    # Read all prompts from prompts.txt
-    script_dir = Path(__file__).parent
-    prompts_file = script_dir / "prompts.txt"
-    if prompts_file.exists():
-        with open(prompts_file, "r", encoding="utf-8") as f:
-            raw_prompts = [line.strip() for line in f.readlines()]
-        prompts = [p for p in raw_prompts if p]  # drop blank lines
+    _apply_routing_and_cache_cli(model, run_config)
+
+    if args.capture_oracle_trace:
+        oracle_bundle = None
+        if args.oracle_trace and os.path.exists(args.oracle_trace):
+            utils_dir = _script_dir.parent / "utils"
+            if str(utils_dir) not in sys.path:
+                sys.path.insert(0, str(utils_dir))
+            from oracle_trace import load_oracle_trace
+
+            oracle_bundle = load_oracle_trace(args.oracle_trace)
+            if oracle_bundle.prompt_token_ids:
+                input_ids = torch.tensor([oracle_bundle.prompt_token_ids], dtype=torch.long, device=args.device)
+                print(f"Capture prompt: {len(oracle_bundle.prompt_token_ids)} token IDs from {args.oracle_trace}")
+            elif oracle_bundle.prompt_text:
+                args.text = oracle_bundle.prompt_text
+                input_ids = model.tokenize(args.text)
+                print(f"Capture prompt: tokenized text from {args.oracle_trace} ({input_ids.size(1)} tokens)")
+            else:
+                input_ids = model.tokenize(args.text)
+        else:
+            input_ids = model.tokenize(args.text)
+
+        if not hasattr(model.model, "begin_oracle_trace_capture"):
+            print("Error: backend lacks oracle trace capture (rebuild predict libtorch).")
+            return 1
+
+        print(f"Capturing oracle trace -> {args.capture_oracle_trace}")
+        model.model.begin_oracle_trace_capture()
+        output = model.generate(
+            input_ids,
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+            top_p=args.top_p,
+            top_k=args.top_k,
+        )
+        prompt_len = input_ids.size(1)
+        gen_ids = output[0, prompt_len:].tolist()
+        prompt_text = args.text
+        if oracle_bundle and oracle_bundle.prompt_text:
+            prompt_text = oracle_bundle.prompt_text
+        generated_text = ""
+        if model.tokenizer is not None:
+            generated_text = model.tokenizer.decode(gen_ids, skip_special_tokens=False)
+        ok = model.model.write_oracle_trace_file(
+            args.capture_oracle_trace,
+            input_ids,
+            output,
+            prompt_text,
+            generated_text,
+            "qwen3_30b",
+        )
+        model.model.cancel_oracle_trace_capture()
+        return 0 if ok else 1
+
+    if args.sweep_prompts_file:
+        print(f"\nRunning sweep using prompts from JSON: {args.sweep_prompts_file}")
+        if not os.path.exists(args.sweep_prompts_file):
+            print(f"Error: Prompts file {args.sweep_prompts_file} not found.")
+            return 1
+
+        with open(args.sweep_prompts_file, "r", encoding="utf-8") as f:
+            prompts = json.load(f)
+
+        print(f"Loaded {len(prompts)} prompts for sweeping.")
+        total_nll_sum = 0.0
+        total_gen_toks_for_ppl = 0
+        prompts_with_gen = 0
+        total_time = 0.0
+        total_generated_tokens = 0
+        prompt_tps_list = []
+        prompt_ppl_list = []
+        
+        model.reset_cache_stats()
+
+        for i, prompt in enumerate(prompts):
+            print(f"\nProcessing Prompt {i+1}/{len(prompts)}...")
+            try:
+                if isinstance(prompt, dict):
+                    if "token_ids" in prompt and prompt["token_ids"]:
+                        input_ids = torch.tensor([prompt["token_ids"]], dtype=torch.long, device=args.device)
+                    else:
+                        input_ids = model.tokenize(prompt.get("text", ""))
+                else:
+                    input_ids = model.tokenize(prompt)
+
+                if args.generation_perplexity:
+                    start_time = time.time()
+                    full_ids = model.generate(
+                        input_ids,
+                        max_new_tokens=args.max_new_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        top_k=args.top_k,
+                    )
+                    elapsed = time.time() - start_time
+                    num_generated = full_ids.size(1) - input_ids.size(1)
+                    if num_generated > 0:
+                        if args.generate:
+                            total_time += elapsed
+                            total_generated_tokens += num_generated
+                            prompt_tps_list.append(num_generated / elapsed)
+
+                            if model.tokenizer is not None:
+                                prompt_len = input_ids.size(1)
+                                generated_tokens = full_ids[0, prompt_len:].tolist()
+                                decoded_generated = model.tokenizer.decode(
+                                    generated_tokens, skip_special_tokens=False
+                                )
+                                print(f"\n{'='*60}")
+                                print("Generated text only:")
+                                print(f"{'='*60}")
+                                print(decoded_generated)
+                                print(f"{'='*60}")
+
+                        gp = model.generation_perplexity(input_ids, full_ids)
+                        total_nll_sum += gp["sum_nll"]
+                        total_gen_toks_for_ppl += gp["num_gen_tokens"]
+                        prompts_with_gen += 1
+                        prompt_ppl = math.exp(gp["sum_nll"] / gp["num_gen_tokens"])
+                        prompt_ppl_list.append(prompt_ppl)
+                elif args.generate:
+                    start_time = time.time()
+                    generated = model.generate(
+                        input_ids,
+                        max_new_tokens=args.max_new_tokens,
+                        temperature=args.temperature,
+                        top_p=args.top_p,
+                        top_k=args.top_k,
+                    )
+                    elapsed = time.time() - start_time
+                    num_generated = generated.size(1) - input_ids.size(1)
+                    if num_generated > 0:
+                        total_time += elapsed
+                        total_generated_tokens += num_generated
+                        prompt_tps_list.append(num_generated / elapsed)
+                        
+                        if model.tokenizer is not None:
+                            prompt_len = input_ids.size(1)
+                            generated_tokens = generated[0, prompt_len:].tolist()
+                            decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
+                            print(f"\n{'='*60}")
+                            print("Generated text only:")
+                            print(f"{'='*60}")
+                            print(decoded_generated)
+                            print(f"{'='*60}")
+
+            except Exception as e:
+                print(f"  Error on prompt {i+1}: {e}")
+
+        print("\n" + "=" * 60)
+        print("Sweep Complete.")
+        
+        if args.generation_perplexity and total_gen_toks_for_ppl > 0:
+            avg_nll = total_nll_sum / total_gen_toks_for_ppl
+            avg_ppl = math.exp(avg_nll)
+            print(f"Generation Perplexity: {avg_ppl:.4f}")
+            print(
+                f"(token-weighted over {total_gen_toks_for_ppl} generated tokens, "
+                f"{prompts_with_gen}/{len(prompts)} prompts with ≥1 new token)"
+            )
+            if len(prompt_ppl_list) > 1:
+                import statistics
+                ppl_std = statistics.stdev(prompt_ppl_list)
+                print(f"Generation Perplexity StdDev: {ppl_std:.4f}")
+            
+        if args.generate and total_generated_tokens > 0:
+            avg_tps = total_generated_tokens / total_time
+            print(f"Average Time per Token: {1.0 / avg_tps:.6f}") # Output inverse since parser expects time per token
+            print(f"End-to-End TPS: {avg_tps:.4f}")
+            if len(prompt_tps_list) > 1:
+                import statistics
+                tps_std = statistics.stdev(prompt_tps_list)
+                print(f"TPS StdDev: {tps_std:.4f}")
+
+        # Get and print cache stats for entire sweep
+        hits, misses = model.get_cache_stats()
+        total = hits + misses
+        hit_rate = (hits / total * 100.0) if total > 0 else 0.0
+        print(f"Cache Stats: Hits={hits}, Misses={misses}, HitRate={hit_rate:.2f}%")
+        
+        pred_stats = model.get_predictor_stats()
+        if pred_stats:
+            pred_hits = sum(s[0] for s in pred_stats)
+            pred_total = sum(s[1] for s in pred_stats)
+            pred_rate = (pred_hits / pred_total * 100.0) if pred_total > 0 else 0.0
+            print(f"Predictor Stats: Hits={pred_hits}, Total={pred_total}, HitRate={pred_rate:.2f}%")
+
+        if hasattr(model, "print_cache_stats"):
+            model.print_cache_stats()
+        return 0
+
+    if args.oracle_trace and os.path.exists(args.oracle_trace):
+        try:
+            utils_dir = _script_dir.parent / "utils"
+            if str(utils_dir) not in sys.path:
+                sys.path.insert(0, str(utils_dir))
+            from oracle_trace import load_oracle_trace
+
+            oracle_bundle = load_oracle_trace(args.oracle_trace)
+            if oracle_bundle.prompt_token_ids:
+                args.oracle_prompt_token_ids = oracle_bundle.prompt_token_ids
+                print(
+                    f"Loaded {len(oracle_bundle.prompt_token_ids)} prompt token IDs from oracle trace "
+                    f"({args.oracle_trace})"
+                )
+            elif oracle_bundle.prompt_text:
+                args.text = oracle_bundle.prompt_text.strip()
+                print(f"Loaded prompt text from oracle trace ({len(args.text)} chars, no token IDs — re-capture recommended)")
+        except Exception as e:
+            print(f"Warning: Failed to load prompt from oracle trace: {e}")
+
+    if getattr(args, "oracle_prompt_token_ids", None):
+        print("Replay uses exact PROMPT TOKEN IDS from oracle trace.")
     else:
-        print(f"Warning: {prompts_file} not found, falling back to --text argument.")
-        prompts = [args.text]
-    print(f"Processing text: '{args.text}'")
+        print(f"Processing text: '{args.text}'")
 
     if args.perplexity:
         print("\nRunning perplexity evaluation...")
@@ -1243,6 +1613,7 @@ def main():
             print(f"Tokens evaluated: {metrics['num_tokens']}")
             print(f"Cross-entropy loss: {metrics['loss']:.6f}")
             print(f"Perplexity: {metrics['perplexity']:.6f}")
+            return 0
         except Exception as e:
             print(f"Error during perplexity evaluation: {e}")
             import traceback
@@ -1251,7 +1622,10 @@ def main():
     elif args.generate:
         print(f"Generating {args.max_new_tokens} tokens...\n")
         try:
-            input_ids = model.tokenize(args.text)
+            if getattr(args, "oracle_prompt_token_ids", None):
+                input_ids = torch.tensor([args.oracle_prompt_token_ids], dtype=torch.long, device=args.device)
+            else:
+                input_ids = model.tokenize(args.text)
 
             generated = model.generate(
                 input_ids,
@@ -1279,68 +1653,20 @@ def main():
                 print(f"{'='*60}")
             else:
                 print(f"\nGenerated token IDs: {generated}")
+            if hasattr(model, "print_cache_stats"):
+                model.print_cache_stats()
+            return 0
         except Exception as e:
             print(f"Error during generation: {e}")
             import traceback
             traceback.print_exc()
             return 1
-    print(f"Running {len(prompts)} prompt(s) from {prompts_file if prompts_file.exists() else '--text'}...\n")
-
-    for prompt_idx, prompt_text in enumerate(prompts):
-        print(f"\n{'='*60}")
-        print(f"PROMPT {prompt_idx + 1}/{len(prompts)}: {prompt_text[:80]}{'...' if len(prompt_text) > 80 else ''}")
-        print(f"{'='*60}")
-
-        if args.generate:
-            try:
-                input_ids = model.tokenize(prompt_text)
-
-                generated = model.generate(
-                    input_ids,
-                    max_new_tokens=args.max_new_tokens,
-                    temperature=args.temperature,
-                    top_p=args.top_p,
-                    top_k=args.top_k
-                )
-
-                if model.tokenizer is not None:
-                    prompt_len = input_ids.size(1)
-                    generated_tokens = generated[0, prompt_len:].tolist()
-                    decoded_generated = model.tokenizer.decode(generated_tokens, skip_special_tokens=False)
-
-                    print("Generated text:")
-                    print(f"{'='*60}")
-                    print(decoded_generated)
-                    print(f"{'='*60}")
-                else:
-                    print(f"Generated token IDs: {generated}")
-            except Exception as e:
-                print(f"Error during generation for prompt {prompt_idx + 1}: {e}")
-                import traceback
-                traceback.print_exc()
-        else:
-            try:
-                start_time = time.time()
-                logits = model(prompt_text)
-                end_time = time.time()
-                print(f"Prefill time: {end_time - start_time:.4f} seconds")
-                print(f"Logits shape: {logits.shape}, dtype: {logits.dtype}")
-                print(f"Logits stats — min: {logits.min().item():.4f}, max: {logits.max().item():.4f}, "
-                      f"mean: {logits.mean().item():.4f}")
-            except Exception as e:
-                print(f"Error during forward pass for prompt {prompt_idx + 1}: {e}")
-                import traceback
-                traceback.print_exc()
-
-    print(f"\n{'=' * 60}")
-    if hasattr(model, "load_time"):
-        print(f"Weight loading time: {model.load_time:.2f} seconds")
-    print("Done!")
-    print(f"{'=' * 60}\n")
     return 0
 
 
 if __name__ == "__main__":
     exit(main())
 
-    # python3 qwen3_30B-A3B_w4a16_model.py   --wikitext2-perplexity   --wikitext2-split test   --wikitext2-max-length 4096   --wikitext2-stride 2048
+    # WikiText-103 (full): --wikitext103-perplexity --wikitext103-split test --wikitext103-max-length 4096 --wikitext103-stride 2048
+    # Examples of limited runs:
+    #   --wikitext103-perplexity --wikitext103-max-windows 2 --wikitext103-max-length 512 --wikitext103-stride 512

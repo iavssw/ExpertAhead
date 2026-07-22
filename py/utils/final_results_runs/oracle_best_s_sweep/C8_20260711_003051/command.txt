@@ -1,0 +1,4 @@
+run_oracle_best_s_sweep.sh C=8
+lookaheads=1 2 3
+NUM_PROMPTS=10
+OUT_DIR=py/utils/final_results_runs/oracle_best_s_sweep/C8_20260711_003051

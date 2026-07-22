@@ -37,10 +37,12 @@ set(CMAKE_TARGET_DEFINITIONS_HIP
 set(CMAKE_HIP_TARGET_INCLUDE_PATH
   "/home/michael/heteroPredict/include"
   "/opt/rocm/include/hip"
+  "/opt/rocm/include"
   "/home/michael/libraries/libtorch_7.1.0/include"
   "/home/michael/libraries/libtorch_7.1.0/include/torch/csrc/api/include"
-  "/opt/rocm-7.1.1/include/hiprand"
-  "/opt/rocm-7.1.1/include/rocrand"
+  "/opt/rocm-7.2.0/include"
+  "/opt/rocm-7.2.0/include/hiprand"
+  "/opt/rocm-7.2.0/include/rocrand"
   )
 
 # The set of dependency files which are needed:

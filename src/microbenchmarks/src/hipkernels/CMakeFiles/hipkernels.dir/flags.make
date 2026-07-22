@@ -4,7 +4,7 @@
 # compile HIP with /opt/rocm-7.1.1/lib/llvm/bin/clang++
 HIP_DEFINES = -DHIPBLASLT_USE_ROCROLLER -DRDNA3=1 -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_PROF_API=1 -DUSE_RPC -DUSE_TENSORPIPE -D__HIP_PLATFORM_AMD__ -D__HIP_PLATFORM_AMD__=1 -D__HIP_ROCclr__=1
 
-HIP_INCLUDES = -I/home/michael/heteroPredict/include -I/opt/rocm/include/hip -isystem /home/michael/libraries/libtorch_7.1.0/include -isystem /home/michael/libraries/libtorch_7.1.0/include/torch/csrc/api/include -isystem /opt/rocm-7.1.1/include/hiprand -isystem /opt/rocm-7.1.1/include/rocrand
+HIP_INCLUDES = -I/home/michael/heteroPredict/include -I/opt/rocm/include/hip -isystem /opt/rocm/include -isystem /home/michael/libraries/libtorch_7.1.0/include -isystem /home/michael/libraries/libtorch_7.1.0/include/torch/csrc/api/include -isystem /opt/rocm-7.2.0/include -isystem /opt/rocm-7.2.0/include/hiprand -isystem /opt/rocm-7.2.0/include/rocrand
 
 HIP_FLAGS =  --offload-arch=gfx1151 -fPIC --offload-arch=gfx1151 -O3 -ffast-math -fPIC -D__HIP_PLATFORM_AMD__=1 -DCUDA_HAS_FP16=1 -DUSE_ROCM -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -DTORCH_HIP_VERSION=701 -Wno-shift-count-negative -Wno-shift-count-overflow -DCAFFE2_USE_MIOPEN -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_HIP -std=c++17 -DHIPBLAS_V2 -DHIP_ENABLE_WARP_SYNC_BUILTINS -DHIPBLASLT_OUTER_VEC -DUSE_ROCM_CK_GEMM
 

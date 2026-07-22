@@ -1,0 +1,7 @@
+run_sec5_2_unified_sweep.sh
+started: 2026-07-07T23:29:23-05:00
+OUT_DIR=py/utils/section_5_2/unified_10prompt_20260707_232923
+NUM_PROMPTS=10
+PRED=trainingData/qwen3_30b/transformer_final_pfill_markov_emb
+START_CACHE=16
+RETRY_FAILED=0

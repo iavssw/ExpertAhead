@@ -8,6 +8,7 @@
 #include "hipkernels/w4a16_gemv_unpacked.hpp"
 #include "unified_llm_w4a16_base/helper.hpp"
 #include "unified_llm_w4a16_base/npuSetup.hpp"
+#include "unified_llm_w4a16_common/moe_timing_stats.hpp"
 #include <algorithm>
 #include <c10/hip/HIPFunctions.h>
 #include <c10/hip/HIPStream.h>
@@ -578,22 +579,34 @@ void QuantizedLinearImpl::set_quantized_weights(torch::Tensor qweight, torch::Te
     auto w_high = w_view.select(-1, 1).to(torch::kUInt8);
     auto packed_w = torch::bitwise_or(torch::bitwise_and(w_low, 0x0F), torch::bitwise_left_shift(torch::bitwise_and(w_high, 0x0F), 4));
 
-    quantized_weight_ = packed_w;
+    // Force resize to match incoming shapes so we can copy_ in place
+    quantized_weight_.resize_(packed_w.sizes());
+    quantized_weight_.copy_(packed_w.to(device));
 
     // Handle Scales and Zeros
     if (scale.size(0) == out_features_ && scale.dim() == 1) {
-        scale_ = scale.to(device).to(torch::kBFloat16);
-        zero_point_ = zero_point.to(device).to(torch::kInt8);
+        scale_.resize_(scale.sizes());
+        zero_point_.resize_(scale.sizes());
+        scale_.copy_(scale.to(device).to(torch::kBFloat16));
+        zero_point_.copy_(zero_point.to(device).to(torch::kInt8));
     } else {
         int64_t num_scales = scale.numel();
         int64_t n_groups = num_scales / out_features_;
 
         if (scale.size(1) == out_features_) {
-            scale_ = scale.t().contiguous().to(device).to(torch::kBFloat16);
-            zero_point_ = zero_point.t().contiguous().to(device).to(torch::kInt8);
+            auto s_flat = scale.t().contiguous();
+            auto z_flat = zero_point.t().contiguous();
+            scale_.resize_(s_flat.sizes());
+            zero_point_.resize_(z_flat.sizes());
+            scale_.copy_(s_flat.to(device).to(torch::kBFloat16));
+            zero_point_.copy_(z_flat.to(device).to(torch::kInt8));
         } else {
-            scale_ = scale.reshape({out_features_, n_groups}).to(device).to(torch::kBFloat16);
-            zero_point_ = zero_point.reshape({out_features_, n_groups}).to(device).to(torch::kInt8);
+            auto s_shaped = scale.reshape({out_features_, n_groups});
+            auto z_shaped = zero_point.reshape({out_features_, n_groups});
+            scale_.resize_(s_shaped.sizes());
+            zero_point_.resize_(z_shaped.sizes());
+            scale_.copy_(s_shaped.to(device).to(torch::kBFloat16));
+            zero_point_.copy_(z_shaped.to(device).to(torch::kInt8));
         }
     }
 }
@@ -601,9 +614,13 @@ void QuantizedLinearImpl::set_quantized_weights(torch::Tensor qweight, torch::Te
 void QuantizedLinearImpl::set_unpacked_params(torch::Tensor qweight_packed, torch::Tensor scale, torch::Tensor zero_point) {
     auto device = quantized_weight_.device();
 
-    quantized_weight_ = qweight_packed.to(torch::kUInt8).contiguous().to(device);
-    scale_ = scale.to(torch::kBFloat16).contiguous().to(device);
-    zero_point_ = zero_point.to(torch::kInt8).contiguous().to(device);
+    quantized_weight_.resize_(qweight_packed.sizes());
+    scale_.resize_(scale.sizes());
+    zero_point_.resize_(zero_point.sizes());
+
+    quantized_weight_.copy_(qweight_packed.to(torch::kUInt8).contiguous().to(device));
+    scale_.copy_(scale.to(torch::kBFloat16).contiguous().to(device));
+    zero_point_.copy_(zero_point.to(torch::kInt8).contiguous().to(device));
 }
 
 // MixtureOfExpertsImpl Implementation
@@ -678,6 +695,7 @@ torch::Tensor MixtureOfExpertsImpl::forward_cpu(const torch::Tensor &x_flat, con
 
 torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_flat, const torch::Tensor &topk_vals,
                                                        const torch::Tensor &topk_idx, torch::Tensor &output) {
+    const auto compute_start = std::chrono::high_resolution_clock::now();
     auto opts = x_flat.options();
     const int64_t active_experts = num_experts_per_tok_;
 
@@ -728,6 +746,11 @@ torch::Tensor MixtureOfExpertsImpl::forward_generation(const torch::Tensor &x_fl
     auto weights = topk_vals[0].to(output.dtype()).view({active_experts, 1});
     down_batched.mul_(weights);
     output.add_(down_batched.sum(0, true));
+
+    const auto compute_end = std::chrono::high_resolution_clock::now();
+    total_moe_compute_time_ms_ +=
+        std::chrono::duration_cast<std::chrono::microseconds>(compute_end - compute_start).count() / 1000.0;
+    moe_expert_invocations_ += active_experts;
     return output;
 }
 
@@ -1120,8 +1143,8 @@ UnifiedLLMW4A16Impl::UnifiedLLMW4A16Impl(ArchitectureType arch_type, int64_t voc
     bool use_qkv_bias = false;
 
     // Initialize quantized layers for each transformer block
-    // Initialize quantized layers for each transformer block
     for (int64_t i = 0; i < num_hidden_layers_; ++i) {
+        torch::DeviceGuard device_guard(layer_devices_[i]);
         // Attention layers (quantized)
         q_layers.push_back(register_module(
             "q_" + std::to_string(i), QuantizedLinear(hidden_size_, num_attention_heads_ * head_dim_, use_qkv_bias, max_seq_len_, "q")));
@@ -2214,4 +2237,46 @@ torch::Tensor UnifiedLLMW4A16Impl::generate(torch::Tensor input_ids, int64_t max
     }
 
     return input_tensor.narrow(1, 0, token_len);
+}
+
+void MixtureOfExpertsImpl::print_moe_timing_stats() const {
+    unified_llm_w4a16_common::print_moe_compute_only(std::cout, moe_expert_invocations_, total_moe_compute_time_ms_);
+}
+
+void MixtureOfExpertsImpl::reset_moe_timing_stats() {
+    moe_expert_invocations_ = 0;
+    total_moe_compute_time_ms_ = 0.0;
+}
+
+void UnifiedLLMW4A16Impl::print_cache_stats() const {
+    std::cout << "\nMoE Timing Statistics (base backend, compute-only — no SSD expert loads):" << std::endl;
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (size_t i = 0; i < moe_layers.size(); ++i) {
+            if (moe_layers[i]->get_moe_expert_invocations() > 0) {
+                std::cout << "Layer " << i;
+                moe_layers[i]->print_moe_timing_stats();
+            }
+        }
+    }
+    std::cout << "============================================================" << std::endl;
+}
+
+void UnifiedLLMW4A16Impl::reset_cache_stats() {
+    if (arch_type_ == ArchitectureType::MIXTRAL || arch_type_ == ArchitectureType::QWEN) {
+        for (auto& layer : moe_layers) {
+            layer->reset_moe_timing_stats();
+        }
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_forced_top_n(int64_t n) {
+    for (auto& layer : moe_layers) {
+        layer->set_forced_top_n(n);
+    }
+}
+
+void UnifiedLLMW4A16Impl::set_random_fill_mode(bool on) {
+    for (auto& layer : moe_layers) {
+        layer->set_random_fill_mode(on);
+    }
 }

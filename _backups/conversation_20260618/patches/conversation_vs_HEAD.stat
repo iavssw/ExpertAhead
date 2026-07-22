@@ -1,0 +1,16 @@
+ .../unified_llm_w4a16_cached/unified_llm_w4a16.hpp |    5 +-
+ include/unified_llm_w4a16_common/moe_expert_io.inl |  173 +-
+ .../moe_expert_load_packed.inl                     |  175 +-
+ .../unified_llm_w4a16_common/moe_timing_stats.hpp  |    9 +
+ .../unified_llm_w4a16_predict/expert_predictor.h   |   71 +-
+ .../unified_llm_w4a16.hpp                          |   68 +-
+ py/utils/sweep_predict_cached_cache_metrics.py     | 2732 ++++++++++----------
+ run_benchmarks.sh                                  |  107 +-
+ src/unified_llm_w4a16_cached/helper.cpp            |    1 +
+ src/unified_llm_w4a16_cached/python_bindings.cpp   |    2 -
+ src/unified_llm_w4a16_cached/unified_llm_w4a16.cpp |  517 ++--
+ src/unified_llm_w4a16_predict/helper.cpp           |   47 +-
+ src/unified_llm_w4a16_predict/python_bindings.cpp  |    1 +
+ .../unified_llm_w4a16.cpp                          |  994 +++++--
+ utils/setup.sh                                     |   13 +-
+ 15 files changed, 2985 insertions(+), 1930 deletions(-)

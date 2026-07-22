@@ -1,0 +1,10 @@
+run_final_best_10prompt_oracle.sh C=16
+NUM_PROMPTS=10
+ORACLE_TRACE_DIR=trainingData/wikitext_test_traces
+OUT_DIR=py/utils/final_results_runs/recollection/C16_20260721_143043
+RANDOM baseline
+Cross-Layer B=8
+Cache-Cond J=5
+ExpertAhead S=2 B=4
+ExpertAhead-CC S=1 B=4 J=5
+Oracle Full Union S=1
