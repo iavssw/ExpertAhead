@@ -156,13 +156,10 @@ Device configs live at `py/unified_llm_w4a16/configs/` (e.g. `configs_strixH_qwe
 
 ## Reproducing ExpertAhead (paper experiments)
 
-### 1. Pack experts for SSD loading
-Download and unpack Qwen3-30B-A3B-AWQ weights to  
-`py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked`, then:
+### 1. Model preparation & expert packing
+The inference runtime requires expert weights packed into a custom binary format for efficient SSD loading.
+Download and unpack Qwen3-30B-A3B-AWQ to `py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked`, then:
 
-### 1. Model Preparation & Expert Packing
-The inference runtime requires expert weights to be packed into a custom binary format for efficient SSD loading.
-After downloading the Qwen3-30B-A3B-AWQ weights and extracting them to `py/unified_llm_w4a16/model_weights/Qwen3-30B-A3B-AWQ_unpacked`, run the packing script to generate the SSD-optimized binaries:
 ```bash
 cd py/unified_llm_w4a16
 python3 pack_experts.py
@@ -170,8 +167,20 @@ python3 pack_experts.py
 
 Default packing covers 48 MoE layers × 128 experts and writes `Qwen3-30B-A3B-AWQ_packed`.
 
-### 2. Training Data Collection
-Generate the training traces for the predictor using the WikiText dataset.
+### 2. Predictors (choose one path)
+
+#### Option A — Use the predictors shipped in this repo
+Pretrained Qwen3-30B ExpertAhead predictors are already in:
+
+```text
+trainingDataExtended/qwen3_30b_sharded/transformer_emb_markov_pfill_full_20260616_174845
+```
+
+Point sweeps / run configs at that directory via `--predictor-base-dir` (or `PRED=...` in the shell scripts). It contains `transformer_eh4_h64_f{lookahead}/layer_*/` checkpoints for each MoE layer.
+
+#### Option B — Train your own
+Collect WikiText routing traces, then train the lightweight cross-token transformer predictors:
+
 ```bash
 cd py/utils
 bash run_collect_training_data.sh qwen3_30b
@@ -184,16 +193,21 @@ cd py/expert_predictor
 bash run_train.sh qwen3_30b
 ```
 
-Trained models are written under the training-data tree.
+Trained models are written under the training-data tree. Use your new output directory as `--predictor-base-dir` the same way as in Option A.
 
-### 4. End-to-end evaluation
-Scripts under `sh_scripts/` drive sweeps and paper tables, for example:
+### 3. End-to-end evaluation (sweeps)
+Scripts under `sh_scripts/` drive sweeps and paper tables (tokens/sec, etc.):
 
-### 4. End-to-End Evaluation (Sweeps)
-Execute the inference evaluation scripts located in the `sh_scripts/` directory to generate the final performance metrics (e.g., Tokens Per Second).
 ```bash
-# Run the 10-prompt Oracle sweep across all configurations
+# Example: 10-prompt oracle sweep across cache sizes
 CACHE_SIZES="16 32 48 64" ./sh_scripts/run_final_best_10prompt_oracle.sh
+```
+
+For predictor-backed runs, set the shipped (or freshly trained) directory, e.g.:
+
+```bash
+PRED=trainingDataExtended/qwen3_30b_sharded/transformer_emb_markov_pfill_full_20260616_174845 \
+  ./sh_scripts/run_final_best_10prompt.sh
 ```
 
 ---
