@@ -46,9 +46,11 @@ Usage:
   python collect_training_data_unified.py \\
       --model <model_tag> \\
       --output-dir <path> \\
-      --num-wikitext 100 \\
+      --num-wikitext 200 --num-orca 200 --num-gsm8k 200 \\
       --max-tokens 512 \\
       --max-gen-tokens 128
+
+Sources (see prompt_datasets.py): wikitext, fineweb, orca, gsm8k, mbpp, cnn_dailymail.
 """
 
 import argparse
@@ -59,59 +61,18 @@ from pathlib import Path
 
 import torch
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Dataset loading
-# ─────────────────────────────────────────────────────────────────────────────
+from prompt_datasets import (
+    DATASET_NAMES,
+    add_collection_args,
+    iter_train_texts,
+    requested_collection_counts,
+)
 
 try:
-    from datasets import load_dataset
+    from datasets import load_dataset  # noqa: F401  (presence check)
     HAS_DATASETS = True
 except ImportError:
     HAS_DATASETS = False
-
-
-def _stream_texts(dataset_name: str, min_tokens: int, max_tokens: int, tokenizer):
-    """
-    Yield (text, token_ids_tensor) pairs from the given streaming dataset,
-    already filtered to [min_tokens, max_tokens] and truncated if needed.
-    """
-    if dataset_name == "fineweb":
-        ds = load_dataset("HuggingFaceFW/fineweb", split="train", streaming=True)
-    elif dataset_name == "orca":
-        ds = load_dataset("Open-Orca/OpenOrca", split="train", streaming=True)
-    elif dataset_name == "wikitext":
-        ds = load_dataset("wikitext", "wikitext-103-v1", split="train", streaming=True)
-    else:
-        raise ValueError(f"Unknown dataset: {dataset_name!r}")
-
-    for example in ds:
-        if dataset_name == "fineweb":
-            text = example.get("text", "").strip()
-        elif dataset_name == "orca":
-            system   = example.get("system_prompt", "")
-            question = example.get("question", "")
-            text = f"{system}\n{question}\n{example.get('response', '')}".strip()
-        elif dataset_name == "wikitext":
-            text = example.get("text", "").strip()
-            if not text or text.startswith(" = "): # Skip section headers
-                continue
-
-        if not text:
-            continue
-
-        enc = tokenizer(
-            [text],
-            return_tensors="pt",
-            padding=False,
-            truncation=True,
-            max_length=max_tokens,
-        )
-        ids = enc["input_ids"]  # [1, seq_len]
-        seq_len = ids.shape[1]
-        if seq_len < min_tokens:
-            continue
-
-        yield text, ids
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -191,6 +152,7 @@ def collect_from_dataset(
     max_tokens: int,
     start_sample_idx: int = 0,
     max_gen_tokens: int = 128,
+    stream_skip: int = 0,
 ):
     """
     Run inference on `num_samples` texts from `dataset_name`, collecting
@@ -229,7 +191,9 @@ def collect_from_dataset(
     model.model.enable_training_data_collection()
 
     try:
-        for text, input_ids in _stream_texts(dataset_name, min_tokens, max_tokens, tokenizer):
+        for text, input_ids in iter_train_texts(
+            dataset_name, tokenizer, min_tokens, max_tokens, stream_skip=stream_skip
+        ):
             global_idx  = start_sample_idx + collected
             prefill_len = input_ids.shape[1]
 
@@ -360,20 +324,22 @@ def collect_from_dataset(
 # Metadata helper
 # ─────────────────────────────────────────────────────────────────────────────
 
-def write_metadata(output_dir: Path, model_tag: str, num_fineweb: int, num_orca: int,
-                   num_wikitext: int, min_tokens: int, max_tokens: int, max_gen_tokens: int,
+def write_metadata(output_dir: Path, model_tag: str, counts: dict,
+                   min_tokens: int, max_tokens: int, max_gen_tokens: int,
                    model_path: str):
     meta = {
         "model":           model_tag,
         "model_path":      model_path,
-        "num_fineweb":     num_fineweb,
-        "num_orca":        num_orca,
-        "num_wikitext":    num_wikitext,
+        "counts":          counts,
+        "num_fineweb":     counts.get("fineweb", 0),
+        "num_orca":        counts.get("orca", 0),
+        "num_wikitext":    counts.get("wikitext", 0),
         "min_tokens":      min_tokens,
         "max_tokens":      max_tokens,
         "max_gen_tokens":  max_gen_tokens,
         "collection_phase": "generation",
         "file_format":     "per_sample_pt",
+        "datasets":        list(DATASET_NAMES),
         "description":     (
             "Each .pt file contains embeddings and router_logits from the GENERATION phase. "
             "'token_count' is the number of generation tokens collected. "
@@ -412,17 +378,11 @@ def main():
         "--output-dir", type=str, required=True,
         help="Directory where per-sample .pt files will be saved."
     )
+    add_collection_args(parser)
     parser.add_argument(
-        "--num-fineweb", type=int, default=0,
-        help="Number of samples from FineWeb (default: 100)."
-    )
-    parser.add_argument(
-        "--num-orca", type=int, default=0,
-        help="Number of samples from OpenOrca (default: 100)."
-    )
-    parser.add_argument(
-        "--num-wikitext", type=int, default=1000,
-        help="Number of samples from Wikitext-103 (default: 0)."
+        "--start-idx", type=int, default=0,
+        help="File-index offset and stream skip for the first dataset collected "
+             "(resume a single-dataset run from this sample index).",
     )
     parser.add_argument(
         "--min-tokens", type=int, default=100,
@@ -444,14 +404,6 @@ def main():
     parser.add_argument(
         "--max-gen-tokens", type=int, default=128,
         help="Maximum number of generation (decode) tokens to collect per sample (default: 128)."
-    )
-    parser.add_argument(
-        "--skip-fineweb", action="store_true",
-        help="Skip FineWeb collection (useful for resuming Orca-only)."
-    )
-    parser.add_argument(
-        "--skip-orca", action="store_true",
-        help="Skip Orca collection (useful for resuming FineWeb-only)."
     )
 
     args = parser.parse_args()
@@ -478,73 +430,48 @@ def main():
         print("ERROR: model has no tokenizer loaded.", file=sys.stderr)
         return 1
 
-    # ── collect FineWeb ───────────────────────────────────────────────────────
-    fineweb_collected = 0
-    if not args.skip_fineweb and args.num_fineweb > 0:
-        fineweb_collected = collect_from_dataset(
+    requested = requested_collection_counts(args)
+    collected = {name: 0 for name in DATASET_NAMES}
+    running_idx = args.start_idx
+    first_dataset = True
+
+    for name in DATASET_NAMES:
+        num = requested[name]
+        if num <= 0:
+            continue
+        stream_skip = args.start_idx if first_dataset else 0
+        collected[name] = collect_from_dataset(
             model=model,
             tokenizer=tokenizer,
-            dataset_name="fineweb",
-            num_samples=args.num_fineweb,
+            dataset_name=name,
+            num_samples=num,
             output_dir=output_dir,
             model_tag=model_tag,
             min_tokens=args.min_tokens,
             max_tokens=args.max_tokens,
-            start_sample_idx=0,
+            start_sample_idx=running_idx,
             max_gen_tokens=args.max_gen_tokens,
+            stream_skip=stream_skip,
         )
+        running_idx += collected[name]
+        first_dataset = False
 
-    # ── collect Orca ──────────────────────────────────────────────────────────
-    orca_collected = 0
-    if not args.skip_orca and args.num_orca > 0:
-        orca_collected = collect_from_dataset(
-            model=model,
-            tokenizer=tokenizer,
-            dataset_name="orca",
-            num_samples=args.num_orca,
-            output_dir=output_dir,
-            model_tag=model_tag,
-            min_tokens=args.min_tokens,
-            max_tokens=args.max_tokens,
-            start_sample_idx=args.num_fineweb,
-            max_gen_tokens=args.max_gen_tokens,
-        )
-
-    # ── collect Wikitext ──────────────────────────────────────────────────────
-    wikitext_collected = 0
-    if args.num_wikitext > 0:
-        wikitext_collected = collect_from_dataset(
-            model=model,
-            tokenizer=tokenizer,
-            dataset_name="wikitext",
-            num_samples=args.num_wikitext,
-            output_dir=output_dir,
-            model_tag=model_tag,
-            min_tokens=args.min_tokens,
-            max_tokens=args.max_tokens,
-            start_sample_idx=args.num_fineweb + args.num_orca,
-            max_gen_tokens=args.max_gen_tokens,
-        )
-
-    # ── write metadata ────────────────────────────────────────────────────────
     write_metadata(
         output_dir=output_dir,
         model_tag=model_tag,
-        num_fineweb=fineweb_collected,
-        num_orca=orca_collected,
-        num_wikitext=wikitext_collected,
+        counts=collected,
         min_tokens=args.min_tokens,
         max_tokens=args.max_tokens,
         max_gen_tokens=args.max_gen_tokens,
         model_path=model_path,
     )
 
-    total = fineweb_collected + orca_collected + wikitext_collected
+    total = sum(collected.values())
     print("=" * 60)
     print("COLLECTION COMPLETE")
-    print(f"  FineWeb: {fineweb_collected} samples")
-    print(f"  Orca:    {orca_collected} samples")
-    print(f"  Total:   {total} .pt files in {output_dir}")
+    for name in DATASET_NAMES:
+        print(f"  {name:<16} {collected[name]} samples")
+    print(f"  Total:           {total} .pt files in {output_dir}")
     print("=" * 60)
     return 0
 

@@ -27,6 +27,8 @@ import threading
 import time
 from typing import Optional
 
+from prompt_datasets import HF_EVAL_CHOICES
+
 try:
     import matplotlib
     matplotlib.use("Agg")
@@ -36,10 +38,23 @@ except ImportError:
     HAS_MATPLOTLIB = False
 
 
-def _is_wikitext_header(text: str) -> bool:
-    """Return True for wikitext section/article title lines (e.g. ' = Title = \n')."""
-    stripped = text.strip()
-    return stripped.startswith("=") and stripped.endswith("=")
+def load_prompts(args):
+    dataset_name = args.dataset
+    num = args.num_prompts
+    max_chars = getattr(args, "prompt_max_chars", 4096)
+
+    if dataset_name in HF_EVAL_CHOICES:
+        from prompt_datasets import load_eval_prompts
+        prompts = load_eval_prompts(
+            dataset_name,
+            num,
+            max_chars=max_chars,
+            stream_skip=getattr(args, "dataset_offset", None),
+        )
+        if prompts:
+            return prompts
+
+    return ["In a shocking finding, scientist discovered a herd of unicorns living in a remote valley."] * num
 
 def run_subprocess(cmd, timeout=600):
     try:
@@ -188,73 +203,6 @@ def parse_output(output):
         result["tps_std"] = float(m_tps_std.group(1))
 
     return result
-
-def load_prompts(args):
-    dataset_name = args.dataset
-    num = args.num_prompts
-    max_chars = getattr(args, "prompt_max_chars", 4096)
-
-    if dataset_name == "wikitext":
-        from datasets import load_dataset
-        print(f"[sweep] Loading wikitext-103 dataset …")
-        ds = load_dataset("wikitext", "wikitext-103-raw-v1", split="test", streaming=True)
-
-        blob_parts = []
-        for item in ds:
-            text = item.get("text", "").strip()
-            if not text or _is_wikitext_header(text):
-                continue
-            blob_parts.append(text)
-
-        blob = "\n\n".join(blob_parts)
-        paragraphs = [p.strip() for p in blob.split("\n\n") if p.strip()]
-
-        prompts = []
-        current = ""
-        for para in paragraphs:
-            candidate = (current + "\n\n" + para) if current else para
-            if len(candidate) >= max_chars:
-                if current:
-                    prompts.append(current[:max_chars])
-                    if len(prompts) >= num:
-                        break
-                while len(para) >= max_chars:
-                    prompts.append(para[:max_chars])
-                    para = para[max_chars:]
-                    if len(prompts) >= num:
-                        break
-                current = para
-            else:
-                current = candidate
-        if current and len(prompts) < num:
-            prompts.append(current[:max_chars])
-
-        if prompts:
-            print(
-                f"[sweep] Loaded {len(prompts)} wikitext chunk(s), "
-                f"chunk_chars={max_chars} (~{max_chars // 4} tokens)",
-                flush=True,
-            )
-            return prompts
-
-    if dataset_name in ("fineweb", "orca"):
-        from datasets import load_dataset
-        print(f"[sweep] Loading {dataset_name} dataset …")
-        if dataset_name == "fineweb":
-            ds = load_dataset("HuggingFaceFW/fineweb-edu", split="train", streaming=True)
-        else:
-            ds = load_dataset("Open-Orca/OpenOrca", split="train", streaming=True)
-
-        prompts = []
-        for item in ds:
-            text = item.get("text", "") if dataset_name == "fineweb" else item.get("question", "")
-            if len(text.strip()) > 100:
-                prompts.append(text.strip()[:max_chars])
-                if len(prompts) >= num:
-                    break
-        return prompts
-
-    return ["In a shocking finding, scientist discovered a herd of unicorns living in a remote valley."] * num
 
 def resolve_prefill_top_n(policy: str, cache_size: int, args) -> Optional[int]:
     """Experts to pin for PREFILL: explicit --prefill-top-n, else fraction of cache size."""
@@ -505,7 +453,18 @@ def build_parser():
         "--prefill-cache-fraction", type=float, default=0.25,
         help="PREFILL only: N = round(fraction * cache_size), at least 1 (default 0.25)",
     )
-    p.add_argument("--dataset", choices=["default", "wikitext", "fineweb", "orca"], default="default")
+    p.add_argument(
+        "--dataset",
+        choices=["default", *HF_EVAL_CHOICES],
+        default="default",
+        help="Prompt source. Eval uses official test splits (or a hash holdout for FineWeb/Orca).",
+    )
+    p.add_argument(
+        "--dataset-offset",
+        type=int,
+        default=None,
+        help="Skip this many eval-partition prompts (never train examples).",
+    )
     p.add_argument("--num-prompts", type=int, default=5)
     p.add_argument("--mode", choices=["perplexity", "generation", "both"], default="generation")
     p.add_argument("--max-new-tokens", type=int, default=30)

@@ -27,9 +27,14 @@ QWEN3_480B_OUT="/mnt/storage/Michael/michaelg/heteroPredict/trainingData/qwen3_4
 
 
 # ── Collection parameters ─────────────────────────────────────────────────────
-NUM_FINEWEB=0
-NUM_ORCA=0
-NUM_WIKITEXT=1000
+# Mix of prompt types so the predictor sees encyclopedia, web, instruction,
+# math, code, and news routing — override any count with env vars.
+NUM_WIKITEXT="${NUM_WIKITEXT:-200}"
+NUM_FINEWEB="${NUM_FINEWEB:-200}"
+NUM_ORCA="${NUM_ORCA:-200}"
+NUM_GSM8K="${NUM_GSM8K:-200}"
+NUM_MBPP="${NUM_MBPP:-200}"
+NUM_CNN_DAILYMAIL="${NUM_CNN_DAILYMAIL:-200}"
 MIN_TOKENS=100
 MAX_TOKENS=1024
 DEVICE="cuda"
@@ -53,20 +58,29 @@ case "$TARGET" in
         ;;
 esac
 
+collect_one() {
+    local model_tag="$1"
+    local output_dir="$2"
+    python collect_training_data_unified.py \
+        --model              "$model_tag" \
+        --output-dir         "$output_dir" \
+        --num-wikitext       "$NUM_WIKITEXT" \
+        --num-fineweb        "$NUM_FINEWEB" \
+        --num-orca           "$NUM_ORCA" \
+        --num-gsm8k          "$NUM_GSM8K" \
+        --num-mbpp           "$NUM_MBPP" \
+        --num-cnn-dailymail  "$NUM_CNN_DAILYMAIL" \
+        --min-tokens         "$MIN_TOKENS" \
+        --max-tokens         "$MAX_TOKENS" \
+        --device             "$DEVICE"
+}
+
 # ── Mixtral 8x7B ─────────────────────────────────────────────────────────────
 if $COLLECT_MIXTRAL_8x7B; then
     echo "========================================================"
     echo "  Collecting Mixtral 8x7B training data"
     echo "========================================================"
-    python collect_training_data_unified.py \
-        --model           mixtral_8x7b \
-        --output-dir      "$MIXTRAL_8x7B_OUT" \
-        --num-fineweb     "$NUM_FINEWEB" \
-        --num-orca        "$NUM_ORCA" \
-        --num-wikitext    "$NUM_WIKITEXT" \
-        --min-tokens      "$MIN_TOKENS" \
-        --max-tokens      "$MAX_TOKENS" \
-        --device          "$DEVICE"
+    collect_one mixtral_8x7b "$MIXTRAL_8x7B_OUT"
     echo "Mixtral collection done → $MIXTRAL_8x7B_OUT"
 fi
 
@@ -76,15 +90,7 @@ if $COLLECT_MIXTRAL_8x22B; then
     echo "========================================================"
     echo "  Collecting Mixtral 8x22B training data"
     echo "========================================================"
-    python collect_training_data_unified.py \
-        --model           mixtral_8x22b \
-        --output-dir      "$MIXTRAL_8x22B_OUT" \
-        --num-fineweb     "$NUM_FINEWEB" \
-        --num-orca        "$NUM_ORCA" \
-        --num-wikitext    "$NUM_WIKITEXT" \
-        --min-tokens      "$MIN_TOKENS" \
-        --max-tokens      "$MAX_TOKENS" \
-        --device          "$DEVICE"
+    collect_one mixtral_8x22b "$MIXTRAL_8x22B_OUT"
     echo "Mixtral collection done → $MIXTRAL_8x22B_OUT"
 fi
 
@@ -93,15 +99,7 @@ if $COLLECT_QWEN3_30B; then
     echo "========================================================"
     echo "  Collecting Qwen3 30B-A3B training data"
     echo "========================================================"
-    python collect_training_data_unified.py \
-        --model           qwen3_30b \
-        --output-dir      "$QWEN3_30B_OUT" \
-        --num-fineweb     "$NUM_FINEWEB" \
-        --num-orca        "$NUM_ORCA" \
-        --num-wikitext    "$NUM_WIKITEXT" \
-        --min-tokens      "$MIN_TOKENS" \
-        --max-tokens      "$MAX_TOKENS" \
-        --device          "$DEVICE"
+    collect_one qwen3_30b "$QWEN3_30B_OUT"
     echo "Qwen3 collection done → $QWEN3_30B_OUT"
 fi
 
@@ -110,15 +108,7 @@ if $COLLECT_QWEN3_480B; then
     echo "========================================================"
     echo "  Collecting Qwen3 480B training data"
     echo "========================================================"
-    python collect_training_data_unified.py \
-        --model           qwen3_480b \
-        --output-dir      "$QWEN3_480B_OUT" \
-        --num-fineweb     "$NUM_FINEWEB" \
-        --num-orca        "$NUM_ORCA" \
-        --num-wikitext    "$NUM_WIKITEXT" \
-        --min-tokens      "$MIN_TOKENS" \
-        --max-tokens      "$MAX_TOKENS" \
-        --device          "$DEVICE"
+    collect_one qwen3_480b "$QWEN3_480B_OUT"
     echo "Qwen3 collection done → $QWEN3_480B_OUT"
 fi
 

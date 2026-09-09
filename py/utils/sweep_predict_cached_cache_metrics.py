@@ -63,6 +63,8 @@ QWEN_MODEL_SCRIPT = os.path.join(ROOT_DIR, "unified_llm_w4a16", "qwen3_30B-A3B_w
 MIXTRAL_MODEL_SCRIPT = os.path.join(ROOT_DIR, "unified_llm_w4a16", "mixtral_8x7B_w4a16_model.py")
 TS = time.strftime("%Y%m%d_%H%M%S")
 
+from prompt_datasets import HF_EVAL_CHOICES
+
 DEFAULT_QWEN_REUSE_CSV = os.path.join(ROOT_DIR, "expert_predictor", "expert_reuse_qwen3_30b.csv")
 DEFAULT_QWEN_EXPERT_WEIGHTS_DIR = os.path.join(
     ROOT_DIR, "unified_llm_w4a16", "model_weights", "Qwen3-30B-A3B-AWQ_packed"
@@ -882,68 +884,10 @@ def build_model_cmd(
     return cmd
 
 
-def _is_wikitext_header(text: str) -> bool:
-    """Return True for wikitext section/article title lines (e.g. ' = Title = \\n')."""
-    stripped = text.strip()
-    return stripped.startswith("=") and stripped.endswith("=")
-
-
 def load_prompts(args: argparse.Namespace) -> List[str]:
     dataset = args.dataset
     n = args.num_prompts
     max_chars: int = getattr(args, "prompt_max_chars", 500)
-
-    if dataset == "wikitext":
-        try:
-            from datasets import load_dataset
-
-            ds = load_dataset("wikitext", "wikitext-103-raw-v1", split="test", streaming=True)
-
-            # Concatenate the full corpus into one blob (drop headers and blank lines),
-            # split by "\n\n" to recover paragraph boundaries, then greedily pack
-            # paragraphs into fixed-size chunks of `max_chars` characters.
-            # At ~4 chars/token this gives ~1024-token context windows when
-            # --prompt-max-chars is left at its default of 4096.
-            blob_parts: List[str] = []
-            for item in ds:
-                text = item.get("text", "").strip()
-                if not text or _is_wikitext_header(text):
-                    continue
-                blob_parts.append(text)
-
-            blob = "\n\n".join(blob_parts)
-            paragraphs = [p.strip() for p in blob.split("\n\n") if p.strip()]
-
-            prompts: List[str] = []
-            current: str = ""
-            for para in paragraphs:
-                candidate = (current + "\n\n" + para) if current else para
-                if len(candidate) >= max_chars:
-                    if current:
-                        prompts.append(current[:max_chars])
-                        if len(prompts) >= n:
-                            break
-                    # paragraph itself may exceed max_chars — chunk it directly
-                    while len(para) >= max_chars:
-                        prompts.append(para[:max_chars])
-                        para = para[max_chars:]
-                        if len(prompts) >= n:
-                            break
-                    current = para
-                else:
-                    current = candidate
-            if current and len(prompts) < n:
-                prompts.append(current[:max_chars])
-
-            if prompts:
-                print(
-                    f"[sweep] Loaded {len(prompts)} wikitext chunk(s), "
-                    f"chunk_chars={max_chars} (~{max_chars // 4} tokens)",
-                    flush=True,
-                )
-                return prompts
-        except Exception as e:
-            print(f"[sweep] Could not load wikitext ({e}), using default.", flush=True)
 
     if dataset == "oracle":
         prompts = []
@@ -974,40 +918,6 @@ def load_prompts(args: argparse.Namespace) -> List[str]:
             print(f"[sweep] Loaded {len(prompts)} prompts from oracle traces.", flush=True)
             return prompts
 
-    if dataset == "fineweb":
-        try:
-            from datasets import load_dataset
-
-            ds = load_dataset("HuggingFaceFW/fineweb-edu", split="train", streaming=True)
-            prompts = []
-            for item in ds:
-                text = item.get("text", "")
-                if len(text) > 100:
-                    prompts.append(text[:max_chars])
-                if len(prompts) >= n:
-                    break
-            if prompts:
-                return prompts
-        except Exception as e:
-            print(f"[sweep] fineweb load failed: {e}", flush=True)
-
-    if dataset == "orca":
-        try:
-            from datasets import load_dataset
-
-            ds = load_dataset("Open-Orca/OpenOrca", split="train", streaming=True)
-            prompts = []
-            for item in ds:
-                text = f"{item.get('system_prompt', '')}\n{item.get('question', '')}".strip()
-                if len(text) > 100:
-                    prompts.append(text[:max_chars])
-                if len(prompts) >= n:
-                    break
-            if prompts:
-                return prompts
-        except Exception as e:
-            print(f"[sweep] orca load failed: {e}", flush=True)
-
     if dataset == "txt":
         path = args.prompts_txt or os.path.join(ROOT_DIR, "unified_llm_w4a16", "prompts.txt")
         with open(path, "r", encoding="utf-8") as f:
@@ -1017,6 +927,22 @@ def load_prompts(args: argparse.Namespace) -> List[str]:
             print(f"[sweep] Loaded all {len(prompts)} prompt(s) from {path}", flush=True)
             return prompts
         return prompts[:n]
+
+    if dataset in HF_EVAL_CHOICES:
+        try:
+            from prompt_datasets import load_eval_prompts
+
+            prompts = load_eval_prompts(
+                dataset,
+                n,
+                max_chars=max_chars,
+                stream_skip=getattr(args, "dataset_offset", None),
+            )
+            if prompts:
+                return prompts
+            print(f"[sweep] {dataset} returned no prompts, using default.", flush=True)
+        except Exception as e:
+            print(f"[sweep] {dataset} load failed: {e}, using default.", flush=True)
 
     default = (
         "In a shocking finding, scientist discovered a herd of unicorns living in a remote, "
@@ -4415,7 +4341,20 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="lambda_fn_sweep: cumulative probability-mass thresholds to compare against forced-top-J.",
     )
     p.add_argument("--config-path", type=str, default=None)
-    p.add_argument("--dataset", choices=["default", "txt", "wikitext", "fineweb", "orca", "oracle"], default="default")
+    p.add_argument(
+        "--dataset",
+        choices=["default", "txt", "oracle", *HF_EVAL_CHOICES],
+        default="default",
+        help="Prompt source. HF catalog uses disjoint eval partitions: official test "
+             "splits, or a hash holdout for FineWeb/Orca. 'all' takes n prompts from each. "
+             "oracle/txt/default are local.",
+    )
+    p.add_argument(
+        "--dataset-offset",
+        type=int,
+        default=None,
+        help="Override eval-partition skip (never reaches into the train partition).",
+    )
     p.add_argument("--prompts-txt", type=str, default=None)
     p.add_argument(
         "--num-prompts",
