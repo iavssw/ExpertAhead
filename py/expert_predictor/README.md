@@ -36,7 +36,9 @@ source ../../utils/setup.sh
 
 ## Step 1 — Collect Training Data
 
-Data collection lives in `py/utils/run_collect_training_data.sh`. It runs the model on raw text (e.g., WikiText, FineWeb, Orca) and saves the embeddings and target router logits as `.pt` files.
+Data collection lives in `py/utils/run_collect_training_data.sh`. It runs the model on mixed prompt types (WikiText, FineWeb, OpenOrca, GSM8K, MBPP, CNN/DailyMail) and saves embeddings and router logits as `.pt` files.
+
+Train and eval never share prompts: official `train`/`test` splits where they exist, and a hash holdout on FineWeb/Orca (no test split). Eval sweeps use `--dataset wikitext|fineweb|orca|gsm8k|mbpp|cnn_dailymail|all`.
 
 1. Navigate to the utility directory:
    ```bash

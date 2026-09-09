@@ -462,7 +462,16 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
     files = sorted(data_path.glob("*.pt"))
     if not files:
         sys.exit(f"ERROR: No .pt files found in: {data_path.resolve()}")
-    print(f"  Found {len(files)} .pt files in {data_path.resolve()}")
+    include = getattr(args, "include_datasets", None)
+    if include:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "utils"))
+        from prompt_datasets import filter_pt_files
+        files = filter_pt_files(files, include)
+        if not files:
+            sys.exit(f"ERROR: No .pt files matched --include_datasets {include}")
+        print(f"  Using {len(files)} .pt files matching {include}")
+    else:
+        print(f"  Found {len(files)} .pt files in {data_path.resolve()}")
 
     ds_kwargs = dict(
         layer_idx=layer_idx, num_experts=args.n_exp,
@@ -675,6 +684,11 @@ if __name__ == "__main__":
     base.add_argument('--tx_layers',  type=int, default=2)
     base.add_argument('--tx_heads',   type=int, default=4)
     base.add_argument('--prefetch_ks', nargs='+', type=int, default=None, help="Evaluate multiple recalls at once")
+    base.add_argument(
+        '--include_datasets', nargs='+', default=None,
+        help="Only train on {name}_*.pt files from these sources "
+             "(wikitext fineweb orca gsm8k mbpp cnn_dailymail). Default: all files.",
+    )
 
     p_train = subparsers.add_parser('train', parents=[base])
     p_train.add_argument('--layer',   type=int)
