@@ -5,7 +5,7 @@ from pathlib import Path
 # Add current directory to path if needed, though we are running it here
 sys.path.append(str(Path(__file__).parent))
 
-from expert_predictor_cross_layer import MultiStepExpertPredictor, TransformerMultiStepPredictor, JITWrapper
+from expert_predictor_cross_token import MultiStepExpertPredictor, TransformerMultiStepPredictor, JITWrapper
 
 def fix_checkpoints(base_dir):
     base_path = Path(base_dir)
@@ -17,7 +17,7 @@ def fix_checkpoints(base_dir):
     
     for ckpt_path in checkpoints:
         try:
-            checkpoint = torch.load(ckpt_path, map_location='cpu')
+            checkpoint = torch.load(ckpt_path, map_location='cpu', weights_only=False)
             config = checkpoint['config']
             
             arch = config.get('arch', 'mlp')

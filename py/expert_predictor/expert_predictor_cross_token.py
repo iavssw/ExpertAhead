@@ -599,7 +599,15 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
             avg_metric = tp_sums[main_eval_k] / max(tot_sum, 1)
             epoch_log[phase] = {'loss': avg_loss}
             for pk in prefetch_ks:
-                epoch_log[phase][f"union_recall@{pk}"] = tp_sums[pk] / max(tot_sum, 1)
+                rec = tp_sums[pk] / max(tot_sum, 1)
+                prec = tp_sums[pk] / max(total * pk, 1)
+                f1 = (2 * rec * prec) / max(rec + prec, 1e-12)
+                epoch_log[phase][f"union_recall@{pk}"] = rec
+                epoch_log[phase][f"union_precision@{pk}"] = prec
+                epoch_log[phase][f"union_f1@{pk}"] = f1
+                epoch_log[phase][f"topk_recall@{pk}"] = rec
+                epoch_log[phase][f"topk_precision@{pk}"] = prec
+                epoch_log[phase][f"topk_f1@{pk}"] = f1
 
             if phase == 'val':
                 train_loss = epoch_log['train']['loss']
@@ -610,8 +618,27 @@ def run_predictor_task(args, layer_idx, hidden_dim, history,
                     best_metric = avg_metric
                     best_val_recalls = epoch_log['val']
                     model.save(out_dir / "best.pt")
-                    # JIT exporting removed to simplify dynamic feature injection 
-                    # if needed in future, ensure ex_prev_layers matches [1, layer_idx * num_experts]
+                    try:
+                        wrapper = JITWrapper(model).eval()
+                        hs = int(model.config.get("hidden_size", history * args.emb_dim))
+                        ne = int(model.config["num_experts"])
+                        ex_emb = torch.randn(1, hs, device=args.device)
+                        ex_pf = torch.zeros(1, ne, device=args.device)
+                        ex_pr = torch.zeros(1, ne, device=args.device)
+                        if use_prev_layers and layer_idx > 0:
+                            ex_prev_layers = torch.zeros(1, layer_idx * ne, device=args.device)
+                            traced = torch.jit.trace(
+                                wrapper, (ex_emb, ex_pf, ex_pr, ex_prev_layers),
+                                check_trace=False, strict=False,
+                            )
+                        else:
+                            traced = torch.jit.trace(
+                                wrapper, (ex_emb, ex_pf, ex_pr),
+                                check_trace=False, strict=False,
+                            )
+                        traced.save(str(out_dir / "best_jit.pt"))
+                    except Exception as e:
+                        print(f"  JIT failed: {e}")
                     no_improve = 0
                 else:
                     no_improve += 1
@@ -694,6 +721,18 @@ if __name__ == "__main__":
     p_train.add_argument('--layer',   type=int)
     p_train.add_argument('--history', type=int, default=1)
     p_train.add_argument('--hidden',  type=int, default=128)
+    p_train.add_argument(
+        '--use_markov', action='store_true',
+        help="Enable the first-order Markov expert-transition branch (ExpertAhead).",
+    )
+    p_train.add_argument(
+        '--use_pfill', action=argparse.BooleanOptionalAction, default=True,
+        help="Enable the prefill expert-distribution branch (default: on). Use --no-use_pfill to disable.",
+    )
+    p_train.add_argument(
+        '--custom_name', default=None,
+        help="Override the output config directory name (used for paper ablation folders).",
+    )
 
     p_sweep = subparsers.add_parser('sweep', parents=[base])
     p_sweep.add_argument('--hiddens',   nargs='+', type=int, default=[64, 128, 256])
@@ -705,6 +744,10 @@ if __name__ == "__main__":
     p_abl.add_argument('--layers',    nargs='+', type=int, default=list(range(32)))
     p_abl.add_argument('--hiddens',   nargs='+', type=int, default=[128, 256])
     p_abl.add_argument('--histories', nargs='+', type=int, default=[1, 2])
+    p_abl.add_argument(
+        '--ablation_variants', nargs='+', default=None,
+        help="Subset of ablation feature names to train (default: the built-in list).",
+    )
 
     p_pareto = subparsers.add_parser('pareto', parents=[base])
     p_pareto.add_argument('--predict_ks',         nargs='+', type=int, required=True)
@@ -717,6 +760,8 @@ if __name__ == "__main__":
 
     ABLATION_VARIANTS = [
         ("emb_only",          True,  False, False, False, False),
+        ("emb_markov",        True,  False, False, True,  False),
+        ("emb_markov_pfill",  True,  True,  False, True,  False),
         ("pfill_only",        False, True,  False, False, False),
         ("prev_only",         False, False, True,  False, False),
         ("markov_only",       False, False, False, True,  False),
@@ -729,7 +774,14 @@ if __name__ == "__main__":
     if args.command == 'train':
         layers = [args.layer] if args.layer is not None else list(range(args.n_layers))
         for l in layers:
-            run_predictor_task(args, l, args.hidden, args.history)
+            run_predictor_task(
+                args, l, args.hidden, args.history,
+                use_emb=True,
+                use_pfill=bool(getattr(args, 'use_pfill', True)),
+                use_prev=False,
+                use_markov=bool(getattr(args, 'use_markov', False)),
+                custom_name=getattr(args, 'custom_name', None),
+            )
 
     elif args.command == 'sweep':
         layers = args.layers or list(range(args.n_layers))
@@ -743,10 +795,13 @@ if __name__ == "__main__":
 
     elif args.command == 'ablation':
         layers = args.layers or list(range(args.n_layers))
+        wanted = set(args.ablation_variants) if getattr(args, 'ablation_variants', None) else None
         for l in layers:
             for hist in args.histories:
                 for h in args.hiddens:
                     for name, e, pf, pr, mk, pl in ABLATION_VARIANTS:
+                        if wanted is not None and name not in wanted:
+                            continue
                         run_predictor_task(
                             args, l, h, hist,
                             use_emb=e, use_pfill=pf, use_prev=pr, use_markov=mk, use_prev_layers=pl,

@@ -27,6 +27,13 @@ def main():
     parser.add_argument("--src", type=str, default="../../trainingDataExtended/qwen3_30b")
     parser.add_argument("--dst", type=str, default="../../trainingDataExtended/qwen3_30b_sharded")
     parser.add_argument("--workers", type=int, default=32)
+    parser.add_argument(
+        "--include_datasets",
+        nargs="+",
+        default=None,
+        help="Only shard files named {dataset}_*.pt (e.g. fineweb orca gsm8k). "
+             "Default: all .pt files in --src.",
+    )
     args = parser.parse_args()
 
     src_root = Path(args.src).resolve()
@@ -34,8 +41,18 @@ def main():
     dst_root.mkdir(parents=True, exist_ok=True)
     
     files = list(src_root.glob("*.pt"))
+    if args.include_datasets:
+        prefixes = tuple(f"{d}_" for d in args.include_datasets)
+        files = [f for f in files if f.name.startswith(prefixes)]
+        print(
+            f"Filtered to {len(files)} files matching {list(args.include_datasets)} "
+            f"from {src_root}"
+        )
     print(f"Found {len(files)} files to shard from {src_root} to {dst_root}...")
-    
+    if not files:
+        print("No matching .pt files; nothing to do.")
+        return
+
     args_list = [(fp, dst_root) for fp in files]
     
     success = 0

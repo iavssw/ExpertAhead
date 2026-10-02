@@ -125,14 +125,30 @@ def _load_model_from_registry(model_tag: str, model_path: str, config_path=None,
         cache_size = 8
 
     print(f"Loading {model_tag} from {model_path} with cache_size={cache_size} …")
-    model = ModelClass(
-        model_path=model_path,
-        backend="cached",           # 'base' doesn't expose training data collection API;
-                                    # 'cached' does, and caching is a bonus during collection.
-        max_cached_experts_per_layer=cache_size,
-        device=device,
-        config_path=config_path,
-    )
+    # Qwen wrappers take a single run_config dict; Mixtral wrappers take kwargs.
+    import inspect
+    init_params = inspect.signature(ModelClass.__init__).parameters
+    if "run_config" in init_params:
+        run_config = {
+            "model_path": model_path,
+            "tokenizer_path": model_path,
+            "backend": "cached",  # 'base' doesn't expose training data collection API
+            "device": device,
+            "max_cached_experts": cache_size,
+            # Cached backend only accepts a single weights-dir argument.
+            "expert_weights_dir": "",
+        }
+        if config_path is not None:
+            run_config["config_path"] = config_path
+        model = ModelClass(run_config)
+    else:
+        model = ModelClass(
+            model_path=model_path,
+            backend="cached",
+            max_cached_experts_per_layer=cache_size,
+            device=device,
+            config_path=config_path,
+        )
     print(f"{model_tag} loaded.\n")
     return model
 
