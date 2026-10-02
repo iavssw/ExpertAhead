@@ -1,0 +1,471 @@
+{
+  "domain": "cnn_dailymail",
+  "metric": "rouge_l",
+  "n_examples": 5,
+  "n_generation_blocks": 55,
+  "per_prompt": [
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.25862068965517243,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.17322834645669294,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.15384615384615385,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.14173228346456693,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.15,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.23008849557522124,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.17054263565891473,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.1694915254237288,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.15503875968992248,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.1322314049586777,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.13333333333333333,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.17187500000000003,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.11666666666666668,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.15748031496062992,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.08771929824561403,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.2,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.1889763779527559,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.15384615384615385,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.1679389312977099,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.17054263565891475,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.10084033613445378,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.23728813559322035,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.15517241379310343,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.1774193548387097,
+      "detail": {}
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "rouge_l",
+      "score": 0.17600000000000002,
+      "detail": {}
+    }
+  ],
+  "by_label": [
+    {
+      "label": "Neither (RANDOM)",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.1558677867796555,
+      "n": 5
+    },
+    {
+      "label": "Prefetch Only B=12",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.1558677867796555,
+      "n": 25
+    },
+    {
+      "label": "Both \u03bb=1.0 B=12",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.16519676988201265,
+      "n": 25
+    }
+  ]
+}

@@ -22,11 +22,14 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import sys
+import time
 from dataclasses import dataclass
-from typing import Callable, Dict, Iterator, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple
 
 ExtractFn = Callable[[dict], Optional[str]]
+GoldFn = Callable[[dict], Optional[Any]]
 
 
 def _strip(value) -> str:
@@ -83,6 +86,38 @@ def _article_field(example: dict) -> Optional[str]:
     return text or None
 
 
+def _gsm8k_gold(example: dict) -> Optional[str]:
+    return _strip(example.get("answer")) or None
+
+
+def _mbpp_gold(example: dict) -> Optional[Any]:
+    """Reference code + tests for later pass@1; stored as JSON-serializable dict."""
+    code = _strip(example.get("code"))
+    tests = example.get("test_list") or example.get("test_cases")
+    if not code and not tests:
+        return None
+    return {"code": code or None, "test_list": list(tests) if tests else []}
+
+
+def _cnn_gold(example: dict) -> Optional[str]:
+    return _strip(example.get("highlights")) or None
+
+
+def _orca_gold(example: dict) -> Optional[str]:
+    return _strip(example.get("response")) or None
+
+
+# Correctness metric name per domain for expanded-prompt evals.
+DOMAIN_METRICS: Dict[str, str] = {
+    "wikitext": "gen_ppl",
+    "fineweb": "gen_ppl",
+    "orca": "gen_ppl",
+    "gsm8k": "exact_match",
+    "mbpp": "code_em",  # weak proxy; pass@1 deferred
+    "cnn_dailymail": "rouge_l",
+}
+
+
 def _is_wikitext_header(text: str) -> bool:
     stripped = text.strip()
     if not stripped:
@@ -109,6 +144,7 @@ class DatasetSpec:
     default_train_n: int = 0
     extract_train: ExtractFn = _text_field
     extract_eval: ExtractFn = _text_field
+    extract_gold: Optional[GoldFn] = None
 
     def __post_init__(self) -> None:
         if self.train_split == self.eval_split and not self.eval_holdout_fraction:
@@ -146,8 +182,10 @@ DATASETS: Dict[str, DatasetSpec] = {
     ),
     "fineweb": DatasetSpec(
         name="fineweb",
-        description="FineWeb-Edu web documents",
+        description="FineWeb-Edu web documents (10BT sample; full dump is huge)",
         hf_path="HuggingFaceFW/fineweb-edu",
+        # sample-10BT avoids pulling the multi-shard full FineWeb catalog over flaky links
+        hf_config="sample-10BT",
         train_split="train",
         eval_split="train",
         streaming=True,
@@ -167,6 +205,7 @@ DATASETS: Dict[str, DatasetSpec] = {
         min_chars=40,
         extract_train=_orca_train_text,
         extract_eval=_orca_eval_text,
+        extract_gold=_orca_gold,
     ),
     "gsm8k": DatasetSpec(
         name="gsm8k",
@@ -179,6 +218,7 @@ DATASETS: Dict[str, DatasetSpec] = {
         min_tokens_override=8,
         extract_train=_question_field,
         extract_eval=_question_field,
+        extract_gold=_gsm8k_gold,
     ),
     "mbpp": DatasetSpec(
         name="mbpp",
@@ -191,6 +231,7 @@ DATASETS: Dict[str, DatasetSpec] = {
         min_tokens_override=16,
         extract_train=_mbpp_text,
         extract_eval=_mbpp_text,
+        extract_gold=_mbpp_gold,
     ),
     "cnn_dailymail": DatasetSpec(
         name="cnn_dailymail",
@@ -203,6 +244,7 @@ DATASETS: Dict[str, DatasetSpec] = {
         min_chars=100,
         extract_train=_article_field,
         extract_eval=_article_field,
+        extract_gold=_cnn_gold,
     ),
 }
 
@@ -218,9 +260,17 @@ def get_spec(name: str) -> DatasetSpec:
     return DATASETS[name]
 
 
+def _silence_hf_progress() -> None:
+    """Avoid hub progress-bar FD races (Errno 9) under tmux/tee/redirects."""
+    os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+    os.environ.setdefault("HF_DATASETS_DISABLE_PROGRESS_BARS", "1")
+    os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
+
+
 def _load_hf(spec: DatasetSpec, split: str, streaming: Optional[bool] = None):
     from datasets import load_dataset
 
+    _silence_hf_progress()
     kwargs = {}
     if spec.trust_remote_code:
         kwargs["trust_remote_code"] = True
@@ -356,40 +406,147 @@ def load_eval_prompts(
     spec = get_spec(dataset_name)
     skip = stream_skip or 0
     extractor = spec.extract_eval
+    last_err: Optional[BaseException] = None
 
-    def raw_texts() -> Iterator[str]:
-        seen = 0
-        for example in _iter_examples(spec, spec.eval_split):
-            if spec.eval_holdout_fraction is not None and not is_eval_holdout(example, spec):
-                continue
-            text = extractor(example)
-            if not text or len(text) < spec.min_chars:
-                continue
-            if seen < skip:
-                seen += 1
-                continue
-            yield text
+    for attempt in range(1, 6):
+        try:
+            def raw_texts() -> Iterator[str]:
+                seen = 0
+                for example in _iter_examples(spec, spec.eval_split):
+                    if spec.eval_holdout_fraction is not None and not is_eval_holdout(example, spec):
+                        continue
+                    text = extractor(example)
+                    if not text or len(text) < spec.min_chars:
+                        continue
+                    if seen < skip:
+                        seen += 1
+                        continue
+                    yield text
 
-    if spec.eval_packing == "wikitext_chunks":
-        prompts = _pack_wikitext_chunks(raw_texts(), n, max_chars)
-    else:
-        prompts = []
-        for text in raw_texts():
-            prompts.append(text[:max_chars])
-            if len(prompts) >= n:
-                break
+            if spec.eval_packing == "wikitext_chunks":
+                prompts = _pack_wikitext_chunks(raw_texts(), n, max_chars)
+            else:
+                prompts = []
+                for text in raw_texts():
+                    prompts.append(text[:max_chars])
+                    if len(prompts) >= n:
+                        break
 
-    holdout = (
-        f"hash_holdout={spec.eval_holdout_fraction}"
-        if spec.eval_holdout_fraction is not None
-        else "official_split"
-    )
-    print(
-        f"[prompt_datasets] Loaded {len(prompts)} {dataset_name} prompt(s) "
-        f"(split={spec.eval_split}, {holdout}, skip={skip}, max_chars={max_chars})",
-        flush=True,
-    )
-    return prompts
+            holdout = (
+                f"hash_holdout={spec.eval_holdout_fraction}"
+                if spec.eval_holdout_fraction is not None
+                else "official_split"
+            )
+            print(
+                f"[prompt_datasets] Loaded {len(prompts)} {dataset_name} prompt(s) "
+                f"(split={spec.eval_split}, {holdout}, skip={skip}, max_chars={max_chars})",
+                flush=True,
+            )
+            return prompts
+        except (OSError, RuntimeError, ConnectionError) as e:
+            last_err = e
+            wait = min(30, 2 ** (attempt - 1))
+            print(
+                f"[prompt_datasets] {dataset_name} load failed "
+                f"(attempt {attempt}/5): {e!r}; retry in {wait}s",
+                flush=True,
+            )
+            time.sleep(wait)
+
+    raise RuntimeError(f"Failed to load eval prompts for {dataset_name}") from last_err
+
+
+def load_eval_examples(
+    dataset_name: str,
+    n: int,
+    max_chars: int = 4096,
+    stream_skip: Optional[int] = None,
+) -> List[Dict[str, Any]]:
+    """Load structured eval examples: domain, text, gold, metric.
+
+    Unlike ``load_eval_prompts``, this keeps gold references for correctness scoring.
+    ``dataset_name='all'`` concatenates ``n`` examples from each catalog source.
+    """
+    if dataset_name == "all":
+        examples: List[Dict[str, Any]] = []
+        for name in DATASET_NAMES:
+            try:
+                part = load_eval_examples(name, n, max_chars=max_chars, stream_skip=stream_skip)
+            except Exception as e:
+                print(f"[prompt_datasets] {name} examples failed: {e}", flush=True)
+                continue
+            print(f"[prompt_datasets] {name}: {len(part)} example(s)", flush=True)
+            examples.extend(part)
+        return examples
+
+    spec = get_spec(dataset_name)
+    metric = DOMAIN_METRICS.get(dataset_name, "none")
+    skip = stream_skip or 0
+    last_err: Optional[BaseException] = None
+
+    for attempt in range(1, 6):
+        try:
+            out: List[Dict[str, Any]] = []
+            seen = 0
+            texts_for_pack: List[str] = []
+
+            for example in _iter_examples(spec, spec.eval_split):
+                if spec.eval_holdout_fraction is not None and not is_eval_holdout(example, spec):
+                    continue
+                text = spec.extract_eval(example)
+                if not text or len(text) < spec.min_chars:
+                    continue
+                if seen < skip:
+                    seen += 1
+                    continue
+
+                if spec.eval_packing == "wikitext_chunks":
+                    texts_for_pack.append(text)
+                    continue
+
+                gold = spec.extract_gold(example) if spec.extract_gold else None
+                out.append(
+                    {
+                        "domain": dataset_name,
+                        "idx": len(out),
+                        "text": text[:max_chars],
+                        "gold": gold,
+                        "metric": metric,
+                    }
+                )
+                if len(out) >= n:
+                    break
+
+            if spec.eval_packing == "wikitext_chunks":
+                packed = _pack_wikitext_chunks(iter(texts_for_pack), n, max_chars)
+                out = [
+                    {
+                        "domain": dataset_name,
+                        "idx": i,
+                        "text": t,
+                        "gold": None,
+                        "metric": metric,
+                    }
+                    for i, t in enumerate(packed)
+                ]
+
+            print(
+                f"[prompt_datasets] Loaded {len(out)} {dataset_name} example(s) "
+                f"(metric={metric}, max_chars={max_chars})",
+                flush=True,
+            )
+            return out
+        except (OSError, RuntimeError, ConnectionError) as e:
+            last_err = e
+            wait = min(30, 2 ** (attempt - 1))
+            print(
+                f"[prompt_datasets] {dataset_name} examples failed "
+                f"(attempt {attempt}/5): {e!r}; retry in {wait}s",
+                flush=True,
+            )
+            time.sleep(wait)
+
+    raise RuntimeError(f"Failed to load eval examples for {dataset_name}") from last_err
 
 
 def filter_pt_files(files: Sequence, include_datasets: Optional[Sequence[str]] = None):

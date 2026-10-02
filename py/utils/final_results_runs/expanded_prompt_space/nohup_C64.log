@@ -1,0 +1,20 @@
+Using ROCm 7.1.1 (/opt/rocm-7.1.1)
+Expert SSD I/O: sequential pread (HETEROPREDICT_SEQUENTIAL_EXPERT_IO=0)
+Autocomplete not enabled for XRT tools
+XILINX_XRT        : /opt/xilinx/xrt
+PATH              : /opt/xilinx/xrt/bin:/opt/rocm-7.1.1/bin:/home/michael/heteroPredict/utils/rocmPytorch/bin:/home/michael/.local/bin:/home/michael/.local/bin:/home/michael/.cursor-server/bin/linux-x64/2ba48ff3f7514cc4643c52ca9f7b3173d9b66130/node_modules/@vscode/ripgrep/bin:/home/michael/.cursor-server/bin/linux-x64/2ba48ff3f7514cc4643c52ca9f7b3173d9b66130/bin/remote-cli:/home/michael/.local/bin:/home/michael/.local/bin:/home/michael/.cursor-server/bin/linux-x64/2ba48ff3f7514cc4643c52ca9f7b3173d9b66130/bin/remote-cli:/home/michael/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+LD_LIBRARY_PATH   : /opt/xilinx/xrt/lib:/opt/rocm-7.1.1/lib:/opt/rocm-7.1.1/lib64:/home/michael/heteroPredict/utils/rocmPytorch/lib/python3.12/site-packages/torch/lib:
+PYTHONPATH        : /opt/xilinx/xrt/python
+=== C=64 → py/utils/final_results_runs/expanded_prompt_space/C64_20260909_001604 ===
+[C=64 01_random] 2026-09-09T00:16:04-05:00
+[sweep] Skipping cache_size=64 / lookahead=16: requires cache >= 67
+
+[sweep] Total runs : 1
+[sweep] Question   : custom_1_16_no_ppl
+[sweep] CSV output : py/utils/final_results_runs/expanded_prompt_space/C64_20260909_001604/sweep.csv
+[sweep] Timeout    : 18600s per run
+--------------------------------------------------------------------------------
+[prompt_datasets] Loaded 5 wikitext prompt(s) (split=test, official_split, skip=0, max_chars=4096)
+[prompt_datasets] wikitext: 5 prompt(s)
+[prompt_datasets] Loaded 5 fineweb prompt(s) (split=train, hash_holdout=0.1, skip=0, max_chars=4096)
+[prompt_datasets] fineweb: 5 prompt(s)

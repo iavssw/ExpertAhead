@@ -1,0 +1,553 @@
+{
+  "domain": "cnn_dailymail",
+  "metric": "rouge_l",
+  "n_examples": 5,
+  "n_generation_blocks": 55,
+  "goal": "prefetch_only vs both vs gold/correct (random = quality reference)",
+  "per_prompt": [
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {},
+      "mode": "random"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {},
+      "mode": "random"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {},
+      "mode": "random"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {},
+      "mode": "random"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Neither (RANDOM)",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {},
+      "mode": "random"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.22033898305084745,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.0847457627118644,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.15652173913043477,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.13740458015267176,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "rouge_l",
+      "score": 0.18032786885245902,
+      "detail": {},
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.25862068965517243,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.17054263565891473,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.1694915254237288,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15151515151515152,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.14173228346456693,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.23140495867768596,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15384615384615385,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15254237288135594,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.234375,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.16666666666666666,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.18644067796610167,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.17187500000000003,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.19999999999999998,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15503875968992248,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.183206106870229,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15254237288135591,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.17187500000000003,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.1694915254237288,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15625,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.16541353383458646,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15254237288135591,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15503875968992248,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.15,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.18749999999999997,
+      "detail": {},
+      "mode": "both"
+    },
+    {
+      "domain": "cnn_dailymail",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "rouge_l",
+      "score": 0.16666666666666666,
+      "detail": {},
+      "mode": "both"
+    }
+  ],
+  "by_label": [
+    {
+      "label": "Neither (RANDOM)",
+      "mode": "random",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.1558677867796555,
+      "n": 5
+    },
+    {
+      "label": "Prefetch Only B=16",
+      "mode": "prefetch_only",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.1558677867796555,
+      "n": 25
+    },
+    {
+      "label": "Both \u03bb=1.0 B=16",
+      "mode": "both",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.17418472854773065,
+      "n": 25
+    }
+  ],
+  "by_mode": [
+    {
+      "mode": "random",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.1558677867796555,
+      "n_configs": 1
+    },
+    {
+      "mode": "prefetch_only",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.1558677867796555,
+      "n_configs": 1
+    },
+    {
+      "mode": "both",
+      "domain": "cnn_dailymail",
+      "metric": "rouge_l",
+      "correctness_mean": 0.17418472854773065,
+      "n_configs": 1
+    }
+  ]
+}

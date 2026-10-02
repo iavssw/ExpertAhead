@@ -1,0 +1,616 @@
+{
+  "domain": "orca",
+  "metric": "gen_ppl",
+  "n_examples": 5,
+  "n_generation_blocks": 55,
+  "goal": "prefetch_only vs both vs gold/correct (random = quality reference)",
+  "per_prompt": [
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Prefetch Only B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "orca",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=16",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    }
+  ],
+  "by_label": [],
+  "by_mode": []
+}

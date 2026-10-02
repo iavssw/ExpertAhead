@@ -1,0 +1,8 @@
+run_expanded_prompt_space.sh domain=mbpp C=32
+EXAMPLES=py/utils/final_results_runs/expanded_prompt_space/by_domain/mbpp.json
+MAX_NEW_TOKENS=100
+LOOKAHEADS=1 2 3 4 5
+BUDGET_FRACTIONS=0.5
+PPL_FLAG=
+PRED=trainingDataExtended/qwen3_30b_sharded/transformer_emb_markov_pfill_full_20260616_174845
+OUT_DIR=py/utils/final_results_runs/expanded_prompt_space/mbpp/C32_20260917_225231

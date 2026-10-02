@@ -1,0 +1,7 @@
+run_predictor_param_sweep.sh  started 2026-09-27T16:28:46-05:00
+PRED=trainingData/qwen3_30b/multi_dataset/transformer_emb_markov_pfill_mixed
+PROMPTS=wikitext NUM_PROMPTS=5 MAX_NEW_TOKENS=80
+C=16 S=1 2 3 4 6 B=4 6 8 12
+C=32 S=1 2 3 4 6 8 B=4 8 12 16 20
+C=48 S=1 2 3 4 5 6 8 B=10 16 20 24 32
+C=64 S=2 3 4 5 6 8 10 12 B=24 28 32 36 40 48

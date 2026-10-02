@@ -1,0 +1,261 @@
+\section{Experiments}
+
+\subsection{Predictor Input Feature Ablation Study} \label{sec:ablation_study}
+
+This ablation study aims to identify an effective predictor architecture by exploring three primary dimensions:
+\begin{enumerate}
+    \item \textbf{Input Features}: We consider prior expert usage traces (Markov transition matrix), current/previous token embeddings, and prefill expert activation distributions.
+    \item \textbf{Embedding Processor Architecture}:  A standard MLP versus a lightweight 2-layer, 4-head Transformer encoder.
+    \item \textbf{Context History ($H$)}: Number of previous embeddings
+\end{enumerate}
+
+Performance is measured via Recall@B (fraction of activated experts within the next $S$ tokens captured in the top-$B$ predictions) and Precision@B (fraction of prefetched experts ultimately activated). Higher Recall@B reduces blocking SSD loads, while higher Precision@B minimizes wasted memory bandwidth.
+
+
+Table~\ref{tab:arch_ablation_b16} shows that increasing the token embedding history and using a transformer instead of an equal-parameter-count MLP consistently increases performance. 
+
+
+\begin{table}[h]
+\centering
+\caption{Recall and Precision (\%) at $B=16$. Embeddings only.}
+\label{tab:arch_ablation_b16}
+\begin{tabular}{l|cc|cc|cc}
+\toprule
+& \multicolumn{2}{c|}{\textbf{MLP Emb (H=1)}} & \multicolumn{2}{c|}{\textbf{MLP Emb (H=4)}} & \multicolumn{2}{c}{\textbf{Transformer (H=4)}} \\
+\textbf{S} & \textbf{Recall} & \textbf{Prec} & \textbf{Recall} & \textbf{Prec} & \textbf{Recall} & \textbf{Prec} \\
+\midrule
+\textbf{1}  & 79.97 & 39.99 & 82.70 & 41.35 & 87.42 & 43.71 \\
+\textbf{4}  & 49.84 & 71.76 & 51.49 & 74.27 & 54.75 & 79.06 \\
+\textbf{8}  & 37.47 & 85.40 & 38.16 & 87.02 & 39.51 & 90.11 \\
+\textbf{16} & 29.02 & 94.77 & 29.21 & 95.31 & 29.49 & 96.21 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Transformer($H=4$) input feature ablation performance at budget $B=16$. Recall and Precision (\%)}
+\label{tab:transformer_h4_ablation_b16}
+\begin{tabular}{c|cc|cc|cc}
+\toprule
+\multirow{2}{*}{$S$} & \multicolumn{2}{c|}{\textbf{Base}} & \multicolumn{2}{c|}{\textbf{+Markov}} & \multicolumn{2}{c}{\textbf{+Markov \& Prefill}} \\
+& Recall & Prec & Recall & Prec & Recall & Prec \\
+\midrule
+1 & 87.42 & 43.71 & 87.63 & 43.81 & 87.76 & 43.88 \\
+4 & 54.75 & 79.06 & 54.88 & 79.26 & 55.02 & 79.45 \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+Since larger strides involve more unique expert activations, the achievable Recall@B is constrained by the prefetch budget. For example, at a stride of 16 tokens, the median number of unique experts used by each layer is 38.
+A budget of B=16 therefore has a theoretical maximum recall of 16/38 $\approx$ 42\%, although it may achieve a precision of up to 100\%.
+
+Across all tested strides and budgets, the transformer-based architecture with $H=4$ outperforms the MLP-based architecture with $H=1$ by up to 7 \% in both recall and precision. Furthermore, incorporating the Markov prior and prefill distribution branches into either architecture provides small but consistent performance improvements. We show the effect of these branches on the Transformer ($H=4$) in Table~\ref{tab:transformer_h4_ablation_b16}. The marginal memory overhead of these feature branches is negligible, amounting to approximately 44~KB of trainable parameters per branch. Therefore, ExpertAhead uses a transformer with $H=4$ for the embedding branch, together with the Markov prior and prefill distribution features, as shown in Figure~\ref{fig:expertAhead_pred_arch}.
+
+\subsection{Predictor Parameters} \label{sec:predictor_stride}
+We define window recall as the percentage of experts out of the set that are used to generate the subsequent $S$ tokens (i.e. \{$t+1$, $t+S$\} where $t$ is the current token), that are predicted. Window precision is the percentage of predicted experts that are used over that window. For $C=48$, several combinations of strides and prefetch budgets are evaluated to find the resulting window precision $\pi$, window recall $\rho$, and throughput (TPS). An LFRU cache management policy is used. The baseline evicts a random inactive expert when we need to load an expert from SSD. We use 5 prompts based on the WikiText-103 test set and generate 80 tokens.
+
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/tps_vs_recall_precision_C48.png}
+    \vspace{-15pt}
+    \caption{Recall-Precision vs Relative Throughput. $C=48$}
+    \label{fig:expertAhead_c48}
+    \vspace{-5pt}
+\end{figure}
+
+Figure~\ref{fig:expertAhead_c48} illustrates the tradeoffs between the independent variables $C$, $S$, $B$ and how they interact with dependent variables $\pi$, $\rho$, and the decode throughput (TPS).
+
+Overall, throughput peaks at ($69\%$ recall, $63\%$ precision) for a stride of $S=5$ with budget $B=24$ ($1.39\times$ baseline). Interestingly, there is clear window recall-precision clustering across strides and budgets. This illustrates how $B$ and $C$, and the resulting $\pi$ and $\rho$ impact throughput with respect to the precision and recall constraints detailed in Section~\ref{list:constraints}.
+
+
+\subsection{Perplexity Impact of Cache-Conditional Routing}
+\label{sec:perplexity_degradation}
+Cache-conditional routing improves throughput by substituting lower-priority SSD-resident experts with cache-resident experts, reducing total SSD loads, but modifies the router output and may therefore reduce model quality. We evaluate this tradeoff by varying the number of preserved top-$J$ experts and recording the change in perplexity score relative to using all router-selected experts.
+
+\begin{table}[h]
+    \centering
+    \caption{Relative ($J=8$) Perplexity Change from changing $J$}
+    \label{tab:perplexity_change}
+    \begin{tabular}{lccccc}
+    \toprule
+    \textbf{Cache Size} & \textbf{$J=3$} & \textbf{$J=4$} & \textbf{$J=5$} & \textbf{$J=6$} & \textbf{$J=7$} \\
+    \midrule
+    $C = 16$ & +20.82\% & +8.46\% & +3.41\% & +1.36\% & -0.03\%  \\
+    $C = 32$ & +13.00\% & +6.07\% & +2.26\% & +0.78\% & +0.03\%  \\
+    $C = 48$ & +9.68\% & +4.07\% & +1.61\% & +0.50\% & +0.20\%  \\
+    $C = 64$ & +6.51\% & +3.07\% & +1.18\% & +0.32\% & -0.04\%  \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+As the cache size increases, there is a greater probability that an expert with a comparable router score is already in the cache, so the average increase in perplexity becomes smaller as the cache size increases for a given $J$.
+
+\subsection{Cache Eviction Policy}
+When managing the expert cache, an eviction policy must be chosen. \citet{skliar2025mixturecacheconditionalexpertsefficient} and \citet{eliseev2023fastinferencemixtureofexpertslanguage} both evict the least-recently used experts, while FlashMoE~\cite{kim2026flashmoereducingssdio} uses an ML-based policy. Although the eviction policy is reactive, it remains an important dimension of SSD-backed MoE inference. At $C$=64, decode throughput with an LFRU policy outperforms a policy evicting the most-recently-used expert by 1.75$\times$ and an LRU policy by 1.03$\times$. For our random eviction baseline, we use a policy where a random inactive expert is selected for eviction.
+
+
+\subsection{End-to-End System Evaluation}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=2\columnwidth]{figures/expert_ahead_evaluation_random_cropped.png}
+    \vspace{-10pt}
+    \caption{End-to-End Comparison of Acceleration Techniques. Normalized to equal-memory cache with random eviction. ExpertAhead predictor outperforms Cross-Layer~\cite{eliseev2023fastinferencemixtureofexpertslanguage} at all measured cache sizes. ExpertAhead-CC adds prediction to Cache-Conditional~\cite{skliar2025mixturecacheconditionalexpertsefficient} which improves decode throughput with no additional perplexity change over \cite{skliar2025mixturecacheconditionalexpertsefficient} }
+    \label{fig:expertAhead_results}
+    \vspace{-5pt}
+\end{figure*}
+
+\begin{table*}[t]
+\centering
+
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccccccccccccc}
+\toprule
+
+&
+\multicolumn{4}{c}{$\mathbf{C=16}$} &
+\multicolumn{4}{c}{$\mathbf{C=32}$} &
+\multicolumn{4}{c}{$\mathbf{C=48}$} &
+\multicolumn{4}{c}{$\mathbf{C=64}$} \\
+
+\cmidrule(lr){2-5}
+\cmidrule(lr){6-9}
+\cmidrule(lr){10-13}
+\cmidrule(lr){14-17}
+
+\textbf{Method}
+&
+\textbf{$S/B/J$} &
+\textbf{TPS} &
+\textbf{SSD} &
+\textbf{Rand}
+&
+\textbf{$S/B/J$} &
+\textbf{TPS} &
+\textbf{SSD} &
+\textbf{Rand}
+&
+\textbf{$S/B/J$} &
+\textbf{TPS} &
+\textbf{SSD} &
+\textbf{Rand}
+&
+\textbf{$S/B/J$} &
+\textbf{TPS} &
+\textbf{SSD} &
+\textbf{Rand}
+\\
+
+\midrule
+
+SSD Streaming
+&
+-- & 1.30 & 1.00$\times$ & 0.53$\times$
+&
+-- & 1.30 & 1.00$\times$ & 0.38$\times$
+&
+-- & 1.30 & 1.00$\times$ & 0.29$\times$
+&
+-- & 1.30 & 1.00$\times$ & 0.23$\times$
+\\
+
+Random Eviction
+&
+--/--/-- & 2.44 & 1.88$\times$ & 1.00$\times$
+&
+--/--/-- & 3.44 & 2.65$\times$ & 1.00$\times$
+&
+--/--/-- & 4.49 & 3.45$\times$ & 1.00$\times$
+&
+--/--/-- & 5.69 & 4.38$\times$ & 1.00$\times$
+\\
+
+Oracle Predictor
+&
+2/--/-- & 4.36 & 3.36$\times$ & 1.79$\times$
+&
+1/--/-- & 7.91 & 6.09$\times$ & 2.30$\times$
+&
+1/--/-- & 14.21 & 10.93$\times$ & 3.17$\times$
+&
+1/--/-- & 17.69 & 13.61$\times$ & 3.11$\times$
+\\
+
+\midrule
+
+Cross-Layer ~\cite{eliseev2023fastinferencemixtureofexpertslanguage}
+&
+--/8/-- & 2.24 & 1.72$\times$ & 0.92$\times$
+&
+--/6/-- & 3.47 & 2.67$\times$ & 1.01$\times$
+&
+--/2/-- & 5.18 & 3.99$\times$ & 1.16$\times$
+&
+--/2/-- & 7.35 & 5.66$\times$ & 1.29$\times$
+\\
+
+Cache-Conditional~\cite{skliar2025mixturecacheconditionalexpertsefficient}
+&
+--/--/5 & 3.47 & 2.67$\times$ & 1.42$\times$
+&
+--/--/5 & 5.44 & 4.18$\times$ & 1.58$\times$
+&
+--/--/5 & 8.17 & 6.29$\times$ & 1.82$\times$
+&
+--/--/5 & 10.97 & 8.44$\times$ & 1.93$\times$
+\\
+
+\midrule
+
+\textbf{ExpertAhead}
+&
+2/4/-- & 2.62 & \textbf{2.02$\times$} & \textbf{1.08$\times$}
+&
+2/8/-- & 3.98 & \textbf{3.06$\times$} & \textbf{1.16$\times$}
+&
+5/24/-- & 6.19 & \textbf{4.77$\times$} & \textbf{1.38$\times$}
+&
+6/36/-- & 9.40 & \textbf{7.24$\times$} & \textbf{1.65$\times$}
+\\
+
+\textbf{ExpertAhead-CC}
+&
+1/4/5 & 3.52 & \textbf{2.71$\times$} & \textbf{1.45$\times$}
+&
+1/8/5 & 5.95 & \textbf{4.58$\times$} & \textbf{1.73$\times$}
+&
+4/20/5 & 8.60 & \textbf{6.62$\times$} & \textbf{1.92$\times$}
+&
+6/36/5 & 11.66 & \textbf{8.97$\times$} & \textbf{2.05$\times$}
+\\
+
+\bottomrule
+\end{tabular}
+}
+\caption{End-to-end throughput across different expert cache sizes ($C$). Speedups are reported relative to both the SSD Streaming baseline and the Random Eviction baseline. Cross-Layer  reproduces~\cite{eliseev2023fastinferencemixtureofexpertslanguage} and Cache-Conditional  reproduces~\cite{skliar2025mixturecacheconditionalexpertsefficient}. Oracle Predictor represents the theoretical upper bound with best-case perfect prediction. "-" is N/A. (10 prompts, 150 generated tokens each)}
+\label{tab:end_to_end_results}
+\end{table*}
+
+\subsubsection{Oracle Predictor}
+We use precomputed expert usage traces to implement an oracle predictor which achieves 100\% recall and precision. Compared to an SSD streaming baseline, where all experts are loaded from SSD for computation and immediately discarded, the oracle achieves \textbf{13.61$\times$} decode speedup while only storing half of the model's total experts in memory ($C=64$). SSD streaming only requires enough memory to store the active experts for a single layer at a time, so this is not an equal-memory comparison. $C=64$ requires 384$\times$ as much memory as SSD streaming. Compared to an equal-memory baseline with the random eviction policy, the oracle predictor achieves up to \textbf{3.11$\times$} decode speedup. 
+
+
+\subsubsection{ExpertAhead and ExpertAhead-CC}
+We directly compare ExpertAhead and ExpertAhead-CC against  prior works: cross-layer predictive prefetching \cite{eliseev2023fastinferencemixtureofexpertslanguage} and pure cache-conditional routing \cite{skliar2025mixturecacheconditionalexpertsefficient} as well as an equal-memory random eviction baseline and SSD streaming in Table~\ref{tab:end_to_end_results}. \cite{eliseev2023fastinferencemixtureofexpertslanguage,skliar2025mixturecacheconditionalexpertsefficient} both use an LRU policy. For cache-conditional, we set $\lambda=1$ and $J=5$. We use the same settings for ExpertAhead-CC. We use 10 WikiText-103-based prompts and generate 150 tokens per prompt, reporting average normalized speedups over a random eviction policy. The results across four expert cache sizes are shown in Table~\ref{tab:end_to_end_results} and Figure~\ref{fig:expertAhead_results}. As cache size increases, raw TPS for all methods increases. Across all cache sizes ExpertAhead consistently outperforms cross-layer prediction \cite{eliseev2023fastinferencemixtureofexpertslanguage} and ExpertAhead-CC outperforms cache-conditional \cite{skliar2025mixturecacheconditionalexpertsefficient}. Compared to SSD streaming, ExpertAhead achieves up to a $7.24\times$ lossless speedup, while ExpertAhead-CC achieves $8.97\times$ speedup with a 1.2\% perplexity increase at $C=64$. At $C=64$ compared to the random eviction baseline, \textbf{ExpertAhead achieves up to a $1.65\times$ lossless speedup, while ExpertAhead-CC achieves $2.05\times$ speedup with a 1.2\% perplexity increase}.
+
+ % For cross-layer prediction, $B$ refers to the optimal measured number of staging slots for the cache size $C$.
+
+While recent reactive cache optimizations like FlashMoE \cite{kim2026flashmoereducingssdio} report a 7\% speedup over LRU for the base Qwen3-30B-A3B model for SSD-backed inference, our results for the quantized Qwen3-30B-A3B-AWQ yield significantly higher gains, validating our prediction-focused approach to SSD-backed decode acceleration. 
+
+% This design point is also favorable relative to speculative decoding under an equal-memory comparison. Assume an expert cache of 8 experts per layer and additional memory which can be used introduce a draft model whose experts are one-quarter the size of the target model's experts (while sharing all other parameters \cite{wang2025moespeqspeculativequantizeddecoding}) or to expand the expert cache by 32 experts per layer, because 128 experts at $\frac{1}{4}$ the size is 32 at original size..
+This design point is also favorable relative to speculative decoding under an equal-memory comparison. Assume an expert cache of 8 experts per layer and additional memory that can either be used to introduce a draft model whose experts are one-quarter the size of the target model's experts (while sharing all other parameters \cite{wang2025moespeqspeculativequantizeddecoding}) or to expand the expert cache by 32 experts per layer. The memory footprint of the draft model's experts is equivalent to 32 full-size experts per layer, since the target model contains 128 experts per layer. Even if the draft model achieves perfect prediction, the former reaches 2.6 TPS, expanding the cache from 8 to 40 experts per layer achieves 4.4 TPS, 69\% faster than the draft model-based solution.
+
+% This design point is also favorable relative to speculative decoding under an equal-memory comparison. Assume an expert cache of 8 experts per layer and additional memory that can either be used to introduce a draft model whose experts are one-quarter the size of the target model's experts (while sharing all other parameters \cite{wang2025moespeqspeculativequantizeddecoding}) or to expand the expert cache by 32 experts per layer. The memory footprint of the draft model's experts is equivalent to 32 full-size experts per layer, since the target model contains 128 experts per layer. Even if the draft model achieves perfect prediction, allocating the additional memory to the draft model reaches only 2.6 TPS. In contrast, allocating the same memory to expand the expert cache from 8 to 40 experts per layer achieves 4.4 TPS, 69\% faster than the draft model-based solution.
+
+% This design point is also favorable relative to speculative decoding under an equal-memory comparison. Introducing a draft model whose experts are one-quarter the size of the target model's experts (while sharing all other parameters \cite{wang2025moespeqspeculativequantizeddecoding}) consumes approximately the same memory as 32 experts per layer. Even if this draft model achieved perfect prediction, allocating that memory to the draft model yields only 2.6 TPS, whereas allocating the same memory to expand the expert cache from 8 to 40 experts per layer achieves 4.4 TPS or 69\% faster. 
+
+% This underscores that ExpertAhead's small size is essential as memory can be better used to increase expert-cache capacity than to store a draft model.

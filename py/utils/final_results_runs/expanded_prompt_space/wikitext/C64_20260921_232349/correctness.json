@@ -1,0 +1,531 @@
+{
+  "domain": "wikitext",
+  "metric": "gen_ppl",
+  "n_examples": 5,
+  "n_generation_blocks": 45,
+  "goal": "degradation vs normal operation (RANDOM @ C=64)",
+  "normal_cache": 64,
+  "normal_transcripts": "py/utils/final_results_runs/expanded_prompt_space/wikitext/normal_C64_20260921_232349/transcripts.jsonl",
+  "normal_correctness": null,
+  "per_prompt": [
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Neither (RANDOM)",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Prefetch Only B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "wikitext",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "gen_ppl",
+      "score": null,
+      "detail": {
+        "note": "see sweep CSV prompt_gen_perplexity"
+      },
+      "mode": "both"
+    }
+  ],
+  "by_label": [
+    {
+      "label": "Normal (RANDOM C=64)",
+      "mode": "normal",
+      "domain": "wikitext",
+      "metric": "gen_ppl",
+      "n": 5,
+      "match_to_normal": 1.0,
+      "degradation_vs_normal": 0.0,
+      "delta_vs_normal": 0.0,
+      "correctness_mean": null
+    }
+  ],
+  "by_mode": [
+    {
+      "mode": "normal",
+      "domain": "wikitext",
+      "metric": "gen_ppl",
+      "n_configs": 1,
+      "match_to_normal": 1.0,
+      "delta_vs_normal": 0.0,
+      "degradation_vs_normal": 0.0
+    }
+  ]
+}

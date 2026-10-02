@@ -1,0 +1,647 @@
+{
+  "domain": "gsm8k",
+  "metric": "exact_match",
+  "n_examples": 5,
+  "n_generation_blocks": 45,
+  "goal": "degradation vs normal operation (RANDOM @ C=64)",
+  "normal_cache": 64,
+  "normal_transcripts": "py/utils/final_results_runs/expanded_prompt_space/gsm8k/normal_C64_20260921_232349/transcripts.jsonl",
+  "normal_correctness": 0.0,
+  "per_prompt": [
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "5",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 1.0,
+      "detail": {
+        "pred_answer": "20",
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "4",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "50",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "9",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 1.0,
+      "detail": {
+        "pred_answer": "20",
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "1",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "1",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "80000",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "1",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "1",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "50",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 1.0,
+      "detail": {
+        "pred_answer": "540",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=32",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    }
+  ],
+  "by_label": [
+    {
+      "label": "Normal (RANDOM C=64)",
+      "mode": "normal",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "n": 5,
+      "match_to_normal": 1.0,
+      "degradation_vs_normal": 0.0,
+      "delta_vs_normal": 0.0,
+      "correctness_mean": 0.0,
+      "normal_correctness": 0.0
+    },
+    {
+      "label": "Neither (RANDOM)",
+      "mode": "random",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.0,
+      "n": 5,
+      "match_to_normal": 1.0,
+      "n_vs_normal": 5,
+      "delta_vs_normal": 0.0,
+      "degradation_vs_normal": 0.0,
+      "normal_correctness": 0.0
+    },
+    {
+      "label": "Prefetch Only B=32",
+      "mode": "prefetch_only",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.0,
+      "n": 20,
+      "match_to_normal": 1.0,
+      "n_vs_normal": 5,
+      "delta_vs_normal": 0.0,
+      "degradation_vs_normal": 0.0,
+      "normal_correctness": 0.0
+    },
+    {
+      "label": "Both \u03bb=1.0 B=32",
+      "mode": "both",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.15,
+      "n": 20,
+      "match_to_normal": 0.0,
+      "n_vs_normal": 5,
+      "delta_vs_normal": 0.15,
+      "degradation_vs_normal": 0.0,
+      "normal_correctness": 0.0
+    }
+  ],
+  "by_mode": [
+    {
+      "mode": "normal",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "n_configs": 1,
+      "correctness_mean": 0.0,
+      "match_to_normal": 1.0,
+      "delta_vs_normal": 0.0,
+      "degradation_vs_normal": 0.0
+    },
+    {
+      "mode": "random",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "n_configs": 1,
+      "correctness_mean": 0.0,
+      "match_to_normal": 1.0,
+      "delta_vs_normal": 0.0,
+      "degradation_vs_normal": 0.0
+    },
+    {
+      "mode": "prefetch_only",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "n_configs": 1,
+      "correctness_mean": 0.0,
+      "match_to_normal": 1.0,
+      "delta_vs_normal": 0.0,
+      "degradation_vs_normal": 0.0
+    },
+    {
+      "mode": "both",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "n_configs": 1,
+      "correctness_mean": 0.15,
+      "match_to_normal": 0.0,
+      "delta_vs_normal": 0.15,
+      "degradation_vs_normal": 0.0
+    }
+  ]
+}

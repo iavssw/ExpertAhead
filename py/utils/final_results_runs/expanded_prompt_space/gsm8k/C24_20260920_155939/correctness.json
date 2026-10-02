@@ -1,0 +1,718 @@
+{
+  "domain": "gsm8k",
+  "metric": "exact_match",
+  "n_examples": 5,
+  "n_generation_blocks": 55,
+  "goal": "prefetch_only vs both vs gold/correct (random = quality reference)",
+  "per_prompt": [
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Neither (RANDOM)",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "random"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "16",
+        "gold_answer": "18"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "150",
+        "gold_answer": "70000"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "25",
+        "gold_answer": "20"
+      },
+      "mode": "prefetch_only"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "1",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 1.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "80000",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 1.0,
+      "detail": {
+        "pred_answer": "540",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "50",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "5",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "100",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "80",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 1.0,
+      "detail": {
+        "pred_answer": "20",
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "5",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "2",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "50",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "180",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": null,
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "4",
+        "gold_answer": "18"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "1",
+        "gold_answer": "3"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "80",
+        "gold_answer": "70000"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": "3",
+        "gold_answer": "540"
+      },
+      "mode": "both"
+    },
+    {
+      "domain": "gsm8k",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "exact_match",
+      "score": 0.0,
+      "detail": {
+        "pred_answer": null,
+        "gold_answer": "20"
+      },
+      "mode": "both"
+    }
+  ],
+  "by_label": [
+    {
+      "label": "Neither (RANDOM)",
+      "mode": "random",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.0,
+      "n": 5
+    },
+    {
+      "label": "Prefetch Only B=12",
+      "mode": "prefetch_only",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.0,
+      "n": 25
+    },
+    {
+      "label": "Both \u03bb=1.0 B=12",
+      "mode": "both",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.12,
+      "n": 25
+    }
+  ],
+  "by_mode": [
+    {
+      "mode": "random",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.0,
+      "n_configs": 1
+    },
+    {
+      "mode": "prefetch_only",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.0,
+      "n_configs": 1
+    },
+    {
+      "mode": "both",
+      "domain": "gsm8k",
+      "metric": "exact_match",
+      "correctness_mean": 0.12,
+      "n_configs": 1
+    }
+  ]
+}

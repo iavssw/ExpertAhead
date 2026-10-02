@@ -1,0 +1,10 @@
+run_expanded_prompt_space.sh C=64
+DATASET=all NUM_PROMPTS=5 (per source)
+MAX_NEW_TOKENS=100
+PRED=trainingDataExtended/qwen3_30b_sharded/transformer_emb_markov_pfill_full_20260616_174845
+OUT_DIR=py/utils/final_results_runs/expanded_prompt_space/C64_20260909_001644
+RANDOM baseline
+Cross-Layer B=2
+Cache-Cond J=5
+ExpertAhead S=6 B=36
+ExpertAhead-CC S=6 B=36 J=5

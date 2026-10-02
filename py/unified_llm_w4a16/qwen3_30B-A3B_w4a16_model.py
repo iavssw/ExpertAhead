@@ -808,6 +808,62 @@ class Qwen3_30BA3BW4A16Model:
 
         return {"sum_nll": sum_nll, "num_gen_tokens": counted}
 
+    def reference_perplexity(
+        self,
+        prompt_ids: torch.Tensor,
+        ref_ids: torch.Tensor,
+    ) -> dict:
+        """Teacher-forced NLL of ``ref_ids`` conditioned on ``prompt_ids``.
+
+        Uses the chunked batched forward of ``run_wikitext103_perplexity`` so the
+        score is comparable to the WikiText perplexity numbers, under whatever
+        routing policy (λ / forced top-J) is currently configured.
+        """
+        if prompt_ids.dim() != 2 or ref_ids.dim() != 2:
+            raise ValueError("Expected prompt_ids and ref_ids with shape [batch, seq_len]")
+        prompt_len = int(prompt_ids.size(1))
+        ref_len = int(ref_ids.size(1))
+        if ref_len == 0 or prompt_len == 0:
+            return {"sum_nll": 0.0, "num_ref_tokens": 0}
+
+        full_ids = torch.cat(
+            [prompt_ids.to(self.device), ref_ids.to(self.device)], dim=1
+        )
+        seq_len = int(full_ids.size(1))
+
+        chunk_size = None
+        if hasattr(self.model, "get_prefill_chunk_size"):
+            try:
+                chunk_size = int(self.model.get_prefill_chunk_size())
+            except Exception:
+                chunk_size = None
+        if chunk_size is None or chunk_size <= 0:
+            chunk_size = min(int(getattr(self, "max_seq_len", 4096)), 4096)
+
+        sum_nll = 0.0
+        counted = 0
+        with torch.no_grad():
+            for chunk_begin in range(0, seq_len, chunk_size):
+                chunk_end = min(chunk_begin + chunk_size, seq_len)
+                logits = self.model.forward(full_ids[:, chunk_begin:chunk_end], start_pos=chunk_begin)
+                # logits[:, j] predicts token chunk_begin + j + 1; score reference positions only.
+                first_target = max(chunk_begin + 1, prompt_len)
+                last_target = min(chunk_end + 1, seq_len)
+                if first_target >= last_target:
+                    continue
+                lo = first_target - 1 - chunk_begin
+                hi = last_target - 1 - chunk_begin
+                labels = full_ids[0, first_target:last_target].to(logits.device)
+                nll = F.cross_entropy(
+                    logits[0, lo:hi, :].float(),
+                    labels,
+                    reduction="sum",
+                )
+                sum_nll += float(nll.item())
+                counted += int(labels.numel())
+
+        return {"sum_nll": sum_nll, "num_ref_tokens": counted}
+
     def __call__(self, input_ids: torch.Tensor, start_pos: int = 0) -> torch.Tensor:
         """Forward pass."""
         if isinstance(input_ids, str):
@@ -1457,6 +1513,8 @@ def main():
         total_generated_tokens = 0
         prompt_tps_list = []
         prompt_ppl_list = []
+        # (prompt_ids, ref_text) scored after generation stats are printed.
+        ref_jobs = []
         
         model.reset_cache_stats()
 
@@ -1468,6 +1526,8 @@ def main():
                         input_ids = torch.tensor([prompt["token_ids"]], dtype=torch.long, device=args.device)
                     else:
                         input_ids = model.tokenize(prompt.get("text", ""))
+                    if prompt.get("ref_text"):
+                        ref_jobs.append((input_ids, prompt["ref_text"]))
                 else:
                     input_ids = model.tokenize(prompt)
 
@@ -1575,6 +1635,22 @@ def main():
 
         if hasattr(model, "print_cache_stats"):
             model.print_cache_stats()
+
+        if ref_jobs and model.tokenizer is not None:
+            ref_nll_sum = 0.0
+            ref_tokens = 0
+            for prompt_ids, ref_text in ref_jobs:
+                try:
+                    ref_ids = model.tokenize(ref_text)
+                    rp = model.reference_perplexity(prompt_ids, ref_ids)
+                    ref_nll_sum += rp["sum_nll"]
+                    ref_tokens += rp["num_ref_tokens"]
+                except Exception as e:
+                    print(f"  Reference perplexity error: {e}")
+            if ref_tokens > 0:
+                print(f"Reference NLL Sum: {ref_nll_sum:.6f}")
+                print(f"Reference Tokens: {ref_tokens}")
+                print(f"Reference Perplexity: {math.exp(ref_nll_sum / ref_tokens):.6f}")
         return 0
 
     if args.oracle_trace and os.path.exists(args.oracle_trace):

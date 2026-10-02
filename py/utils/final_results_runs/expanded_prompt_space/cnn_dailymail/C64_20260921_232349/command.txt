@@ -1,0 +1,10 @@
+run_expanded_prompt_space.sh domain=cnn_dailymail C=64
+NORMAL_DIR=py/utils/final_results_runs/expanded_prompt_space/cnn_dailymail/normal_C64_20260921_232349
+NORMAL_CACHE=64
+EXAMPLES=py/utils/final_results_runs/expanded_prompt_space/by_domain/cnn_dailymail.json
+MAX_NEW_TOKENS=100
+LOOKAHEADS=1 4 8 16
+BUDGET_FRACTIONS=0.5
+PPL_FLAG=
+PRED_ARGS=--predictor-base-dir trainingData/qwen3_30b/multi_dataset/transformer_emb_markov_pfill_mixed
+OUT_DIR=py/utils/final_results_runs/expanded_prompt_space/cnn_dailymail/C64_20260921_232349

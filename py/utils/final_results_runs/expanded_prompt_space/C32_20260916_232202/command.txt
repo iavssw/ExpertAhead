@@ -1,0 +1,11 @@
+run_expanded_prompt_space.sh C=32
+PROMPTS_TXT=py/utils/final_results_runs/expanded_prompt_space/prompts_5each.txt
+MAX_NEW_TOKENS=100
+LOOKAHEADS=1 2 3 4 5
+BUDGET_FRACTIONS=0.5
+CACHE_LOOKAHEAD_SLACK=3
+PRED=trainingDataExtended/qwen3_30b_sharded/transformer_emb_markov_pfill_full_20260616_174845
+OUT_DIR=py/utils/final_results_runs/expanded_prompt_space/C32_20260916_232202
+01_random
+02_expert_ahead prefetch-only LA×B
+03_expert_ahead_cc both λ=1 J=5 LA×B

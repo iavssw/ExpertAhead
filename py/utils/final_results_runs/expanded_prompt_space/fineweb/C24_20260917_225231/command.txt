@@ -1,0 +1,8 @@
+run_expanded_prompt_space.sh domain=fineweb C=24
+EXAMPLES=py/utils/final_results_runs/expanded_prompt_space/by_domain/fineweb.json
+MAX_NEW_TOKENS=100
+LOOKAHEADS=1 2 3 4 5
+BUDGET_FRACTIONS=0.5
+PPL_FLAG=--enable-generation-perplexity
+PRED=trainingDataExtended/qwen3_30b_sharded/transformer_emb_markov_pfill_full_20260616_174845
+OUT_DIR=py/utils/final_results_runs/expanded_prompt_space/fineweb/C24_20260917_225231

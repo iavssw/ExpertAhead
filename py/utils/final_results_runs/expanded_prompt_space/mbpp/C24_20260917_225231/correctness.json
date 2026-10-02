@@ -1,0 +1,471 @@
+{
+  "domain": "mbpp",
+  "metric": "code_em",
+  "n_examples": 5,
+  "n_generation_blocks": 55,
+  "per_prompt": [
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Neither (RANDOM)",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Neither (RANDOM)",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Neither (RANDOM)",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Neither (RANDOM)",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Neither (RANDOM)",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Prefetch Only B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 0,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 1,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 2,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 3,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    },
+    {
+      "domain": "mbpp",
+      "idx": 4,
+      "label": "Both \u03bb=1.0 B=12",
+      "metric": "code_em",
+      "score": 0.0,
+      "detail": {}
+    }
+  ],
+  "by_label": [
+    {
+      "label": "Neither (RANDOM)",
+      "domain": "mbpp",
+      "metric": "code_em",
+      "correctness_mean": 0.0,
+      "n": 5
+    },
+    {
+      "label": "Prefetch Only B=12",
+      "domain": "mbpp",
+      "metric": "code_em",
+      "correctness_mean": 0.0,
+      "n": 25
+    },
+    {
+      "label": "Both \u03bb=1.0 B=12",
+      "domain": "mbpp",
+      "metric": "code_em",
+      "correctness_mean": 0.0,
+      "n": 25
+    }
+  ]
+}

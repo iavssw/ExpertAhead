@@ -482,7 +482,19 @@ def parse_output(output: str) -> Dict[str, Optional[float]]:
         "prefetch_hits_wait": None,
         "prefetch_ticks_skipped": None,
         "avg_ms_per_expert_load": None,
+        "ref_perplexity": None,
+        "ref_nll_sum": None,
+        "ref_tokens": None,
     }
+
+    m_ref_nll = re.search(r"^Reference NLL Sum:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output, re.MULTILINE)
+    m_ref_tok = re.search(r"^Reference Tokens:\s+(\d+)", output, re.MULTILINE)
+    m_ref_ppl = re.search(r"^Reference Perplexity:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)", output, re.MULTILINE)
+    if m_ref_nll and m_ref_tok:
+        result["ref_nll_sum"] = float(m_ref_nll.group(1))
+        result["ref_tokens"] = int(m_ref_tok.group(1))
+    if m_ref_ppl:
+        result["ref_perplexity"] = float(m_ref_ppl.group(1))
 
     ppl_matches = re.findall(
         r"^Perplexity:\s+([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)",
@@ -884,10 +896,34 @@ def build_model_cmd(
     return cmd
 
 
-def load_prompts(args: argparse.Namespace) -> List[str]:
+def load_prompts(args: argparse.Namespace) -> List[Any]:
     dataset = args.dataset
     n = args.num_prompts
     max_chars: int = getattr(args, "prompt_max_chars", 500)
+
+    examples_json = getattr(args, "examples_json", None)
+    if examples_json:
+        with open(examples_json, "r", encoding="utf-8") as f:
+            examples = json.load(f)
+        prompts: List[Any] = []
+        for ex in examples:
+            if isinstance(ex, dict):
+                p = {
+                    "text": (ex.get("text") or "")[:max_chars],
+                    "domain": ex.get("domain"),
+                    "idx": ex.get("idx"),
+                    "gold": ex.get("gold"),
+                    "metric": ex.get("metric"),
+                }
+                if ex.get("ref_text"):
+                    p["ref_text"] = ex["ref_text"]
+                prompts.append(p)
+            else:
+                prompts.append({"text": str(ex)[:max_chars]})
+        if n > 0:
+            prompts = prompts[:n]
+        print(f"[sweep] Loaded {len(prompts)} example(s) from {examples_json}", flush=True)
+        return prompts
 
     if dataset == "oracle":
         prompts = []
@@ -920,6 +956,13 @@ def load_prompts(args: argparse.Namespace) -> List[str]:
 
     if dataset == "txt":
         path = args.prompts_txt or os.path.join(ROOT_DIR, "unified_llm_w4a16", "prompts.txt")
+        # Structured examples JSON from cache_eval_prompts.py
+        if str(path).endswith(".json"):
+            with open(path, "r", encoding="utf-8") as f:
+                raw_obj = json.load(f)
+            if isinstance(raw_obj, list) and raw_obj and isinstance(raw_obj[0], dict) and "text" in raw_obj[0]:
+                args.examples_json = path
+                return load_prompts(args)
         with open(path, "r", encoding="utf-8") as f:
             raw = f.read()
         prompts = [p.strip() for p in raw.split("\n\n") if p.strip()]
@@ -2234,6 +2277,7 @@ def aggregate_cold_prompt_metrics(outputs: Iterable[str]) -> Dict[str, Optional[
     for key in (
         "gen_perplexity",
         "gen_perplexity_std",
+        "prompt_gen_perplexity",
         "tokens_per_second",
         "tokens_per_second_std",
         "hit_rate_pct",
@@ -2272,12 +2316,122 @@ def aggregate_cold_prompt_metrics(outputs: Iterable[str]) -> Dict[str, Optional[
         "prefetch_hits_ready",
         "prefetch_hits_wait",
         "prefetch_ticks_skipped",
+        "ref_tokens",
     ):
         values = [int(m[key]) for m in good if m.get(key) is not None]
         if values:
             result[key] = sum(values)
 
+    ref_nll = [float(m["ref_nll_sum"]) for m in good if m.get("ref_nll_sum") is not None]
+    if ref_nll and result.get("ref_tokens"):
+        result["ref_nll_sum"] = sum(ref_nll)
+        result["ref_perplexity"] = math.exp(result["ref_nll_sum"] / float(result["ref_tokens"]))
+
     return result
+
+
+def _prompt_text_from_obj(prompt: Any) -> str:
+    if isinstance(prompt, dict):
+        return str(prompt.get("text") or "")
+    return str(prompt or "")
+
+
+def _append_generations_md(
+    out: str,
+    *,
+    out_dir: str,
+    label: str,
+    cache_size: int,
+    forced_top_n: int,
+    lambda_val: float,
+    temperature: float,
+    lookahead: Optional[int],
+    batch_idx: int = 0,
+    prompt: Any = None,
+    predictor_tag: str = "",
+    prefetch_budget: Optional[int] = None,
+    domain: Optional[str] = None,
+) -> None:
+    """Append prompt + response blocks for manual verification.
+
+    Writes:
+      - generations.md  (human-readable)
+      - transcripts.jsonl (one JSON object per prompt/response pair)
+    """
+    matches = re.findall(r"Generated text only:\n={60}\n(.*?)\n={60}", out, re.DOTALL)
+    if not matches:
+        return
+    os.makedirs(out_dir, exist_ok=True)
+    gen_file = os.path.join(out_dir, "generations.md")
+    jsonl_file = os.path.join(out_dir, "transcripts.jsonl")
+    prompt_text = _prompt_text_from_obj(prompt)
+    gold = None
+    metric = None
+    prompt_idx = None
+    if isinstance(prompt, dict):
+        gold = prompt.get("gold")
+        metric = prompt.get("metric")
+        prompt_idx = prompt.get("idx")
+        domain = domain or prompt.get("domain")
+    # Per-prompt metrics only when this output covers a single prompt (cold path).
+    per_prompt_metrics: Dict[str, Optional[float]] = {}
+    if len(matches) == 1:
+        parsed = parse_output(out)
+        for key in ("tokens_per_second", "ref_perplexity", "ref_tokens", "prompt_gen_perplexity"):
+            if parsed.get(key) is not None:
+                per_prompt_metrics[key] = parsed[key]
+
+    with open(gen_file, "a", encoding="utf-8") as f, open(jsonl_file, "a", encoding="utf-8") as jf:
+        for idx, gen_text in enumerate(matches):
+            gen_text = gen_text.strip()
+            ordinal = batch_idx + idx + 1
+            f.write(f"### Prompt {ordinal}\n")
+            f.write(f"**Label:** {label}\n")
+            if domain:
+                f.write(f"**Domain:** {domain}\n")
+            if predictor_tag:
+                f.write(f"**Predictor:** {predictor_tag}\n")
+            f.write(
+                f"**Config:** Cache={cache_size} | Top-J={forced_top_n} | "
+                f"Lam={lambda_val} | T={temperature:g} | Lookahead={lookahead} | "
+                f"B={prefetch_budget}\n\n"
+            )
+            f.write("**Prompt:**\n")
+            f.write(f"```text\n{prompt_text}\n```\n\n")
+            f.write("**Response:**\n")
+            f.write(f"```text\n{gen_text}\n```\n\n")
+            if gold is not None:
+                gold_s = gold if isinstance(gold, str) else json.dumps(gold, ensure_ascii=False)
+                f.write("**Gold:**\n")
+                f.write(f"```text\n{gold_s}\n```\n\n")
+            if per_prompt_metrics:
+                f.write(
+                    "**Metrics:** "
+                    + " | ".join(f"{k}={v:.4f}" if isinstance(v, float) else f"{k}={v}"
+                                 for k, v in per_prompt_metrics.items())
+                    + "\n\n"
+                )
+            f.write("---\n\n")
+
+            record = {
+                "prompt_ordinal": ordinal,
+                "prompt_idx": prompt_idx if prompt_idx is not None else batch_idx + idx,
+                "domain": domain,
+                "label": label,
+                "predictor_tag": predictor_tag or None,
+                "cache_size": cache_size,
+                "forced_top_n": forced_top_n,
+                "lambda_val": lambda_val,
+                "temperature": temperature,
+                "lookahead": lookahead,
+                "prefetch_budget": prefetch_budget,
+                "metric": metric,
+                "prompt": prompt_text,
+                "response": gen_text,
+                "gold": gold,
+                **per_prompt_metrics,
+            }
+            jf.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
 def execute_comprehensive_run(
@@ -2370,17 +2524,35 @@ def execute_comprehensive_run(
             return None
             
         if mode_generate and out:
-            import re
             matches = re.findall(r"Generated text only:\n={60}\n(.*?)\n={60}", out, re.DOTALL)
+            # One subprocess may cover many prompts; pair each gen with its prompt.
             if matches:
-                gen_file = os.path.join(getattr(args, "out_dir", "."), "generations.md")
-                with open(gen_file, "a") as f:
-                    for idx, gen_text in enumerate(matches):
-                        gen_text = gen_text.strip()
-                        f.write(f"### Prompt {(batch_idx if batch_idx is not None else 0) + idx + 1}\n")
-                        f.write(f"**Label:** {config.get('label', '')}\n")
-                        f.write(f"**Config:** Cache={cache_size} | Top-J={forced_top_n} | Lam={lambda_val} | T={run_temperature:g} | Lookahead={lookahead}\n\n")
-                        f.write(f"```text\n{gen_text}\n```\n\n---\n\n")
+                for i, gen_text in enumerate(matches):
+                    prompt_obj = prompts[i] if i < len(prompts) else (
+                        prompts[batch_idx] if batch_idx is not None and batch_idx < len(prompts) else None
+                    )
+                    # Reconstruct a tiny fake "out" with one block so helper stays simple
+                    fake_out = (
+                        "Generated text only:\n"
+                        + ("=" * 60) + "\n"
+                        + gen_text
+                        + "\n" + ("=" * 60)
+                    )
+                    _append_generations_md(
+                        fake_out,
+                        out_dir=getattr(args, "out_dir", "."),
+                        label=config.get("label", ""),
+                        cache_size=cache_size,
+                        forced_top_n=forced_top_n,
+                        lambda_val=lambda_val,
+                        temperature=run_temperature,
+                        lookahead=lookahead,
+                        batch_idx=(batch_idx if batch_idx is not None else 0) + i,
+                        prompt=prompt_obj,
+                        predictor_tag=str(predictor_tag or ""),
+                        prefetch_budget=budget,
+                        domain=getattr(args, "domain", None),
+                    )
                     
         return parse_output(out)
 
@@ -2487,6 +2659,7 @@ def execute_comprehensive_run(
 
         if config.get("mode_generate", False) and not config.get("mode_perplexity", False):
             outputs = []
+            want_gen_ppl = bool(config.get("mode_generation_perplexity", False))
             for batch_idx, prompt in enumerate(prompts):
                 if args.drop_page_cache_between_prompts:
                     drop_page_cache()
@@ -2512,7 +2685,10 @@ def execute_comprehensive_run(
                         max_new_tokens=args.max_new_tokens,
                         mode_generate=True,
                         mode_wikitext_perplexity=False,
+                        generation_perplexity=want_gen_ppl,
                         predictor_device=args.predictor_device,
+                        expert_weights_dir=getattr(args, "expert_weights_dir", None),
+                        predictor_stride=predictor_stride,
                         disable_measurement=getattr(args, "disable_measurement", False),
                         cache_policy=config.get("cache_policy"),
                         oracle_trace_path=resolve_oracle_trace_path(args, batch_idx if batch_idx is not None else 0) if config.get("backend") == "predict" and config.get("is_oracle", False) else None,
@@ -2529,6 +2705,21 @@ def execute_comprehensive_run(
                     out = run_subprocess(cmd, timeout=args.subprocess_timeout, log_file=args.log_file)
                     if out:
                         outputs.append(out)
+                        _append_generations_md(
+                            out,
+                            out_dir=getattr(args, "out_dir", "."),
+                            label=config.get("label", ""),
+                            cache_size=cache_size,
+                            forced_top_n=forced_top_n,
+                            lambda_val=lambda_val,
+                            temperature=run_temperature,
+                            lookahead=lookahead,
+                            batch_idx=batch_idx,
+                            prompt=prompt,
+                            predictor_tag=str(predictor_tag or ""),
+                            prefetch_budget=budget,
+                            domain=getattr(args, "domain", None),
+                        )
                 finally:
                     try:
                         os.remove(one_prompt_path)
@@ -4038,13 +4229,17 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
     # predictor produced each row.  The comparison plot overlays them.
     predictor_dirs = getattr(args, "predictor_base_dirs", None) or []
     multi_predictor = len(predictor_dirs) > 1
+    predictor_tags = getattr(args, "predictor_tags", None) or [
+        os.path.basename(os.path.normpath(d)) for d in predictor_dirs
+    ]
+    if len(predictor_tags) != len(predictor_dirs):
+        raise SystemExit("--predictor-tags must have one tag per --predictor-base-dirs entry")
 
     def _make_custom_configs(fn, question_name):
         if not multi_predictor:
             return fn(args, min_cache_map=min_cache_map)
         cfgs = []
-        for pd_dir in predictor_dirs:
-            tag = os.path.basename(os.path.normpath(pd_dir))
+        for pd_dir, tag in zip(predictor_dirs, predictor_tags):
             cfgs.extend(fn(args, predictor_base_dir=pd_dir, predictor_tag=tag, min_cache_map=min_cache_map))
         # Shared LRU only — never append the full untagged grid (predict rows would
         # fall back to --predictor-base-dir default, not the A/B dirs above).
@@ -4102,6 +4297,10 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             )
     configs = apply_row_selection_flags(configs, args)
     apply_non_baseline_cache_policy(configs, getattr(args, "non_baseline_cache_policy", None))
+    if getattr(args, "enable_generation_perplexity", False):
+        for c in configs:
+            if c.get("mode_generate", False):
+                c["mode_generation_perplexity"] = True
 
     append_existing = getattr(args, "append", False)
     merge_existing = (
@@ -4151,6 +4350,18 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
     print(f"[sweep] Timeout    : {args.subprocess_timeout}s per run", flush=True)
     print("-" * 80, flush=True)
 
+    if getattr(args, "list_configs", False):
+        for c in expanded_runs:
+            print(
+                f"[config] {c['label']} | backend={c['backend']} C={c['cache_size']} "
+                f"λ={c['lambda_val']} J={c['forced_top_n']} LA={c.get('lookahead')} "
+                f"B={c.get('prefetch_budget')} tag={c.get('predictor_tag') or '-'} "
+                f"policy={c.get('cache_policy') or '-'} type={c.get('predictor_type') or '-'} "
+                f"oracle={bool(c.get('is_oracle'))}",
+                flush=True,
+            )
+        return
+
     prompts = load_prompts(args)
     print(f"[sweep] Loaded {len(prompts)} prompt(s), dataset={args.dataset}", flush=True)
     fd, prompts_file = tempfile.mkstemp(suffix=".json")
@@ -4173,6 +4384,11 @@ def run_comprehensive_mode(args: argparse.Namespace) -> int:
             row["prompt_hash"] = prompt_hash
             row["config_id"] = config.get("_config_id", -1)
             row["run_iter"] = config.get("_run_iter", 0)
+            domain = getattr(args, "domain", None)
+            if domain:
+                row["domain"] = domain
+            elif prompts and isinstance(prompts[0], dict) and prompts[0].get("domain"):
+                row["domain"] = prompts[0]["domain"]
             results.append(row)
             pd.DataFrame(results).to_csv(csv_file, index=False)
     finally:
@@ -4303,6 +4519,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
              "basename is used as the predictor tag in the CSV & plots. When provided, "
              "the sweep runs each config once per predictor and generates comparison plots.",
     )
+    p.add_argument(
+        "--predictor-tags",
+        type=str,
+        nargs="+",
+        default=None,
+        help="Tags for --predictor-base-dirs (same order). Default: each directory's basename.",
+    )
     p.add_argument("--predict-layers", type=int, nargs="*", default=None)
     p.add_argument("--predictor-device", type=str, default="cpu")
     p.add_argument("--routing-bias-top-n", type=int, default=6, dest="routing_bias_top_n",
@@ -4356,6 +4579,25 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Override eval-partition skip (never reaches into the train partition).",
     )
     p.add_argument("--prompts-txt", type=str, default=None)
+    p.add_argument(
+        "--examples-json",
+        type=str,
+        default=None,
+        help="Structured examples JSON from cache_eval_prompts.py "
+             "({domain,idx,text,gold,metric}). Preferred over blank-line txt.",
+    )
+    p.add_argument(
+        "--domain",
+        type=str,
+        default=None,
+        help="Stamp this domain name onto every CSV row (per-domain sweeps).",
+    )
+    p.add_argument(
+        "--enable-generation-perplexity",
+        action="store_true",
+        help="Also score generation perplexity on the sweep prompts "
+             "(fills prompt_gen_perplexity; used for wikitext/fineweb/orca).",
+    )
     p.add_argument(
         "--num-prompts",
         type=int,
@@ -4441,6 +4683,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--drop-page-cache-between-runs", action="store_true")
     p.add_argument("--drop-page-cache-before-first-run", action="store_true")
     p.add_argument("--cold-per-prompt", action="store_true")
+    p.add_argument("--list-configs", action="store_true",
+                   help="Print the selected configs and exit without running anything.")
     p.add_argument("--drop-page-cache-between-prompts", action="store_true")
     p.add_argument(
         "--expert-weights-dir", type=str, default=None,
